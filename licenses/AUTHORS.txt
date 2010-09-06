@@ -1,0 +1,26 @@
+###################
+# Core Developers #
+###################
+
+Clemens Wrzodek (1)
+  clemens.wrzodek@uni-tuebingen.de
+Andreas Dräger (1)
+  andreas.draeger@uni-tuebingen.de
+  
+###################
+#  Contributors   #
+###################
+
+Andreas Zell (1)
+  andreas.zell@uni-tuebingen.de
+
+###################
+#     Alumni      #
+###################
+
+
+###################
+#  Institutions   #
+###################
+
+(1) University of Tübingen, Germany
