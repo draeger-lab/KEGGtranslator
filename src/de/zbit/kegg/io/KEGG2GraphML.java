@@ -248,7 +248,8 @@ public class KEGG2GraphML implements KeggConverter {
     //KeggParser.silent=false;
     System.out.println("DEMO MODE");
     System.out.println("Reading kegg pathway...");
-    Pathway p = KeggParser.parse("files/KGMLsamplefiles/hsa04310.xml").get(0); //04115
+//    Pathway p = KeggParser.parse("files/KGMLsamplefiles/hsa04310.xml").get(0); //04115
+    Pathway p = KeggParser.parse("files/KGMLsamplefiles/hsa04010.xml").get(0); //04115
     //Pathway p = KeggParser.parse("ko02010.xml").get(0);
     //p = KeggParser.parse("http://kaas.genome.jp/kegg/KGML/KGML_v0.6.1/ko/ko00010.xml").get(0);
     
