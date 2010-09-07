@@ -1,0 +1,2126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://www.yworks.com/xml/graphml" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd">
+  <!--Created by yFiles for Java 2.7-->
+  <key for="graphml" id="d0" yfiles.type="resources"/>
+  <key attr.name="url" attr.type="string" for="node" id="d1"/>
+  <key attr.name="ensemblIds" attr.type="string" for="node" id="d2"/>
+  <key attr.name="uniprotIds" attr.type="string" for="node" id="d3"/>
+  <key attr.name="keggIds" attr.type="string" for="node" id="d4"/>
+  <key attr.name="description" attr.type="string" for="node" id="d5"/>
+  <key attr.name="type" attr.type="string" for="node" id="d6"/>
+  <key attr.name="entrezIds" attr.type="string" for="node" id="d7"/>
+  <key attr.name="nodeLabel" attr.type="string" for="node" id="d8"/>
+  <key for="node" id="d9" yfiles.type="nodegraphics"/>
+  <key attr.name="interactionDescription" attr.type="string" for="edge" id="d10"/>
+  <key attr.name="description" attr.type="string" for="edge" id="d11"/>
+  <key for="edge" id="d12" yfiles.type="edgegraphics"/>
+  <graph edgedefault="directed" id="G">
+    <node id="n0">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:226+hsa:229+hsa:230]]></data>
+      <data key="d2"><![CDATA[ENSG00000149925,ENSG00000136872,ENSG00000109107]]></data>
+      <data key="d3"><![CDATA[P04075,P05062,P09972]]></data>
+      <data key="d4"><![CDATA[hsa:226 hsa:229 hsa:230]]></data>
+      <data key="d5"><![CDATA[aldolase A fructose-bisphosphate (EC:4.1.2.13),aldolase B fructose-bisphosphate (EC:4.1.2.13),aldolase C fructose-bisphosphate (EC:4.1.2.13)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[226,229,230]]></data>
+      <data key="d8"><![CDATA[ALDOA,ALDOB,ALDOC]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="448.0" y="408.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="52.0" x="-3.0" y="-0.8505859375">ALDOA...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n1">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:217+hsa:219+hsa:223+hsa:224+hsa:501]]></data>
+      <data key="d2"><![CDATA[ENSG00000111275,ENSG00000137124,ENSG00000143149,ENSG00000072210,ENSG00000164904]]></data>
+      <data key="d3"><![CDATA[P05091,P30837,B9EKV4 P49189,P51648 Q6I9T3,P49419]]></data>
+      <data key="d4"><![CDATA[hsa:217 hsa:219 hsa:223 hsa:224 hsa:501]]></data>
+      <data key="d5"><![CDATA[aldehyde dehydrogenase 2 family (mitochondrial) (EC:1.2.1.3),aldehyde dehydrogenase 1 family member B1 (EC:1.2.1.3),aldehyde dehydrogenase 9 family member A1 (EC:1.2.1.3 1.2.1.19 1.2.1.47),aldehyde dehydrogenase 3 family member A2 (EC:1.2.1.3),aldehyde dehydrogenase 7 family member A1 (EC:1.2.1.31)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[217,219,223,224,501]]></data>
+      <data key="d8"><![CDATA[ALDH2,ALDH1B1,ALDH9A1,ALDH3A2,ALDH7A1]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="254.0" y="947.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="52.0" x="-3.0" y="-0.8505859375">ALDH2...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n2">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:55902+hsa:84532]]></data>
+      <data key="d2"><![CDATA[ENSG00000131069,ENSG00000154930]]></data>
+      <data key="d3"><![CDATA[Q5QPH3 Q8N238 Q96FY7,Q9NUB1]]></data>
+      <data key="d4"><![CDATA[hsa:55902 hsa:84532]]></data>
+      <data key="d5"><![CDATA[acyl-CoA synthetase short-chain family member 2 (EC:6.2.1.1),acyl-CoA synthetase short-chain family member 1 (EC:6.2.1.1)]]></data>
+      <data key="d6"><![CDATA[gene,gene]]></data>
+      <data key="d7"><![CDATA[55902,84532]]></data>
+      <data key="d8"><![CDATA[ACSS2,ACSS1]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="111.0" y="915.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="52.0" x="-3.0" y="-0.8505859375">ACSS2...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n3">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:218+hsa:220+hsa:221+hsa:222]]></data>
+      <data key="d2"><![CDATA[ENSG00000108602,ENSG00000184254,ENSG00000006534,ENSG00000132746]]></data>
+      <data key="d3"><![CDATA[P30838 Q6PKA6,P47895,A3FMP9 P43353,P48448]]></data>
+      <data key="d4"><![CDATA[hsa:218 hsa:220 hsa:221 hsa:222]]></data>
+      <data key="d5"><![CDATA[aldehyde dehydrogenase 3 family memberA1 (EC:1.2.1.5),aldehyde dehydrogenase 1 family member A3 (EC:1.2.1.5),aldehyde dehydrogenase 3 family member B1 (EC:1.2.1.5),aldehyde dehydrogenase 3 family member B2 (EC:1.2.1.5)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[218,220,221,222]]></data>
+      <data key="d8"><![CDATA[ALDH3A1,ALDH1A3,ALDH3B1,ALDH3B2]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="254.0" y="968.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="66.0" x="-10.0" y="-0.8505859375">ALDH3A1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n4">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00033]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00033]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Acetate;
+Acetic acid;
+Ethanoic acid;
+Glacial acetic acid]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="130.0" y="962.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="96.0" x="-44.0" y="-4.12548828125">Glacial acetic acid</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n5">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa00030]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[path:hsa00030]]></data>
+      <data key="d5"><![CDATA[The pentose phosphate pathway is a process of glucose turnover that produces NADPH as reducing equivalents and pentoses as essential parts of nucleotides. There are two different phases in the pathway. One is irreversible oxidative phase in which glucose-6P is converted to ribulose-5P by oxidative decarboxylation and NADPH is generated [MD:M00006]. The other is reversible non-oxidative phase in which phosphorylated sugars are interconverted to generate xylulose-5P ribulose-5P and ribose-5P [MD:M00007]. Phosphoribosyl pyrophosphate (PRPP) formed from ribose-5P [MD:M00005] is an activated compound used in the biosynthesis of histidine and purine/pyrimidine nucleotides. This pathway map also shows the Entner-Doudoroff pathway where 6-P-gluconate is dehydrated and then cleaved into pyruvate and glyceraldehyde-3P [MD:M00008].]]></data>
+      <data key="d6"><![CDATA[map]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Pentose phosphate pathway - Homo sapiens (human)]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="237.0" width="62.0" x="613.0" y="233.5"/>
+          <y:Fill color="#C0C0C0" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="302.0" x="-120.0" y="109.1494140625">Pentose phosphate pathway - Homo sapiens (human)</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n6">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa00500]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[path:hsa00500]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[map]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Starch and sucrose metabolism - Homo sapiens (human)]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="34.0" width="110.0" x="418.0" y="72.0"/>
+          <y:Fill color="#C0C0C0" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="322.0" x="-106.0" y="7.6494140625">Starch and sucrose metabolism - Homo sapiens (human)</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n7">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:10327]]></data>
+      <data key="d2"><![CDATA[ENSG00000117448]]></data>
+      <data key="d3"><![CDATA[P14550]]></data>
+      <data key="d4"><![CDATA[hsa:10327]]></data>
+      <data key="d5"><![CDATA[aldo-keto reductase family 1 member A1 (aldehyde reductase) (EC:1.1.1.2)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[10327]]></data>
+      <data key="d8"><![CDATA[AKR1A1]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="452.0" y="947.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="49.0" x="-1.5" y="-0.8505859375">AKR1A1</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n8">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:124+hsa:125+hsa:126+hsa:127+hsa:128+hsa:130+hsa:131]]></data>
+      <data key="d2"><![CDATA[ENSG00000187758,ENSG00000196616,ENSG00000198099,ENSG00000197894,ENSG00000172955,ENSG00000196344]]></data>
+      <data key="d3"><![CDATA[P07327,P00325,P00326,P08319,P11766 Q6IRT1,P28332 Q8IUN7,A2RRB6 P40394]]></data>
+      <data key="d4"><![CDATA[hsa:124 hsa:125 hsa:126 hsa:127 hsa:128 hsa:130 hsa:131]]></data>
+      <data key="d5"><![CDATA[alcohol dehydrogenase 1A (class I) alpha polypeptide (EC:1.1.1.1),alcohol dehydrogenase 1B (class I) beta polypeptide (EC:1.1.1.1),alcohol dehydrogenase 1C (class I) gamma polypeptide (EC:1.1.1.1),alcohol dehydrogenase 4 (class II) pi polypeptide (EC:1.1.1.1),alcohol dehydrogenase 5 (class III) chi polypeptide (EC:1.1.1.1 1.1.1.284),alcohol dehydrogenase 6 (class V) (EC:1.1.1.1),alcohol dehydrogenase 7 (class IV) mu or sigma polypeptide (EC:1.1.1.1)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene,gene,gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[124,125,126,127,128,130,131]]></data>
+      <data key="d8"><![CDATA[ADH1A,ADH1B,ADH1C,ADH4,ADH5,ADH6,ADH7]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="404.0" y="947.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="52.0" x="-3.0" y="-0.8505859375">ADH1A...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n9">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:5160+hsa:5161+hsa:5162]]></data>
+      <data key="d2"><![CDATA[ENSG00000131828,ENSG00000163114,ENSG00000168291]]></data>
+      <data key="d3"><![CDATA[P08559,P29803,B2R7L0 P11177]]></data>
+      <data key="d4"><![CDATA[hsa:5160 hsa:5161 hsa:5162]]></data>
+      <data key="d5"><![CDATA[pyruvate dehydrogenase (lipoamide) alpha 1 (EC:1.2.4.1),pyruvate dehydrogenase (lipoamide) alpha 2 (EC:1.2.4.1),pyruvate dehydrogenase (lipoamide) beta (EC:1.2.4.1)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[5160,5161,5162]]></data>
+      <data key="d8"><![CDATA[PDHA1,PDHA2,PDHB]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="396.0" y="857.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="53.0" x="-3.5" y="-0.8505859375">PDHA1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n10">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:5160+hsa:5161+hsa:5162]]></data>
+      <data key="d2"><![CDATA[ENSG00000131828,ENSG00000163114,ENSG00000168291]]></data>
+      <data key="d3"><![CDATA[P08559,P29803,B2R7L0 P11177]]></data>
+      <data key="d4"><![CDATA[hsa:5160 hsa:5161 hsa:5162]]></data>
+      <data key="d5"><![CDATA[pyruvate dehydrogenase (lipoamide) alpha 1 (EC:1.2.4.1),pyruvate dehydrogenase (lipoamide) alpha 2 (EC:1.2.4.1),pyruvate dehydrogenase (lipoamide) beta (EC:1.2.4.1)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[5160,5161,5162]]></data>
+      <data key="d8"><![CDATA[PDHA1,PDHA2,PDHB]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="284.0" y="869.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="53.0" x="-3.5" y="-0.8505859375">PDHA1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n11">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:1737]]></data>
+      <data key="d2"><![CDATA[ENSG00000150768]]></data>
+      <data key="d3"><![CDATA[P10515 Q86YI5]]></data>
+      <data key="d4"><![CDATA[hsa:1737]]></data>
+      <data key="d5"><![CDATA[dihydrolipoamide S-acetyltransferase (EC:2.3.1.12)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[1737]]></data>
+      <data key="d8"><![CDATA[DLAT]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="175.0" y="869.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="34.0" x="6.0" y="-0.8505859375">DLAT</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n12">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:160287+hsa:3939+hsa:3945+hsa:3948+hsa:92483]]></data>
+      <data key="d2"><![CDATA[ENSG00000166800,ENSG00000134333,ENSG00000111716,ENSG00000166796,ENSG00000171989]]></data>
+      <data key="d3"><![CDATA[Q6ZMR3,B4DKQ2,P07195 Q5U077,P07864,Q9BYZ2]]></data>
+      <data key="d4"><![CDATA[hsa:160287 hsa:3939 hsa:3945 hsa:3948 hsa:92483]]></data>
+      <data key="d5"><![CDATA[lactate dehydrogenase A-like 6A (EC:1.1.1.27),lactate dehydrogenase A (EC:1.1.1.27),lactate dehydrogenase B (EC:1.1.1.27),lactate dehydrogenase C (EC:1.1.1.27),lactate dehydrogenase A-like 6B (EC:1.1.1.27)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[160287,3939,3945,3948,92483]]></data>
+      <data key="d8"><![CDATA[LDHAL6A,LDHA,LDHB,LDHC,LDHAL6B]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="523.0" y="868.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="66.0" x="-10.0" y="-0.8505859375">LDHAL6A...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n13">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa00620]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[path:hsa00620]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[map]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Pyruvate metabolism - Homo sapiens (human)]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="34.0" width="78.0" x="333.0" y="759.0"/>
+          <y:Fill color="#C0C0C0" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="261.0" x="-91.5" y="7.6494140625">Pyruvate metabolism - Homo sapiens (human)</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n14">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:5313+hsa:5315]]></data>
+      <data key="d2"><![CDATA[ENSG00000143627,ENSG00000067225]]></data>
+      <data key="d3"><![CDATA[P30613,P14618]]></data>
+      <data key="d4"><![CDATA[hsa:5313 hsa:5315]]></data>
+      <data key="d5"><![CDATA[pyruvate kinase liver and RBC (EC:2.7.1.40),pyruvate kinase muscle (EC:2.7.1.40)]]></data>
+      <data key="d6"><![CDATA[gene,gene]]></data>
+      <data key="d7"><![CDATA[5313,5315]]></data>
+      <data key="d8"><![CDATA[PKLR,PKM2]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="448.0" y="774.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="45.0" x="0.5" y="-0.8505859375">PKLR...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n15">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa00020]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[path:hsa00020]]></data>
+      <data key="d5"><![CDATA[The citrate cycle (TCA cycle Krebs cycle) is an important aerobic pathway for the final steps of the oxidation of carbohydrates and fatty acids. The cycle starts with acetyl-CoA the activated form of acetate derived from glycolysis and pyruvate oxidation for carbohydrates and from beta oxidation of fatty acids. The two-carbon acetyl group in acetyl-CoA is transferred to the four-carbon compound of oxaloacetate to form the six-carbon compound of citrate. In a series of reactions two carbons in citrate are oxidized to CO2 and the reaction pathway supplies NADH for use in the oxidative phosphorylation and other metabolic processes. The pathway also supplies important precursor metabolites including 2-oxoglutarate. At the end of the cycle the remaining four-carbon part is transformed back to oxaloacetate. According to the genome sequence data many organisms seem to lack genes for the full cycle [MD:M00009] but contain genes for specific segments [MD:M00010 M00011].]]></data>
+      <data key="d6"><![CDATA[map]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Citrate cycle (TCA cycle) - Homo sapiens (human)]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="154.0" width="47.0" x="41.5" y="736.0"/>
+          <y:Fill color="#C0C0C0" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="276.0" x="-114.5" y="67.6494140625">Citrate cycle (TCA cycle) - Homo sapiens (human)</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n16">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2023+hsa:2026+hsa:2027]]></data>
+      <data key="d2"><![CDATA[ENSG00000074800,ENSG00000111674,ENSG00000108515]]></data>
+      <data key="d3"><![CDATA[P06733,P09104 Q6FHV6,P13929]]></data>
+      <data key="d4"><![CDATA[hsa:2023 hsa:2026 hsa:2027]]></data>
+      <data key="d5"><![CDATA[enolase 1 (alpha) (EC:4.2.1.11),enolase 2 (gamma neuronal) (EC:4.2.1.11),enolase 3 (beta muscle) (EC:4.2.1.11)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[2023,2026,2027]]></data>
+      <data key="d8"><![CDATA[ENO1,ENO2,ENO3]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="448.0" y="705.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="46.0" x="0.0" y="-0.8505859375">ENO1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n17">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:441531+hsa:5223+hsa:5224+hsa:669]]></data>
+      <data key="d2"><![CDATA[ENSG00000226784,ENSG00000171314,ENSG00000164708,ENSG00000172331]]></data>
+      <data key="d3"><![CDATA[Q8N0Y7,P18669 Q6FHU2,P15259,A4D1N9 P07738]]></data>
+      <data key="d4"><![CDATA[hsa:441531 hsa:5223 hsa:5224 hsa:669]]></data>
+      <data key="d5"><![CDATA[phosphoglycerate mutase family member 4 (EC:3.1.3.13 5.4.2.1 5.4.2.4),phosphoglycerate mutase 1 (brain) (EC:3.1.3.13 5.4.2.1 5.4.2.4),phosphoglycerate mutase 2 (muscle) (EC:3.1.3.13 5.4.2.1 5.4.2.4),23-bisphosphoglycerate mutase (EC:3.1.3.13 5.4.2.1 5.4.2.4)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[441531,5223,5224,669]]></data>
+      <data key="d8"><![CDATA[PGAM4,PGAM1,PGAM2,BPGM]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="449.0" y="633.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="53.0" x="-3.5" y="-0.8505859375">PGAM4...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n18">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2597]]></data>
+      <data key="d2"><![CDATA[ENSG00000111640]]></data>
+      <data key="d3"><![CDATA[P04406]]></data>
+      <data key="d4"><![CDATA[hsa:2597]]></data>
+      <data key="d5"><![CDATA[glyceraldehyde-3-phosphate dehydrogenase (EC:1.2.1.12)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[2597]]></data>
+      <data key="d8"><![CDATA[GAPDH]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="423.0" y="488.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="46.0" x="0.0" y="-0.8505859375">GAPDH</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n19">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?map00710]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[path:map00710]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[map]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Carbon fixation in photosynthetic organisms]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="34.0" width="153.0" x="217.5" y="595.0"/>
+          <y:Fill color="#C0C0C0" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="244.0" x="-45.5" y="7.6494140625">Carbon fixation in photosynthetic organisms</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n20">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:7167]]></data>
+      <data key="d2"><![CDATA[ENSG00000111669]]></data>
+      <data key="d3"><![CDATA[P60174 Q53HE2]]></data>
+      <data key="d4"><![CDATA[hsa:7167]]></data>
+      <data key="d5"><![CDATA[triosephosphate isomerase 1 (EC:5.3.1.1)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[7167]]></data>
+      <data key="d8"><![CDATA[TPI1]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="368.0" y="454.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="29.0" x="8.5" y="-0.8505859375">TPI1</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n21">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:5211+hsa:5213+hsa:5214]]></data>
+      <data key="d2"><![CDATA[ENSG00000141959,ENSG00000152556,ENSG00000067057]]></data>
+      <data key="d3"><![CDATA[P17858 Q7L2M7,P08237,B3KS15 Q01813 Q5VSR8]]></data>
+      <data key="d4"><![CDATA[hsa:5211 hsa:5213 hsa:5214]]></data>
+      <data key="d5"><![CDATA[phosphofructokinase liver (EC:2.7.1.11),phosphofructokinase muscle (EC:2.7.1.11),phosphofructokinase platelet (EC:2.7.1.11)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[5211,5213,5214]]></data>
+      <data key="d8"><![CDATA[PFKL,PFKM,PFKP]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="448.0" y="342.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="43.0" x="1.5" y="-0.8505859375">PFKL...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n22">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2203+hsa:8789]]></data>
+      <data key="d2"><![CDATA[ENSG00000165140,ENSG00000130957]]></data>
+      <data key="d3"><![CDATA[P09467,O00757]]></data>
+      <data key="d4"><![CDATA[hsa:2203 hsa:8789]]></data>
+      <data key="d5"><![CDATA[fructose-16-bisphosphatase 1 (EC:3.1.3.11),fructose-16-bisphosphatase 2 (EC:3.1.3.11)]]></data>
+      <data key="d6"><![CDATA[gene,gene]]></data>
+      <data key="d7"><![CDATA[2203,8789]]></data>
+      <data key="d8"><![CDATA[FBP1,FBP2]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="395.0" y="342.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="43.0" x="1.5" y="-0.8505859375">FBP1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n23">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2821]]></data>
+      <data key="d2"><![CDATA[ENSG00000105220]]></data>
+      <data key="d3"><![CDATA[P06744]]></data>
+      <data key="d4"><![CDATA[hsa:2821]]></data>
+      <data key="d5"><![CDATA[glucose phosphate isomerase (EC:5.3.1.9)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[2821]]></data>
+      <data key="d8"><![CDATA[GPI]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="448.0" y="272.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="24.0" x="11.0" y="-0.8505859375">GPI</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n24">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:5236+hsa:55276]]></data>
+      <data key="d2"><![CDATA[ENSG00000079739,ENSG00000169299]]></data>
+      <data key="d3"><![CDATA[P36871,Q96G03]]></data>
+      <data key="d4"><![CDATA[hsa:5236 hsa:55276]]></data>
+      <data key="d5"><![CDATA[phosphoglucomutase 1 (EC:5.4.2.2),phosphoglucomutase 2 (EC:5.4.2.2)]]></data>
+      <data key="d6"><![CDATA[gene,gene]]></data>
+      <data key="d7"><![CDATA[5236,55276]]></data>
+      <data key="d8"><![CDATA[PGM1,PGM2]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="448.0" y="177.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="46.0" x="0.0" y="-0.8505859375">PGM1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n25">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2821]]></data>
+      <data key="d2"><![CDATA[ENSG00000105220]]></data>
+      <data key="d3"><![CDATA[P06744]]></data>
+      <data key="d4"><![CDATA[hsa:2821]]></data>
+      <data key="d5"><![CDATA[glucose phosphate isomerase (EC:5.3.1.9)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[2821]]></data>
+      <data key="d8"><![CDATA[GPI]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="368.0" y="306.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="24.0" x="11.0" y="-0.8505859375">GPI</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n26">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:3098+hsa:3099+hsa:3101]]></data>
+      <data key="d2"><![CDATA[ENSG00000156515,ENSG00000159399,ENSG00000160883]]></data>
+      <data key="d3"><![CDATA[A8K7J7 B3KXY9 P19367 Q59FD4,P52789,P52790]]></data>
+      <data key="d4"><![CDATA[hsa:3098 hsa:3099 hsa:3101]]></data>
+      <data key="d5"><![CDATA[hexokinase 1 (EC:2.7.1.1),hexokinase 2 (EC:2.7.1.1),hexokinase 3 (white cell) (EC:2.7.1.1)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[3098,3099,3101]]></data>
+      <data key="d8"><![CDATA[HK1,HK2,HK3]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="213.0" y="287.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="37.0" x="4.5" y="-0.8505859375">HK1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n27">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2645]]></data>
+      <data key="d2"><![CDATA[ENSG00000106633]]></data>
+      <data key="d3"><![CDATA[P35557 Q53Y25]]></data>
+      <data key="d4"><![CDATA[hsa:2645]]></data>
+      <data key="d5"><![CDATA[glucokinase (hexokinase 4) (EC:2.7.1.2)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[2645]]></data>
+      <data key="d8"><![CDATA[GCK]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="213.0" y="306.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="30.0" x="8.0" y="-0.8505859375">GCK</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n28">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2821]]></data>
+      <data key="d2"><![CDATA[ENSG00000105220]]></data>
+      <data key="d3"><![CDATA[P06744]]></data>
+      <data key="d4"><![CDATA[hsa:2821]]></data>
+      <data key="d5"><![CDATA[glucose phosphate isomerase (EC:5.3.1.9)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[2821]]></data>
+      <data key="d8"><![CDATA[GPI]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="322.0" y="273.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="24.0" x="11.0" y="-0.8505859375">GPI</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n29">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:130589]]></data>
+      <data key="d2"><![CDATA[ENSG00000143891]]></data>
+      <data key="d3"><![CDATA[Q53RY1 Q96C23]]></data>
+      <data key="d4"><![CDATA[hsa:130589]]></data>
+      <data key="d5"><![CDATA[galactose mutarotase (aldose 1-epimerase) (EC:5.1.3.3)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[130589]]></data>
+      <data key="d8"><![CDATA[GALM]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="146.0" y="268.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="36.0" x="5.0" y="-0.8505859375">GALM</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n30">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2645]]></data>
+      <data key="d2"><![CDATA[ENSG00000106633]]></data>
+      <data key="d3"><![CDATA[P35557 Q53Y25]]></data>
+      <data key="d4"><![CDATA[hsa:2645]]></data>
+      <data key="d5"><![CDATA[glucokinase (hexokinase 4) (EC:2.7.1.2)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[2645]]></data>
+      <data key="d8"><![CDATA[GCK]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="213.0" y="231.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="30.0" x="8.0" y="-0.8505859375">GCK</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n31">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:3098+hsa:3099+hsa:3101]]></data>
+      <data key="d2"><![CDATA[ENSG00000156515,ENSG00000159399,ENSG00000160883]]></data>
+      <data key="d3"><![CDATA[A8K7J7 B3KXY9 P19367 Q59FD4,P52789,P52790]]></data>
+      <data key="d4"><![CDATA[hsa:3098 hsa:3099 hsa:3101]]></data>
+      <data key="d5"><![CDATA[hexokinase 1 (EC:2.7.1.1),hexokinase 2 (EC:2.7.1.1),hexokinase 3 (white cell) (EC:2.7.1.1)]]></data>
+      <data key="d6"><![CDATA[gene,gene,gene]]></data>
+      <data key="d7"><![CDATA[3098,3099,3101]]></data>
+      <data key="d8"><![CDATA[HK1,HK2,HK3]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="213.0" y="212.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="37.0" x="4.5" y="-0.8505859375">HK1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n32">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:2538+hsa:57818]]></data>
+      <data key="d2"><![CDATA[ENSG00000131482,ENSG00000152254]]></data>
+      <data key="d3"><![CDATA[P35575,Q9NQR9]]></data>
+      <data key="d4"><![CDATA[hsa:2538 hsa:57818]]></data>
+      <data key="d5"><![CDATA[glucose-6-phosphatase catalytic subunit (EC:3.1.3.9),glucose-6-phosphatase catalytic 2 (EC:3.1.3.9)]]></data>
+      <data key="d6"><![CDATA[gene,gene]]></data>
+      <data key="d7"><![CDATA[2538,57818]]></data>
+      <data key="d8"><![CDATA[G6PC,G6PC2]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="281.0" y="190.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="46.0" x="0.0" y="-0.8505859375">G6PC...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n33">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?pathway+hsa00010]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[path:hsa00010]]></data>
+      <data key="d5"><![CDATA[Glycolysis is the process of converting glucose into pyruvate and generating small amounts of ATP (energy) and NADH (reducing power). It is a central pathway that produces important precursor metabolites: six-carbon compounds of glucose-6P and fructose-6P and three-carbon compounds of glycerone-P glyceraldehyde-3P glycerate-3P phosphoenolpyruvate and pyruvate [MD:M00001]. Acetyl-CoA another important precursor metabolite is produced by oxidative decarboxylation of pyruvate [MD:M00679]. When the enzyme genes of this pathway are examined in completely sequenced genomes the reaction steps of three-carbon compounds from glycerone-P to pyruvate form a conserved core module [MD:M00002] which is found in almost all organisms and which often corresponds to operon structures in bacterial genomes. Gluconeogenesis is a synthesis pathway of glucose from noncarbohydrate precursors. It is essentially a reversal of glycolysis with minor variations of alternative paths [MD:M00003].]]></data>
+      <data key="d6"><![CDATA[map]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Glycolysis / Gluconeogenesis - Homo sapiens (human)]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="25.0" width="251.0" x="55.5" y="60.5"/>
+          <y:Fill color="#00FF00" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="309.0" x="-29.0" y="3.1494140625">Glycolysis / Gluconeogenesis - Homo sapiens (human)</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n34">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:1738]]></data>
+      <data key="d2"><![CDATA[ENSG00000091140]]></data>
+      <data key="d3"><![CDATA[B2R5X0 P09622]]></data>
+      <data key="d4"><![CDATA[hsa:1738]]></data>
+      <data key="d5"><![CDATA[dihydrolipoamide dehydrogenase (EC:1.8.1.4)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[1738]]></data>
+      <data key="d8"><![CDATA[DLD]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="227.0" y="912.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="29.0" x="8.5" y="-0.8505859375">DLD</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n35">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:5230+hsa:5232]]></data>
+      <data key="d2"><![CDATA[ENSG00000102144,ENSG00000170950]]></data>
+      <data key="d3"><![CDATA[A8K4W6 P00558,P07205]]></data>
+      <data key="d4"><![CDATA[hsa:5230 hsa:5232]]></data>
+      <data key="d5"><![CDATA[phosphoglycerate kinase 1 (EC:2.7.2.3),phosphoglycerate kinase 2 (EC:2.7.2.3)]]></data>
+      <data key="d6"><![CDATA[gene,gene]]></data>
+      <data key="d7"><![CDATA[5230,5232]]></data>
+      <data key="d8"><![CDATA[PGK1,PGK2]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="448.0" y="560.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="45.0" x="0.5" y="-0.8505859375">PGK1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n36">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00103]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00103]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[D-Glucose 1-phosphate;
+alpha-D-Glucose 1-phosphate;
+Cori ester;
+D-Glucose alpha-1-phosphate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="152.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="144.0" x="-68.0" y="-4.12548828125">D-Glucose alpha-1-phosphate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n37">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00631]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00631]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[2-Phospho-D-glycerate;
+D-Glycerate 2-phosphate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="673.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="121.0" x="-56.5" y="-4.12548828125">D-Glycerate 2-phosphate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n38">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00267]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00267]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[alpha-D-Glucose]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="165.0" y="237.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="83.0" x="-37.5" y="-4.12548828125">alpha-D-Glucose</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n39">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00221]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00221]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[beta-D-Glucose]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="165.0" y="310.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="77.0" x="-34.5" y="-4.12548828125">beta-D-Glucose</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n40">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00111]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00111]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Glycerone phosphate;
+Dihydroxyacetone phosphate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="316.0" y="457.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="141.0" x="-66.5" y="-4.12548828125">Dihydroxyacetone phosphate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n41">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C01172]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C01172]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[beta-D-Glucose 6-phosphate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="316.0" y="310.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="138.0" x="-65.0" y="-4.12548828125">beta-D-Glucose 6-phosphate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n42">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00668]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00668]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[alpha-D-Glucose 6-phosphate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="239.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="144.0" x="-68.0" y="-4.12548828125">alpha-D-Glucose 6-phosphate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n43">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C05345]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C05345]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[beta-D-Fructose 6-phosphate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="312.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="139.0" x="-65.5" y="-4.12548828125">beta-D-Fructose 6-phosphate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n44">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00074]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00074]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Phosphoenolpyruvate;
+Phosphoenolpyruvic acid;
+PEP]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="745.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="25.0" x="-8.5" y="-4.12548828125">PEP</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n45">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00197]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00197]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[3-Phospho-D-glycerate;
+D-Glycerate 3-phosphate;
+3-Phospho-(R)-glycerate;
+3-Phosphoglycerate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="601.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="98.0" x="-45.0" y="-4.12548828125">3-Phosphoglycerate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n46">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00236]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00236]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[3-Phospho-D-glyceroyl phosphate;
+13-Bisphospho-D-glycerate;
+(R)-2-Hydroxy-3-(phosphonooxy)-1-monoanhydride with phosphoric
+propanoic acid]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="529.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="387.0" x="-189.5" y="-4.12548828125">(R)-2-Hydroxy-3-(phosphonooxy)-1-monoanhydride with phosphoricpropanoic acid</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n47">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00186]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00186]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[(S)-Lactate;
+L-Lactate;
+L-Lactic acid]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="611.0" y="872.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="67.0" x="-29.5" y="-4.12548828125">L-Lactic acid</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n48">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C15972]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C15972]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Enzyme N6-(lipoyl)lysine;
+Lipoamide-E]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="298.0" y="915.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="65.0" x="-28.5" y="-4.12548828125">Lipoamide-E</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n49">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00022]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00022]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Pyruvate;
+Pyruvic acid;
+2-Oxopropanoate;
+2-Oxopropanoic acid;
+Pyroracemic acid]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="872.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="88.0" x="-40.0" y="-4.12548828125">Pyroracemic acid</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n50">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00024]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00024]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Acetyl-CoA;
+Acetyl coenzyme A]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="130.0" y="872.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="96.0" x="-44.0" y="-4.12548828125">Acetyl coenzyme A</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n51">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00084]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00084]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Acetaldehyde;
+Ethanal]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="362.0" y="962.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="41.0" x="-16.5" y="-4.12548828125">Ethanal</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n52">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C16255]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C16255]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[[Dihydrolipoyllysine-residue acetyltransferase]
+S-acetyldihydrolipoyllysine;
+S-Acetyldihydrolipoamide-E]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="249.0" y="872.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="137.0" x="-64.5" y="-4.12548828125">S-Acetyldihydrolipoamide-E</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n53">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C15973]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C15973]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Enzyme N6-(dihydrolipoyl)lysine;
+Dihydrolipoamide-E]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="196.0" y="915.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="98.0" x="-45.0" y="-4.12548828125">Dihydrolipoamide-E</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n54">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C05378]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C05378]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[beta-D-Fructose 16-bisphosphate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="382.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="161.0" x="-76.5" y="-4.12548828125">beta-D-Fructose 1,6-bisphosphate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n55">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:5105+hsa:5106]]></data>
+      <data key="d2"><![CDATA[ENSG00000124253,ENSG00000100889]]></data>
+      <data key="d3"><![CDATA[P35558]]></data>
+      <data key="d4"><![CDATA[hsa:5105 hsa:5106]]></data>
+      <data key="d5"><![CDATA[phosphoenolpyruvate carboxykinase 1 (soluble) (EC:4.1.1.32),phosphoenolpyruvate carboxykinase 2 (mitochondrial) (EC:4.1.1.32)]]></data>
+      <data key="d6"><![CDATA[gene,gene]]></data>
+      <data key="d7"><![CDATA[5105,5106]]></data>
+      <data key="d8"><![CDATA[PCK1,PCK2]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="169.0" y="730.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="45.0" x="0.5" y="-0.8505859375">PCK1...</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n56">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00036]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00036]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Oxaloacetate;
+Oxalacetic acid;
+Oxaloacetic acid;
+2-Oxobutanedioic acid;
+Oxosuccinic acid;
+keto-Oxaloacetate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="130.0" y="745.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="90.0" x="-41.0" y="-4.12548828125">keto-Oxaloacetate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n57">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa00640]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[path:hsa00640]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[map]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[Propanoate metabolism - Homo sapiens (human)]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="25.0" width="127.0" x="553.5" y="920.5"/>
+          <y:Fill color="#C0C0C0" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="279.0" x="-76.0" y="3.1494140625">Propanoate metabolism - Homo sapiens (human)</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n58">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:669]]></data>
+      <data key="d2"><![CDATA[ENSG00000172331]]></data>
+      <data key="d3"><![CDATA[A4D1N9 P07738]]></data>
+      <data key="d4"><![CDATA[hsa:669]]></data>
+      <data key="d5"><![CDATA[23-bisphosphoglycerate mutase (EC:3.1.3.13 5.4.2.1 5.4.2.4)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[669]]></data>
+      <data key="d8"><![CDATA[BPGM]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="402.0" y="590.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="38.0" x="4.0" y="-0.8505859375">BPGM</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n59">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?hsa:669]]></data>
+      <data key="d2"><![CDATA[ENSG00000172331]]></data>
+      <data key="d3"><![CDATA[A4D1N9 P07738]]></data>
+      <data key="d4"><![CDATA[hsa:669]]></data>
+      <data key="d5"><![CDATA[23-bisphosphoglycerate mutase (EC:3.1.3.13 5.4.2.1 5.4.2.4)]]></data>
+      <data key="d6"><![CDATA[gene]]></data>
+      <data key="d7"><![CDATA[669]]></data>
+      <data key="d8"><![CDATA[BPGM]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="17.0" width="46.0" x="403.0" y="526.5"/>
+          <y:Fill color="#BFFFBF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="38.0" x="4.0" y="-0.8505859375">BPGM</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n60">
+      <data key="d1"><![CDATA[http://www.kegg.jp/dbget-bin/www_bget?C00118]]></data>
+      <data key="d2"/>
+      <data key="d3"/>
+      <data key="d4"><![CDATA[cpd:C00118]]></data>
+      <data key="d5"/>
+      <data key="d6"><![CDATA[compound]]></data>
+      <data key="d7"/>
+      <data key="d8"><![CDATA[D-Glyceraldehyde 3-phosphate;
+(2R)-2-Hydroxy-3-(phosphonooxy)-propanal;
+Glyceraldehyde 3-phosphate]]></data>
+      <data key="d9">
+        <y:ShapeNode>
+          <y:Geometry height="8.0" width="8.0" x="467.0" y="457.0"/>
+          <y:Fill color="#FFFFFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="16.2509765625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="140.0" x="-66.0" y="-4.12548828125">Glyceraldehyde 3-phosphate</y:NodeLabel>
+          <y:Shape type="ellipse"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <edge id="e0" source="n31" target="n38">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="4.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e1" source="n38" target="n29">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="4.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e2" source="n30" target="n38">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-39.5" y="2.589558843356457">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e3" source="n32" target="n38">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-73.5" y="24.866674126519086">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e4" source="n29" target="n39">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="0.5004425048828125" y="2.589561348530765">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e5" source="n39" target="n27">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="0.5004425048828125" y="2.589561348530765">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e6" source="n39" target="n26">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="0.6369781494140625" y="1.8288560554162245">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e7" source="n27" target="n41">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.500396728515625" y="2.5845096212038356">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e8" source="n41" target="n25">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.500396728515625" y="2.5845096212038356">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e9" source="n26" target="n41">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="9.0" y="12.285727364676347">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e10" source="n32" target="n42">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="5.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e11" source="n42" target="n23">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="5.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e12" source="n42" target="n28">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-69.17886352539062" y="23.412498837425574">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e13" source="n42" target="n24">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-29.150390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e14" source="n31" target="n42">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="84.5" y="13.56169537483379">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e15" source="n30" target="n42">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="84.5" y="3.576603146816808">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e16" source="n24" target="n42">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="15.349609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e17" source="n28" target="n42">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="30.0" y="-7.285712832496301">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e18" source="n23" target="n43">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-3.93083408900668" y="3.916581639703736">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e19" source="n43" target="n22">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-3.93083408900668" y="3.916581639703736">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e20" source="n43" target="n21">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="4.349609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e21" source="n22" target="n54">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="2.349609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e22" source="n54" target="n0">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="2.349609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e23" source="n21" target="n54">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="4.349609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e24" source="n0" target="n40">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.5015869140625" y="3.1690497599857395">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e25" source="n40" target="n20">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.5015869140625" y="3.1690497599857395">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e26" source="n35" target="n46">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-1.8639763726128535" y="-19.36492919921875">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e27" source="n46" target="n18">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-1.8639763726128535" y="-19.36492919921875">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e28" source="n35" target="n45">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.5176234889675015" y="5.35107421875">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e29" source="n45" target="n17">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.5176234889675015" y="5.35107421875">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e30" source="n17" target="n37">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="5.349609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e31" source="n37" target="n16">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="5.349609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e32" source="n11" target="n52">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-5.99725341796875" y="3.2222990813080514">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e33" source="n52" target="n10">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-5.99725341796875" y="3.2222990813080514">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e34" source="n34" target="n48">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="4.5828983958174945" y="-21.1798095703125">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e35" source="n48" target="n10">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="4.5828983958174945" y="-21.1798095703125">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e36" source="n34" target="n53">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="1.6412457721989426" y="-21.1551513671875">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e37" source="n53" target="n11">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="1.6412457721989426" y="-21.1551513671875">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e38" source="n8" target="n51">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-50.5250244140625" y="0.705082239729677">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e39" source="n51" target="n1">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-50.5250244140625" y="0.705082239729677">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e40" source="n51" target="n3">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-50.53021240234375" y="8.245293435085955">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e41" source="n7" target="n51">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-60.5" y="7.550443036840647">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e42" source="n16" target="n44">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="3.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e43" source="n44" target="n14">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="3.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e44" source="n2" target="n4">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="38.50975036621094" y="-0.6929752376530587">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e45" source="n4" target="n1">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="38.50975036621094" y="-0.6929752376530587">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e46" source="n3" target="n4">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-21.650390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e47" source="n4" target="n2">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-21.650390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e48" source="n25" target="n43">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="7.0" y="2.5749938964843864">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e49" source="n14" target="n49">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="4.5003662109375" y="2.579988606770712">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e50" source="n49" target="n12">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="4.5003662109375" y="2.579988606770712">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e51" source="n49" target="n9">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-32.07196044921875" y="3.3322941706730944">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e52" source="n12" target="n49">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-43.5" y="1.9399739583333258">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e53" source="n11" target="n50">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="10.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e54" source="n50" target="n2">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="10.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e55" source="n28" target="n41">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-48.000274658203125" y="2.571440197172592">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e56" source="n41" target="n27">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-48.000274658203125" y="2.571440197172592">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e57" source="n41" target="n26">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-48.088775634765625" y="0.052389962332597406">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e58" source="n6" target="n36">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="1.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e59" source="n36" target="n24">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="1.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e60" source="n5" target="n42">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-56.0887753547878" y="-50.40006745619581">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e61" source="n42" target="n32">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-89.63198852539062" y="-11.340162174430418">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e62" source="n42" target="n31">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-123.51742553710938" y="-5.912273131025586">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e63" source="n42" target="n30">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-123.50033569335938" y="0.921268674160558">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e64" source="n15" target="n44">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-18.150390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e65" source="n44" target="n16">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-18.150390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e66" source="n15" target="n49">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-47.150390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e67" source="n49" target="n14">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-47.150390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e68" source="n15" target="n50">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-0.998046875" y="3.18756103515625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e69" source="n50" target="n11">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-0.998046875" y="3.18756103515625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e70" source="n59" target="n46">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="4.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e71" source="n46" target="n35">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="4.849609375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e72" source="n45" target="n58">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-29.033599853515625" y="3.2999426800266747">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e73" source="n17" target="n45">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="1.8554225612331265" y="-19.150390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e74" source="n44" target="n55">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-145.5025634765625" y="-1.817323964983757">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e75" source="n14" target="n44">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-17.650390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e76" source="n57" target="n47">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-40.50042724609375" y="2.5869441377944895">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e77" source="n47" target="n12">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-40.50042724609375" y="2.5869441377944895">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e78" source="n19" target="n45">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="28.719970703125" y="0.8641819495938989">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e79" source="n45" target="n35">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-18.650390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e80" source="n55" target="n56">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-12.377822875976562" y="13.335977305536744">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e81" source="n56" target="n15">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-12.377822875976562" y="13.335977305536744">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e82" source="n5" target="n37">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.5186410086495243" y="-18.15203857421875">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e83" source="n37" target="n17">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.5186410086495243" y="-18.15203857421875">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e84" source="n5" target="n49">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-69.12678492888244" y="215.4360422123375">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e85" source="n18" target="n60">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-46.001251220703125" y="3.1500244140625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e86" source="n60" target="n20">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-46.001251220703125" y="3.1500244140625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e87" source="n20" target="n60">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-22.650390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e88" source="n60" target="n0">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="2.0" y="-22.650390625">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e89" source="n5" target="n60">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="-56.0887753547878" y="36.59928620619581">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+    <edge id="e90" source="n60" target="n5">
+      <data key="d12">
+        <y:GenericEdge configuration="DEFAULT">
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
+          <y:EdgeLabel alignment="center" distance="2.0" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="13.80078125" modelName="six_pos" modelPosition="tail" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" visible="true" width="39.0" x="82.56771878583709" y="-50.76231657700731">compound</y:EdgeLabel>
+        </y:GenericEdge>
+      </data>
+    </edge>
+  </graph>
+  <data key="d0">
+    <y:Resources/>
+  </data>
+</graphml>

@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?><sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" version="4"><model metaid="meta_path_map04010hsa" name="MAPK signaling pathway" id="path_map04010hsa"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><h1>Model of “MAPK signaling pathway”</h1><a href="http://www.genome.jp/kegg/pathway/map/map04010hsa.gif"><img alt="http://www.genome.jp/kegg/pathway/map/map04010hsa.gif" src="http://www.genome.jp/kegg/pathway/map/map04010hsa.gif"/></a><br/><a href="http://www.genome.jp/dbget-bin/show_pathway?map04010hsa">Original Entry</a><br/><p>KGML Comment: “Creation date: Apr 08 2006 03:58:37 +0900 (JST)”<br/>KGML Version was: 0.6<br/></p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:modelVersion>4.0</celldesigner:modelVersion>
+<celldesigner:modelDisplay sizeX="1357" sizeY="953"/>
+<celldesigner:listOfCompartmentAliases>
+<celldesigner:compartmentAlias compartment="" id="cd_ca">
+<celldesigner:class>SQUARE</celldesigner:class>
+<celldesigner:bounds h="933" w="1337" x="10.0" y="10.0"/>
+<celldesigner:namePoint x="657" y="909"/>
+<celldesigner:doubleLine innerWidth="1.0" outerWidth="2.0" thickness="10.0"/>
+<celldesigner:paint color="ffcccc00" scheme="Color"/>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:compartmentAlias>
+</celldesigner:listOfCompartmentAliases>
+<celldesigner:listOfComplexSpeciesAliases>
+<celldesigner:complexSpeciesAlias id="cd_sagroup" species="group">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="59" w="129" x="945" y="310"/>
+<celldesigner:view state="usual"/>
+<celldesigner:backupSize h="0.0" w="0.0"/>
+<celldesigner:backupView state="none"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="59" width="129"/>
+<celldesigner:singleLine width="2.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="59" width="129"/>
+<celldesigner:singleLine width="2.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:complexSpeciesAlias>
+<celldesigner:complexSpeciesAlias id="cd_sawnt" species="wnt">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="32" w="46" x="1005" y="839"/>
+<celldesigner:view state="usual"/>
+<celldesigner:backupSize h="0.0" w="0.0"/>
+<celldesigner:backupView state="none"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="32" width="46"/>
+<celldesigner:singleLine width="2.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="32" width="46"/>
+<celldesigner:singleLine width="2.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:complexSpeciesAlias>
+</celldesigner:listOfComplexSpeciesAliases>
+<celldesigner:listOfSpeciesAliases>
+<celldesigner:speciesAlias id="cd_saDiglyceride" species="Diglyceride">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="8" w="8" x="484" y="136"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_sacAMP" species="cAMP">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="8" w="8" x="446" y="123"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_saIns145P3" species="Ins145P3">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="8" w="8" x="410" y="136"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_saCa2" species="Ca2">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="8" w="8" x="314" y="175"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_saCell_cycle" species="Cell_cycle">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="271" w="34" x="1301" y="601"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="271" width="34"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="271" width="34"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_saApoptosis" species="Apoptosis">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="26" w="94" x="1217" y="623"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="26" width="94"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="26" width="94"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_saWnt_signaling_pathway" species="Wnt_signaling_pathway">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="38" w="94" x="1039" y="852"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="38" width="94"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="38" width="94"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_saAlzheimers_disease" species="Alzheimers_disease">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="38" w="94" x="1039" y="549"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="38" width="94"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="38" width="94"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_saFocal_adhesion" species="Focal_adhesion">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="38" w="104" x="301" y="453"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="38" width="104"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="38" width="104"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+<celldesigner:speciesAlias id="cd_saLPS" species="LPS">
+<celldesigner:activity>inactive</celldesigner:activity>
+<celldesigner:bounds h="8" w="8" x="138" y="743"/>
+<celldesigner:view state="usual"/>
+<celldesigner:usualView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="1.0"/>
+<celldesigner:paint color="ffffffff" scheme="Color"/>
+</celldesigner:usualView>
+<celldesigner:briefView>
+<celldesigner:innerPosition x="0.0" y="0.0"/>
+<celldesigner:boxSize height="8" width="8"/>
+<celldesigner:singleLine width="0.0"/>
+<celldesigner:paint color="3fffffff" scheme="Color"/>
+</celldesigner:briefView>
+<celldesigner:info angle="0.0" state="empty"/>
+</celldesigner:speciesAlias>
+</celldesigner:listOfSpeciesAliases>
+<celldesigner:listOfProteins/>
+<celldesigner:listOfGroups/>
+<celldesigner:listOfGenes/>
+<celldesigner:listOfRNAs/>
+<celldesigner:listOfAntisenseRNAs/>
+<celldesigner:listOfLayers/>
+<celldesigner:listOfBlockDiagrams/>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_path_map04010hsa"> 
+<creator> 
+<Bag> 
+<li parseType="Resource"> 
+<ORG parseType="Resource"><Orgname>ZBIT, University of Tübingen, WSI-RA</Orgname> 
+</ORG> 
+</li> 
+</Bag> 
+</creator> 
+<modified parseType="Resource"> 
+<W3CDTF>Wed May 12 16:12:09 CEST 2010</W3CDTF> 
+</modified> 
+<bqmodel:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.pathway:map04010hsa"/> 
+</Bag> 
+</bqmodel:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+<listOfUnitDefinitions> 
+<unitDefinition name="Predefined unit area" id="area"> 
+<listOfUnits> 
+<unit exponent="2" kind="metre" scale="0" multiplier="1.0" offset="0.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+<unitDefinition name="Predefined unit length" id="length"> 
+<listOfUnits> 
+<unit exponent="1" kind="metre" scale="0" multiplier="1.0" offset="0.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+<unitDefinition name="Predefined unit substance" id="substance"> 
+<listOfUnits> 
+<unit exponent="1" kind="mole" scale="0" multiplier="1.0" offset="0.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+<unitDefinition sboTerm="SBO:0000345" name="Predefined unit time" id="time"> 
+<listOfUnits> 
+<unit sboTerm="SBO:0000345" exponent="1" kind="second" scale="0" multiplier="1.0" offset="0.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+<unitDefinition name="Predefined unit volume" id="volume"> 
+<listOfUnits> 
+<unit exponent="1" kind="litre" scale="0" multiplier="1.0" offset="0.0"> 
+</unit> 
+</listOfUnits> 
+</unitDefinition> 
+</listOfUnitDefinitions> 
+<listOfCompartments> 
+<compartment units="volume" size="1.0" name="default"> 
+</compartment> 
+</listOfCompartments> 
+<listOfSpecies> 
+<species sboTerm="SBO:0000247" substanceUnits="substance" metaid="meta_Diglyceride" name="Diglyceride" initialAmount="1.0" id="Diglyceride"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00165">Original Kegg Entry</a><br/><p><b>Diglyceride</b></p><p><b>All given names:</b><br/>Diacylglycerol<br/>Diglyceride</p><p><b>Formula:</b> C5H6O5R2</p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
+<celldesigner:name>Diglyceride</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_Diglyceride"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.compound:C00165"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:obo.chebi:CHEBI:18035"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000247" substanceUnits="substance" metaid="meta_cAMP" name="cAMP" initialAmount="1.0" id="cAMP"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00575">Original Kegg Entry</a><br/><p><b>cAMP</b></p><p><b>All given names:</b><br/>3',5'-Cyclic AMP<br/>Cyclic adenylic acid<br/>Cyclic AMP<br/>Adenosine 3',5'-phosphate<br/>Adenosine 3',5'-cyclic phosphate<br/>cAMP</p><p><b>Formula:</b> C10H12N5O6P</p><p><b>Mass:</b> 329.0525</p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
+<celldesigner:name>cAMP</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_cAMP"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.compound:C00575"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:obo.chebi:CHEBI:17489"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:pubchem.substance:3854"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:3dmet:B01289"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000247" substanceUnits="substance" metaid="meta_Ins145P3" name="Ins(1,4,5)P3" initialAmount="1.0" id="Ins145P3"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C01245">Original Kegg Entry</a><br/><p><b>Ins(1,4,5)P3</b></p><p><b>All given names:</b><br/>D-myo-Inositol 1,4,5-trisphosphate<br/>1D-myo-Inositol 1,4,5-trisphosphate<br/>Inositol 1,4,5-trisphosphate<br/>Ins(1,4,5)P3</p><p><b>Formula:</b> C6H15O15P3</p><p><b>Mass:</b> 419.9624</p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
+<celldesigner:name>Ins(1,4,5)P3</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_Ins145P3"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.compound:C01245"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:obo.chebi:CHEBI:16595"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:pubchem.substance:4466"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:3dmet:B01422"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000247" substanceUnits="substance" metaid="meta_Ca2" name="Ca2+" initialAmount="1.0" id="Ca2"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00076">Original Kegg Entry</a><br/><p><b>Ca2+</b></p><p><b>All given names:</b><br/>Calcium<br/>Ca2+</p><p><b>Formula:</b> Ca</p><p><b>Mass:</b> 39.9626</p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
+<celldesigner:name>Ca2+</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_Ca2"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.compound:C00076"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:obo.chebi:CHEBI:29108"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:pubchem.substance:3376"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000291" substanceUnits="substance" metaid="meta_Cell_cycle" name="Cell cycle" initialAmount="1.0" id="Cell_cycle"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="">Original Kegg Entry</a><br/><p><b>Cell cycle</b></p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>UNKNOWN</celldesigner:class>
+<celldesigner:name>Cell_space_cycle</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_Cell_cycle"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.pathway:map04110"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000291" substanceUnits="substance" metaid="meta_Apoptosis" name="Apoptosis" initialAmount="1.0" id="Apoptosis"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/kegg/pathway/map/map04210.html">Original Kegg Entry</a><br/><p><b>Apoptosis</b></p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>UNKNOWN</celldesigner:class>
+<celldesigner:name>Apoptosis</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_Apoptosis"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.pathway:map04210"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000291" substanceUnits="substance" metaid="meta_Wnt_signaling_pathway" name="Wnt signaling pathway" initialAmount="1.0" id="Wnt_signaling_pathway"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/kegg/pathway/map/map04310.html">Original Kegg Entry</a><br/><p><b>Wnt signaling pathway</b></p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>UNKNOWN</celldesigner:class>
+<celldesigner:name>Wnt_space_signaling_space_pathway</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_Wnt_signaling_pathway"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.pathway:map04310"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000291" substanceUnits="substance" metaid="meta_Alzheimers_disease" name="Alzheimer's disease" initialAmount="1.0" id="Alzheimers_disease"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/kegg/pathway/map/map05010.html">Original Kegg Entry</a><br/><p><b>Alzheimer's disease</b></p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>UNKNOWN</celldesigner:class>
+<celldesigner:name>Alzheimer's_space_disease</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_Alzheimers_disease"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.pathway:map05010"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000291" substanceUnits="substance" metaid="meta_Focal_adhesion" name="Focal adhesion" initialAmount="1.0" id="Focal_adhesion"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/kegg/pathway/map/map04510.html">Original Kegg Entry</a><br/><p><b>Focal adhesion</b></p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>UNKNOWN</celldesigner:class>
+<celldesigner:name>Focal_space_adhesion</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_Focal_adhesion"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.pathway:map04510"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000247" substanceUnits="substance" metaid="meta_LPS" name="LPS" initialAmount="1.0" id="LPS"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00338">Original Kegg Entry</a><br/><p><b>LPS</b></p><p><b>All given names:</b><br/>Lipopolysaccharide<br/>LPS</p></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
+<celldesigner:name>LPS</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/"> 
+<rdf:Description rdf:about="#meta_LPS"> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:kegg.compound:C00338"/> 
+</Bag> 
+</bqbiol:is> 
+<bqbiol:is> 
+<Bag> 
+<li resource="urn:miriam:obo.chebi:CHEBI:16412"/> 
+</Bag> 
+</bqbiol:is> 
+
+</rdf:Description> 
+</rdf:RDF> 
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000253" substanceUnits="substance" metaid="meta_group" name="group:" initialAmount="1.0" id="group"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>COMPLEX</celldesigner:class>
+<celldesigner:name>group:</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+</annotation> 
+</species> 
+<species sboTerm="SBO:0000253" substanceUnits="substance" metaid="meta_wnt" name="wnt" initialAmount="1.0" id="wnt"> 
+<notes> 
+<body xmlns="http://www.w3.org/1999/xhtml"><a href="">Original Kegg Entry</a><br/></body>
+</notes> 
+<annotation> 
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>COMPLEX</celldesigner:class>
+<celldesigner:name>wnt</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+</annotation> 
+</species> 
+</listOfSpecies> 
+</model> 
+</sbml>
