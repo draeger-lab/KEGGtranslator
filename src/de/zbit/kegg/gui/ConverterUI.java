@@ -24,7 +24,6 @@ import org.sbml.jsbml.xml.stax.SBMLWriter;
 import de.zbit.gui.GUITools;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
-import de.zbit.kegg.io.FileFilterKGML;
 import de.zbit.kegg.io.KEGG2jSBML;
 
 /**

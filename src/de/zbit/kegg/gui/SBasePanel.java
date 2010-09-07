@@ -77,8 +77,8 @@ import atp.sHotEqn;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.SystemBrowser;
-import de.zbit.io.LaTeXExport;
-import de.zbit.io.MIRIAMparser;
+import de.zbit.kegg.io.MIRIAMparser;
+import de.zbit.kegg.io.LaTeXExport;
 import de.zbit.resources.Resource;
 
 /**

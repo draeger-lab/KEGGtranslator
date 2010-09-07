@@ -318,8 +318,8 @@ public class KEGG2jSBML implements KeggConverter {
 
 		long start = System.currentTimeMillis();
 		try {
-			k2s.Convert("resources/de/zbit/kegg/samplefiles/map04010hsa.xml",
-					"resources/de/zbit/kegg/samplefiles/map04010hsa.sbml.xml");
+			k2s.Convert("files/KGMLsamplefiles/map04010hsa.xml",
+					"files/KGMLsamplefiles/map04010hsa.sbml.xml");
 			// k2s.Kegg2jSBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml");
 
 			// Remember already queried objects
