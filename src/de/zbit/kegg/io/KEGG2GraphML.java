@@ -34,6 +34,7 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
+import de.zbit.gui.GUITools;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
@@ -781,6 +782,13 @@ public class KEGG2GraphML implements KeggConverter {
                 el.setText(st.getValue());
                 el.setFontSize(10);
               }
+            }
+            
+            if (st.getEdgeColor()!=null && st.getEdgeColor().length()>0) {
+            	if (st.getEdgeColor().startsWith("#"))
+            	  er.setLineColor(ColorFromHTML(st.getEdgeColor()));
+            	else
+            	  System.err.println("Invalid edge color: " + st.getEdgeColor());
             }
             
             if (nOne.getEdgeTo(nTwo)==null) {

@@ -44,6 +44,9 @@ import de.zbit.util.SortedArrayList;
 /**
  * 
  * @author wrzodek
+ * TODO by me:
+ * - subtype.setValue contains replacement of &gt; to > !!!
+ * - Edges (Subtypes of relations) now may have colors.
  */
 public class KEGG2jSBML implements KeggConverter {
 	/**
