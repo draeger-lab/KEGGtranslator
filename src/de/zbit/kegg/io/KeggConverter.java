@@ -1,38 +1,38 @@
-/**
- *
- */
 package de.zbit.kegg.io;
 
 import de.zbit.kegg.parser.pathway.Pathway;
 
 /**
- * @author wrzodek
- * 
+ * Generic interface for KeggConverters.
+ * @author wrzodek 
  */
 public interface KeggConverter {
 
-	/**
-	 * 
-	 * @param p
-	 * @param outFile
-	 * @throws Exception
-	 */
-	public boolean Convert(Pathway p, String outFile) throws Exception;
+  /**
+   * Convert a given Kegg Pathway and write it
+   * in the new format to outfile. 
+   * @param p
+   * @param outFile
+   * @return true if and only if the conversion was
+   * successful and the outFile has been written.
+   */
+	public boolean convert(Pathway p, String outFile);
 
 	/**
-	 * 
-	 * @param infile
+	 * Convert a Kegg Pathway from the KGML formatted infile and write it
+	 * in the new format to outfile.
+	 * @param infile - input file in KGML format.
 	 * @param outfile
 	 * @throws Exception
 	 */
-	public void Convert(String infile, String outfile) throws Exception;
+	public void convert(String infile, String outfile) throws Exception;
 
 	/**
-	 * Gibt an, ob das letzte geschriebene outFile bereits vorhanden war und
-	 * deshalb ueberschrieben wurde.
+	 * Tells you, if the last outFile that has been written was already there
+	 * and has been overwritten. 
 	 * 
-	 * @return
+	 * @return true or false.
 	 */
-	public boolean lastFileWasOverwritten();
+	public boolean isLastFileWasOverwritten();
 
 }

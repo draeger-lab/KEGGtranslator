@@ -34,7 +34,6 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
-import de.zbit.gui.GUITools;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
@@ -222,7 +221,7 @@ public class KEGG2GraphML implements KeggConverter {
    */
   public static void KEGG2GraphML(Pathway p, String outFile) {
     KEGG2GraphML k2g = new KEGG2GraphML();
-    k2g.Convert(p, outFile);
+    k2g.convert(p, outFile);
   }
   
   /**
@@ -241,7 +240,8 @@ public class KEGG2GraphML implements KeggConverter {
         Pathway p = KeggParser.parse(args[0]).get(0);
         KEGG2GraphML(p, outfile);
         
-        KeggInfoManagement.saveToFilesystem("keggdb.dat", manager); // Remember already queried objects
+        if (manager.isCacheChangedSinceLastLoading())
+          KeggInfoManagement.saveToFilesystem("keggdb.dat", manager); // Remember already queried objects
       }
       return;
     }
@@ -378,8 +378,11 @@ public class KEGG2GraphML implements KeggConverter {
     return nr;
   }
   
-  public boolean Convert(Pathway p, String outFile) {
-    Graph2D graph = Convert(p);
+  /**
+   * {@inheritDoc}
+   */
+  public boolean convert(Pathway p, String outFile) {
+    Graph2D graph = convert(p);
     if (graph==null) return false;
     return writeGraphToFile(outFile, graph);
   }
@@ -390,7 +393,7 @@ public class KEGG2GraphML implements KeggConverter {
    * You should write this pathway to disk with the internal writeGraphToFile method.
    * If you don't do so, all meta-information (entrez ids for labels, etc.) will be lost.
    */
-  public Graph2D Convert(Pathway p) {
+  public Graph2D convert(Pathway p) {
     Graph2D graph = new Graph2D();
     ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>();
     if (retrieveKeggAnnots) {
@@ -995,21 +998,19 @@ public class KEGG2GraphML implements KeggConverter {
     return g;
   }
   
-  /*
-   * (non-Javadoc)
-   * @see de.zbit.kegg.io.KeggConverter#Convert()
+  /**
+   * {@inheritDoc}
    */
-  public void Convert(String infile, String outfile) {
+  public void convert(String infile, String outfile) {
     Pathway p = KeggParser.parse(infile).get(0);
-    Convert(p, outfile);
+    convert(p, outfile);
   }
   
   
-  /*
-   * (non-Javadoc)
-   * @see de.zbit.kegg.io.KeggConverter#lastFileWasOverwritten()
+  /**
+   * {@inheritDoc}
    */
-  public boolean lastFileWasOverwritten() {
+  public boolean isLastFileWasOverwritten() {
     return lastFileWasOverwritten;
   }
   
