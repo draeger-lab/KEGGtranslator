@@ -8,7 +8,6 @@ import java.util.List;
 import org.sbml.jsbml.SBMLException;
 
 import de.zbit.kegg.gui.ConverterUI;
-import de.zbit.kegg.io.FileFilterKGML;
 
 /**
  * @author draeger
@@ -60,7 +59,7 @@ public class ConverterTest {
 	 */
 	private List<File> findKGMLFiles(File f) {
 		LinkedList<File> l = new LinkedList<File>();
-		FileFilter ff = new FileFilterKGML();
+		FileFilter ff = new de.zbit.kegg.gui.FileFilterKGML();
 		if (f.exists()) {
 			if (f.isFile() && ff.accept(f)) {
 				l.add(f);

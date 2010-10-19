@@ -152,12 +152,12 @@ public class BatchConvertKegg {
           
           // XXX: Main Part
           try {
-			converter.Convert(pw.get(i), outFile);
+			converter.convert(pw.get(i), outFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
           
-          if (converter.lastFileWasOverwritten()) { // Datei war oben noch nicht da, sp�ter aber schon => ein anderer prezess macht das selbe bereits.
+          if (converter.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, sp�ter aber schon => ein anderer prezess macht das selbe bereits.
             System.out.println("It looks like another instance is processing the same files. Going to next subfolder.");
             return; // Function is recursive.
           }

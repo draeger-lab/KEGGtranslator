@@ -80,8 +80,14 @@ public class ConverterUI extends JDialog implements ActionListener {
 		}
 		if (new File("keggdb.dat").exists()
 				&& new File("keggdb.dat").length() > 0) {
-			KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement
-					.loadFromFilesystem("keggdb.dat");
+			KeggInfoManagement manager;
+      try {
+        manager = (KeggInfoManagement) KeggInfoManagement
+        		.loadFromFilesystem("keggdb.dat");
+      } catch (IOException e) {
+        e.printStackTrace();
+        manager = new KeggInfoManagement();
+      }
 			k2s = new KEGG2jSBML(manager);
 		} else {
 			k2s = new KEGG2jSBML();

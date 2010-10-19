@@ -226,8 +226,9 @@ public class KEGG2GraphML implements KeggConverter {
   
   /**
    * @param args
+   * @throws IOException 
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     if (new File("keggdb.dat").exists() && new File("keggdb.dat").length()>0)
       manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem("keggdb.dat");
       

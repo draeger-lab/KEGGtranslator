@@ -1,0 +1,15 @@
+Publizieren in Oxford Bioinformatics
+
+- KEGG translator
+- SBML & GraphML
+- jSBML Vorteile hervorheben
+- Abrenzung zu anderen Convertern (Reactions)
+- auch gml export (und weitere yFiles formate prüfen)
+- API, webservice, stand-alone anbieten
+- yFiles obfuscating rules beachten!
+
+- Für Webservice: KGML downloaden und bereithalten.
+
+- Geplante Erweiterung: libSBGN Anbindung
+
+
