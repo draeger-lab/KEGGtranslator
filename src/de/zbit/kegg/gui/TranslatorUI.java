@@ -10,9 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -37,7 +39,7 @@ import de.zbit.util.ProgressBarSwing;
  * @author Andreas Dr&auml;ger
  * 
  */
-public class TranslatorUI extends JDialog implements ActionListener {
+public class TranslatorUI extends JFrame implements ActionListener {
 
 	/**
 	 * This is a enumeration of all possible commands this
@@ -86,7 +88,7 @@ public class TranslatorUI extends JDialog implements ActionListener {
 	}
 	
 	static {
-		char c = File.separatorChar;
+		char c = '/';
 		String path = TranslatorUI.class.getPackage().getName().replace('.', c);
 		String iconPath = path + c + "img" + c;
 		String cfgPath = c + path + c + "cfg";
@@ -109,7 +111,7 @@ public class TranslatorUI extends JDialog implements ActionListener {
 			k2s = new KEGG2jSBML();
 		}
 	}
-
+	
 	/**
 	 * Generated serial version id
 	 */
@@ -213,21 +215,7 @@ public class TranslatorUI extends JDialog implements ActionListener {
 			break;
 		}
 	}
-
-	/*
-      setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-      addWindowListener(new WindowListener() {
-        public void windowActivated(WindowEvent e) {}
-        public void windowDeactivated(WindowEvent e) {}
-        public void windowDeiconified(WindowEvent e) {}
-        public void windowIconified(WindowEvent e) {}
-        public void windowOpened(WindowEvent e) {}
-        public void windowClosed(WindowEvent e) {}
-        public void windowClosing(WindowEvent e) {
-          exit();
-        }
-      });
-	 */
+	
 	/**
 	 * Creates a JMenuBar for this component that provides access to all Actions
 	 * definied in the enum Command.
