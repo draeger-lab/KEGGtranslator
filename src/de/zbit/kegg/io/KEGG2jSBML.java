@@ -53,11 +53,12 @@ import de.zbit.util.Utils;
  */
 public class KEGG2jSBML implements KEGGtranslator {
   
-  /*
-   * INTERNAL VARIABLES
-   */
-  
-  /**
+	/**
+	 * 
+	 */
+  public static final String VERSION_NUMBER = "1.0.0";
+
+/**
    * Retrieve annotations from Kegg or use purely information available in the
    * document.
    */

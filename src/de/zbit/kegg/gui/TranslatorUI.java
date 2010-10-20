@@ -17,16 +17,15 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.UIManager;
 
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
+import org.sbml.squeezer.CfgKeys;
+import org.sbml.squeezer.gui.LaTeXExportDialog;
 
-import de.zbit.gui.GUITools;
 import de.zbit.gui.VerticalLayout;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
@@ -44,20 +43,24 @@ public class TranslatorUI extends JDialog implements ActionListener {
 	 * This is a enumeration of all possible commands this
 	 * {@link ActionListener} can process.
 	 * 
-	 * @author draeger
+	 * @author Andreas Dr&auml;ger
 	 * 
 	 */
 	public static enum Command {
 		/**
-		 * Command to open a file.
+		 * {@link Command} to open a file.
 		 */
 		OPEN_FILE,
 		/**
-		 * Command to save the conversion result to a file.
+		 * {@link Command} to save the conversion result to a file.
 		 */
 		SAVE_FILE,
 		/**
-		 * Closes the program
+		 * {@link Command} for LaTeX export.
+		 */
+		TO_LATEX,
+		/**
+		 * {@link Command} that closes the program.
 		 */
 		EXIT;
 
@@ -72,6 +75,8 @@ public class TranslatorUI extends JDialog implements ActionListener {
 				return "Open";
 			case SAVE_FILE:
 				return "Save";
+			case TO_LATEX:
+				return "Export to LaTeX";
 			case EXIT:
 				return "Exit";
 			default:
@@ -81,11 +86,14 @@ public class TranslatorUI extends JDialog implements ActionListener {
 	}
 	
 	static {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		char c = File.separatorChar;
+		String path = TranslatorUI.class.getPackage().getName().replace('.', c);
+		String iconPath = path + c + "img" + c;
+		String cfgPath = c + path + c + "cfg";
+		GUITools.initIcons(iconPath);
+		GUITools.initLaF("KEGGtranslator");
+		CfgKeys.setDefaultsCfgFile(cfgPath + c + "KEGGtranslator.cfg");
+		CfgKeys.setUserPrefNode(cfgPath);
 		if (new File(KEGGtranslator.cacheFileName).exists()
 				&& new File(KEGGtranslator.cacheFileName).length() > 0) {
 			KeggInfoManagement manager;
@@ -188,12 +196,14 @@ public class TranslatorUI extends JDialog implements ActionListener {
 			try {
 				showGUI(translate(openFile()));
 			} catch (Throwable exc) {
-				exc.printStackTrace();
 				GUITools.showErrorMessage(this, exc);
 			}
 			break;
 		case SAVE_FILE:
 			saveFile();
+			break;
+		case TO_LATEX:
+			new LaTeXExportDialog(this, CfgKeys.getProperties(), doc);
 			break;
 		case EXIT:
 			dispose();
@@ -258,21 +268,15 @@ public class TranslatorUI extends JDialog implements ActionListener {
 	 */
 	private void saveFile() {
 		if (isVisible() && (doc != null)) {
-			JFileChooser chooser = GUITools.createJFileChooser(baseSaveDir,
-					false, false, JFileChooser.FILES_ONLY,
+			File file = GUITools.saveFileDialog(this, baseSaveDir, false,
+					false, JFileChooser.FILES_ONLY,
 					SBFileFilter.SBML_FILE_FILTER);
-			if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-				File f = chooser.getSelectedFile();
-				if (!f.exists() || GUITools.overwriteExistingFile(this, f)) {
-					try {
-						SBMLWriter.write(doc, chooser.getSelectedFile()
-								.getAbsolutePath());
-					} catch (Exception exc) {
-						exc.printStackTrace();
-						JOptionPane.showMessageDialog(this, exc.getMessage(),
-								exc.getClass().getSimpleName(),
-								JOptionPane.ERROR_MESSAGE);
-					}
+			if (file != null) {
+				try {
+					SBMLWriter.write(doc, file, "SBML from KEGG",
+							KEGG2jSBML.VERSION_NUMBER);
+				} catch (Throwable exc) {
+					GUITools.showErrorMessage(this, exc);
 				}
 			}
 		}

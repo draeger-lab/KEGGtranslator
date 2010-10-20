@@ -177,7 +177,7 @@ public class LaTeXExport extends LaTeX {
 	/**
 	 * Constructs a new instance of LaTeX export. For each document to be
 	 * translated a new instance has to be created. Here default values are used
-	 * (A4 paper, 11pt, portrait, fancy headings, no titlepage).
+	 * (A4 paper, 11pt, portrait, fancy headings, no title page).
 	 */
 	public LaTeXExport(boolean namesInEquations, boolean landscape,
 			boolean typeWriterFont, boolean titlePage, short fontSize,
