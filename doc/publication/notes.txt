@@ -9,6 +9,7 @@ Publizieren in Oxford Bioinformatics
 - yFiles obfuscating rules beachten!
 
 - Für Webservice: KGML downloaden und bereithalten.
+- Wir dürfen (und sollten) Jochens pathway visualizer mit-verwenden (und mit-publizieren?)
 
 - Geplante Erweiterung: libSBGN Anbindung
 

@@ -3,6 +3,9 @@
  */
 package de.zbit.kegg.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -10,10 +13,13 @@ import java.io.IOException;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 
 import org.sbml.jsbml.SBMLDocument;
@@ -21,9 +27,12 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.gui.GUITools;
+import de.zbit.gui.VerticalLayout;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.io.KEGG2jSBML;
+import de.zbit.kegg.io.KEGGtranslator;
+import de.zbit.util.ProgressBarSwing;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -70,19 +79,19 @@ public class TranslatorUI extends JDialog implements ActionListener {
 			}
 		}
 	}
-
+	
 	static {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (new File("keggdb.dat").exists()
-				&& new File("keggdb.dat").length() > 0) {
+		if (new File(KEGGtranslator.cacheFileName).exists()
+				&& new File(KEGGtranslator.cacheFileName).length() > 0) {
 			KeggInfoManagement manager;
 			try {
 				manager = (KeggInfoManagement) KeggInfoManagement
-						.loadFromFilesystem("keggdb.dat");
+						.loadFromFilesystem(KEGGtranslator.cacheFileName);
 			} catch (IOException e) {
 				e.printStackTrace();
 				manager = new KeggInfoManagement();
@@ -190,11 +199,25 @@ public class TranslatorUI extends JDialog implements ActionListener {
 			dispose();
 			System.exit(0);
 		default:
-			System.err.println("unsuported action");
+			System.err.println("unsuported action: " + e.getActionCommand());
 			break;
 		}
 	}
 
+	/*
+      setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+      addWindowListener(new WindowListener() {
+        public void windowActivated(WindowEvent e) {}
+        public void windowDeactivated(WindowEvent e) {}
+        public void windowDeiconified(WindowEvent e) {}
+        public void windowIconified(WindowEvent e) {}
+        public void windowOpened(WindowEvent e) {}
+        public void windowClosed(WindowEvent e) {}
+        public void windowClosing(WindowEvent e) {
+          exit();
+        }
+      });
+	 */
 	/**
 	 * Creates a JMenuBar for this component that provides access to all Actions
 	 * definied in the enum Command.
@@ -279,14 +302,56 @@ public class TranslatorUI extends JDialog implements ActionListener {
 	 * @return
 	 */
 	private SBMLDocument translate(File f) {
+	  JDialog load = null;
 		try {
+		  load = createLoadingJPanel("Translating kegg pathway " +f.getName() + "...");
 			this.doc = k2s.translate(f);
 			return doc;
 		} catch (Throwable exc) {
 			GUITools.showErrorMessage(this, exc, String.format(
 					"Could not read input file %s.", f.getAbsolutePath()));
+		} finally {
+		  if (load!=null) load.dispose();
 		}
 		return null;
+	}
+	
+	/**
+	 * Create and display a temporary loading panel with the given
+	 * message and a progress bar.
+	 * @param loadingMessage - the Message to display.
+	 * @return JDialog
+	 */
+	private JDialog createLoadingJPanel(String loadingMessage) {
+	  // Create the panel
+	  Dimension panelSize = new java.awt.Dimension(400,75);
+	  JPanel p = new JPanel(new VerticalLayout());
+	  p.setPreferredSize(panelSize);
+	  
+	  // Create the label and progressBar
+	  JLabel jl = new JLabel(loadingMessage);
+	  Font font = new java.awt.Font("Tahoma",Font.PLAIN,12);
+	  jl.setFont(font);
+	  
+	  JProgressBar prog = new JProgressBar();
+	  prog.setPreferredSize(new Dimension(panelSize.width-20, panelSize.height/4));
+	  p.add(jl, BorderLayout.NORTH);
+	  p.add(prog, BorderLayout.CENTER);
+	  
+	  // Link the progressBar to the keggConverter
+	  k2s.setProgressBar(new ProgressBarSwing(prog));
+	  
+	  // Display the panel in an jFrame
+	  JDialog f = new JDialog();
+	  f.setTitle("KEGG Translator");
+    f.setSize(p.getPreferredSize());
+	  f.setContentPane(p);
+	  f.setPreferredSize(p.getPreferredSize());
+	  f.setLocationRelativeTo(null);
+	  f.setVisible(true);
+	  f.setDefaultCloseOperation( DO_NOTHING_ON_CLOSE ); 
+	  
+	  return f;
 	}
 
 }

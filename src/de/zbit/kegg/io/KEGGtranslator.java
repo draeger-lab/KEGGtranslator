@@ -9,6 +9,13 @@ import de.zbit.kegg.parser.pathway.Pathway;
  */
 public interface KEGGtranslator {
 
+  /**
+   * Filename of the KEGG cache file (implemented just
+   * like the browser cache). Must be loded upon start
+   * and saved upon exit.
+   */
+  public static String cacheFileName = "keggdb.dat";
+  
 	/**
 	 * Translate a given KEGG Pathway and write it in the new format to outfile.
 	 * 

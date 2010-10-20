@@ -229,8 +229,9 @@ public class KEGG2GraphML implements KEGGtranslator {
    * @throws IOException 
    */
   public static void main(String[] args) throws IOException {
-    if (new File("keggdb.dat").exists() && new File("keggdb.dat").length()>0)
-      manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem("keggdb.dat");
+    if (new File(KEGGtranslator.cacheFileName).exists() && 
+        new File(KEGGtranslator.cacheFileName).length()>0)
+      manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
       
     if (args!=null && args.length >0) {
       File f = new File(args[0]);
@@ -242,7 +243,7 @@ public class KEGG2GraphML implements KEGGtranslator {
         KEGG2GraphML(p, outfile);
         
         if (manager.isCacheChangedSinceLastLoading())
-          KeggInfoManagement.saveToFilesystem("keggdb.dat", manager); // Remember already queried objects
+          KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, manager); // Remember already queried objects
       }
       return;
     }
@@ -258,7 +259,7 @@ public class KEGG2GraphML implements KEGGtranslator {
     System.out.println("Converting to GraphML");
     //silent = false;
     KEGG2GraphML(p, "files/KGMLsamplefiles/test.graphML");
-    KeggInfoManagement.saveToFilesystem("keggdb.dat", manager); // Remember already queried objects
+    KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, manager); // Remember already queried objects
   }
   
   /**

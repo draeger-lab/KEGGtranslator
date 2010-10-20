@@ -36,6 +36,7 @@ import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.Info;
 import de.zbit.util.ProgressBar;
@@ -114,6 +115,11 @@ public class KEGG2jSBML implements KEGGtranslator {
    * overwritten. This variable is used by the BatchConverter.
    */
   private boolean lastFileWasOverwritten = false;
+  
+  /**
+   * ProgressBar for Kegg2xConversion
+   */
+  private AbstractProgressBar progress=null;
   
   /**
    * Temporary Stringbuffers, needed to write CellDesigner annotations. Clear
@@ -312,6 +318,15 @@ public class KEGG2jSBML implements KEGGtranslator {
   public boolean isLastFileWasOverwritten() {
     return lastFileWasOverwritten;
   }	
+  
+  /**
+   * Set a progressBar that should be used to display the
+   * status of the conversion.
+   * @param progressBarSwing
+   */
+  public void setProgressBar(AbstractProgressBar progressBar) {
+    this.progress = progressBar;
+  }
   
   
   /*===========================
@@ -653,7 +668,7 @@ public class KEGG2jSBML implements KEGGtranslator {
       
       // Remember already queried objects
       if (getKeggInfoManager().hasChanged() || getKeggInfoManager().isCacheChangedSinceLastLoading()) {
-        KeggInfoManagement.saveToFilesystem("keggdb.dat", getKeggInfoManager());
+        KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, getKeggInfoManager());
       }
       return doc;
     }
@@ -709,18 +724,24 @@ public class KEGG2jSBML implements KEGGtranslator {
           preFetchIDs.add(ko_id);
         }
       }
-      manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs
-                                                         .size()]));
+      System.out.print("Fetching information from KEGG online resources... ");
+      manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]));
+      System.out.println("done.");
       // TODO: Add relations?
       // -------------------------
     }
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
     
     // Initialize a progress bar.
-    int aufrufeGesamt = p.getEntries().size(); // +p.getRelations().size(); // Relations gehen sehr schnell.
+    int totalCalls = p.getEntries().size(); // +p.getRelations().size(); // Relations are very fast.
     
     // if (adap==null) aufrufeGesamt+=p.getRelations().size(); // TODO: noch ausloten wann klasse aufgerufen wird.
-    ProgressBar progress = new ProgressBar(aufrufeGesamt + 1);
+    if (progress==null) {
+      progress = new ProgressBar(totalCalls + 1);
+    } else {
+      progress.reset();
+      progress.setNumberOfTotalCalls(totalCalls + 1);
+    }
     progress.DisplayBar();
     
     // new Model with Kegg id as id.
@@ -1441,9 +1462,9 @@ public class KEGG2jSBML implements KEGGtranslator {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network
     // load and heavily reduces computation time.
     KEGG2jSBML k2s;
-    if (new File("keggdb.dat").exists()
-        && new File("keggdb.dat").length() > 0) {
-      KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem("keggdb.dat");
+    if (new File(KEGGtranslator.cacheFileName).exists()
+        && new File(KEGGtranslator.cacheFileName).length() > 0) {
+      KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
       k2s = new KEGG2jSBML(manager);
     } else {
       k2s = new KEGG2jSBML();
@@ -1475,7 +1496,7 @@ public class KEGG2jSBML implements KEGGtranslator {
       
       // Remember already queried objects (save cache)
       if (k2s.getKeggInfoManager().hasChanged() || k2s.getKeggInfoManager().isCacheChangedSinceLastLoading()) {
-        KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager());
+        KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, k2s.getKeggInfoManager());
       }
       
       return;
@@ -1492,7 +1513,7 @@ public class KEGG2jSBML implements KEGGtranslator {
       
       // Remember already queried objects
       if (k2s.getKeggInfoManager().hasChanged() || k2s.getKeggInfoManager().isCacheChangedSinceLastLoading()) {
-        KeggInfoManagement.saveToFilesystem("keggdb.dat", k2s.getKeggInfoManager());
+        KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, k2s.getKeggInfoManager());
       }
       
     } catch (Exception e) {
