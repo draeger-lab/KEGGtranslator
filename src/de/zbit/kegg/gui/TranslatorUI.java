@@ -15,7 +15,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
@@ -27,10 +26,10 @@ import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.io.KEGG2jSBML;
 
 /**
- * @author draeger
+ * @author Andreas Dr&auml;ger
  * 
  */
-public class ConverterUI extends JDialog implements ActionListener {
+public class TranslatorUI extends JDialog implements ActionListener {
 
 	/**
 	 * This is a enumeration of all possible commands this
@@ -47,7 +46,11 @@ public class ConverterUI extends JDialog implements ActionListener {
 		/**
 		 * Command to save the conversion result to a file.
 		 */
-		SAVE_FILE;
+		SAVE_FILE,
+		/**
+		 * Closes the program
+		 */
+		EXIT;
 
 		/**
 		 * Returns a human-readable name for each command.
@@ -60,6 +63,8 @@ public class ConverterUI extends JDialog implements ActionListener {
 				return "Open";
 			case SAVE_FILE:
 				return "Save";
+			case EXIT:
+				return "Exit";
 			default:
 				return "Unknown";
 			}
@@ -69,25 +74,19 @@ public class ConverterUI extends JDialog implements ActionListener {
 	static {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		if (new File("keggdb.dat").exists()
 				&& new File("keggdb.dat").length() > 0) {
 			KeggInfoManagement manager;
-      try {
-        manager = (KeggInfoManagement) KeggInfoManagement
-        		.loadFromFilesystem("keggdb.dat");
-      } catch (IOException e) {
-        e.printStackTrace();
-        manager = new KeggInfoManagement();
-      }
+			try {
+				manager = (KeggInfoManagement) KeggInfoManagement
+						.loadFromFilesystem("keggdb.dat");
+			} catch (IOException e) {
+				e.printStackTrace();
+				manager = new KeggInfoManagement();
+			}
 			k2s = new KEGG2jSBML(manager);
 		} else {
 			k2s = new KEGG2jSBML();
@@ -123,13 +122,13 @@ public class ConverterUI extends JDialog implements ActionListener {
 			}
 			if (infile != null) {
 				if (outfile != null) {
-					new ConverterUI(infile, outfile);
+					new TranslatorUI(infile, outfile);
 				} else {
-					new ConverterUI(infile, System.getProperty("user.dir"));
+					new TranslatorUI(infile, System.getProperty("user.dir"));
 				}
 			}
 		} else {
-			new ConverterUI();
+			new TranslatorUI();
 		}
 	}
 
@@ -151,7 +150,7 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 * 
 	 * @throws SBMLException
 	 */
-	public ConverterUI() throws SBMLException {
+	public TranslatorUI() throws SBMLException {
 		this(System.getProperty("user.dir"), System.getProperty("user.dir"));
 	}
 
@@ -161,32 +160,35 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 * @param saveDir
 	 * @throws SBMLException
 	 */
-	public ConverterUI(String baseDir, String saveDir) throws SBMLException {
+	public TranslatorUI(String baseDir, String saveDir) throws SBMLException {
 		super();
 		this.baseOpenDir = baseDir;
 		this.baseSaveDir = saveDir;
-		this.doc = convert(openFile());
+		this.doc = translate(openFile());
 		showGUI(doc);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		switch (Command.valueOf(e.getActionCommand())) {
 		case OPEN_FILE:
-			// Convert Kegg File to SBML document.
+			// Translate KEGG file to SBML document.
 			if (isVisible()) {
 				setVisible(false);
 				removeAll();
 			}
 			try {
-				showGUI(convert(openFile()));
-			} catch (SBMLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				showGUI(translate(openFile()));
+			} catch (Throwable exc) {
+				exc.printStackTrace();
+				GUITools.showErrorMessage(this, exc);
 			}
 			break;
 		case SAVE_FILE:
 			saveFile();
 			break;
+		case EXIT:
+			dispose();
+			System.exit(0);
 		default:
 			System.err.println("unsuported action");
 			break;
@@ -216,20 +218,16 @@ public class ConverterUI extends JDialog implements ActionListener {
 	 * Open and display a KGML file.
 	 */
 	private File openFile() {
-		File f = new File(baseOpenDir);
-		if (f.isDirectory()) {
-			JFileChooser chooser = GUITools
-					.createJFileChooser(baseOpenDir, false, false,
-							JFileChooser.FILES_ONLY, new FileFilterKGML());
-			if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-				f = chooser.getSelectedFile();
-				baseOpenDir = f.getParent();
-			} else {
-				dispose();
-				System.exit(0);
-			}
+		File file = GUITools.openFileDialog(this, baseOpenDir, false, false,
+				JFileChooser.FILES_ONLY, new FileFilterKGML());
+		if (file != null) {
+			baseOpenDir = file.getParent();
+			return file;
+		} else {
+			dispose();
+			System.exit(0);
 		}
-		return f;
+		return new File(baseOpenDir);
 	}
 
 	/**
@@ -267,26 +265,26 @@ public class ConverterUI extends JDialog implements ActionListener {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setJMenuBar(createJMenuBar());
 		getContentPane().add(new SBMLModelSplitPane(doc.getModel()));
-		setTitle("KGML2SBMLconverter " + doc.getModel().getId());
+		setTitle("SBML from KEGG " + doc.getModel().getId());
 		pack();
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
 
 	/**
-	 * This method convertes a given KGML file into an SBMLDocument by calling
-	 * the dedicated method in Kegg2jSBML.
+	 * This method translates a given KGML file into an SBMLDocument by calling
+	 * the dedicated method in {@link KEGG2jSBML}.
 	 * 
 	 * @param f
 	 * @return
 	 */
-	private SBMLDocument convert(File f) {
+	private SBMLDocument translate(File f) {
 		try {
-			this.doc = k2s.convert(f);
+			this.doc = k2s.translate(f);
 			return doc;
-		} catch (IOException exc) {
-			JOptionPane.showMessageDialog(this, exc.getMessage(), exc
-					.getClass().getSimpleName(), JOptionPane.WARNING_MESSAGE);
+		} catch (Throwable exc) {
+			GUITools.showErrorMessage(this, exc, String.format(
+					"Could not read input file %s.", f.getAbsolutePath()));
 		}
 		return null;
 	}

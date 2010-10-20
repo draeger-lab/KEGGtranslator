@@ -3,33 +3,16 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.xml.stream.XMLStreamException;
-
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.DirectoryParser;
 
 
 /**
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  */
-public class BatchConvertKegg {
-  /**
-   * @param args
-   */
-  public static void main(String[] args) {
-    BatchConvertKegg batch = new BatchConvertKegg();
-    if (args!=null && args.length>0) {
-      batch.setOrgOutdir(args[0]);
-      if (args.length>1) batch.setChangeOutdirTo(args[1]);
-      batch.parseDirAndSubDir();
-      return;
-    }
-    System.out.println("Demo Mode:");
-    batch.setOrgOutdir("C:\\Dokumente und Einstellungen\\wrzodek\\Desktop\\KEGG\\KEGG Daten\\kgml");
-    batch.setChangeOutdirTo("C:\\Dokumente und Einstellungen\\wrzodek\\Desktop\\KEGG\\KEGG Daten\\kgml\\gml");
-    batch.parseDirAndSubDir();
-  }
+public class BatchKEGGtranslator {
+
   /**
    * 
    */
@@ -46,7 +29,7 @@ public class BatchConvertKegg {
   /**
    * 
    */
-  private KeggConverter converter;
+  private KEGGtranslator converter;
   
   /**
    * 
@@ -64,6 +47,25 @@ public class BatchConvertKegg {
     return myDir;
   }
   
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String args[]) {
+		BatchKEGGtranslator batch = new BatchKEGGtranslator();
+		if (args != null && args.length > 0) {
+			batch.setOrgOutdir(args[0]);
+			if (args.length > 1)
+				batch.setChangeOutdirTo(args[1]);
+			batch.parseDirAndSubDir();
+			return;
+		}
+		System.out.println("Demo Mode:");
+		batch.setOrgOutdir(System.getProperty("user.home"));
+		batch.setChangeOutdirTo(System.getProperty("user.home"));
+		batch.parseDirAndSubDir();
+	}
+  
   /**
    * 
    * @return
@@ -76,7 +78,7 @@ public class BatchConvertKegg {
    * 
    * @return
    */
-  public KeggConverter getConverter() {
+  public KEGGtranslator getConverter() {
     return converter;
   }
   
@@ -152,7 +154,7 @@ public class BatchConvertKegg {
           
           // XXX: Main Part
           try {
-			converter.convert(pw.get(i), outFile);
+			converter.translate(pw.get(i), outFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -180,7 +182,7 @@ public class BatchConvertKegg {
    * 
    * @param converter
    */
-  public void setConverter(KeggConverter converter) {
+  public void setConverter(KEGGtranslator converter) {
     this.converter = converter;
   }
   

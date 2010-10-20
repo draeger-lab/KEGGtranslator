@@ -20,7 +20,6 @@ package de.zbit.kegg.gui;
 
 import java.awt.event.ActionListener;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -29,7 +28,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.sbml.jsbml.ASTNode;
@@ -179,25 +178,24 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * .TreeSelectionEvent)
 	 */
 	public void valueChanged(TreeSelectionEvent e) {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
+		TreeNode node = (TreeNode) tree
 				.getLastSelectedPathComponent();
 		if (node == null)
 			// Nothing is selected.
 			return;
-		Object nodeInfo = node.getUserObject();
-		if (nodeInfo instanceof SBase) {
+		if (node instanceof SBase) {
 			int proportionalLocation = getDividerLocation();
 			try {
-				setRightComponent(createRightComponent((SBase) nodeInfo));
+				setRightComponent(createRightComponent((SBase) node));
 			} catch (SBMLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			setDividerLocation(proportionalLocation);
-		} else if (nodeInfo instanceof ASTNode) {
+		} else if (node instanceof ASTNode) {
 			int proportionalLocation = getDividerLocation();
 			try {
-				setRightComponent(createRightComponent((ASTNode) nodeInfo));
+				setRightComponent(createRightComponent((ASTNode) node));
 			} catch (SBMLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

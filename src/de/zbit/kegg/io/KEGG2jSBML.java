@@ -44,13 +44,13 @@ import de.zbit.util.Utils;
 
 /**
  * 
- * @author wrzodek
+ * @author Clemens Wrzodek
  * 
  * Notes:
  * XXX: Important to know: subtype.setValue contains replacement of &gt; to > !!!
- * TODO: Edges (Subtypes of relations) now may have colors.
+ * TODO: Edges (sub types of relations) now may have colors.
  */
-public class KEGG2jSBML implements KeggConverter {
+public class KEGG2jSBML implements KEGGtranslator {
   
   /*
    * INTERNAL VARIABLES
@@ -600,7 +600,7 @@ public class KEGG2jSBML implements KeggConverter {
   /**
    * {@inheritDoc}
    */
-  public boolean convert(Pathway p, String outFile) {
+  public boolean translate(Pathway p, String outFile) {
     SBMLDocument doc = Kegg2jSBML(p);
     
     // JSBML IO => write doc to outfile.
@@ -629,7 +629,7 @@ public class KEGG2jSBML implements KeggConverter {
    * 
    * @see de.zbit.kegg.io.KeggConverter#Convert()
    */
-  public void convert(String infile, String outfile)
+  public void translate(String infile, String outfile)
   throws XMLStreamException, InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException, SBMLException {
     SBMLDocument doc = Kegg2jSBML(infile);
     
@@ -647,7 +647,7 @@ public class KEGG2jSBML implements KeggConverter {
    * @return the generated jSBML document.
    * @throws IOException - if the input file is not readable.
    */
-  public SBMLDocument convert(File f) throws IOException {
+  public SBMLDocument translate(File f) throws IOException {
     if (f.exists() && f.isFile() && f.canRead()) {
       SBMLDocument doc = Kegg2jSBML(f.getAbsolutePath());
       
@@ -1454,7 +1454,7 @@ public class KEGG2jSBML implements KeggConverter {
       File f = new File(args[0]);
       if (f.isDirectory()) {
         // Directory mode. Convert all files in directory.
-        BatchConvertKegg batch = new BatchConvertKegg();
+        BatchKEGGtranslator batch = new BatchKEGGtranslator();
         batch.setOrgOutdir(args[0]);
         if (args.length > 1)
           batch.setChangeOutdirTo(args[1]);
@@ -1470,7 +1470,7 @@ public class KEGG2jSBML implements KeggConverter {
         if (args.length > 1) outfile = args[1];
         
         Pathway p = KeggParser.parse(args[0]).get(0);
-        k2s.convert(p, outfile);
+        k2s.translate(p, outfile);
       }
       
       // Remember already queried objects (save cache)
@@ -1487,7 +1487,7 @@ public class KEGG2jSBML implements KeggConverter {
     
     long start = System.currentTimeMillis();
     try {
-      k2s.convert("files/KGMLsamplefiles/map04010hsa.xml", "files/KGMLsamplefiles/map04010hsa.sbml.xml");
+      k2s.translate("files/KGMLsamplefiles/map04010hsa.xml", "files/KGMLsamplefiles/map04010hsa.sbml.xml");
       // k2s.Kegg2jSBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml");
       
       // Remember already queried objects

@@ -49,7 +49,7 @@ import de.zbit.util.ProgressBar;
  * 
  * @author wrzodek
  */
-public class KEGG2GraphML implements KeggConverter {
+public class KEGG2GraphML implements KEGGtranslator {
   /**
    * 
    */
@@ -221,7 +221,7 @@ public class KEGG2GraphML implements KeggConverter {
    */
   public static void KEGG2GraphML(Pathway p, String outFile) {
     KEGG2GraphML k2g = new KEGG2GraphML();
-    k2g.convert(p, outFile);
+    k2g.translate(p, outFile);
   }
   
   /**
@@ -234,7 +234,7 @@ public class KEGG2GraphML implements KeggConverter {
       
     if (args!=null && args.length >0) {
       File f = new File(args[0]);
-      if (f.isDirectory()) BatchConvertKegg.main(args);
+      if (f.isDirectory()) BatchKEGGtranslator.main(args);
       else {
         String outfile = args[0].substring(0, args[0].contains(".")?args[0].lastIndexOf("."):args[0].length())+".graphML";
         if (args.length>1) outfile = args[1];
@@ -382,7 +382,7 @@ public class KEGG2GraphML implements KeggConverter {
   /**
    * {@inheritDoc}
    */
-  public boolean convert(Pathway p, String outFile) {
+  public boolean translate(Pathway p, String outFile) {
     Graph2D graph = convert(p);
     if (graph==null) return false;
     return writeGraphToFile(outFile, graph);
@@ -1002,9 +1002,9 @@ public class KEGG2GraphML implements KeggConverter {
   /**
    * {@inheritDoc}
    */
-  public void convert(String infile, String outfile) {
+  public void translate(String infile, String outfile) {
     Pathway p = KeggParser.parse(infile).get(0);
-    convert(p, outfile);
+    translate(p, outfile);
   }
   
   

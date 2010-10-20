@@ -7,13 +7,13 @@ import java.util.List;
 
 import org.sbml.jsbml.SBMLException;
 
-import de.zbit.kegg.gui.ConverterUI;
+import de.zbit.kegg.gui.TranslatorUI;
 
 /**
  * @author draeger
  * 
  */
-public class ConverterTest {
+public class TranslatorTest {
 
 	/**
 	 * 
@@ -22,7 +22,7 @@ public class ConverterTest {
 	 *            file.
 	 * @throws SBMLException 
 	 */
-	public ConverterTest(String path) throws SBMLException {
+	public TranslatorTest(String path) throws SBMLException {
 		File f = new File(path);
 		if (f.exists()) {
 			List<File> files;
@@ -34,7 +34,7 @@ public class ConverterTest {
 			}
 			for (File file : files) {
 				System.out.println(file);
-				new ConverterUI(file.getAbsolutePath(), System
+				new TranslatorUI(file.getAbsolutePath(), System
 						.getProperty("user.dir"));
 			}
 		}
@@ -48,7 +48,7 @@ public class ConverterTest {
 	 * @throws SBMLException 
 	 */
 	public static void main(String args[]) throws SBMLException {
-		new ConverterTest(args[0]);
+		new TranslatorTest(args[0]);
 	}
 
 	/**

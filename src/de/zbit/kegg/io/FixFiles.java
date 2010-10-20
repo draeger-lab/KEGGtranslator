@@ -12,7 +12,8 @@ import de.zbit.util.DirectoryParser;
 /**
  * Small bugfixes in generated graphML files.
  * Much faster than re-generating all files.
- * @author wrzodek
+ * 
+ * @author Clemens Wrzodek
  */
 public class FixFiles {
   

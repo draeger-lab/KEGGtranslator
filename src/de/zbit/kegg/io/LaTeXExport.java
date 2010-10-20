@@ -49,6 +49,7 @@ import org.sbml.jsbml.util.compilers.LaTeX;
  * @author Andreas Dr&auml;ger
  * @date 2007-12-04
  */
+@SuppressWarnings("deprecation")
 public class LaTeXExport extends LaTeX {
 
 	/**
@@ -195,7 +196,6 @@ public class LaTeXExport extends LaTeX {
 	 * @param u
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public StringBuilder format(Unit u) {
 		StringBuilder buffer = new StringBuilder();
 		boolean standardScale = (u.getScale() == 18) || (u.getScale() == 12)
@@ -682,8 +682,6 @@ public class LaTeXExport extends LaTeX {
 	 * @throws IOException
 	 * @throws SBMLException 
 	 */
-
-	@SuppressWarnings("deprecation")
 	public StringBuffer toLaTeX(Model model) throws IOException, SBMLException {
 		StringBuffer laTeX;
 		String newLine = System.getProperty("line.separator");
