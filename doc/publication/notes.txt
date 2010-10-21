@@ -7,6 +7,8 @@ Publizieren in Oxford Bioinformatics
 - auch gml export (und weitere yFiles formate prüfen)
 - API, webservice, stand-alone anbieten
 - yFiles obfuscating rules beachten!
+- Alle unterstützen MIRIAM identifier aufzählen
+- Notes erwähnen (sehr umfangreich mit bild, etc.)
 
 - Für Webservice: KGML downloaden und bereithalten.
 - Wir dürfen (und sollten) Jochens pathway visualizer mit-verwenden (und mit-publizieren?)

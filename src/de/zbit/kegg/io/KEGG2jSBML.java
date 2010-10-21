@@ -24,7 +24,6 @@ import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.CVTerm.Type;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
-import de.zbit.kegg.KeggAdaptor;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.parser.KeggParser;
@@ -123,6 +122,16 @@ public class KEGG2jSBML implements KEGGtranslator {
   private AbstractProgressBar progress=null;
   
   /**
+   * Default compartment size.
+   */
+  private double defaultCompartmentSize=1d;
+  
+  /**
+   * Default initial amount of a species.
+   */
+  private double speciesDefaultInitialAmount=1d;
+  
+  /**
    * Temporary Stringbuffers, needed to write CellDesigner annotations. Clear
    * those before converting another document!
    */
@@ -207,7 +216,7 @@ public class KEGG2jSBML implements KEGGtranslator {
    * Initialize a new Kegg2jSBML object, using a new Cache and a new KeggAdaptor.
    */
   public KEGG2jSBML() {
-    this(new KeggInfoManagement(1000, new KeggAdaptor()));
+    this(new KeggInfoManagement());
   }
   
   /**
@@ -329,6 +338,40 @@ public class KEGG2jSBML implements KEGGtranslator {
     this.progress = progressBar;
   }
   
+  /**
+   * Returns the default compartment size.
+   * @return
+   */
+  public double getDefaultCompartmentSize() {
+    return defaultCompartmentSize;
+  }
+  
+  /**
+   * Set the default size of a compartment.
+   * Default: 1.
+   * @param d
+   */
+  public void setDefaultCompartmentSize(double d) {
+    defaultCompartmentSize=d;
+  }
+  
+  /**
+   * Returns the default initial amount of a species.
+   * @return
+   */
+  public double getDefaultSpeciesInitialAmount() {
+    return speciesDefaultInitialAmount;
+  }
+  
+  /**
+   * Set the default initial amount of a species.
+   * Default: 1.
+   * @param d
+   */
+  public void setDefaultSpeciesInitialAmount(double d) {
+    speciesDefaultInitialAmount=d;
+  }
+
   
   /*===========================
    * FUNCTIONS
@@ -668,8 +711,9 @@ public class KEGG2jSBML implements KEGGtranslator {
       SBMLDocument doc = Kegg2jSBML(f.getAbsolutePath());
       
       // Remember already queried objects
-      if (getKeggInfoManager().hasChanged() || getKeggInfoManager().isCacheChangedSinceLastLoading()) {
+      if (getKeggInfoManager().hasChanged()) {
         KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, getKeggInfoManager());
+        System.out.println("Cache saved.");
       }
       return doc;
     }
@@ -751,8 +795,7 @@ public class KEGG2jSBML implements KEGGtranslator {
     model.setName(p.getTitle());
     Compartment compartment = model.createCompartment("default");
     // Create neccessary default compartment
-    // TODO: provide a parameter for this value.
-    compartment.setSize(1d);
+    compartment.setSize(defaultCompartmentSize);
     compartment.setUnits(model.getUnitDefinition("volume"));
     // Be careful: compartment ID ant other compartment stuff are HARDCODED
     // in cellDesigner extension code generation!
@@ -767,7 +810,7 @@ public class KEGG2jSBML implements KEGGtranslator {
     annot.setAbout("#" + model.getMetaId());
     model.setAnnotation(annot);
     model.setHistory(hist);
-    model.appendNotes("<body xmlns=\"http://www.w3.org/1999/xhtml\">");
+    model.appendNotes("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>");
     
     // CellDesigner Annotations
     if (addCellDesignerAnnots) {
@@ -821,7 +864,11 @@ public class KEGG2jSBML implements KEGGtranslator {
           model.addCVTerm(mtGoID);
       }
     }
-    model.appendNotes(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", p.getImage(), p.getImage(), p.getImage()));
+    
+    String alternativeImageURL = "http://www.genome.jp/kegg-bin/show_pathway?"+
+      (p.getName().contains(":")?p.getName().substring(p.getName().indexOf(":")+1): p.getName());
+    
+    model.appendNotes(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", p.getImage(), p.getImage(), alternativeImageURL));
     model.appendNotes(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
     
     // Write model version and creation date, if available, into model notes.
@@ -909,8 +956,8 @@ public class KEGG2jSBML implements KEGGtranslator {
       /*
        * TODO: Gruppenknoten erstellen.
        * Gibt es sowas in SBML?
-       * InCD -> ja, aber umsetzung ist ungenÃŒgend (nur
-       * zur visualisierung, keine SBML Species fÃŒr alle species).
+       * InCD -> ja, aber umsetzung ist ungenügend (nur
+       * zur visualisierung, keine SBML Species für alle species).
        *
        *  Beispiel (aus map04010hsa.xml):
        *      <entry id="141" name="group:" type="genes">
@@ -949,8 +996,7 @@ public class KEGG2jSBML implements KEGGtranslator {
       Species spec = model.createSpecies();
       spec.setCompartment(compartment); // spec.setId("s_" +
       // entry.getId());
-      // TODO: introduce a parameter for this quantity.
-      spec.setInitialAmount(1d);
+      spec.setInitialAmount(speciesDefaultInitialAmount);
       spec.setUnits(model.getUnitDefinition("substance"));
       
       // ID has to be at this place, because other refer to it by id and if id is not set. refenreces go to null.
@@ -962,7 +1008,7 @@ public class KEGG2jSBML implements KEGGtranslator {
       Annotation specAnnot = new Annotation("");
       specAnnot.setAbout("");
       spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
-      spec.appendNotes("<body xmlns=\"http://www.w3.org/1999/xhtml\">");
+      spec.appendNotes("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>");
       spec.appendNotes(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
       
       // Set SBO Term
@@ -1035,7 +1081,11 @@ public class KEGG2jSBML implements KEGGtranslator {
       CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
       CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
       CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-      // TODO: Seit neustem noch mehr in MIRIAM verfügbar.
+      // New as of oktober 2010:
+      CVTerm PDBeChem = new CVTerm(); PDBeChem.setQualifierType(Type.BIOLOGICAL_QUALIFIER); PDBeChem.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm GlycomeDB = new CVTerm(); GlycomeDB.setQualifierType(Type.BIOLOGICAL_QUALIFIER); GlycomeDB.setBiologicalQualifierType(Qualifier.BQB_IS);
+      CVTerm LipidBank = new CVTerm(); LipidBank.setQualifierType(Type.BIOLOGICAL_QUALIFIER); LipidBank.setBiologicalQualifierType(Qualifier.BQB_IS);
+      
       
       // Parse every gene/object in this node.
       for (String ko_id : entry.getName().split(" ")) {
@@ -1045,7 +1095,7 @@ public class KEGG2jSBML implements KEGGtranslator {
         String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(ko_id, entry.getType());
         if (kgMiriamEntry != null) cvtKGID.addResource(kgMiriamEntry);
         
-        // Retrieve further information via Kegg API -- Be careful: very slow!
+        // Retrieve further information via Kegg API -- Be careful: very slow! Precache all queries at top of this function!
         KeggInfos infos = new KeggInfos(ko_id, manager);
         if (infos.queryWasSuccessfull()) {
           
@@ -1093,6 +1143,13 @@ public class KEGG2jSBML implements KEGGtranslator {
             appendAllIds(infos.getReaction_id(), cvtReactionID, KeggInfos.miriam_urn_kgReaction);
           if (infos.getTaxonomy() != null)
             appendAllIds(infos.getTaxonomy(), cvtTaxonomyID, KeggInfos.miriam_urn_taxonomy);
+
+          if (infos.getPDBeChem()!= null)
+            appendAllIds(infos.getPDBeChem(), PDBeChem, KeggInfos.miriam_urn_PDBeChem);
+          if (infos.getGlycomeDB()!= null)
+            appendAllIds(infos.getGlycomeDB(), GlycomeDB, KeggInfos.miriam_urn_GlycomeDB);
+          if (infos.getLipidBank()!= null)
+            appendAllIds(infos.getLipidBank(), LipidBank, KeggInfos.miriam_urn_LipidBank);
         }
         
       }
@@ -1112,10 +1169,14 @@ public class KEGG2jSBML implements KEGGtranslator {
       if (cvt3dmetID.getNumResources() > 0) spec.addCVTerm(cvt3dmetID);
       if (cvtReactionID.getNumResources() > 0) spec.addCVTerm(cvtReactionID);
       if (cvtTaxonomyID.getNumResources() > 0) spec.addCVTerm(cvtTaxonomyID);
+      if (PDBeChem.getNumResources() > 0) spec.addCVTerm(PDBeChem);
+      if (GlycomeDB.getNumResources() > 0) spec.addCVTerm(GlycomeDB);
+      if (LipidBank.getNumResources() > 0) spec.addCVTerm(LipidBank);
+      
       
       // Finally, add the fully configured species.
       spec.setName(name);
-      spec.appendNotes("</body>");
+      spec.appendNotes("</body></html>");
       specAnnot.setAbout("#" + spec.getMetaId());
       entry.setCustom(spec); // Remember node in KEGG Structure for further references.
       if (addCellDesignerAnnots) addCellDesignerAnnotationToSpecies(spec, entry);
@@ -1150,7 +1211,7 @@ public class KEGG2jSBML implements KEGGtranslator {
       Annotation rAnnot = new Annotation("");
       rAnnot.setAbout("");
       sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheuert... (Annotation darf nicht null sein, ist aber default null).
-      sbReaction.appendNotes("<body xmlns=\"http://www.w3.org/1999/xhtml\">");
+      sbReaction.appendNotes("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>");
       
       // Pro/ Edukte
       sbReaction.setReversible(r.getType().equals(ReactionType.reversible));
@@ -1222,7 +1283,7 @@ public class KEGG2jSBML implements KEGGtranslator {
       // Finally, add the fully configured reaction.
       sbReaction.setName(r.getName());
       sbReaction.setId(NameToSId(r.getName()));
-      sbReaction.appendNotes("</body>");
+      sbReaction.appendNotes("</body></html>");
       sbReaction.setMetaId("meta_" + sbReaction.getId());
       sbReaction.setSBOTerm(231); // interaction. Most generic SBO Term possible, for a reaction.
       rAnnot.setAbout("#" + sbReaction.getMetaId());
@@ -1233,7 +1294,7 @@ public class KEGG2jSBML implements KEGGtranslator {
     
     // TODO: Special reactions / relations.
     
-    model.appendNotes("</body>");
+    model.appendNotes("</body></html>");
     
     /* Removing nodes here does not work, because all CellDesigner annotations are static and don't get removed!
      * if (removeOrphans) {
@@ -1355,6 +1416,7 @@ public class KEGG2jSBML implements KEGGtranslator {
    * @param miriam_URNPrefix
    */
   private static void appendAllIds(String IDs, CVTerm myCVterm, String miriam_URNPrefix) {
+    if (IDs==null || IDs.length()<1) return;
     for (String id : IDs.split(" ")) {
       myCVterm.addResource(miriam_URNPrefix + KeggInfos.suffix(id));
     }
@@ -1496,7 +1558,7 @@ public class KEGG2jSBML implements KEGGtranslator {
       }
       
       // Remember already queried objects (save cache)
-      if (k2s.getKeggInfoManager().hasChanged() || k2s.getKeggInfoManager().isCacheChangedSinceLastLoading()) {
+      if (k2s.getKeggInfoManager().hasChanged()) {
         KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, k2s.getKeggInfoManager());
       }
       
@@ -1510,10 +1572,11 @@ public class KEGG2jSBML implements KEGGtranslator {
     long start = System.currentTimeMillis();
     try {
       k2s.translate("files/KGMLsamplefiles/map04010hsa.xml", "files/KGMLsamplefiles/map04010hsa.sbml.xml");
+      k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
       // k2s.Kegg2jSBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml");
       
       // Remember already queried objects
-      if (k2s.getKeggInfoManager().hasChanged() || k2s.getKeggInfoManager().isCacheChangedSinceLastLoading()) {
+      if (k2s.getKeggInfoManager().hasChanged()) {
         KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, k2s.getKeggInfoManager());
       }
       
