@@ -52,12 +52,12 @@ import de.zbit.util.Utils;
  */
 public class KEGG2jSBML implements KEGGtranslator {
   
-	/**
-	 * 
-	 */
+  /**
+   * 
+   */
   public static final String VERSION_NUMBER = "1.0.0";
-
-/**
+  
+  /**
    * Retrieve annotations from Kegg or use purely information available in the
    * document.
    */
@@ -71,7 +71,7 @@ public class KEGG2jSBML implements KEGGtranslator {
   /**
    * Remove single, not linked nodes/species
    */
-  private boolean removeOrphans = true;
+  private boolean removeOrphans = false; // TODO: Set to true, by default.
   
   /**
    * If false, all relations in the document will be skipped. Just like most
@@ -81,14 +81,14 @@ public class KEGG2jSBML implements KEGGtranslator {
   
   /**
    * If true, all nodes in white color (except for small molecules/ compounds)
-   * will be removed from the graph. Kegg colours all nodes, which do NOT
+   * will be removed from the graph. Kegg colors all nodes, which do NOT
    * occur in the current species in white. Removing these nodes is HEAVILY
    * recommended if you want to use the SBML document for simulations.
    * 
    * Set this node to false if you convert generic pathways (not species
    * specific), since they ONLY contain white nodes.
    */
-  private boolean removeWhiteNodes = true;
+  private boolean removeWhiteNodes = false; // TODO: Set to true, by default.
   
   /**
    * If false, simply sets an SBO term to the species, based on entryType.
@@ -383,8 +383,7 @@ public class KEGG2jSBML implements KEGGtranslator {
    * @param annot
    * @param defaultC
    */
-  private void addCellDesignerAnnotationToModel(Pathway p, Annotation annot,
-      Compartment defaultC) {
+  private void addCellDesignerAnnotationToModel(Pathway p, Annotation annot, Compartment defaultC) {
     annot.appendNoRDFAnnotation("<celldesigner:extension>\n");
     annot.appendNoRDFAnnotation("<celldesigner:modelVersion>4.0</celldesigner:modelVersion>\n");
     int[] maxCoords = getMaxCoords(p);
@@ -535,7 +534,7 @@ public class KEGG2jSBML implements KEGGtranslator {
   private void addCellDesignerAnnotationToSpecies(Species spec, Entry e) {
     // TODO: Sind die defaults so richtig? was bedeutet z.B. cd:activity?
     EntryType t = e.getType();
-    boolean isGroupNode = (t.equals(EntryType.group) || t.equals(EntryType.genes)); // genes = group in kgml v<0.7
+    boolean isGroupNode = isGroupNode(e); // genes = group in kgml v<0.7
     
     spec.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
     spec.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
@@ -550,8 +549,18 @@ public class KEGG2jSBML implements KEGGtranslator {
     // Warning: prefix "cd_sa" is also hardcoded in addCDAtoReaction!
     target.append("<celldesigner:"
         + (isGroupNode ? "complexSpeciesAlias" : "speciesAlias")
-        + " id=\"cd_sa" + spec.getId() + "\" species=\"" + spec.getId()
-        + "\">\n");
+        + " id=\"cd_sa" + spec.getId() + "\" species=\"" + spec.getId()+"\"");
+    
+    // If this is a child of a group (complex) node, reflect this here.
+    if (!isGroupNode && e.getParentNode()!=null) {
+      Entry parent = e.getParentNode();
+      if (parent.getCustom()!=null) {
+        target.append(" complexSpeciesAlias=\"");
+        target.append("cd_sa"+((Species)parent.getCustom()).getId());
+        target.append('\"');
+      }
+    }
+    target.append(">\n");
     
     target.append("<celldesigner:activity>inactive</celldesigner:activity>\n");
     if (e.hasGraphics())
@@ -574,10 +583,14 @@ public class KEGG2jSBML implements KEGGtranslator {
       target.append(String.format("<celldesigner:boxSize width=\"%d\" height=\"%d\"/>\n",
           e.hasGraphics() ? e.getGraphics().getWidth() : 90, e.hasGraphics() ? e.getGraphics().getHeight() : 25));
       target.append("<celldesigner:singleLine width=\"" + (isGroupNode ? "2.0" : (i == 1 ? "1.0" : "0.0")) + "\"/>\n");
+      
+      String col = "FFFFFF";
+      if (e.hasGraphics() && e.getGraphics().getBgcolor()!=null) {
+        col = e.getGraphics().getBgcolor().replace("#", "").toLowerCase();
+      }
       target.append(String.format("<celldesigner:paint color=\""
           + (i == 1 ? "ff" : "3f")
-          + "%s\" scheme=\"Color\"/>\n", e.getGraphics().getBgcolor().replace("#", "").toLowerCase()));
-      
+          + "%s\" scheme=\"Color\"/>\n", col));
       if (i == 1) {
         target.append("</celldesigner:usualView>\n");
       } else {
@@ -632,12 +645,10 @@ public class KEGG2jSBML implements KEGGtranslator {
    * @param sr
    * @param SBO
    */
-  private void configureReactionComponent(Pathway p, ReactionComponent rc,
-      SpeciesReference sr, int SBO) {
-    if (rc.getName() == null || rc.getName().trim().length() == 0) {
+  private void configureReactionComponent(Pathway p, ReactionComponent rc, SpeciesReference sr, int SBO) {
+    if (rc.getName() == null || rc.getName().trim().length()<1) {
       rc = rc.getAlt();
-      if (rc.getName() == null || rc.getName().trim().length() == 0)
-        return;
+      if (rc==null || rc.getName() == null || rc.getName().trim().length()<1) return;
     }
     sr.setName(rc.getName());
     sr.setId(NameToSId(sr.getName()));
@@ -775,7 +786,11 @@ public class KEGG2jSBML implements KEGGtranslator {
       // TODO: Add relations?
       // -------------------------
     }
+    // Reset lists and buffers.
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
+    CDloSpeciesAliases = new StringBuffer();
+    CDloComplexSpeciesAliases = new StringBuffer();
+    CDloProteins = new StringBuffer();
     
     // Initialize a progress bar.
     int totalCalls = p.getEntries().size(); // +p.getRelations().size(); // Relations are very fast.
@@ -954,10 +969,17 @@ public class KEGG2jSBML implements KEGGtranslator {
         }
       }
       /*
-       * TODO: Gruppenknoten erstellen.
+       * XXX: Gruppenknoten erstellen.
        * Gibt es sowas in SBML?
        * InCD -> ja, aber umsetzung ist ungenügend (nur
        * zur visualisierung, keine SBML Species für alle species).
+       * 
+       * Gelöst: Über complexSpeciesAlias in CD.
+       * In simplen SBML ignoriert, da funktion nicht vorhanden.
+       * Reaktionen werden stets so übersetzt, wie sie im Dokument stehen
+       * (meist nur vom Gruppenknoten aus, nicht von den Komponenten).
+       * Das macht Sinn, da Gruppenknoten selbst nicht nur eine "Gruppe" ist,
+       * sondern per se auch schon ein Protein o.ä. definiert.
        *
        *  Beispiel (aus map04010hsa.xml):
        *      <entry id="141" name="group:" type="genes">
@@ -1002,7 +1024,6 @@ public class KEGG2jSBML implements KEGGtranslator {
       // ID has to be at this place, because other refer to it by id and if id is not set. refenreces go to null.
       // spec.setId(NameToSId(entry.getName().replace(' ', '_')));
       spec.setId(NameToSId(name.replace(' ', '_')));
-      
       spec.setMetaId("meta_" + spec.getId());
       
       Annotation specAnnot = new Annotation("");
@@ -1047,140 +1068,37 @@ public class KEGG2jSBML implements KEGGtranslator {
       
       // Process graphics information
       if (entry.hasGraphics()) {
-        /*    <entry id="16" name="ko:K04467 ko:K07209 ko:K07210" type="ortholog">
-                 <graphics name="IKBKA..." fgcolor="#000000" bgcolor="#FFFFFF"
-                   type="rectangle" x="785" y="141" width="45" height="17"/>
-                   
-         *   ... is actually a compund!?!?
-         */
-        
-        // Get name, description and other annotations via api (organism specific) possible!!
-        //Graphics g = entry.getGraphics();
+        // is handled by cellDesigner functions.
       }
       
       // Process Component information
       /*
-       * // No need to do that!
+       * // No need to do that! See Group Node information above.
        * if (entry.getComponents()!=null && entry.getComponents().size()>0) {
        *   for (int c:entry.getComponents()) {
        * 
        * } }
        */
-      
-      CVTerm cvtKGID = new CVTerm(); cvtKGID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtEntrezID = new CVTerm(); cvtEntrezID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtOmimID = new CVTerm(); cvtOmimID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtHgncID = new CVTerm(); cvtHgncID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtHgncID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtEnsemblID = new CVTerm(); cvtEnsemblID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtUniprotID = new CVTerm(); cvtUniprotID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtChebiID = new CVTerm(); cvtChebiID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtChebiID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtDrugbankID = new CVTerm(); cvtDrugbankID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtDrugbankID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtGoID = new CVTerm(); cvtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF);
-      CVTerm cvtHGNCID = new CVTerm(); cvtHGNCID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtHGNCID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtPubchemID = new CVTerm(); cvtPubchemID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtPubchemID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
-      CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-      // New as of oktober 2010:
-      CVTerm PDBeChem = new CVTerm(); PDBeChem.setQualifierType(Type.BIOLOGICAL_QUALIFIER); PDBeChem.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm GlycomeDB = new CVTerm(); GlycomeDB.setQualifierType(Type.BIOLOGICAL_QUALIFIER); GlycomeDB.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm LipidBank = new CVTerm(); LipidBank.setQualifierType(Type.BIOLOGICAL_QUALIFIER); LipidBank.setBiologicalQualifierType(Qualifier.BQB_IS);
-      
-      
-      // Parse every gene/object in this node.
-      for (String ko_id : entry.getName().split(" ")) {
-        if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents()) continue; // "undefined" = group node, which contains "Components"
-        
-        // Add Kegg-id Miriam identifier
-        String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(ko_id, entry.getType());
-        if (kgMiriamEntry != null) cvtKGID.addResource(kgMiriamEntry);
-        
-        // Retrieve further information via Kegg API -- Be careful: very slow! Precache all queries at top of this function!
-        KeggInfos infos = new KeggInfos(ko_id, manager);
-        if (infos.queryWasSuccessfull()) {
-          
-          // HTML Information
-          if ((infos.getDefinition() != null) && (infos.getName() != null)) {
-            spec.appendNotes(String.format("<p><b>Description for %s%s%s:</b> %s</p>\n",
-                quotStart, EscapeChars.forHTML(infos.getName()), quotEnd, EscapeChars.forHTML(infos.getDefinition().replace("\n", " "))));
-          } else if (infos.getName() != null) {
-            spec.appendNotes(String.format("<p><b>%s</b></p>\n", EscapeChars.forHTML(infos.getName())));
-          }
-          if (infos.containsMultipleNames())
-            spec.appendNotes(String.format("<p><b>All given names:</b><br/>%s</p>\n",EscapeChars.forHTML(infos.getNames().replace(";", ""))));
-          if (infos.getCas() != null)
-            spec.appendNotes(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
-          if (infos.getFormula() != null)
-            spec.appendNotes(String.format("<p><b>Formula:</b> %s</p>\n", EscapeChars.forHTML(infos.getFormula())));
-          if (infos.getMass() != null)
-            spec.appendNotes(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
-          
-          // Parse "NCBI-GeneID:","UniProt:", "Ensembl:", ...
-          if (infos.getEnsembl_id() != null)
-            appendAllIds(infos.getEnsembl_id(), cvtEnsemblID, KeggInfos.miriam_urn_ensembl);
-          if (infos.getChebi() != null)
-            appendAllIds(infos.getChebi(), cvtChebiID, KeggInfos.miriam_urn_chebi, "CHEBI:");
-          if (infos.getDrugbank() != null)
-            appendAllIds(infos.getDrugbank(), cvtDrugbankID, KeggInfos.miriam_urn_drugbank);
-          if (infos.getEntrez_id() != null)
-            appendAllIds(infos.getEntrez_id(), cvtEntrezID, KeggInfos.miriam_urn_entrezGene);
-          if (infos.getGo_id() != null)
-            appendAllGOids(infos.getGo_id(), cvtGoID);
-          if (infos.getHgnc_id() != null)
-            appendAllIds(infos.getHgnc_id(), cvtHGNCID, KeggInfos.miriam_urn_hgnc, "HGNC:");
-          
-          if (infos.getOmim_id() != null)
-            appendAllIds(infos.getOmim_id(), cvtOmimID, KeggInfos.miriam_urn_omim);
-          if (infos.getPubchem() != null)
-            appendAllIds(infos.getPubchem(), cvtPubchemID, KeggInfos.miriam_urn_PubChem_Substance);
-          
-          if (infos.getThree_dmet() != null)
-            appendAllIds(infos.getThree_dmet(), cvt3dmetID, KeggInfos.miriam_urn_3dmet);
-          if (infos.getUniprot_id() != null)
-            appendAllIds(infos.getUniprot_id(), cvtUniprotID, KeggInfos.miriam_urn_uniprot);
-          
-          if (infos.getReaction_id() != null)
-            appendAllIds(infos.getReaction_id(), cvtReactionID, KeggInfos.miriam_urn_kgReaction);
-          if (infos.getTaxonomy() != null)
-            appendAllIds(infos.getTaxonomy(), cvtTaxonomyID, KeggInfos.miriam_urn_taxonomy);
-
-          if (infos.getPDBeChem()!= null)
-            appendAllIds(infos.getPDBeChem(), PDBeChem, KeggInfos.miriam_urn_PDBeChem);
-          if (infos.getGlycomeDB()!= null)
-            appendAllIds(infos.getGlycomeDB(), GlycomeDB, KeggInfos.miriam_urn_GlycomeDB);
-          if (infos.getLipidBank()!= null)
-            appendAllIds(infos.getLipidBank(), LipidBank, KeggInfos.miriam_urn_LipidBank);
-        }
-        
-      }
-      // Add all non-empty ressources.
       specAnnot.addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
-      if (cvtKGID.getNumResources() > 0) spec.addCVTerm(cvtKGID);
-      if (cvtEntrezID.getNumResources() > 0) spec.addCVTerm(cvtEntrezID);
-      if (cvtOmimID.getNumResources() > 0) spec.addCVTerm(cvtOmimID);
-      if (cvtHgncID.getNumResources() > 0) spec.addCVTerm(cvtHgncID);
-      if (cvtEnsemblID.getNumResources() > 0) spec.addCVTerm(cvtEnsemblID);
-      if (cvtUniprotID.getNumResources() > 0) spec.addCVTerm(cvtUniprotID);
-      if (cvtChebiID.getNumResources() > 0) spec.addCVTerm(cvtChebiID);
-      if (cvtDrugbankID.getNumResources() > 0) spec.addCVTerm(cvtDrugbankID);
-      if (cvtGoID.getNumResources() > 0) spec.addCVTerm(cvtGoID);
-      if (cvtHGNCID.getNumResources() > 0) spec.addCVTerm(cvtHGNCID);
-      if (cvtPubchemID.getNumResources() > 0) spec.addCVTerm(cvtPubchemID);
-      if (cvt3dmetID.getNumResources() > 0) spec.addCVTerm(cvt3dmetID);
-      if (cvtReactionID.getNumResources() > 0) spec.addCVTerm(cvtReactionID);
-      if (cvtTaxonomyID.getNumResources() > 0) spec.addCVTerm(cvtTaxonomyID);
-      if (PDBeChem.getNumResources() > 0) spec.addCVTerm(PDBeChem);
-      if (GlycomeDB.getNumResources() > 0) spec.addCVTerm(GlycomeDB);
-      if (LipidBank.getNumResources() > 0) spec.addCVTerm(LipidBank);
-      
+      addMiriamURNs(entry, spec);
       
       // Finally, add the fully configured species.
       spec.setName(name);
       spec.appendNotes("</body></html>");
       specAnnot.setAbout("#" + spec.getMetaId());
       entry.setCustom(spec); // Remember node in KEGG Structure for further references.
-      if (addCellDesignerAnnots) addCellDesignerAnnotationToSpecies(spec, entry);
+      // NOT here, because it may depend on other entries, that are not yet processed.
+      //if (addCellDesignerAnnots) addCellDesignerAnnotationToSpecies(spec, entry);
       // Not neccessary to add species to model, due to call in "model.createSpecies()".
+    }
+    
+    // Add CellDesigner information to species / entries.
+    if (addCellDesignerAnnots) {
+      for (Entry entry : entries) {
+        if (entry.getCustom()!=null && entry.getCustom() instanceof Species) {
+          addCellDesignerAnnotationToSpecies((Species) entry.getCustom(), entry);
+        }
+      }
     }
     
     // ------------------------------------------------------------------
@@ -1323,6 +1241,162 @@ public class KEGG2jSBML implements KEGGtranslator {
     }
     
     return doc;
+  }
+  
+  /**
+   * Adds all available MIRIAM URNs and ids to the given species.
+   */
+  private void addMiriamURNs(Entry entry, Species spec) {
+
+    CVTerm cvtKGID = new CVTerm(); cvtKGID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtEntrezID = new CVTerm(); cvtEntrezID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtOmimID = new CVTerm(); cvtOmimID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtHgncID = new CVTerm(); cvtHgncID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtHgncID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtEnsemblID = new CVTerm(); cvtEnsemblID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtUniprotID = new CVTerm(); cvtUniprotID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtChebiID = new CVTerm(); cvtChebiID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtChebiID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtDrugbankID = new CVTerm(); cvtDrugbankID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtDrugbankID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtGoID = new CVTerm(); cvtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_VERSION_OF);
+    CVTerm cvtHGNCID = new CVTerm(); cvtHGNCID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtHGNCID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtPubchemID = new CVTerm(); cvtPubchemID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtPubchemID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
+    CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
+    // New as of oktober 2010:
+    CVTerm PDBeChem = new CVTerm(); PDBeChem.setQualifierType(Type.BIOLOGICAL_QUALIFIER); PDBeChem.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm GlycomeDB = new CVTerm(); GlycomeDB.setQualifierType(Type.BIOLOGICAL_QUALIFIER); GlycomeDB.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm LipidBank = new CVTerm(); LipidBank.setQualifierType(Type.BIOLOGICAL_QUALIFIER); LipidBank.setBiologicalQualifierType(Qualifier.BQB_IS);
+    
+    
+    // Parse every gene/object in this node.
+    for (String ko_id : entry.getName().split(" ")) {
+      if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents()) continue; // "undefined" = group node, which contains "Components"
+      
+      // Add Kegg-id Miriam identifier
+      String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(ko_id, entry.getType());
+      if (kgMiriamEntry != null) cvtKGID.addResource(kgMiriamEntry);
+      
+      // Retrieve further information via Kegg API -- Be careful: very slow! Precache all queries at top of this function!
+      KeggInfos infos = new KeggInfos(ko_id, manager);
+      if (infos.queryWasSuccessfull()) {
+        
+        // HTML Information
+        if ((infos.getDefinition() != null) && (infos.getName() != null)) {
+          spec.appendNotes(String.format("<p><b>Description for %s%s%s:</b> %s</p>\n",
+              quotStart, EscapeChars.forHTML(infos.getName()), quotEnd, EscapeChars.forHTML(infos.getDefinition().replace("\n", " "))));
+        } else if (infos.getName() != null) {
+          spec.appendNotes(String.format("<p><b>%s</b></p>\n", EscapeChars.forHTML(infos.getName())));
+        }
+        if (infos.containsMultipleNames())
+          spec.appendNotes(String.format("<p><b>All given names:</b><br/>%s</p>\n",EscapeChars.forHTML(infos.getNames().replace(";", ""))));
+        if (infos.getCas() != null)
+          spec.appendNotes(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
+        if (infos.getFormula() != null)
+          spec.appendNotes(String.format("<p><b>Formula:</b> %s</p>\n", EscapeChars.forHTML(infos.getFormula())));
+        if (infos.getMass() != null)
+          spec.appendNotes(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
+        
+        // Parse "NCBI-GeneID:","UniProt:", "Ensembl:", ...
+        if (infos.getEnsembl_id() != null)
+          appendAllIds(infos.getEnsembl_id(), cvtEnsemblID, KeggInfos.miriam_urn_ensembl);
+        if (infos.getChebi() != null)
+          appendAllIds(infos.getChebi(), cvtChebiID, KeggInfos.miriam_urn_chebi, "CHEBI:");
+        if (infos.getDrugbank() != null)
+          appendAllIds(infos.getDrugbank(), cvtDrugbankID, KeggInfos.miriam_urn_drugbank);
+        if (infos.getEntrez_id() != null)
+          appendAllIds(infos.getEntrez_id(), cvtEntrezID, KeggInfos.miriam_urn_entrezGene);
+        if (infos.getGo_id() != null)
+          appendAllGOids(infos.getGo_id(), cvtGoID);
+        if (infos.getHgnc_id() != null)
+          appendAllIds(infos.getHgnc_id(), cvtHGNCID, KeggInfos.miriam_urn_hgnc, "HGNC:");
+        
+        if (infos.getOmim_id() != null)
+          appendAllIds(infos.getOmim_id(), cvtOmimID, KeggInfos.miriam_urn_omim);
+        if (infos.getPubchem() != null)
+          appendAllIds(infos.getPubchem(), cvtPubchemID, KeggInfos.miriam_urn_PubChem_Substance);
+        
+        if (infos.getThree_dmet() != null)
+          appendAllIds(infos.getThree_dmet(), cvt3dmetID, KeggInfos.miriam_urn_3dmet);
+        if (infos.getUniprot_id() != null)
+          appendAllIds(infos.getUniprot_id(), cvtUniprotID, KeggInfos.miriam_urn_uniprot);
+        
+        if (infos.getReaction_id() != null)
+          appendAllIds(infos.getReaction_id(), cvtReactionID, KeggInfos.miriam_urn_kgReaction);
+        if (infos.getTaxonomy() != null)
+          appendAllIds(infos.getTaxonomy(), cvtTaxonomyID, KeggInfos.miriam_urn_taxonomy);
+
+        if (infos.getPDBeChem()!= null)
+          appendAllIds(infos.getPDBeChem(), PDBeChem, KeggInfos.miriam_urn_PDBeChem);
+        if (infos.getGlycomeDB()!= null)
+          appendAllIds(infos.getGlycomeDB(), GlycomeDB, KeggInfos.miriam_urn_GlycomeDB);
+        if (infos.getLipidBank()!= null)
+          appendAllIds(infos.getLipidBank(), LipidBank, KeggInfos.miriam_urn_LipidBank);
+      }
+      
+    }
+    // Add all non-empty ressources.
+    if (cvtKGID.getNumResources() > 0) spec.addCVTerm(cvtKGID);
+    if (cvtEntrezID.getNumResources() > 0) spec.addCVTerm(cvtEntrezID);
+    if (cvtOmimID.getNumResources() > 0) spec.addCVTerm(cvtOmimID);
+    if (cvtHgncID.getNumResources() > 0) spec.addCVTerm(cvtHgncID);
+    if (cvtEnsemblID.getNumResources() > 0) spec.addCVTerm(cvtEnsemblID);
+    if (cvtUniprotID.getNumResources() > 0) spec.addCVTerm(cvtUniprotID);
+    if (cvtChebiID.getNumResources() > 0) spec.addCVTerm(cvtChebiID);
+    if (cvtDrugbankID.getNumResources() > 0) spec.addCVTerm(cvtDrugbankID);
+    if (cvtGoID.getNumResources() > 0) spec.addCVTerm(cvtGoID);
+    if (cvtHGNCID.getNumResources() > 0) spec.addCVTerm(cvtHGNCID);
+    if (cvtPubchemID.getNumResources() > 0) spec.addCVTerm(cvtPubchemID);
+    if (cvt3dmetID.getNumResources() > 0) spec.addCVTerm(cvt3dmetID);
+    if (cvtReactionID.getNumResources() > 0) spec.addCVTerm(cvtReactionID);
+    if (cvtTaxonomyID.getNumResources() > 0) spec.addCVTerm(cvtTaxonomyID);
+    if (PDBeChem.getNumResources() > 0) spec.addCVTerm(PDBeChem);
+    if (GlycomeDB.getNumResources() > 0) spec.addCVTerm(GlycomeDB);
+    if (LipidBank.getNumResources() > 0) spec.addCVTerm(LipidBank);
+  }
+  
+  /**
+   * Extends a list of ReactionComponent by adding all children
+   * of all group nodes, in addition to the group nodes itself.
+   * @param src
+   * @return
+   */
+  private ArrayList<ReactionComponent> splitGroupNodes (Pathway p, ArrayList<ReactionComponent> src) {
+    // We can not use group nodes in SBML, so we need to split them to the
+    // single components and treat every component individually.
+    ArrayList<ReactionComponent> ret = new ArrayList<ReactionComponent>();
+    for (ReactionComponent rc : src) {
+      // Check, if the given ReactionComponent is valid.
+      if (rc.getName() == null || rc.getName().trim().length()<1) {
+        rc = rc.getAlt();
+        if (rc==null || rc.getName() == null || rc.getName().trim().length()<1)
+          continue;
+      }
+      
+      // Add the node anyways
+      ret.add(rc);
+      
+      // If there are groupNodes, add also the children to the list.
+      Entry s = p.getEntryForName(rc.getName());
+      if (isGroupNode(s) && s.hasComponents()) {
+        for (Integer c: s.getComponents()) {
+          Entry child = p.getEntryForId(c);
+          if (child!=null) ret.add(new ReactionComponent(child.getName()));
+        }
+      }
+    }
+    
+    return ret;
+  }
+
+  
+  /**
+   * Returns true if and only if the given entry refers to a group node.
+   * @param e
+   * @return
+   */
+  private boolean isGroupNode(Entry e) {
+    EntryType t = e.getType();
+    return (t.equals(EntryType.group) || e.getName().toLowerCase().trim().startsWith("group:"));
   }
   
   /**
@@ -1520,8 +1594,7 @@ public class KEGG2jSBML implements KEGGtranslator {
    * @throws InvalidPropertiesFormatException 
    * @throws SBMLException 
    */
-  public static void main(String[] args) throws XMLStreamException,
-  InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException, SBMLException {
+  public static void main(String[] args) throws Exception {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network
     // load and heavily reduces computation time.
     KEGG2jSBML k2s;
@@ -1573,7 +1646,6 @@ public class KEGG2jSBML implements KEGGtranslator {
     try {
       k2s.translate("files/KGMLsamplefiles/map04010hsa.xml", "files/KGMLsamplefiles/map04010hsa.sbml.xml");
       k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
-      // k2s.Kegg2jSBML("resources/de/zbit/kegg/samplefiles/hsa00010.xml");
       
       // Remember already queried objects
       if (k2s.getKeggInfoManager().hasChanged()) {
