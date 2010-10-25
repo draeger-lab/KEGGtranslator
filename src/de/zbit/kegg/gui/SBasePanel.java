@@ -23,7 +23,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
@@ -40,7 +39,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import org.jdom.JDOMException;
 import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
@@ -71,15 +69,15 @@ import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.StringTools;
+import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeX;
+import org.sbml.tolatex.SBML2LaTeX;
+import org.sbml.tolatex.io.LaTeXExport;
 
 import atp.sHotEqn;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.SystemBrowser;
-import de.zbit.kegg.io.MIRIAMparser;
-import de.zbit.kegg.io.LaTeXExport;
-import de.zbit.resources.Resource;
 
 /**
  * A specialized {@link JPanel} that displays all available properties of a
@@ -108,24 +106,8 @@ public class SBasePanel extends JPanel {
 
 	/**
 	 * 
-	 */
-	private static final MIRIAMparser miriam = new MIRIAMparser();
-
-	static {
-		try {
-			miriam.setMIRIAMfile(Resource.class.getResource("cfg/MIRIAM.xml")
-					.getPath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JDOMException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 
 	 * @param sbase
-	 * @throws SBMLException 
+	 * @throws SBMLException
 	 */
 	public SBasePanel(SBase sbase) throws SBMLException {
 		super();
@@ -222,7 +204,7 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param e
-	 * @throws SBMLException 
+	 * @throws SBMLException
 	 */
 	private void addProperties(Event e) throws SBMLException {
 		JCheckBox check = new JCheckBox("Uses values from trigger time", e
@@ -254,14 +236,17 @@ public class SBasePanel extends JPanel {
 	 * @param list
 	 */
 	private void addProperties(ListOf<? extends SBase> list) {
-		// TODO
-		list.size();
+		JList l = new JList(list.toArray(new SBase[] {}));
+		l.setBorder(BorderFactory.createLoweredBevelBorder());
+		lh.add(new JScrollPane(l, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), 1, ++row, 3, 1, 1,
+				0);
 	}
 
 	/**
 	 * 
 	 * @param mc
-	 * @throws SBMLException 
+	 * @throws SBMLException
 	 */
 	private void addProperties(MathContainer mc) throws SBMLException {
 		if (mc.isSetMath()) {
@@ -459,7 +444,7 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param sbase
-	 * @throws SBMLException 
+	 * @throws SBMLException
 	 */
 	private void addProperties(Reaction reaction) throws SBMLException {
 		JCheckBox check = new JCheckBox("Reversible", reaction.getReversible());
@@ -498,8 +483,8 @@ public class SBasePanel extends JPanel {
 		lh.add(scroll, 1, ++row, 3, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		JPanel rEqPanel = new JPanel(new BorderLayout());
-		sHotEqn rEqn = new sHotEqn((new LaTeXExport(false, false, true, false,
-				(short) 11, "a4")).reactionEquation(reaction));
+		sHotEqn rEqn = new sHotEqn((new LaTeXExport())
+				.reactionEquation(reaction));
 		JScrollPane s = new JScrollPane(rEqn,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -533,10 +518,11 @@ public class SBasePanel extends JPanel {
 		if (sbase.isSetNotes() || editable) {
 			lh.add(new JLabel("Notes: "), 1, ++row, 1, 1, 1, 1);
 			String text = sbase.getNotesString();
-			if (text.startsWith("<notes") && text.endsWith("notes>"))
+			if (text.startsWith("<notes") && text.endsWith("notes>")) {
 				text = text.substring(sbase.getNotesString().indexOf('>') + 1,
 						sbase.getNotesString().lastIndexOf('/') - 1);
-			text = text.trim();
+			}
+			text = text.trim().replace("/>", ">");
 			if (!text.startsWith("<body") && !text.endsWith("</body>"))
 				text = "<body>" + text + "</body>";
 			JEditorPane notesArea = new JEditorPane("text/html",
@@ -565,7 +551,8 @@ public class SBasePanel extends JPanel {
 				String cvtString = cvt.toString();
 				for (int k = 0; k < cvt.getNumResources(); k++) {
 					String uri = cvt.getResourceURI(k);
-					String loc[] = miriam.getLocations(uri);
+					String loc[] = SBML2LaTeX.getMIRIAMparser().getLocations(
+							uri);
 					if (loc.length > 0) {
 						String split[] = cvtString.split(uri);
 						StringBuilder sbu = new StringBuilder();
@@ -618,7 +605,7 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param ssr
-	 * @throws SBMLException 
+	 * @throws SBMLException
 	 */
 	private void addProperties(SimpleSpeciesReference ssr) throws SBMLException {
 		if (ssr.isSetSpecies()) {
@@ -827,7 +814,7 @@ public class SBasePanel extends JPanel {
 	/**
 	 * 
 	 * @param ud
-	 * @throws SBMLException 
+	 * @throws SBMLException
 	 */
 	private void addProperties(UnitDefinition ud) throws SBMLException {
 		lh.add(new JLabel("Definition: "), 1, ++row, 1, 1, 1, 1);

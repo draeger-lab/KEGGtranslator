@@ -24,9 +24,10 @@ import javax.swing.JProgressBar;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
-import org.sbml.squeezer.CfgKeys;
-import org.sbml.squeezer.gui.LaTeXExportDialog;
+import org.sbml.tolatex.SBML2LaTeX;
+import org.sbml.tolatex.gui.LaTeXExportDialog;
 
+import de.zbit.gui.GUITools;
 import de.zbit.gui.VerticalLayout;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
@@ -85,16 +86,9 @@ public class TranslatorUI extends JFrame implements ActionListener {
 			}
 		}
 	}
-	
+
 	static {
-		char c = '/';
-		String path = TranslatorUI.class.getPackage().getName().replace('.', c);
-		String iconPath = path + c + "img" + c;
-		String cfgPath = c + path + c + "cfg";
-		GUITools.initIcons(iconPath);
 		GUITools.initLaF("KEGGtranslator");
-		CfgKeys.setDefaultsCfgFile(cfgPath + c + "KEGGtranslator.cfg");
-		CfgKeys.setUserPrefNode(cfgPath);
 		if (new File(KEGGtranslator.cacheFileName).exists()
 				&& new File(KEGGtranslator.cacheFileName).length() > 0) {
 			KeggInfoManagement manager;
@@ -110,7 +104,7 @@ public class TranslatorUI extends JFrame implements ActionListener {
 			k2s = new KEGG2jSBML();
 		}
 	}
-	
+
 	/**
 	 * Generated serial version id
 	 */
@@ -204,7 +198,8 @@ public class TranslatorUI extends JFrame implements ActionListener {
 			saveFile();
 			break;
 		case TO_LATEX:
-			new LaTeXExportDialog(this, CfgKeys.getProperties(), doc);
+			new LaTeXExportDialog(this, SBML2LaTeX.getPreferences()
+					.toProperties(), doc);
 			break;
 		case EXIT:
 			dispose();
@@ -214,7 +209,7 @@ public class TranslatorUI extends JFrame implements ActionListener {
 			break;
 		}
 	}
-	
+
 	/**
 	 * Creates a JMenuBar for this component that provides access to all Actions
 	 * definied in the enum Command.
@@ -293,56 +288,61 @@ public class TranslatorUI extends JFrame implements ActionListener {
 	 * @return
 	 */
 	private SBMLDocument translate(File f) {
-	  JDialog load = null;
+		JDialog load = null;
 		try {
-		  load = createLoadingJPanel("Translating kegg pathway " +f.getName() + "...");
+			load = createLoadingJPanel("Translating kegg pathway "
+					+ f.getName() + "...");
 			this.doc = k2s.translate(f);
 			return doc;
 		} catch (Throwable exc) {
 			GUITools.showErrorMessage(this, exc, String.format(
 					"Could not read input file %s.", f.getAbsolutePath()));
 		} finally {
-		  if (load!=null) load.dispose();
+			if (load != null)
+				load.dispose();
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Create and display a temporary loading panel with the given
-	 * message and a progress bar.
-	 * @param loadingMessage - the Message to display.
+	 * Create and display a temporary loading panel with the given message and a
+	 * progress bar.
+	 * 
+	 * @param loadingMessage
+	 *            - the Message to display.
 	 * @return JDialog
 	 */
 	private JDialog createLoadingJPanel(String loadingMessage) {
-	  // Create the panel
-	  Dimension panelSize = new java.awt.Dimension(400,75);
-	  JPanel p = new JPanel(new VerticalLayout());
-	  p.setPreferredSize(panelSize);
-	  
-	  // Create the label and progressBar
-	  JLabel jl = new JLabel(loadingMessage);
-	  Font font = new java.awt.Font("Tahoma",Font.PLAIN,12);
-	  jl.setFont(font);
-	  
-	  JProgressBar prog = new JProgressBar();
-	  prog.setPreferredSize(new Dimension(panelSize.width-20, panelSize.height/4));
-	  p.add(jl, BorderLayout.NORTH);
-	  p.add(prog, BorderLayout.CENTER);
-	  
-	  // Link the progressBar to the keggConverter
-	  k2s.setProgressBar(new ProgressBarSwing(prog));
-	  
-	  // Display the panel in an jFrame
-	  JDialog f = new JDialog();
-	  f.setTitle("KEGG Translator");
-    f.setSize(p.getPreferredSize());
-	  f.setContentPane(p);
-	  f.setPreferredSize(p.getPreferredSize());
-	  f.setLocationRelativeTo(null);
-	  f.setVisible(true);
-	  f.setDefaultCloseOperation( DO_NOTHING_ON_CLOSE ); 
-	  
-	  return f;
+		// Create the panel
+		Dimension panelSize = new java.awt.Dimension(400, 75);
+		JPanel p = new JPanel(new VerticalLayout());
+		p.setPreferredSize(panelSize);
+
+		// Create the label and progressBar
+		JLabel jl = new JLabel(loadingMessage);
+		Font font = new java.awt.Font("Tahoma", Font.PLAIN, 12);
+		jl.setFont(font);
+
+		JProgressBar prog = new JProgressBar();
+		prog.setPreferredSize(new Dimension(panelSize.width - 20,
+				panelSize.height / 4));
+		p.add(jl, BorderLayout.NORTH);
+		p.add(prog, BorderLayout.CENTER);
+
+		// Link the progressBar to the keggConverter
+		k2s.setProgressBar(new ProgressBarSwing(prog));
+
+		// Display the panel in an jFrame
+		JDialog f = new JDialog();
+		f.setTitle("KEGG Translator");
+		f.setSize(p.getPreferredSize());
+		f.setContentPane(p);
+		f.setPreferredSize(p.getPreferredSize());
+		f.setLocationRelativeTo(null);
+		f.setVisible(true);
+		f.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		return f;
 	}
 
 }

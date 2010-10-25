@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <comment>
+    Default configuration of KEGGtranslator.
+  </comment>
+  <entry key="OPEN_DIR">user.home</entry>
+  <entry key="SAVE_DIR">user.home</entry>
+ </properties>

@@ -110,7 +110,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		TreePath path = null;
 		if (tree != null)
 			path = (TreePath) tree.getSelectionPath();
-		tree = new SBMLTree(model);
+		tree = new SBMLTree(model.getSBMLDocument());
 		tree.setShowsRootHandles(true);
 		tree.setScrollsOnExpand(true);
 		for (ActionListener al : actionListeners)
