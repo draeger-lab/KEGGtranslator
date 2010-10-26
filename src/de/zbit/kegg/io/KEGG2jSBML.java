@@ -27,7 +27,6 @@ import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
-import de.zbit.kegg.KeggTools;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -50,7 +49,7 @@ import de.zbit.util.Utils;
  * XXX: Important to know: subtype.setValue contains replacement of &gt; to > !!!
  * TODO: Edges (sub types of relations) now may have colors.
  */
-public class KEGG2jSBML implements KEGGtranslator {
+public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
   
   /**
    * Version number of this translator
@@ -58,37 +57,9 @@ public class KEGG2jSBML implements KEGGtranslator {
   public static final String VERSION_NUMBER = "1.0.0";
   
   /**
-   * Retrieve annotations from Kegg or use purely information available in the
-   * document.
-   */
-  private boolean retrieveKeggAnnots = true;
-  
-  /**
    * Generate pure SBML or do you want to add CellDesigner annotations?
    */
   private boolean addCellDesignerAnnots = true;
-  
-  /**
-   * Remove single, not linked nodes/species
-   */
-  private boolean removeOrphans = false; // TODO: Set to true, by default.
-  
-  /**
-   * If false, all relations in the document will be skipped. Just like most
-   * of the other very-basic converters.
-   */
-  private boolean considerRelations = true;
-  
-  /**
-   * If true, all nodes in white color (except for small molecules/ compounds)
-   * will be removed from the graph. Kegg colors all nodes, which do NOT
-   * occur in the current species in white. Removing these nodes is HEAVILY
-   * recommended if you want to use the SBML document for simulations.
-   * 
-   * Set this node to false if you convert generic pathways (not species
-   * specific), since they ONLY contain white nodes.
-   */
-  private boolean removeWhiteNodes = false; // TODO: Set to true, by default.
   
   /**
    * If false, simply sets an SBO term to the species, based on entryType.
@@ -99,29 +70,10 @@ public class KEGG2jSBML implements KEGGtranslator {
   private boolean treatEntrysWithReactionDifferent = true;
   
   /**
-   * If true, missing reactants and enzymes for reactions will be retrieved
-   * from the KEGG-DB and added to the result file.
-   * REQUIRES: {@link #retrieveKeggAnnots}
-   */
-  private boolean autocompleteReactions=true;
-  
-  /**
-   * This manager uses a cache and retrieved informations from the KeggDB. By
-   * using the cache, it is very fast in retrieving informations.
-   */
-  private KeggInfoManagement manager;
-  
-  /**
    * Contains all ids already assigned to an element in the sbml document.
    * Used for avoiding giving the same id to two or more different elements.
    */
   private ArrayList<String> SIds = new ArrayList<String>();
-  
-  /**
-   * A flag, if the last sbml file that has been written by this class was
-   * overwritten. This variable is used by the BatchConverter.
-   */
-  private boolean lastFileWasOverwritten = false;
   
   /**
    * ProgressBar for Kegg2xConversion
@@ -223,26 +175,13 @@ public class KEGG2jSBML implements KEGGtranslator {
    * @param manager
    */
   public KEGG2jSBML(KeggInfoManagement manager) {
-    this.manager = manager;
+    super(manager);
   }
   
   /*===========================
    * Getters and Setters
    * ===========================*/
   
-  /**
-   * See {@link #retrieveKeggAnnots}
-   * @return
-   */
-  public boolean isRetrieveKeggAnnots() {
-    return retrieveKeggAnnots;
-  }
-  /**
-   * @param retrieveKeggAnnots - see {@link #retrieveKeggAnnots}.
-   */
-  public void setRetrieveKeggAnnots(boolean retrieveKeggAnnots) {
-    this.retrieveKeggAnnots = retrieveKeggAnnots;
-  }
   /**
    * See {@link #addCellDesignerAnnots}
    * @return
@@ -257,45 +196,6 @@ public class KEGG2jSBML implements KEGGtranslator {
     this.addCellDesignerAnnots = addCellDesignerAnnots;
   }
   /**
-   * See {@link #removeOrphans}
-   * @return
-   */
-  public boolean isRemoveOrphans() {
-    return removeOrphans;
-  }
-  /** 
-   * @param removeOrphans - see {@link #removeOrphans}.
-   */
-  public void setRemoveOrphans(boolean removeOrphans) {
-    this.removeOrphans = removeOrphans;
-  }
-  /**
-   * See {@link #considerRelations}
-   * @return
-   */
-  public boolean isConsiderRelations() {
-    return considerRelations;
-  }
-  /**
-   * @param considerRelations - see {@link #considerRelations}.
-   */
-  public void setConsiderRelations(boolean considerRelations) {
-    this.considerRelations = considerRelations;
-  }
-  /**
-   * See {@link #removeWhiteNodes}
-   * @return
-   */
-  public boolean isRemoveWhiteNodes() {
-    return removeWhiteNodes;
-  }
-  /**
-   * @param removeWhiteNodes - see {@link #removeWhiteNodes}.
-   */
-  public void setRemoveWhiteNodes(boolean removeWhiteNodes) {
-    this.removeWhiteNodes = removeWhiteNodes;
-  }
-  /**
    * See {@link #treatEntrysWithReactionDifferent}
    * @return
    */
@@ -308,25 +208,6 @@ public class KEGG2jSBML implements KEGGtranslator {
   public void setTreatEntrysWithReactionDifferent(boolean b) {
     this.treatEntrysWithReactionDifferent = b;
   }
-  /**
-   * See {@link #manager}
-   * @param manager
-   */
-  public void setKeggInfoManager(KeggInfoManagement manager) {
-    this.manager = manager;
-  }
-  /**
-   * @return - see {@link #manager}.
-   */
-  public KeggInfoManagement getKeggInfoManager() {
-    return manager;
-  }
-  /**
-   * {@inheritDoc}
-   */
-  public boolean isLastFileWasOverwritten() {
-    return lastFileWasOverwritten;
-  }	
   
   /**
    * Set a progressBar that should be used to display the
@@ -372,10 +253,10 @@ public class KEGG2jSBML implements KEGGtranslator {
   }
 
   
+  
   /*===========================
    * FUNCTIONS
    * ===========================*/
-  
   
   /**
    * Configures the SpeciesReference: Sets the name,
@@ -406,19 +287,12 @@ public class KEGG2jSBML implements KEGGtranslator {
       sr.setSBOTerm(SBO);
     }
   }
-  
-  /**
-   * {@inheritDoc}
+
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.AbstractKEGGtranslator#writeToFile(java.lang.Object, java.lang.String)
    */
-  public boolean translate(Pathway p, String outFile) {
-    SBMLDocument doc = Kegg2jSBML(p);
-    
-    // JSBML IO => write doc to outfile.
-    if (new File(outFile).exists()) {
-      // Remember that file was already there.
-      lastFileWasOverwritten = true;
-    }
-    
+  @Override
+  public boolean writeToFile(SBMLDocument doc, String outFile) {
     try {
       SBMLWriter.write(doc, outFile);
     } catch (FileNotFoundException e) {
@@ -434,95 +308,16 @@ public class KEGG2jSBML implements KEGGtranslator {
     return true;
   }
   
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.zbit.kegg.io.KeggConverter#Convert()
-   */
-  public void translate(String infile, String outfile)
-  throws XMLStreamException, InstantiationException, IllegalAccessException, InvalidPropertiesFormatException, IOException, ClassNotFoundException, SBMLException {
-    SBMLDocument doc = Kegg2jSBML(infile);
-    
-    // JSBML IO => write doc to outfile.
-    if (new File(outfile).exists())
-      lastFileWasOverwritten = true; // Remember that file was already there.
-    
-    SBMLWriter.write(doc, outfile);
-  }
-  
-  /**
-   * This method converts a given KGML file into an SBMLDocument.
-   * 
-   * @param f - the input file.
-   * @return the generated jSBML document.
-   * @throws IOException - if the input file is not readable.
-   */
-  public SBMLDocument translate(File f) throws IOException {
-    if (f.exists() && f.isFile() && f.canRead()) {
-      SBMLDocument doc = Kegg2jSBML(f.getAbsolutePath());
-      
-      // Remember already queried objects
-      if (getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, getKeggInfoManager());
-        System.out.println("Cache saved.");
-      }
-      return doc;
-    }
-    throw new IOException("Cannot read input file " + f.getAbsolutePath());
-  }
-  
-  
-  /**
-   * This method converts a given KGML file into an SBMLDocument.
-   * @param filepath - the input file.
-   * @return the generated jSBML document.
-   */
-  public SBMLDocument Kegg2jSBML(String filepath) {
-    // System.out.println("Reading kegg pathway...");
-    Pathway p = KeggParser.parse(filepath).get(0);
-    
-    // System.out.println("Converting to SBML");
-    SBMLDocument doc = Kegg2jSBML(p);
-    
-    return doc;
-  }
   
   /**
    * Converts the given pathway to a jSBML document.
    * @param p - the Kegg Pathway.
    * @return SBMLDocument
    */
-  public SBMLDocument Kegg2jSBML(Pathway p) {
+  protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     int level = 2;
     int version = 4;
     SBMLDocument doc = new SBMLDocument(level, version);
-    
-    // ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>();
-    if (!retrieveKeggAnnots) {
-      KeggInfoManagement.offlineMode = true;
-    } else {
-      KeggInfoManagement.offlineMode = false;
-      
-      // Prefetch kegg information (enormas speed improvement).
-      System.out.print("Fetching information from KEGG online resources... ");
-      KeggTools.preFetchInformation(p,manager,autocompleteReactions);
-      System.out.println("done.");
-      
-      // Auto-complete the reaction by adding all substrates, products and enzymes.
-      if (autocompleteReactions) {
-        KeggTools.autocompleteReactions(p, manager);
-      }
-    }
-    
-    // Preprocess pathway
-    if (removeOrphans) {
-      KeggTools.removeOrphans(p, considerRelations);
-    }
-    
-    // Skip it, if it's white
-    if (removeWhiteNodes) {
-      KeggTools.removeWhiteNodes(p);
-    }
     
     // Reset lists and buffers.
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
@@ -531,7 +326,6 @@ public class KEGG2jSBML implements KEGGtranslator {
     
     // Initialize a progress bar.
     int totalCalls = p.getEntries().size(); // +p.getRelations().size(); // Relations are very fast.
-    
     // if (adap==null) aufrufeGesamt+=p.getRelations().size(); // TODO: noch ausloten wann klasse aufgerufen wird.
     if (progress==null) {
       progress = new ProgressBar(totalCalls + 1);
