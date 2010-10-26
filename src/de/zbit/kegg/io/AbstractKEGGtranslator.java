@@ -197,7 +197,6 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * {@inheritDoc}
    */
   public boolean translate(Pathway p, String outFile) {
-    preProcessPathway(p);
     OutputFormat doc = translate(p);
     
     if (new File(outFile).exists()) {
