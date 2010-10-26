@@ -35,8 +35,6 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
-import de.zbit.kegg.parser.pathway.Relation;
-import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.Info;
@@ -516,6 +514,16 @@ public class KEGG2jSBML implements KEGGtranslator {
       }
     }
     
+    // Preprocess pathway
+    if (removeOrphans) {
+      KeggTools.removeOrphans(p, considerRelations);
+    }
+    
+    // Skip it, if it's white
+    if (removeWhiteNodes) {
+      KeggTools.removeWhiteNodes(p);
+    }
+    
     // Reset lists and buffers.
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
     CellDesignerUtils cdu = null;
@@ -954,53 +962,6 @@ public class KEGG2jSBML implements KEGGtranslator {
       return null;//continue;
     }
     
-    // Skip it, if it's white
-    if (removeWhiteNodes && entry.hasGraphics() && entry.getGraphics().getBgcolor().toLowerCase().trim().endsWith("ffffff")
-        && (entry.getType() == EntryType.gene || entry.getType() == EntryType.ortholog))
-      return null;//continue;
-    
-    // Look if not is an orphan
-    if (removeOrphans) {
-      if (entry.getReaction() == null || entry.getReaction().length() < 1) {
-        boolean found = false;
-        for (Reaction r : p.getReactions()) {
-          for (ReactionComponent rc : r.getProducts())
-            if (rc.getName().equalsIgnoreCase(entry.getName())) {
-              found = true;
-              break;
-            }
-          if (!found) {
-            for (ReactionComponent rc : r.getSubstrates())
-              if (rc.getName().equalsIgnoreCase(entry.getName())) {
-                found = true;
-                break;
-              }
-          }
-          if (found) break;
-        }
-        
-        if (considerRelations && !found) {
-          for (Relation r : p.getRelations()) {
-            if (r.getEntry1() == entry.getId() || r.getEntry2() == entry.getId()) {
-              found = true;
-              break;
-            }
-            for (SubType st : r.getSubtypes()) {
-              try {
-                if (Integer.parseInt(st.getValue()) == entry.getId()) {
-                  found = true;
-                  break;
-                }
-              } catch (Exception e) {}
-            }
-            if (found) break;
-          }
-        }
-        
-        // It is an orphan!
-        if (!found) return null; //continue;
-      }
-    }
     /*
      * XXX: Gruppenknoten erstellen.
      * Gibt es sowas in SBML?
