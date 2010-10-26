@@ -8,7 +8,12 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * @author Clemens Wrzodek
  */
 public interface KEGGtranslator {
-
+  
+  /**
+   * The name of the appplication.
+   */
+  public final static String appName = "KEGGtranslator";
+  
   /**
    * Filename of the KEGG cache file (implemented just
    * like the browser cache). Must be loded upon start

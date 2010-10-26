@@ -29,7 +29,7 @@ public class BatchKEGGtranslator {
   /**
    * 
    */
-  private KEGGtranslator converter;
+  private KEGGtranslator translator;
   
   /**
    * 
@@ -79,7 +79,7 @@ public class BatchKEGGtranslator {
    * @return
    */
   public KEGGtranslator getConverter() {
-    return converter;
+    return translator;
   }
   
   /**
@@ -115,11 +115,11 @@ public class BatchKEGGtranslator {
     System.out.println("Parsing directory " + dir);
     
     boolean isGraphML = outFormat.equalsIgnoreCase("GraphML");
-    if (converter==null) {
+    if (translator==null) {
       if (outFormat.equalsIgnoreCase("sbml")) {
-        converter = new KEGG2jSBML();
+        translator = new KEGG2jSBML();
       } else if (outFormat.equalsIgnoreCase("GraphML")) {
-        converter = new KEGG2GraphML();
+        translator = new KEGG2GraphML();
       } else {
         System.err.println("Unknwon output Format: '" + outFormat + "'.");
         return;
@@ -154,12 +154,12 @@ public class BatchKEGGtranslator {
           
           // XXX: Main Part
           try {
-			converter.translate(pw.get(i), outFile);
+			translator.translate(pw.get(i), outFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
           
-          if (converter.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, sp�ter aber schon => ein anderer prezess macht das selbe bereits.
+          if (translator.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, sp�ter aber schon => ein anderer prezess macht das selbe bereits.
             System.out.println("It looks like another instance is processing the same files. Going to next subfolder.");
             return; // Function is recursive.
           }
@@ -179,11 +179,12 @@ public class BatchKEGGtranslator {
   }
 
   /**
-   * 
-   * @param converter
+   * Set the translator you wish to use. This will determine the
+   * output format of this class.
+   * @param translator
    */
-  public void setConverter(KEGGtranslator converter) {
-    this.converter = converter;
+  public void setTranslator(KEGGtranslator translator) {
+    this.translator = translator;
   }
   
   /**

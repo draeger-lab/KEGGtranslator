@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.InvalidPropertiesFormatException;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -26,6 +27,7 @@ import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
+import de.zbit.kegg.KeggTools;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -53,7 +55,7 @@ import de.zbit.util.Utils;
 public class KEGG2jSBML implements KEGGtranslator {
   
   /**
-   * 
+   * Version number of this translator
    */
   public static final String VERSION_NUMBER = "1.0.0";
   
@@ -99,6 +101,13 @@ public class KEGG2jSBML implements KEGGtranslator {
   private boolean treatEntrysWithReactionDifferent = true;
   
   /**
+   * If true, missing reactants and enzymes for reactions will be retrieved
+   * from the KEGG-DB and added to the result file.
+   * REQUIRES: {@link #retrieveKeggAnnots}
+   */
+  private boolean autocompleteReactions=true;
+  
+  /**
    * This manager uses a cache and retrieved informations from the KeggDB. By
    * using the cache, it is very fast in retrieving informations.
    */
@@ -130,14 +139,6 @@ public class KEGG2jSBML implements KEGGtranslator {
    * Default initial amount of a species.
    */
   private double speciesDefaultInitialAmount=1d;
-  
-  /**
-   * Temporary Stringbuffers, needed to write CellDesigner annotations. Clear
-   * those before converting another document!
-   */
-  StringBuffer CDloSpeciesAliases = new StringBuffer();
-  StringBuffer CDloComplexSpeciesAliases = new StringBuffer();
-  StringBuffer CDloProteins = new StringBuffer();
   
   
   /*===========================
@@ -377,268 +378,10 @@ public class KEGG2jSBML implements KEGGtranslator {
    * FUNCTIONS
    * ===========================*/
   
-  /**
-   * 
-   * @param p
-   * @param annot
-   * @param defaultC
-   */
-  private void addCellDesignerAnnotationToModel(Pathway p, Annotation annot, Compartment defaultC) {
-    annot.appendNoRDFAnnotation("<celldesigner:extension>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:modelVersion>4.0</celldesigner:modelVersion>\n");
-    int[] maxCoords = getMaxCoords(p);
-    annot.appendNoRDFAnnotation("<celldesigner:modelDisplay sizeX=\""
-        + (maxCoords[0] + 22) + "\" sizeY=\"" + (maxCoords[1] + 22) + "\"/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfCompartmentAliases>\n");
-    
-    annot.appendNoRDFAnnotation(String.format("<celldesigner:compartmentAlias id=\"cd_ca%s\" compartment=\"%s\">\n", 
-        defaultC.getId(), defaultC.getId()));
-    annot.appendNoRDFAnnotation("<celldesigner:class>SQUARE</celldesigner:class>\n");
-    annot.appendNoRDFAnnotation(String.format("<celldesigner:bounds x=\"10.0\" y=\"10.0\" w=\"%d\" h=\"%d\" />\n", 
-        (maxCoords[0] + 2), (maxCoords[1] + 2)));
-    // <celldesigner:namePoint x="WIDTH HALBE - TEXT_WIDHT HALB"
-    // y="COMPARTMENT_HEIGHT-25"/>
-    annot.appendNoRDFAnnotation(String.format("<celldesigner:namePoint x=\"%d\" y=\"%d\"/>\n",
-        ((maxCoords[0] + 22) / 2 - (3 * defaultC.getName().length())),maxCoords[1] - 22));
-    annot.appendNoRDFAnnotation("<celldesigner:doubleLine thickness=\"10.0\" outerWidth=\"2.0\" innerWidth=\"1.0\"/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:paint color=\"ffcccc00\" scheme=\"Color\" />\n");
-    annot.appendNoRDFAnnotation("<celldesigner:info state=\"empty\" angle=\"0.0\"/>\n");
-    annot.appendNoRDFAnnotation("</celldesigner:compartmentAlias>\n");
-    
-    annot.appendNoRDFAnnotation("</celldesigner:listOfCompartmentAliases>\n");
-    
-    if (CDloComplexSpeciesAliases.length() > 0) {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfComplexSpeciesAliases>\n");
-      annot.appendNoRDFAnnotation(CDloComplexSpeciesAliases.toString());
-      annot.appendNoRDFAnnotation("</celldesigner:listOfComplexSpeciesAliases>\n");
-    } else {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfComplexSpeciesAliases/>\n");
-    }
-    if (CDloSpeciesAliases.length() > 0) {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfSpeciesAliases>\n");
-      annot.appendNoRDFAnnotation(CDloSpeciesAliases.toString());
-      annot.appendNoRDFAnnotation("</celldesigner:listOfSpeciesAliases>\n");
-    } else {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfSpeciesAliases/>\n");
-    }
-    if (CDloProteins.length() > 0) {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfProteins>\n");
-      annot.appendNoRDFAnnotation(CDloProteins.toString());
-      annot.appendNoRDFAnnotation("</celldesigner:listOfProteins>\n");
-    } else {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfProteins/>\n");
-    }
-    annot.appendNoRDFAnnotation("<celldesigner:listOfGroups/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfGenes/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfRNAs/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfAntisenseRNAs/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfLayers/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfBlockDiagrams/>\n");
-    annot.appendNoRDFAnnotation("</celldesigner:extension>\n");
-  }
   
   /**
-   * Call me only on final/completely configured reactions!
-   * 
-   * @param sbReaction
-   * @param r
-   */
-  private void addCellDesignerAnnotationToReaction(
-      org.sbml.jsbml.Reaction sbReaction, Reaction r) {
-    sbReaction.getAnnotation().addAnnotationNamespace("xmlns:celldesigner",
-        "", "http://www.sbml.org/2001/ns/celldesigner");
-    sbReaction.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
-    
-    // Add Reaction Annotation
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:extension>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:name>%s</celldesigner:name>\n",
-        sbReaction.getName()));
-    // TODO: STATE_TRANSITION or UNKNOWN_TRANSITION ? Ersteres in anderen
-    // releases.
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:reactionType>STATE_TRANSITION</celldesigner:reactionType>\n");
-    
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:baseReactants>\n");
-    for (SpeciesReference s : sbReaction.getListOfReactants()) {
-      sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:baseReactant species=\"%s\" alias=\"%s\"/>\n",
-          s.getSpeciesInstance().getId(),"cd_sa"+ s.getSpeciesInstance().getId()));
-      
-      // Write annotation for SpeciesReference
-      if (!s.isSetAnnotation()) {
-        Annotation rAnnot = new Annotation("");
-        rAnnot.setAbout("");
-        s.setAnnotation(rAnnot);
-        s.getAnnotation().addAnnotationNamespace("xmlns:celldesigner","", "http://www.sbml.org/2001/ns/celldesigner");
-        s.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
-      }
-      s.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
-          "cd_sa"+ s.getSpeciesInstance().getId()));
-    }
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:baseReactants>\n");
-    
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:baseProducts>\n");
-    for (SpeciesReference s : sbReaction.getListOfProducts()) {
-      sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:baseProduct species=\"%s\" alias=\"%s\"/>\n",
-          s.getSpeciesInstance().getId(),"cd_sa"+ s.getSpeciesInstance().getId()));
-      // Write annotation for SpeciesReference
-      if (!s.isSetAnnotation()) {
-        Annotation rAnnot = new Annotation("");
-        rAnnot.setAbout("");
-        s.setAnnotation(rAnnot);
-        s.getAnnotation().addAnnotationNamespace("xmlns:celldesigner","", "http://www.sbml.org/2001/ns/celldesigner");
-        s.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
-      }
-      s.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
-          "cd_sa"+ s.getSpeciesInstance().getId()));
-    }
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:baseProducts>\n");
-    
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:connectScheme connectPolicy=\"direct\" rectangleIndex=\"0\">\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:listOfLineDirection>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:lineDirection index=\"0\" value=\"unknown\"/>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:listOfLineDirection>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:connectScheme>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:line width=\"1.0\" color=\"ff000000\"/>\n");
-    
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:listOfModification>\n");
-    for (ModifierSpeciesReference s : sbReaction.getListOfModifiers()) {
-      sbReaction.getAnnotation().appendNoRDFAnnotation(
-          String.format("<celldesigner:modification type=\"CATALYSIS\" modifiers=\"%s\" aliases=\"%s\" targetLineIndex=\"-1,0\">\n", // original: -1,2
-              s.getSpeciesInstance().getId(),"cd_sa"+ s.getSpeciesInstance().getId()));
-      sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:connectScheme connectPolicy=\"direct\">\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:listOfLineDirection>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:lineDirection index=\"0\" value=\"unknown\"/>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:listOfLineDirection>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:connectScheme>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:line width=\"1.0\" color=\"ff000000\"/>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:modification>\n");
-      
-      // Write annotation for ModifierSpeciesReference
-      s.getAnnotation().appendNoRDFAnnotation(String.format(
-          "<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
-          "cd_sa"+ s.getSpeciesInstance().getId()));
-      
-      // Write further annotations for the Modifying species.
-      s.getSpeciesInstance().getAnnotation().appendNoRDFAnnotation(String.format(
-          "<celldesigner:listOfCatalyzedReactions>\n<celldesigner:catalyzed reaction=\"%s\"/>\n</celldesigner:listOfCatalyzedReactions>\n",
-          sbReaction.getId()));
-    }
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:listOfModification>\n");
-    
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:extension>\n");
-  }
-  
-  /**
-   * Uses spec.getName() ! Be careful, the species CD Extension tag is NOT
-   * closed.
-   */
-  private void addCellDesignerAnnotationToSpecies(Species spec, Entry e) {
-    // TODO: Sind die defaults so richtig? was bedeutet z.B. cd:activity?
-    EntryType t = e.getType();
-    boolean isGroupNode = isGroupNode(e); // genes = group in kgml v<0.7
-    
-    spec.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
-    spec.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
-    
-    // Add to Species Annotation list
-    StringBuffer target;
-    if (isGroupNode)
-      target = CDloComplexSpeciesAliases;
-    else
-      target = CDloSpeciesAliases;
-    
-    // Warning: prefix "cd_sa" is also hardcoded in addCDAtoReaction!
-    target.append("<celldesigner:"
-        + (isGroupNode ? "complexSpeciesAlias" : "speciesAlias")
-        + " id=\"cd_sa" + spec.getId() + "\" species=\"" + spec.getId()+"\"");
-    
-    // If this is a child of a group (complex) node, reflect this here.
-    if (!isGroupNode && e.getParentNode()!=null) {
-      Entry parent = e.getParentNode();
-      if (parent.getCustom()!=null) {
-        target.append(" complexSpeciesAlias=\"");
-        target.append("cd_sa"+((Species)parent.getCustom()).getId());
-        target.append('\"');
-      }
-    }
-    target.append(">\n");
-    
-    target.append("<celldesigner:activity>inactive</celldesigner:activity>\n");
-    if (e.hasGraphics())
-      target.append(String.format("<celldesigner:bounds x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\"/>\n",
-              e.getGraphics().getX(), e.getGraphics().getY(), e.getGraphics().getWidth(), e.getGraphics().getHeight()));
-    target.append("<celldesigner:view state=\"usual\"/>\n");
-    
-    if (isGroupNode) {
-      target.append("<celldesigner:backupSize w=\"0.0\" h=\"0.0\"/>\n");
-      target.append("<celldesigner:backupView state=\"none\"/>\n");
-    }
-    
-    // Add usual- and brief view
-    for (int i = 1; i <= 2; i++) {
-      if (i == 1)
-        target.append("<celldesigner:usualView>\n");
-      else
-        target.append("<celldesigner:briefView>\n");
-      target.append("<celldesigner:innerPosition x=\"0.0\" y=\"0.0\"/>\n");
-      target.append(String.format("<celldesigner:boxSize width=\"%d\" height=\"%d\"/>\n",
-          e.hasGraphics() ? e.getGraphics().getWidth() : 90, e.hasGraphics() ? e.getGraphics().getHeight() : 25));
-      target.append("<celldesigner:singleLine width=\"" + (isGroupNode ? "2.0" : (i == 1 ? "1.0" : "0.0")) + "\"/>\n");
-      
-      String col = "FFFFFF";
-      if (e.hasGraphics() && e.getGraphics().getBgcolor()!=null) {
-        col = e.getGraphics().getBgcolor().replace("#", "").toLowerCase();
-      }
-      target.append(String.format("<celldesigner:paint color=\""
-          + (i == 1 ? "ff" : "3f")
-          + "%s\" scheme=\"Color\"/>\n", col));
-      if (i == 1) {
-        target.append("</celldesigner:usualView>\n");
-      } else {
-        target.append("</celldesigner:briefView>\n");
-      }
-    }
-    
-    target.append("<celldesigner:info state=\"empty\" angle=\"0.0\"/>\n");
-    target.append("</celldesigner:"+ (isGroupNode ? "complexSpeciesAlias" : "speciesAlias")+ ">\n");
-    
-    // Add to type specific annotation
-    String type = "";
-    String reference = "";
-    if (t.equals(EntryType.ortholog) || t.equals(EntryType.enzyme) || t.equals(EntryType.gene)) {
-      // A Protein. (EntryType.gene => KeggDoc says
-      // "the node is a gene PRODUCT (mostly a protein)")
-      CDloProteins.append(String.format("<celldesigner:protein id=\"cd_pr%s\" name=\"%s\" type=\"GENERIC\"/>\n",
-              spec.getId(), spec.getId()));
-      type = "PROTEIN";
-      reference = "<celldesigner:proteinReference>cd_pr" + spec.getId() + "</celldesigner:proteinReference>";
-    } else if (isGroupNode) { // t.equals(EntryType.group)
-      type = "COMPLEX";
-      reference = "<celldesigner:name>"+ NameToCellDesignerName(spec.getName())+ "</celldesigner:name>";
-    } else if (t.equals(EntryType.compound)) {
-      type = "SIMPLE_MOLECULE";
-      reference = "<celldesigner:name>"+ NameToCellDesignerName(spec.getName())+ "</celldesigner:name>";
-    } else if (t.equals(EntryType.map) || t.equals(EntryType.other)) {
-      type = "UNKNOWN";
-      reference = "<celldesigner:name>"+ NameToCellDesignerName(spec.getName())+ "</celldesigner:name>";
-    }
-    
-    // Add Species Annotation
-    spec.getAnnotation().appendNoRDFAnnotation("<celldesigner:extension>\n");
-    spec.getAnnotation().appendNoRDFAnnotation("<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>\n");
-    spec.getAnnotation().appendNoRDFAnnotation("<celldesigner:speciesIdentity>\n");
-    spec.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:class>%s</celldesigner:class>\n",type));
-    spec.getAnnotation().appendNoRDFAnnotation(reference + "\n");
-    spec.getAnnotation().appendNoRDFAnnotation("</celldesigner:speciesIdentity>\n");
-    
-    /*
-     * DON'T WRITE END TAG HERE. Catalysts write additional data in
-     * "addCellDesignerAnnotationToReaction".
-     * spec.getAnnotation().appendNoRDFAnnotation
-     * ("</celldesigner:extension>\n");
-     */
-  }
-  
-  /**
+   * Configures the SpeciesReference: Sets the name,
+   * id, metaId, species and SBO term.
    * 
    * @param p
    * @param rc
@@ -661,8 +404,7 @@ public class KEGG2jSBML implements KEGGtranslator {
     
     if (sr.getSpeciesInstance() != null
         && sr.getSpeciesInstance().getSBOTerm() <= 0) {
-      sr.getSpeciesInstance().setSBOTerm(SBO); // should be
-      // Product/Substrate
+      sr.getSpeciesInstance().setSBOTerm(SBO); // should be Product/Substrate
       sr.setSBOTerm(SBO);
     }
   }
@@ -756,7 +498,6 @@ public class KEGG2jSBML implements KEGGtranslator {
     int level = 2;
     int version = 4;
     SBMLDocument doc = new SBMLDocument(level, version);
-    ArrayList<Entry> entries = p.getEntries();
     
     // ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>();
     if (!retrieveKeggAnnots) {
@@ -764,33 +505,21 @@ public class KEGG2jSBML implements KEGGtranslator {
     } else {
       KeggInfoManagement.offlineMode = false;
       
-      // PreFetch infos. Enormous performance improvement!
-      ArrayList<String> preFetchIDs = new ArrayList<String>();
-      preFetchIDs.add("GN:" + p.getOrg());
-      preFetchIDs.add(p.getName());
-      for (Entry entry : entries) {
-        for (String ko_id : entry.getName().split(" ")) {
-          if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents())
-            continue; // "undefined" = group node, which contains "Components"
-          preFetchIDs.add(ko_id);
-        }
-      }
-      for (Reaction r : p.getReactions()) {
-        for (String ko_id : r.getName().split(" ")) {
-          preFetchIDs.add(ko_id);
-        }
-      }
+      // Prefetch kegg information (enormas speed improvement).
       System.out.print("Fetching information from KEGG online resources... ");
-      manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]));
+      KeggTools.preFetchInformation(p,manager,autocompleteReactions);
       System.out.println("done.");
-      // TODO: Add relations?
-      // -------------------------
+      
+      // Auto-complete the reaction by adding all substrates, products and enzymes.
+      if (autocompleteReactions) {
+        KeggTools.autocompleteReactions(p, manager);
+      }
     }
+    
     // Reset lists and buffers.
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
-    CDloSpeciesAliases = new StringBuffer();
-    CDloComplexSpeciesAliases = new StringBuffer();
-    CDloProteins = new StringBuffer();
+    CellDesignerUtils cdu = null;
+    if (addCellDesignerAnnots) cdu = new CellDesignerUtils(); 
     
     // Initialize a progress bar.
     int totalCalls = p.getEntries().size(); // +p.getRelations().size(); // Relations are very fast.
@@ -829,17 +558,9 @@ public class KEGG2jSBML implements KEGGtranslator {
     
     // CellDesigner Annotations
     if (addCellDesignerAnnots) {
-      // XXX: Probably the more correct way. But currently, extensions get completely ignored.
-      // Annotation cdAnnot = new Annotation();
-      // cdAnnot.setAbout("");
-      // addCellDesignerAnnotationPrefixToModel(p, cdAnnot);
-      // annot.addExtension("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner", cdAnnot);
-      
-      String cellDesignerNameSpace = "xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner";
-      model.addNamespace(cellDesignerNameSpace);
-      annot.addAnnotationNamespace("xmlns:celldesigner", "", "http://www.sbml.org/2001/ns/celldesigner");
-      doc.addNamespace("xmlns:celldesigner", "", "http://www.sbml.org/2001/ns/celldesigner"); // xmlns:celldesigner
+      cdu.initCellDesignerAnnotations(model, doc);
     }
+    
     model.getAnnotation().addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
     model.getAnnotation().addRDFAnnotationNamespace("bqmodel", "", "http://biomodels.net/model-qualifiers/");
     
@@ -890,361 +611,210 @@ public class KEGG2jSBML implements KEGGtranslator {
     if (p.getVersion() > 0 || (p.getComment() != null && p.getComment().length() > 0)) {
       model.appendNotes("<p>");
       if (p.getComment() != null && p.getComment().length() > 0) {
-        model.appendNotes(String.format("KGML Comment: %s%s%s<br/>\n", quotStart, p.getComment(), quotEnd));
+        model.appendNotes(String.format("KGML comment: %s%s%s<br/>\n", quotStart, p.getComment(), quotEnd));
       }
       if (p.getVersion() > 0) {
-        model.appendNotes(String.format("KGML Version was: %s<br/>\n", Double.toString(p.getVersion())));
+        model.appendNotes(String.format("KGML version was: %s<br/>\n", Double.toString(p.getVersion())));
       }
       model.appendNotes("</p>");
     }
+    model.appendNotes(String.format("<div align=\"right\"><i><small>This file has been generated by %s version %s</small></i></div><br/>\n", 
+        KEGGtranslator.appName, VERSION_NUMBER));
     
     // Save all reaction modifiers in a list. String = reaction id.
     SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers = new SortedArrayList<Info<String, ModifierSpeciesReference>>();
     
     // Create species
+    ArrayList<Entry> entries = p.getEntries();
     for (Entry entry : entries) {
       progress.DisplayBar();
-      /*
-       * <entry id="1" name="ko:K00128" type="ortholog" reaction="rn:R00710" link="http://www.genome.jp/dbget-bin/www_bget?ko+K00128">
-       * <graphics name="K00128" fgcolor="#000000" bgcolor="#BFBFFF" type="rectangle" x="170" y="1018" width="45" height="17"/>
-       * </entry>
-       */
       
-      boolean isPathwayReference = false;
-      String name = entry.getName().trim();
-      if ((name != null) && (name.toLowerCase().startsWith("path:") || entry.getType().equals(EntryType.map))) {
-        isPathwayReference = true;
-      }
-      // Eventually skip this node. It's just a label for the current pathway.
-      if (isPathwayReference && (entry.hasGraphics() && entry.getGraphics().getName().toLowerCase().startsWith("title:"))) {
-        compartment.setName(entry.getGraphics().getName().substring(6).trim());
-        continue;
-      }
-      
-      // Skip it, if it's white
-      if (removeWhiteNodes && entry.hasGraphics() && entry.getGraphics().getBgcolor().toLowerCase().trim().endsWith("ffffff")
-          && (entry.getType() == EntryType.gene || entry.getType() == EntryType.ortholog))
-        continue;
-      
-      // Look if not is an orphan
-      if (removeOrphans) {
-        if (entry.getReaction() == null || entry.getReaction().length() < 1) {
-          boolean found = false;
-          for (Reaction r : p.getReactions()) {
-            for (ReactionComponent rc : r.getProducts())
-              if (rc.getName().equalsIgnoreCase(entry.getName())) {
-                found = true;
-                break;
-              }
-            if (!found) {
-              for (ReactionComponent rc : r.getSubstrates())
-                if (rc.getName().equalsIgnoreCase(entry.getName())) {
-                  found = true;
-                  break;
-                }
-            }
-            if (found) break;
-          }
-          
-          if (considerRelations && !found) {
-            for (Relation r : p.getRelations()) {
-              if (r.getEntry1() == entry.getId() || r.getEntry2() == entry.getId()) {
-                found = true;
-                break;
-              }
-              for (SubType st : r.getSubtypes()) {
-                try {
-                  if (Integer.parseInt(st.getValue()) == entry.getId()) {
-                    found = true;
-                    break;
-                  }
-                } catch (Exception e) {}
-              }
-              if (found) break;
-            }
-          }
-          
-          // It is an orphan!
-          if (!found) continue;
-        }
-      }
-      /*
-       * XXX: Gruppenknoten erstellen.
-       * Gibt es sowas in SBML?
-       * InCD -> ja, aber umsetzung ist ungenügend (nur
-       * zur visualisierung, keine SBML Species für alle species).
-       * 
-       * Gelöst: Über complexSpeciesAlias in CD.
-       * In simplen SBML ignoriert, da funktion nicht vorhanden.
-       * Reaktionen werden stets so übersetzt, wie sie im Dokument stehen
-       * (meist nur vom Gruppenknoten aus, nicht von den Komponenten).
-       * Das macht Sinn, da Gruppenknoten selbst nicht nur eine "Gruppe" ist,
-       * sondern per se auch schon ein Protein o.ä. definiert.
-       *
-       *  Beispiel (aus map04010hsa.xml):
-       *      <entry id="141" name="group:" type="genes">
-       *         <graphics fgcolor="#000000" bgcolor="#FFFFFF" type="rectangle" x="945" y="310" width="129" height="59"/>
-       *         <component id="131"/>
-       *         <component id="133"/>
-       *         <component id="134"/>
-       *     </entry>
-       *  Beispiel aktuell (kg0.7 map04010.xml):
-       *    <entry id="138" name="undefined" type="group">
-       *         <graphics fgcolor="#000000" bgcolor="#FFFFFF"
-       *              type="rectangle" x="945" y="310" width="129" height="59"/>
-       *         <component id="131"/>
-       *         <component id="133"/>
-       *         <component id="134"/>
-       *     </entry> 
-      */
-      
-      // Get a good name for the node
-      boolean hasMultipleIDs = false;
-      if (entry.getName().trim().contains(" ")) hasMultipleIDs = true;
-      if (entry.hasGraphics()&& entry.getGraphics().getName().length() > 0) {
-        name = entry.getGraphics().getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
-      }
-      // Set name to real and human-readable name (from Inet data - Kegg API).
-      if (!hasMultipleIDs) {
-        // Be careful: very slow, uses Cache - so doesn't matter to query the same id one or more times.
-        KeggInfos infos = new KeggInfos(entry.getName().trim(), manager);
-        if (infos.queryWasSuccessfull() && (infos.getName() != null)) {
-          name = infos.getName();
-        }
-      }
-      // ---
-      
-      // Initialize species object
-      Species spec = model.createSpecies();
-      spec.setCompartment(compartment); // spec.setId("s_" +
-      // entry.getId());
-      spec.setInitialAmount(speciesDefaultInitialAmount);
-      spec.setUnits(model.getUnitDefinition("substance"));
-      
-      // ID has to be at this place, because other refer to it by id and if id is not set. refenreces go to null.
-      // spec.setId(NameToSId(entry.getName().replace(' ', '_')));
-      spec.setId(NameToSId(name.replace(' ', '_')));
-      spec.setMetaId("meta_" + spec.getId());
-      
-      Annotation specAnnot = new Annotation("");
-      specAnnot.setAbout("");
-      spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
-      spec.appendNotes("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>");
-      spec.appendNotes(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
-      
-      // Set SBO Term
-      if (treatEntrysWithReactionDifferent && entry.getReaction() != null && entry.getReaction().trim().length() != 0) {
-        // Q: Ist es richtig, sowohl dem Modifier als auch der species eine neue id zu geben? A: Nein, ist nicht richtig.
-        // spec.setSBOTerm(ET_SpecialReactionCase2SBO);
-        ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
-        
-        Annotation tempAnnot = new Annotation("");
-        tempAnnot.setAbout("");
-        modifier.setAnnotation(tempAnnot);
-        if (addCellDesignerAnnots) {
-          modifier.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
-          modifier.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
-        }
-        modifier.setId(this.NameToSId("mod_" + entry.getReaction()));
-        modifier.setMetaId("meta_" + modifier.getId());
-        modifier.setName(modifier.getId());
-        if (entry.getType().equals(EntryType.enzyme)   || entry.getType().equals(EntryType.gene)
-            || entry.getType().equals(EntryType.group) || entry.getType().equals(EntryType.ortholog)
-            || entry.getType().equals(EntryType.genes)) {
-          // 1 & 2: klar. 3 (group): Doku sagt "MOSTLY a protein complex". 4 (ortholog): Kommen in
-          // nicht-spezies spezifischen PWs vor und sind quasi otholog geclusterte gene.
-          // 5. (genes) ist group in kgml versionen <0.7.
-          modifier.setSBOTerm(ET_EnzymaticModifier2SBO); // 460 = Enzymatic catalyst
-        } else { // "Metall oder etwas anderes, was definitiv nicht enzymatisch wirkt"
-          modifier.setSBOTerm(ET_GeneralModifier2SBO); // 13 = Catalyst
-        }
-        
-        // Remember modifier for later association with reaction.
-        reactionModifiers.add(new Info<String, ModifierSpeciesReference>(entry.getReaction().toLowerCase().trim(), modifier));
-        
-      } else {
-        spec.setSBOTerm(getSBOTerm(entry.getType()));
-      }
-      
-      // Process graphics information
-      if (entry.hasGraphics()) {
-        // is handled by cellDesigner functions.
-      }
-      
-      // Process Component information
-      /*
-       * // No need to do that! See Group Node information above.
-       * if (entry.getComponents()!=null && entry.getComponents().size()>0) {
-       *   for (int c:entry.getComponents()) {
-       * 
-       * } }
-       */
-      specAnnot.addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
-      addMiriamURNs(entry, spec);
-      
-      // Finally, add the fully configured species.
-      spec.setName(name);
-      spec.appendNotes("</body></html>");
-      specAnnot.setAbout("#" + spec.getMetaId());
-      entry.setCustom(spec); // Remember node in KEGG Structure for further references.
-      // NOT here, because it may depend on other entries, that are not yet processed.
-      //if (addCellDesignerAnnots) addCellDesignerAnnotationToSpecies(spec, entry);
-      // Not neccessary to add species to model, due to call in "model.createSpecies()".
+      addKGMLEntry(entry, p, model, compartment, reactionModifiers);
     }
     
     // Add CellDesigner information to species / entries.
-    if (addCellDesignerAnnots) {
-      for (Entry entry : entries) {
-        if (entry.getCustom()!=null && entry.getCustom() instanceof Species) {
-          addCellDesignerAnnotationToSpecies((Species) entry.getCustom(), entry);
-        }
-      }
-    }
+    if (addCellDesignerAnnots) cdu.addCellDesignerAnnotationToAllSpecies(p);
     
     // ------------------------------------------------------------------
     
     // All species added. Parse reactions and relations.
     for (Reaction r : p.getReactions()) {
-      // Skip reaction if it has either no reactants or no products.
-      boolean hasAtLeastOneReactantAndProduct = false;
-      for (ReactionComponent rc : r.getSubstrates()) {
-        Entry spec = p.getEntryForName(rc.getName());
-        if (spec == null || spec.getCustom() == null) continue;
-        hasAtLeastOneReactantAndProduct = true;
-        break;
-      }
-      if (!hasAtLeastOneReactantAndProduct) continue;
-      hasAtLeastOneReactantAndProduct = false;
-      for (ReactionComponent rc : r.getProducts()) {
-        Entry spec = p.getEntryForName(rc.getName());
-        if (spec == null || spec.getCustom() == null) continue;
-        hasAtLeastOneReactantAndProduct = true;
-        break;
-      }
-      if (!hasAtLeastOneReactantAndProduct) continue;
-      
-      org.sbml.jsbml.Reaction sbReaction = model.createReaction();
-      sbReaction.initDefaults();
-      sbReaction.setCompartment(compartment);
-      Annotation rAnnot = new Annotation("");
-      rAnnot.setAbout("");
-      sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheuert... (Annotation darf nicht null sein, ist aber default null).
-      sbReaction.appendNotes("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>");
-      
-      // Pro/ Edukte
-      sbReaction.setReversible(r.getType().equals(ReactionType.reversible));
-      for (ReactionComponent rc : r.getSubstrates()) {
-        SpeciesReference sr = sbReaction.createReactant();
-        configureReactionComponent(p, rc, sr, 15); // 15 =Substrate
-      }
-      for (ReactionComponent rc : r.getProducts()) {
-        SpeciesReference sr = sbReaction.createProduct();
-        configureReactionComponent(p, rc, sr, 11); // 11 =Product
-      }
-      
-      // Eventually add modifier
-      int pos = reactionModifiers.indexOf(r.getName().toLowerCase().trim());
-      while (pos >= 0) { // Multiple modifiers possible
-        sbReaction.addModifier(reactionModifiers.get(pos).getInformation());
-        reactionModifiers.remove(pos);
-        pos = reactionModifiers.indexOf(r.getName().toLowerCase().trim());
-      }
-      
-      // Add Kegg-id Miriam identifier
-      CVTerm reID = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_IS);
-      CVTerm rePWs = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-      
-      for (String ko_id : r.getName().split(" ")) {
-        reID.addResource(KeggInfos.getMiriamURIforKeggID(r.getName()));
-        
-        // Retrieve further information via Kegg API -- Be careful: very slow!
-        KeggInfos infos = new KeggInfos(ko_id, manager);
-        if (infos.queryWasSuccessfull()) {
-          sbReaction.appendNotes("<p>");
-          if (infos.getDefinition() != null) {
-            sbReaction.appendNotes(String.format("<b>Definition of %s%s%s:</b> %s<br/>\n",
-                quotStart, ko_id.toUpperCase(), quotEnd, EscapeChars.forHTML(infos.getDefinition().replace("\n", " "))));
-            // System.out.println(sbReaction.getNotesString());
-            // notes="<body xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>&#8220;TEST&#8221;</b> A &lt;&#061;&gt;&#62;&#x3e;\u003E B<br/></p></body>";
-          } else
-            sbReaction.appendNotes(String.format("<b>%s</b><br/>\n", ko_id.toUpperCase()));
-          if (infos.getEquation() != null) {
-            sbReaction.appendNotes(String.format("<b>Equation for %s%s%s:</b> %s<br/>\n",
-                quotStart, ko_id.toUpperCase(), quotEnd, EscapeChars.forHTML(infos.getEquation())));
-          }
-          String prefix = "http://www.genome.jp/Fig/reaction/";
-          String suffix = KeggInfos.suffix(ko_id.toUpperCase()) + ".gif";
-          sbReaction.appendNotes(String.format("<a href=\"%s%s\">", prefix, suffix));
-          sbReaction.appendNotes(String.format("<img src=\"%s%s\"/></a>\n", prefix, suffix));
-          if (infos.getPathwayDescriptions() != null) {
-            sbReaction.appendNotes("<b>Occurs in:</b><br/>\n");
-            for (String desc : infos.getPathwayDescriptions().split(",")) { // e.g. ",Glycolysis / Gluconeogenesis,Metabolic pathways"
-              sbReaction.appendNotes(desc + "<br/>\n");
-            }
-            sbReaction.appendNotes("<br/>\n");
-          }
-          sbReaction.appendNotes("</p>");
-          
-          if (rePWs != null && infos.getPathways() != null) {
-            for (String pwId : infos.getPathways().split(",")) {
-              rePWs.addResource(KeggInfos.miriam_urn_kgPathway + KeggInfos.suffix(pwId));
-            }
-          }
-        }
-      }
-      if ((reID.getNumResources() > 0) || (rePWs.getNumResources() > 0)) {
-        sbReaction.getAnnotation().addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
-      }
-      if (reID.getNumResources() > 0) sbReaction.addCVTerm(reID);
-      if (rePWs.getNumResources() > 0) sbReaction.addCVTerm(rePWs);
-      
-      // Finally, add the fully configured reaction.
-      sbReaction.setName(r.getName());
-      sbReaction.setId(NameToSId(r.getName()));
-      sbReaction.appendNotes("</body></html>");
-      sbReaction.setMetaId("meta_" + sbReaction.getId());
-      sbReaction.setSBOTerm(231); // interaction. Most generic SBO Term possible, for a reaction.
-      rAnnot.setAbout("#" + sbReaction.getMetaId());
-      if (addCellDesignerAnnots) addCellDesignerAnnotationToReaction(sbReaction, r);
+      org.sbml.jsbml.Reaction sbReaction = addKGMLReaction(r,p,model,compartment,reactionModifiers);
+
+      if (addCellDesignerAnnots && sbReaction!=null)
+        cdu.addCellDesignerAnnotationToReaction(sbReaction, r);
     }
     
     // ------------------------------------------------------------------
     
     // TODO: Special reactions / relations.
     
-    model.appendNotes("</body></html>");
     
-    /* Removing nodes here does not work, because all CellDesigner annotations are static and don't get removed!
-     * if (removeOrphans) {
-      ArrayList<Species> containedSpecies = new ArrayList<Species>();
-      for (org.sbml.jsbml.Reaction r: model.getListOfReactions()) {
-        for (SpeciesReference s:r.getListOfProducts()) containedSpecies.add(s.getSpeciesInstance());
-        for (SpeciesReference s:r.getListOfReactants()) containedSpecies.add(s.getSpeciesInstance());
-        for (ModifierSpeciesReference s:r.getListOfModifiers()) containedSpecies.add(s.getSpeciesInstance());
-      }
-      for (int i=0; i<model.getListOfSpecies().size(); i++) {
-        Species s = model.getListOfSpecies().get(i);
-        if (!containedSpecies.contains(s)) {model.removeSpecies(s); i--;}
-      }
-    }*/
     
+    
+    
+    // Removing nodes here (removeOrphans) does not work, because
+    // all CellDesigner annotations are static and don't get removed!
+    
+    
+    // Finalize notes and annotations.
+    model.appendNotes("</body></html>");    
     if (addCellDesignerAnnots) {
-      addCellDesignerAnnotationToModel(p, annot, compartment);
-      
-      // Close open species CD tags.
-      for (Species s : model.getListOfSpecies()) {
-        String a = s.getAnnotation().getNoRDFAnnotation();
-        if (a != null && a.length() > 0 && a.contains("celldesigner")) {
-          s.getAnnotation().appendNoRDFAnnotation("</celldesigner:extension>\n");
-        }
-      }
+      cdu.addCellDesignerAnnotationToModel(p, model, compartment);
     }
     
     return doc;
   }
   
   /**
-   * Adds all available MIRIAM URNs and ids to the given species.
+   * Translate a KGML reaction to an SBML reaction.
+   * @param r - the reaction to translate.
+   * @param p - the pathway, in which the reaction is contained.
+   * @param model - the current SBML model.
+   * @param compartment - the current SBML compartment.
+   * @param reactionModifiers - list of all reactionModifiers.
+   */
+  private org.sbml.jsbml.Reaction addKGMLReaction(Reaction r, Pathway p, Model model, Compartment compartment,
+      SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers) {
+    // Skip reaction if it has either no reactants or no products.
+    boolean hasAtLeastOneReactantAndProduct = false;
+    for (ReactionComponent rc : r.getSubstrates()) {
+      Entry spec = p.getEntryForName(rc.getName());
+      if (spec == null || spec.getCustom() == null) continue;
+      hasAtLeastOneReactantAndProduct = true;
+      break;
+    }
+    if (!hasAtLeastOneReactantAndProduct) return null;//continue;
+    hasAtLeastOneReactantAndProduct = false;
+    for (ReactionComponent rc : r.getProducts()) {
+      Entry spec = p.getEntryForName(rc.getName());
+      if (spec == null || spec.getCustom() == null) continue;
+      hasAtLeastOneReactantAndProduct = true;
+      break;
+    }
+    
+    if (!hasAtLeastOneReactantAndProduct) return null;//continue;
+    
+    org.sbml.jsbml.Reaction sbReaction = model.createReaction();
+    sbReaction.initDefaults();
+    sbReaction.setCompartment(compartment);
+    Annotation rAnnot = new Annotation("");
+    rAnnot.setAbout("");
+    sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheuert... (Annotation darf nicht null sein, ist aber default null).
+    sbReaction.appendNotes("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>");
+    
+    // Add substrates/ products
+    sbReaction.setReversible(r.getType().equals(ReactionType.reversible));
+    for (ReactionComponent rc : r.getSubstrates()) {
+      SpeciesReference sr = sbReaction.createReactant();
+      configureReactionComponent(p, rc, sr, 15); // 15 =Substrate
+    }
+    for (ReactionComponent rc : r.getProducts()) {
+      SpeciesReference sr = sbReaction.createProduct();
+      configureReactionComponent(p, rc, sr, 11); // 11 =Product
+    }
+    
+    // Eventually add modifier
+    List<ModifierSpeciesReference> modifier = getAllModifier(reactionModifiers,r);
+    for (ModifierSpeciesReference mod : modifier) {
+      sbReaction.addModifier(mod);
+    }
+    
+    // Miriam identifier
+    CVTerm reID = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    CVTerm rePWs = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
+    
+    for (String ko_id : r.getName().split(" ")) {
+      reID.addResource(KeggInfos.getMiriamURIforKeggID(r.getName()));
+      
+      // Retrieve further information via Kegg API
+      KeggInfos infos = new KeggInfos(ko_id, manager);
+      if (infos.queryWasSuccessfull()) {
+        sbReaction.appendNotes("<p>");
+        if (infos.getDefinition() != null) {
+          sbReaction.appendNotes(String.format("<b>Definition of %s%s%s:</b> %s<br/>\n",
+              quotStart, ko_id.toUpperCase(), quotEnd, EscapeChars.forHTML(infos.getDefinition().replace("\n", " "))));
+          // System.out.println(sbReaction.getNotesString());
+          // notes="<body xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>&#8220;TEST&#8221;</b> A &lt;&#061;&gt;&#62;&#x3e;\u003E B<br/></p></body>";
+        } else
+          sbReaction.appendNotes(String.format("<b>%s</b><br/>\n", ko_id.toUpperCase()));
+        if (infos.getEquation() != null) {
+          sbReaction.appendNotes(String.format("<b>Equation for %s%s%s:</b> %s<br/>\n",
+              quotStart, ko_id.toUpperCase(), quotEnd, EscapeChars.forHTML(infos.getEquation())));
+        }
+        String prefix = "http://www.genome.jp/Fig/reaction/";
+        String suffix = KeggInfos.suffix(ko_id.toUpperCase()) + ".gif";
+        sbReaction.appendNotes(String.format("<a href=\"%s%s\">", prefix, suffix));
+        sbReaction.appendNotes(String.format("<img src=\"%s%s\"/></a>\n", prefix, suffix));
+        if (infos.getPathwayDescriptions() != null) {
+          sbReaction.appendNotes("<b>Occurs in:</b><br/>\n");
+          for (String desc : infos.getPathwayDescriptions().split(",")) { // e.g. ",Glycolysis / Gluconeogenesis,Metabolic pathways"
+            sbReaction.appendNotes(desc + "<br/>\n");
+          }
+          sbReaction.appendNotes("<br/>\n");
+        }
+        sbReaction.appendNotes("</p>");
+        
+        if (rePWs != null && infos.getPathways() != null) {
+          for (String pwId : infos.getPathways().split(",")) {
+            rePWs.addResource(KeggInfos.miriam_urn_kgPathway + KeggInfos.suffix(pwId));
+          }
+        }
+      }
+    }
+    if ((reID.getNumResources() > 0) || (rePWs.getNumResources() > 0)) {
+      sbReaction.getAnnotation().addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
+    }
+    if (reID.getNumResources() > 0) sbReaction.addCVTerm(reID);
+    if (rePWs.getNumResources() > 0) sbReaction.addCVTerm(rePWs);
+    
+    
+    // Finally, add the fully configured reaction.
+    sbReaction.setName(r.getName());
+    sbReaction.setId(NameToSId(r.getName()));
+    sbReaction.appendNotes("</body></html>");
+    sbReaction.setMetaId("meta_" + sbReaction.getId());
+    sbReaction.setSBOTerm(231); // interaction. Most generic SBO Term possible, for a reaction.
+    rAnnot.setAbout("#" + sbReaction.getMetaId());
+    
+    return sbReaction;
+  }
+
+  /**
+   * Returns all reactionModifiers for the given reaction.
+   * @param reactionModifiers - List of all modifiers (must be sorted)
+   * @param r - The reaction, for which you want to have all modifiers.
+   * @return list of modifiers, or empty list.
+   */
+  private List<ModifierSpeciesReference> getAllModifier (
+      SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers, Reaction r) {
+    List<ModifierSpeciesReference> modifier = new ArrayList<ModifierSpeciesReference>();
+    String lName = r.getName().toLowerCase().trim();
+    int modifierPos = reactionModifiers.indexOf(lName);
+    if (modifierPos<0) return modifier;
+    
+    // Add the current item
+    modifier.add(reactionModifiers.get(modifierPos).getInformation());
+    
+    // Multiple modifiers possible
+    
+    // Add all previous items
+    int modifierPos2=modifierPos;
+    while ((--modifierPos2) >= 0 && reactionModifiers.get(modifierPos2).getIdentifier().equalsIgnoreCase(lName)) {
+      modifier.add(reactionModifiers.get(modifierPos2).getInformation());
+    }
+    
+    // Add all following items
+    modifierPos2=modifierPos;
+    while ((++modifierPos2) < reactionModifiers.size() && reactionModifiers.get(modifierPos2).getIdentifier().equalsIgnoreCase(lName)) {
+      modifier.add(reactionModifiers.get(modifierPos2).getInformation());
+    }    
+    
+    return modifier;
+  }
+  
+  /**
+   * Adds all available MIRIAM URNs and ids to the given species/entry.
    */
   private void addMiriamURNs(Entry entry, Species spec) {
 
@@ -1354,6 +924,210 @@ public class KEGG2jSBML implements KEGGtranslator {
     if (LipidBank.getNumResources() > 0) spec.addCVTerm(LipidBank);
   }
   
+  
+  /**
+   * Translates the given entry to jSBML.
+   * 
+   * @param entry - KGML entry to add.
+   * @param p - pathway of the specified entry.
+   * @param model - current model.
+   * @param compartment - current compartment.
+   * @param reactionModifiers - list of modifiers to add this species,
+   * if it is an enzyme or similar.
+   */
+  private Species addKGMLEntry(Entry entry, Pathway p, Model model, Compartment compartment,
+      List<Info<String, ModifierSpeciesReference>> reactionModifiers) {
+    /*
+     * <entry id="1" name="ko:K00128" type="ortholog" reaction="rn:R00710" link="http://www.genome.jp/dbget-bin/www_bget?ko+K00128">
+     * <graphics name="K00128" fgcolor="#000000" bgcolor="#BFBFFF" type="rectangle" x="170" y="1018" width="45" height="17"/>
+     * </entry>
+     */
+    
+    boolean isPathwayReference = false;
+    String name = entry.getName().trim();
+    if ((name != null) && (name.toLowerCase().startsWith("path:") || entry.getType().equals(EntryType.map))) {
+      isPathwayReference = true;
+    }
+    // Eventually skip this node. It's just a label for the current pathway.
+    if (isPathwayReference && (entry.hasGraphics() && entry.getGraphics().getName().toLowerCase().startsWith("title:"))) {
+      compartment.setName(entry.getGraphics().getName().substring(6).trim());
+      return null;//continue;
+    }
+    
+    // Skip it, if it's white
+    if (removeWhiteNodes && entry.hasGraphics() && entry.getGraphics().getBgcolor().toLowerCase().trim().endsWith("ffffff")
+        && (entry.getType() == EntryType.gene || entry.getType() == EntryType.ortholog))
+      return null;//continue;
+    
+    // Look if not is an orphan
+    if (removeOrphans) {
+      if (entry.getReaction() == null || entry.getReaction().length() < 1) {
+        boolean found = false;
+        for (Reaction r : p.getReactions()) {
+          for (ReactionComponent rc : r.getProducts())
+            if (rc.getName().equalsIgnoreCase(entry.getName())) {
+              found = true;
+              break;
+            }
+          if (!found) {
+            for (ReactionComponent rc : r.getSubstrates())
+              if (rc.getName().equalsIgnoreCase(entry.getName())) {
+                found = true;
+                break;
+              }
+          }
+          if (found) break;
+        }
+        
+        if (considerRelations && !found) {
+          for (Relation r : p.getRelations()) {
+            if (r.getEntry1() == entry.getId() || r.getEntry2() == entry.getId()) {
+              found = true;
+              break;
+            }
+            for (SubType st : r.getSubtypes()) {
+              try {
+                if (Integer.parseInt(st.getValue()) == entry.getId()) {
+                  found = true;
+                  break;
+                }
+              } catch (Exception e) {}
+            }
+            if (found) break;
+          }
+        }
+        
+        // It is an orphan!
+        if (!found) return null; //continue;
+      }
+    }
+    /*
+     * XXX: Gruppenknoten erstellen.
+     * Gibt es sowas in SBML?
+     * InCD -> ja, aber umsetzung ist ungenügend (nur
+     * zur visualisierung, keine SBML Species für alle species).
+     * 
+     * Gelöst: Über complexSpeciesAlias in CD.
+     * In simplen SBML ignoriert, da funktion nicht vorhanden.
+     * Reaktionen werden stets so übersetzt, wie sie im Dokument stehen
+     * (meist nur vom Gruppenknoten aus, nicht von den Komponenten).
+     * Das macht Sinn, da Gruppenknoten selbst nicht nur eine "Gruppe" ist,
+     * sondern per se auch schon ein Protein o.ä. definiert.
+     *
+     *  Beispiel (aus map04010hsa.xml):
+     *      <entry id="141" name="group:" type="genes">
+     *         <graphics fgcolor="#000000" bgcolor="#FFFFFF" type="rectangle" x="945" y="310" width="129" height="59"/>
+     *         <component id="131"/>
+     *         <component id="133"/>
+     *         <component id="134"/>
+     *     </entry>
+     *  Beispiel aktuell (kg0.7 map04010.xml):
+     *    <entry id="138" name="undefined" type="group">
+     *         <graphics fgcolor="#000000" bgcolor="#FFFFFF"
+     *              type="rectangle" x="945" y="310" width="129" height="59"/>
+     *         <component id="131"/>
+     *         <component id="133"/>
+     *         <component id="134"/>
+     *     </entry> 
+    */
+    
+    // Get a good name for the node
+    boolean hasMultipleIDs = false;
+    if (entry.getName().trim().contains(" ")) hasMultipleIDs = true;
+    if (entry.hasGraphics()&& entry.getGraphics().getName().length() > 0) {
+      name = entry.getGraphics().getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
+    }
+    // Set name to real and human-readable name (from Inet data - Kegg API).
+    if (!hasMultipleIDs) {
+      // Be careful: very slow, uses Cache - so doesn't matter to query the same id one or more times.
+      KeggInfos infos = new KeggInfos(entry.getName().trim(), manager);
+      if (infos.queryWasSuccessfull() && (infos.getName() != null)) {
+        name = infos.getName();
+      }
+    }
+    // ---
+    
+    // Initialize species object
+    Species spec = model.createSpecies();
+    spec.setCompartment(compartment); // spec.setId("s_" +
+    // entry.getId());
+    spec.setInitialAmount(speciesDefaultInitialAmount);
+    spec.setUnits(model.getUnitDefinition("substance"));
+    
+    // ID has to be at this place, because other refer to it by id and if id is not set. refenreces go to null.
+    // spec.setId(NameToSId(entry.getName().replace(' ', '_')));
+    spec.setId(NameToSId(name.replace(' ', '_')));
+    spec.setMetaId("meta_" + spec.getId());
+    
+    Annotation specAnnot = new Annotation("");
+    specAnnot.setAbout("");
+    spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
+    spec.appendNotes("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>");
+    spec.appendNotes(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
+    
+    // Set SBO Term
+    if (treatEntrysWithReactionDifferent && entry.getReaction() != null && entry.getReaction().trim().length() != 0) {
+      // Q: Ist es richtig, sowohl dem Modifier als auch der species eine neue id zu geben? A: Nein, ist nicht richtig.
+      // spec.setSBOTerm(ET_SpecialReactionCase2SBO);
+      ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
+      
+      Annotation tempAnnot = new Annotation("");
+      tempAnnot.setAbout("");
+      modifier.setAnnotation(tempAnnot);
+      if (addCellDesignerAnnots) {
+        modifier.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
+        modifier.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+      }
+      modifier.setId(this.NameToSId("mod_" + entry.getReaction()));
+      modifier.setMetaId("meta_" + modifier.getId());
+      modifier.setName(modifier.getId());
+      if (entry.getType().equals(EntryType.enzyme)   || entry.getType().equals(EntryType.gene)
+          || entry.getType().equals(EntryType.group) || entry.getType().equals(EntryType.ortholog)
+          || entry.getType().equals(EntryType.genes)) {
+        // 1 & 2: klar. 3 (group): Doku sagt "MOSTLY a protein complex". 4 (ortholog): Kommen in
+        // nicht-spezies spezifischen PWs vor und sind quasi otholog geclusterte gene.
+        // 5. (genes) ist group in kgml versionen <0.7.
+        modifier.setSBOTerm(ET_EnzymaticModifier2SBO); // 460 = Enzymatic catalyst
+      } else { // "Metall oder etwas anderes, was definitiv nicht enzymatisch wirkt"
+        modifier.setSBOTerm(ET_GeneralModifier2SBO); // 13 = Catalyst
+      }
+      
+      
+      // Remember modifier for later association with reaction.
+      reactionModifiers.add(new Info<String, ModifierSpeciesReference>(entry.getReaction().toLowerCase().trim(), modifier));
+      
+    } else {
+      spec.setSBOTerm(getSBOTerm(entry.getType()));
+    }
+    
+    // Process graphics information
+    if (entry.hasGraphics()) {
+      // is handled by cellDesigner functions.
+    }
+    
+    // Process Component information
+    /*
+     * // No need to do that! See Group Node information above.
+     * if (entry.getComponents()!=null && entry.getComponents().size()>0) {
+     *   for (int c:entry.getComponents()) {
+     * 
+     * } }
+     */
+    specAnnot.addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
+    addMiriamURNs(entry, spec);
+    
+    // Finally, add the fully configured species.
+    spec.setName(name);
+    spec.appendNotes("</body></html>");
+    specAnnot.setAbout("#" + spec.getMetaId());
+    entry.setCustom(spec); // Remember node in KEGG Structure for further references.
+    // NOT here, because it may depend on other entries, that are not yet processed.
+    //if (addCellDesignerAnnots) addCellDesignerAnnotationToSpecies(spec, entry);
+    // Not neccessary to add species to model, due to call in "model.createSpecies()".
+    
+    return spec;
+  }
+  
   /**
    * Extends a list of ReactionComponent by adding all children
    * of all group nodes, in addition to the group nodes itself.
@@ -1394,26 +1168,9 @@ public class KEGG2jSBML implements KEGGtranslator {
    * @param e
    * @return
    */
-  private boolean isGroupNode(Entry e) {
+  public static boolean isGroupNode(Entry e) {
     EntryType t = e.getType();
     return (t.equals(EntryType.group) || e.getName().toLowerCase().trim().startsWith("group:"));
-  }
-  
-  /**
-   * CellDesigner has special encodings for space, minus, alpha, etc. in the
-   * id attribute. This function reformats the given string, replacing original
-   * with these special attributes.
-   * 
-   * @param name - input string to reformat.
-   * @param forCellDesigner
-   * @return String with special CD attributes (e.g. " " => "_space_").
-   */
-  private String NameToCellDesignerName(String name) {
-    name = name.trim().replace(" ", "_space_").replace("-", "_minus_")
-      .replace("alpha", "_alpha_").replace("beta", "_beta_").replace("gamma", "_gamma_").replace("delta", "_delta_").replace("epsilon  ", "_epsilon_")
-      .replace("ALPHA", "_ALPHA_").replace("BETA", "_BETA_").replace("GAMMA", "_GAMMA_").replace("DELTA", "_DELTA_").replace("EPSILON  ", "_EPSILON_");
-    
-    return (name);
   }
   
   /**
@@ -1537,24 +1294,6 @@ public class KEGG2jSBML implements KEGGtranslator {
     return true;
   }
   
-  /**
-   * Parses a Kegg Pathway and returns the maximum x and y coordinates
-   * 
-   * @param p - Kegg Pathway Object
-   * @return int[]{x,y}
-   */
-  public static int[] getMaxCoords(Pathway p) {
-    int x = 0, y = 0;
-    for (Entry e : p.getEntries()) {
-      if (e.hasGraphics()) {
-        x = Math.max(x, e.getGraphics().getX()
-            + e.getGraphics().getWidth());
-        y = Math.max(y, e.getGraphics().getY()
-            + e.getGraphics().getHeight());
-      }
-    }
-    return new int[] { x, y };
-  }
   
   /**
    * Returns the SBO Term for an EntryType.
@@ -1615,7 +1354,7 @@ public class KEGG2jSBML implements KEGGtranslator {
         batch.setOrgOutdir(args[0]);
         if (args.length > 1)
           batch.setChangeOutdirTo(args[1]);
-        batch.setConverter(k2s);
+        batch.setTranslator(k2s);
         batch.setOutFormat("sbml");
         batch.parseDirAndSubDir();
         
@@ -1644,7 +1383,7 @@ public class KEGG2jSBML implements KEGGtranslator {
     
     long start = System.currentTimeMillis();
     try {
-      k2s.translate("files/KGMLsamplefiles/map04010hsa.xml", "files/KGMLsamplefiles/map04010hsa.sbml.xml");
+      //k2s.translate("files/KGMLsamplefiles/map04010hsa.xml", "files/KGMLsamplefiles/map04010hsa.sbml.xml");
       k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
       
       // Remember already queried objects
