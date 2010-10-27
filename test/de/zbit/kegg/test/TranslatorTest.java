@@ -2,6 +2,8 @@ package de.zbit.kegg.test;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.util.InvalidPropertiesFormatException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,9 +22,12 @@ public class TranslatorTest {
 	 * @param path
 	 *            The path to a directory that contains KGML files or a single
 	 *            file.
-	 * @throws SBMLException 
+	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public TranslatorTest(String path) throws SBMLException {
+	public TranslatorTest(String path) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		File f = new File(path);
 		if (f.exists()) {
 			List<File> files;
@@ -45,9 +50,12 @@ public class TranslatorTest {
 	 * @param args
 	 *            The first argument must be a directory that contains KGML
 	 *            files.
-	 * @throws SBMLException 
+	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public static void main(String args[]) throws SBMLException {
+	public static void main(String args[]) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		new TranslatorTest(args[0]);
 	}
 

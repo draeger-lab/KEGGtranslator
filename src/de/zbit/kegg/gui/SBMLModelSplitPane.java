@@ -19,7 +19,9 @@
 package de.zbit.kegg.gui;
 
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -36,6 +38,8 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SBaseChangedListener;
+
+import de.zbit.gui.GUITools;
 
 /**
  * A specialized {@link JSplitPane} that displays a {@link JTree} containing all
@@ -56,7 +60,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 */
-	private Set<ActionListener> actionListeners;
+	private final Set<ActionListener> actionListeners;
 
 	/**
 	 * 
@@ -66,9 +70,12 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	/**
 	 * 
 	 * @param model
-	 * @throws SBMLException 
+	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public SBMLModelSplitPane(Model model) throws SBMLException {
+	public SBMLModelSplitPane(Model model) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		actionListeners = new HashSet<ActionListener>();
 		model.addChangeListener(this);
@@ -88,9 +95,12 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @param sbase
 	 * @return
-	 * @throws SBMLException 
+	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	private JScrollPane createRightComponent(SBase sbase) throws SBMLException {
+	private JScrollPane createRightComponent(SBase sbase) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		JPanel p = new JPanel();
 		p.add(new SBasePanel(sbase));
 		JScrollPane scroll = new JScrollPane(p,
@@ -103,13 +113,16 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @param model
 	 * @param keepDivider
-	 * @throws SBMLException 
+	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public void init(Model model, boolean keepDivider) throws SBMLException {
+	public void init(Model model, boolean keepDivider) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		int proportionalLocation = getDividerLocation();
 		TreePath path = null;
 		if (tree != null)
-			path = (TreePath) tree.getSelectionPath();
+			path = tree.getSelectionPath();
 		tree = new SBMLTree(model.getSBMLDocument());
 		tree.setShowsRootHandles(true);
 		tree.setScrollsOnExpand(true);
@@ -178,8 +191,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * .TreeSelectionEvent)
 	 */
 	public void valueChanged(TreeSelectionEvent e) {
-		TreeNode node = (TreeNode) tree
-				.getLastSelectedPathComponent();
+		TreeNode node = (TreeNode) tree.getLastSelectedPathComponent();
 		if (node == null)
 			// Nothing is selected.
 			return;
@@ -187,18 +199,16 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			int proportionalLocation = getDividerLocation();
 			try {
 				setRightComponent(createRightComponent((SBase) node));
-			} catch (SBMLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (Exception e1) {
+				GUITools.showErrorMessage(this, e1);
 			}
 			setDividerLocation(proportionalLocation);
 		} else if (node instanceof ASTNode) {
 			int proportionalLocation = getDividerLocation();
 			try {
 				setRightComponent(createRightComponent((ASTNode) node));
-			} catch (SBMLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (Exception exc) {
+				GUITools.showErrorMessage(this, exc);
 			}
 			setDividerLocation(proportionalLocation);
 		} else {
@@ -211,9 +221,12 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 * 
 	 * @param nodeInfo
 	 * @return
-	 * @throws SBMLException 
+	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	private JScrollPane createRightComponent(ASTNode node) throws SBMLException {
+	private JScrollPane createRightComponent(ASTNode node)
+			throws SBMLException, InvalidPropertiesFormatException, IOException {
 		return new JScrollPane(new ASTNodePanel(node),
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);

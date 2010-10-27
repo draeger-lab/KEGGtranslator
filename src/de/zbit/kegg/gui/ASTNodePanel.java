@@ -18,6 +18,9 @@
  */
 package de.zbit.kegg.gui;
 
+import java.io.IOException;
+import java.util.InvalidPropertiesFormatException;
+
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -31,9 +34,8 @@ import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.util.compilers.LaTeX;
 
-import de.zbit.gui.LayoutHelper;
-
 import atp.sHotEqn;
+import de.zbit.gui.LayoutHelper;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -49,9 +51,12 @@ public class ASTNodePanel extends JPanel {
 	/**
 	 * 
 	 * @param node
-	 * @throws SBMLException 
+	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public ASTNodePanel(ASTNode node) throws SBMLException {
+	public ASTNodePanel(ASTNode node) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		super();
 		LayoutHelper lh = new LayoutHelper(this);
 		boolean enabled = false;

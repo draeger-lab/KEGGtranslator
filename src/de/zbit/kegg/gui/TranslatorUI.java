@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.InvalidPropertiesFormatException;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -24,9 +25,10 @@ import javax.swing.JProgressBar;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
-import org.sbml.squeezer.CfgKeys;
-import org.sbml.squeezer.gui.LaTeXExportDialog;
+import org.sbml.tolatex.gui.LaTeXExportDialog;
 
+import de.zbit.gui.GUITools;
+import de.zbit.gui.ImageTools;
 import de.zbit.gui.VerticalLayout;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
@@ -87,14 +89,8 @@ public class TranslatorUI extends JFrame implements ActionListener {
 	}
 	
 	static {
-		char c = '/';
-		String path = TranslatorUI.class.getPackage().getName().replace('.', c);
-		String iconPath = path + c + "img" + c;
-		String cfgPath = c + path + c + "cfg";
-		GUITools.initIcons(iconPath);
+		ImageTools.initImages(TranslatorUI.class.getResource("img"));
 		GUITools.initLaF(KEGGtranslator.appName);
-		CfgKeys.setDefaultsCfgFile(cfgPath + c + "KEGGtranslator.cfg");
-		CfgKeys.setUserPrefNode(cfgPath);
 		if (new File(KEGGtranslator.cacheFileName).exists()
 				&& new File(KEGGtranslator.cacheFileName).length() > 0) {
 			KeggInfoManagement manager;
@@ -127,8 +123,11 @@ public class TranslatorUI extends JFrame implements ActionListener {
 	 *            accepted arguments are --input=<base directory to open files>
 	 *            and --output=<base directory to save files>
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public static void main(String[] args) throws SBMLException {
+	public static void main(String[] args) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		if (args.length > 0) {
 			String infile = null, outfile = null;
 			for (String arg : args) {
@@ -157,7 +156,7 @@ public class TranslatorUI extends JFrame implements ActionListener {
 	/**
 	 * Basis directory when saving files.
 	 */
-	private String baseSaveDir;
+	private final String baseSaveDir;
 	/**
 	 * The SBML document as a result of a successful conversion.
 	 */
@@ -167,8 +166,11 @@ public class TranslatorUI extends JFrame implements ActionListener {
 	 * Shows a small GUI.
 	 * 
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public TranslatorUI() throws SBMLException {
+	public TranslatorUI() throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		this(System.getProperty("user.dir"), System.getProperty("user.dir"));
 	}
 
@@ -177,8 +179,11 @@ public class TranslatorUI extends JFrame implements ActionListener {
 	 * @param baseDir
 	 * @param saveDir
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public TranslatorUI(String baseDir, String saveDir) throws SBMLException {
+	public TranslatorUI(String baseDir, String saveDir) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		super();
 		this.baseOpenDir = baseDir;
 		this.baseSaveDir = saveDir;
@@ -204,7 +209,7 @@ public class TranslatorUI extends JFrame implements ActionListener {
 			saveFile();
 			break;
 		case TO_LATEX:
-			new LaTeXExportDialog(this, CfgKeys.getProperties(), doc);
+			new LaTeXExportDialog(this, doc);
 			break;
 		case EXIT:
 			dispose();
@@ -273,8 +278,11 @@ public class TranslatorUI extends JFrame implements ActionListener {
 	 * Displays an overview of the result of a conversion.
 	 * 
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	private void showGUI(SBMLDocument doc) throws SBMLException {
+	private void showGUI(SBMLDocument doc) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		getContentPane().removeAll();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setJMenuBar(createJMenuBar());

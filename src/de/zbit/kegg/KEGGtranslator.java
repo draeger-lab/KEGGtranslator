@@ -42,6 +42,11 @@ public class KEGGtranslator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		for (Object key : System.getProperties().keySet()) {
+			System.out.printf("%s:\t%s\n", key, System.getProperty(key
+					.toString()));
+		}
+
 		preferences.analyzeCommandLineArguments(
 				"java KEGGtranslator [options]", args);
 	}

@@ -23,7 +23,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.Date;
+import java.util.InvalidPropertiesFormatException;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -94,9 +96,9 @@ public class SBasePanel extends JPanel {
 	 */
 	private static final long serialVersionUID = -4969096536922920641L;
 
-	private LayoutHelper lh;
+	private final LayoutHelper lh;
 
-	private LaTeX latex;
+	private final LaTeX latex;
 
 	private static final int preferedWidth = 450;
 
@@ -104,13 +106,19 @@ public class SBasePanel extends JPanel {
 
 	private int row;
 
+	private final LaTeXExport latexExport;
+
 	/**
 	 * 
 	 * @param sbase
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	public SBasePanel(SBase sbase) throws SBMLException {
+	public SBasePanel(SBase sbase) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		super();
+		this.latexExport = new LaTeXExport();
 		GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
 		latex = new LaTeX(false);
@@ -205,8 +213,11 @@ public class SBasePanel extends JPanel {
 	 * 
 	 * @param e
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	private void addProperties(Event e) throws SBMLException {
+	private void addProperties(Event e) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		JCheckBox check = new JCheckBox("Uses values from trigger time", e
 				.getUseValuesFromTriggerTime());
 		check.setEnabled(editable);
@@ -247,8 +258,11 @@ public class SBasePanel extends JPanel {
 	 * 
 	 * @param mc
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	private void addProperties(MathContainer mc) throws SBMLException {
+	private void addProperties(MathContainer mc) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		if (mc.isSetMath()) {
 			StringBuffer laTeXpreview = new StringBuffer();
 			laTeXpreview.append(LaTeX.eqBegin);
@@ -445,8 +459,11 @@ public class SBasePanel extends JPanel {
 	 * 
 	 * @param sbase
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	private void addProperties(Reaction reaction) throws SBMLException {
+	private void addProperties(Reaction reaction) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		JCheckBox check = new JCheckBox("Reversible", reaction.getReversible());
 		check.setEnabled(editable);
 		lh.add(check, 1, ++row, 3, 1, 1, 1);
@@ -483,7 +500,7 @@ public class SBasePanel extends JPanel {
 		lh.add(scroll, 1, ++row, 3, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		JPanel rEqPanel = new JPanel(new BorderLayout());
-		sHotEqn rEqn = new sHotEqn((new LaTeXExport())
+		sHotEqn rEqn = new sHotEqn(latexExport
 				.reactionEquation(reaction));
 		JScrollPane s = new JScrollPane(rEqn,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -606,8 +623,11 @@ public class SBasePanel extends JPanel {
 	 * 
 	 * @param ssr
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	private void addProperties(SimpleSpeciesReference ssr) throws SBMLException {
+	private void addProperties(SimpleSpeciesReference ssr)
+			throws SBMLException, InvalidPropertiesFormatException, IOException {
 		if (ssr.isSetSpecies()) {
 			Model m = ssr.getModel();
 			String idsOrNames[] = new String[m.getNumSpecies()];
@@ -815,8 +835,11 @@ public class SBasePanel extends JPanel {
 	 * 
 	 * @param ud
 	 * @throws SBMLException
+	 * @throws IOException
+	 * @throws InvalidPropertiesFormatException
 	 */
-	private void addProperties(UnitDefinition ud) throws SBMLException {
+	private void addProperties(UnitDefinition ud) throws SBMLException,
+			InvalidPropertiesFormatException, IOException {
 		lh.add(new JLabel("Definition: "), 1, ++row, 1, 1, 1, 1);
 		lh.add(unitPreview(ud), 3, row, 1, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
