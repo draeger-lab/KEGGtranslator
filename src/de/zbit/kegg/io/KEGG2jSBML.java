@@ -34,10 +34,8 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
-import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.Info;
-import de.zbit.util.ProgressBar;
 import de.zbit.util.SortedArrayList;
 import de.zbit.util.Utils;
 
@@ -74,11 +72,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
    * Used for avoiding giving the same id to two or more different elements.
    */
   private ArrayList<String> SIds = new ArrayList<String>();
-  
-  /**
-   * ProgressBar for Kegg2xConversion
-   */
-  private AbstractProgressBar progress=null;
   
   /**
    * Default compartment size.
@@ -210,15 +203,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
   }
   
   /**
-   * Set a progressBar that should be used to display the
-   * status of the conversion.
-   * @param progressBarSwing
-   */
-  public void setProgressBar(AbstractProgressBar progressBar) {
-    this.progress = progressBar;
-  }
-  
-  /**
    * Returns the default compartment size.
    * @return
    */
@@ -293,6 +277,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
    */
   @Override
   public boolean writeToFile(SBMLDocument doc, String outFile) {
+    if (new File(outFile).exists()) lastFileWasOverwritten=true;
     try {
       SBMLWriter.write(doc, outFile);
     } catch (FileNotFoundException e) {
@@ -325,15 +310,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
     if (addCellDesignerAnnots) cdu = new CellDesignerUtils(); 
     
     // Initialize a progress bar.
-    int totalCalls = p.getEntries().size(); // +p.getRelations().size(); // Relations are very fast.
-    // if (adap==null) aufrufeGesamt+=p.getRelations().size(); // TODO: noch ausloten wann klasse aufgerufen wird.
-    if (progress==null) {
-      progress = new ProgressBar(totalCalls + 1);
-    } else {
-      progress.reset();
-      progress.setNumberOfTotalCalls(totalCalls + 1);
-    }
-    progress.DisplayBar();
+    initProgressBar(p,false,false);
     
     // new Model with Kegg id as id.
     Model model = doc.createModel(NameToSId(p.getName().replace(":", "_")));
@@ -915,17 +892,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
     }
     
     return ret;
-  }
-
-  
-  /**
-   * Returns true if and only if the given entry refers to a group node.
-   * @param e
-   * @return
-   */
-  public static boolean isGroupNode(Entry e) {
-    EntryType t = e.getType();
-    return (t.equals(EntryType.group) || e.getName().toLowerCase().trim().startsWith("group:"));
   }
   
   /**

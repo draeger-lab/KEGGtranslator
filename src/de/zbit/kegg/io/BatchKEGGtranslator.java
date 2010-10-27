@@ -1,8 +1,10 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.DirectoryParser;
 
@@ -12,7 +14,7 @@ import de.zbit.util.DirectoryParser;
  * @author Clemens Wrzodek
  */
 public class BatchKEGGtranslator {
-
+  
   /**
    * 
    */
@@ -47,24 +49,24 @@ public class BatchKEGGtranslator {
     return myDir;
   }
   
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String args[]) {
-		BatchKEGGtranslator batch = new BatchKEGGtranslator();
-		if (args != null && args.length > 0) {
-			batch.setOrgOutdir(args[0]);
-			if (args.length > 1)
-				batch.setChangeOutdirTo(args[1]);
-			batch.parseDirAndSubDir();
-			return;
-		}
-		System.out.println("Demo Mode:");
-		batch.setOrgOutdir(System.getProperty("user.home"));
-		batch.setChangeOutdirTo(System.getProperty("user.home"));
-		batch.parseDirAndSubDir();
-	}
+  /**
+   * 
+   * @param args
+   */
+  public static void main(String args[]) {
+    BatchKEGGtranslator batch = new BatchKEGGtranslator();
+    if (args != null && args.length > 0) {
+      batch.setOrgOutdir(args[0]);
+      if (args.length > 1)
+        batch.setChangeOutdirTo(args[1]);
+      batch.parseDirAndSubDir();
+      return;
+    }
+    System.out.println("Demo Mode:");
+    batch.setOrgOutdir(System.getProperty("user.home"));
+    batch.setChangeOutdirTo(System.getProperty("user.home"));
+    batch.parseDirAndSubDir();
+  }
   
   /**
    * 
@@ -109,21 +111,47 @@ public class BatchKEGGtranslator {
    * 
    * @param dir
    */
+  @SuppressWarnings("unchecked")
   private void parseDirAndSubDir(String dir) {
+    KeggInfoManagement manager = loadCache();
+    
     if (!dir.endsWith("/") && !dir.endsWith("\\"))
       if (dir.contains("\\")) dir+="\\"; else dir +="/";
     System.out.println("Parsing directory " + dir);
     
-    boolean isGraphML = outFormat.equalsIgnoreCase("GraphML");
+    
+    String fileExtension=".translated";
     if (translator==null) {
       if (outFormat.equalsIgnoreCase("sbml")) {
-        translator = new KEGG2jSBML();
+        translator = new KEGG2jSBML(manager);
+        fileExtension = ".sbml.xml";
+        
       } else if (outFormat.equalsIgnoreCase("GraphML")) {
-        translator = new KEGG2GraphML();
+        translator = KEGG2yGraph.createKEGG2GraphML(manager);
+        
+      } else if (outFormat.equalsIgnoreCase("GML")) {
+        translator = KEGG2yGraph.createKEGG2GML(manager);
+
+      } else if (outFormat.equalsIgnoreCase("JPG")) {
+        translator = KEGG2yGraph.createKEGG2JPG(manager);
+        
+      } else if (outFormat.equalsIgnoreCase("GIF")) {
+        translator = KEGG2yGraph.createKEGG2GIF(manager);
+        
+      } else if (outFormat.equalsIgnoreCase("YGF")) {
+        translator = KEGG2yGraph.createKEGG2YGF(manager);
+        
+      } else if (outFormat.equalsIgnoreCase("TGF")) {
+        translator = KEGG2yGraph.createKEGG2TGF(manager);
+        
       } else {
         System.err.println("Unknwon output Format: '" + outFormat + "'.");
         return;
+        
       }
+    }
+    if (translator instanceof KEGG2yGraph) {
+      fileExtension = ((KEGG2yGraph)translator).getOutputHandler().getFileNameExtension();
     }
     
     DirectoryParser dp = new DirectoryParser(dir);
@@ -137,9 +165,9 @@ public class BatchKEGGtranslator {
       } else if (fn.toLowerCase().trim().endsWith(".xml")) {
         // Test if outFile already exists. Assumes: 1 Pathway per file. (should be true for all files... not crucial if assumption is wrong)
         String myDir = getAndCreateOutDir(dir);
-        String outFileTemp = myDir + fn.trim().substring(0, fn.trim().length()-4) + (isGraphML?".graphML":".sbml.xml");
+        String outFileTemp = myDir + fn.trim().substring(0, fn.trim().length()-4) + fileExtension;
         if (new File(outFileTemp).exists()) continue; // Skip already converted files.
-
+        
         // Parse and convert all Pathways in XML file.
         ArrayList<Pathway> pw=null;
         try {
@@ -149,15 +177,15 @@ public class BatchKEGGtranslator {
         
         boolean appendNumber=(pw.size()>1);
         for (int i=0; i<pw.size(); i++) {
-          String outFile = myDir + fn.trim().substring(0, fn.trim().length()-4) + (appendNumber?"-"+(i+1):"") + (isGraphML?".graphML":".sbml.xml");
+          String outFile = myDir + fn.trim().substring(0, fn.trim().length()-4) + (appendNumber?"-"+(i+1):"") + fileExtension;
           if (new File(outFile).exists()) continue; // Skip already converted files.
           
           // XXX: Main Part
           try {
-			translator.translate(pw.get(i), outFile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            translator.translate(pw.get(i), outFile);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
           
           if (translator.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, sp�ter aber schon => ein anderer prezess macht das selbe bereits.
             System.out.println("It looks like another instance is processing the same files. Going to next subfolder.");
@@ -168,6 +196,35 @@ public class BatchKEGGtranslator {
         
       }
     }
+    
+    // Remember already queried objects (save cache)
+    if ((translator instanceof AbstractKEGGtranslator) &&
+        ((AbstractKEGGtranslator) translator).getKeggInfoManager().hasChanged()) {
+      KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, 
+          ((AbstractKEGGtranslator) translator).getKeggInfoManager());
+    }
+  }
+  
+  /**
+   * Load or create a KeggInfoManager
+   * @return KeggInfoManagement
+   */
+  private KeggInfoManagement loadCache() {
+    KeggInfoManagement manager=null;
+    if (new File(KEGGtranslator.cacheFileName).exists()
+        && new File(KEGGtranslator.cacheFileName).length() > 0) {
+      try {
+        manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
+    if (manager==null){
+      manager = new KeggInfoManagement();
+    }
+    
+    return manager;
   }
   
   /**
@@ -177,7 +234,7 @@ public class BatchKEGGtranslator {
   public void setChangeOutdirTo(String changeOutdirTo) {
     this.changeOutdirTo = changeOutdirTo;
   }
-
+  
   /**
    * Set the translator you wish to use. This will determine the
    * output format of this class.
@@ -194,7 +251,7 @@ public class BatchKEGGtranslator {
   public void setOrgOutdir(String orgOutdir) {
     this.orgOutdir = orgOutdir;
   }
-
+  
   /**
    * @param outFormat - "graphml" or "sbml".
    */

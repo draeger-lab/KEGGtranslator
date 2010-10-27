@@ -10,12 +10,18 @@ import java.io.IOException;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggTools;
 import de.zbit.kegg.parser.KeggParser;
+import de.zbit.kegg.parser.pathway.Entry;
+import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.ProgressBar;
 
 
 /**
+ * Abstract superclass for Kegg translators. All non-ouput-format specific
+ * stuff should be implemented into this class.
+ * 
  * @author wrzodek
- *
  */
 public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtranslator {
 
@@ -68,7 +74,13 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * A flag, if the last sbml file that has been written by this class was
    * overwritten. This variable is used by the BatchConverter.
    */
-  private boolean lastFileWasOverwritten = false;
+  protected boolean lastFileWasOverwritten = false;
+  
+  /**
+   * ProgressBar for Kegg2xConversion
+   */
+  protected AbstractProgressBar progress=null;
+  
   
   /*===========================
    * CONSTRUCTORS
@@ -78,6 +90,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @param manager2
    */
   public AbstractKEGGtranslator(KeggInfoManagement manager) {
+    if (manager==null) manager = new KeggInfoManagement();
     this.manager = manager;
   }
 
@@ -157,7 +170,16 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   public boolean isLastFileWasOverwritten() {
     return lastFileWasOverwritten;
-  } 
+  }
+  
+  /**
+   * Set a progressBar that should be used to display the
+   * status of the conversion.
+   * @param progressBarSwing
+   */
+  public void setProgressBar(AbstractProgressBar progressBar) {
+    this.progress = progressBar;
+  }
   
   /**
    * Preprocesses the given pathway:
@@ -255,6 +277,40 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     throw new IOException("Cannot read input file " + f.getAbsolutePath());
   }
   
+  /**
+   * Initializes the given, or a new progressBar with the number of
+   * entries. Optionally, the number of relations or reactions can
+   * be added.
+   * @param p - The KEGG Pathway to translate
+   * @param addRelations - if true, also adds the number of relations
+   * to the number of total calls.
+   * @param addReactions - if true, also adds the number of reactions
+   * to the number of total calls. 
+   */
+  protected void initProgressBar(Pathway p, boolean addRelations, boolean addReactions) {
+    // Initialize a progress bar.
+    int totalCalls = p.getEntries().size(); // +p.getRelations().size(); // Relations are very fast.
+    if (addRelations) totalCalls+=p.getRelations().size();
+    if (addReactions) totalCalls+=p.getReactions().size();
+    // if (!retrieveKeggAnnots) aufrufeGesamt+=p.getRelations().size();
+    if (progress==null) {
+      progress = new ProgressBar(totalCalls + 1);
+    } else {
+      progress.reset();
+      progress.setNumberOfTotalCalls(totalCalls + 1);
+    }
+    progress.DisplayBar();
+  }
+  
+  /**
+   * Returns true if and only if the given entry refers to a group node.
+   * @param e
+   * @return
+   */
+  public static boolean isGroupNode(Entry e) {
+    EntryType t = e.getType();
+    return (t.equals(EntryType.group) || e.getName().toLowerCase().trim().startsWith("group:") || e.hasComponents());
+  }
 
   /**
    * Write the translated document to the given file.

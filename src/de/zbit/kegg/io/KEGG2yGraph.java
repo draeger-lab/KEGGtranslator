@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import y.base.DataMap;
 import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.EdgeMap;
@@ -16,8 +17,14 @@ import y.base.Node;
 import y.base.NodeList;
 import y.base.NodeMap;
 import y.geom.YInsets;
+import y.io.GIFIOHandler;
+import y.io.GMLIOHandler;
 import y.io.GraphMLIOHandler;
 import y.io.IOHandler;
+import y.io.JPGIOHandler;
+import y.io.TGFIOHandler;
+import y.io.YGFIOHandler;
+import y.io.graphml.GraphMLHandler;
 import y.io.graphml.KeyScope;
 import y.io.graphml.KeyType;
 import y.io.graphml.graph2d.Graph2DGraphMLHandler;
@@ -36,117 +43,145 @@ import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
+import de.zbit.kegg.extensions.GenericDataMap;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
+import de.zbit.kegg.parser.pathway.GraphicsType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
-import de.zbit.util.ProgressBar;
+import de.zbit.util.Utils;
 
 /**
- * 
+ * KEGG2yGraph converter.
  * @author wrzodek
  */
-public class KEGG2GraphML implements KEGGtranslator {
-  /**
-   * 
-   */
-  public static boolean silent = true; // Surpresses all outputs, except %-values
-  /**
-   * 
-   */
-  public static boolean absoluteNoOutputs = true;
-  /**
-   * 
-   */
-  public static boolean retrieveKeggAnnots=true; // z.B. "hsa" = homo sapiens, "" => General, null => keine infos von kegg.
-  /**
-   * 
-   */
-  public static boolean showEntriesWithoutGraphAttribute=true;
-  /**
-   * 
-   */
-  public static boolean skipCompounds=false;
-  /**
-   * 
-   */
-  public static boolean groupNodesWithSameEdges=false;
-  /**
-   * 
-   */
-  public static boolean removeDegreeZeroNodes=true; // Bezieht sich nur auf "Non-map nodes" (Also nicht auf Pathway referenzen).
-  /**
-   * 
-   */
-  public static boolean renameCompoundToSmallMolecule=true; // Fuer Jochen & GePS unbedingt true lassen (so was wie LPS, CA2+ als "sm" bezeichnen).
-  /**
-   * 
-   */
-  public static boolean lastFileWasOverwritten=false; // Gibt an, ob das letzte geschriebene outFile bereits vorhanden war und deshalb ueberschrieben wurde.
-  /**
-   * 
-   */
-  public static KeggInfoManagement manager=null;
+public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   /**
-   * Store last output hander. This handler contains all maps (node => nodeLabel,
-   * entrez id, etc.). The generated graph should be written to disk with this handler.
+   * This translation is mainly graph based, so simply ignoring entries
+   * without an graph attribute makes sense.
    */
-  private IOHandler lastOutputHandler=null;
+  private boolean showEntriesWithoutGraphAttribute=true;
+  /**
+   * Compounds are small molecules, biopolymers, and other chemical
+   * substances that are relevant to biological systems. 
+   */
+  private boolean skipCompounds=false;
+  /**
+   * If multiple nodes having exactly the same edges, they are being grouped
+   * to one node if this is set to true.
+   */
+  private boolean groupNodesWithSameEdges=false;
+  
+  /**
+   * Important: This determines the output format. E.g. a GraphMLIOHandler
+   * will write a graphML file, a GMLIOHandler will write a GML file.
+   * 
+   */
+  private IOHandler outputHandler = null;
+  
+  /**
+   * This is used internally to identify a certain dataHandler in the Graph document.
+   */
+  private final static String mapDescription="-MAP_DESCRIPTION-";
+  
+  /*===========================
+   * CONSTRUCTORS
+   * ===========================*/
   
   /**
    * 
-   * @param nm
-   * @param ioh
-   * @param desc
    */
-  private static void addEdgeMap(EdgeMap nm, Graph2DGraphMLHandler ioh, String desc) {
-    addEdgeMap(nm, ioh, desc, KeyType.STRING);//AttributeConstants.TYPE_STRING
+  public KEGG2yGraph(IOHandler outputHandler) {
+    this(outputHandler, new KeggInfoManagement());
+  }
+  /**
+   * @param manager
+   */
+  public KEGG2yGraph(IOHandler outputHandler, KeggInfoManagement manager) {
+    super(manager);
+    this.outputHandler = outputHandler;
   }
   
-  /**
-   * 
-   * @param nm
-   * @param ioh
-   * @param desc
-   * @param keytype
-   */
-  private static void addEdgeMap(EdgeMap nm, Graph2DGraphMLHandler ioh, String desc, KeyType keytype) {
-    ioh.addInputDataAcceptor (desc, nm, KeyScope.EDGE, keytype);
-    ioh.addOutputDataProvider(desc, nm, KeyScope.EDGE, keytype);
-    //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
-  }
+  /*===========================
+   * Getters and Setters
+   * ===========================*/
   
   /**
-   * 
-   * @param nm
-   * @param ioh
-   * @param desc
+   * See {@link #setShowEntriesWithoutGraphAttribute(boolean)}
    */
-  private static void addNodeMap(NodeMap nm, Graph2DGraphMLHandler ioh, String desc) {
-    addNodeMap(nm, ioh, desc, KeyType.STRING);//AttributeConstants.TYPE_STRING
+  public boolean isShowEntriesWithoutGraphAttribute() {
+    return showEntriesWithoutGraphAttribute;
   }
-
   /**
-   * 
-   * @param nm
-   * @param ioh
-   * @param desc
-   * @param keytype
+   * This translation is mainly graph based, so simply ignoring entries
+   * without an graph attribute makes sense.
+   * @param showEntriesWithoutGraphAttribute
    */
-  private static void addNodeMap(NodeMap nm, Graph2DGraphMLHandler ioh, String desc, KeyType keytype) {
-    ioh.addInputDataAcceptor (desc, nm, KeyScope.NODE, keytype);
-    ioh.addOutputDataProvider(desc, nm, KeyScope.NODE, keytype);
-    //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
+  public void setShowEntriesWithoutGraphAttribute(boolean showEntriesWithoutGraphAttribute) {
+    this.showEntriesWithoutGraphAttribute = showEntriesWithoutGraphAttribute;
   }
-  
   /**
-   * 
-   * @param theColor
+   * If true, all compounds will get skipped in the translation.
+   * See also: {@link #skipCompounds}
    * @return
+   */
+  public boolean isSkipCompounds() {
+    return skipCompounds;
+  }
+  /**
+   * See {@link #isSkipCompounds()}
+   * @param skipCompounds
+   */
+  public void setSkipCompounds(boolean skipCompounds) {
+    this.skipCompounds = skipCompounds;
+  }
+  /**
+   * If multiple nodes having exactly the same edges, they are being grouped
+   * to one node if this is set to true.
+   * @return
+   */
+  public boolean isGroupNodesWithSameEdges() {
+    return groupNodesWithSameEdges;
+  }
+  /**
+   * See {@link #isGroupNodesWithSameEdges()}
+   * @param groupNodesWithSameEdges
+   */
+  public void setGroupNodesWithSameEdges(boolean groupNodesWithSameEdges) {
+    this.groupNodesWithSameEdges = groupNodesWithSameEdges;
+  }
+  /**
+   * The IOHandler determines the output format.
+   * May be GraphMLIOHandler or GMLIOHandler,...
+   * @return
+   */
+  public IOHandler getOutputHandler() {
+    return outputHandler;
+  }
+  /**
+   * Set the outputHander to use when writing the file.
+   * May be GraphMLIOHandler or GMLIOHandler,...
+   * See also: {@link #outputHandler}
+   * @param outputHandler
+   */
+  public void setOutputHandler(IOHandler outputHandler) {
+    this.outputHandler = outputHandler;
+  }
+  
+  
+  
+  /*===========================
+   * FUNCTIONS
+   * ===========================*/
+  
+  /**
+   * Converts an HTML color to an awt color.
+   * @param theColor
+   * @return java.awt.Color
    */
   public static Color ColorFromHTML(String theColor) {
     if (theColor.startsWith("#")) theColor = theColor.substring(1);
@@ -155,15 +190,15 @@ public class KEGG2GraphML implements KEGGtranslator {
     if (theColor.length() != 6)
       throw new IllegalArgumentException("Not a valid HTML color: " + theColor);
     return new Color(
-      Integer.valueOf(theColor.substring(0, 2), 16).intValue(),
-      Integer.valueOf(theColor.substring(2, 4), 16).intValue(),
-      Integer.valueOf(theColor.substring(4, 6), 16).intValue());
+        Integer.valueOf(theColor.substring(0, 2), 16).intValue(),
+        Integer.valueOf(theColor.substring(2, 4), 16).intValue(),
+        Integer.valueOf(theColor.substring(4, 6), 16).intValue());
   }
   
   /**
-   * 
+   * Converts a java.awt.Color to the corresponding HTML-color code.
    * @param color
-   * @return
+   * @return e.g. "#FEFEFE"
    */
   public static String ColorToHTML(Color color) {
     return "#" + Integer.toHexString(color.getRGB()).substring(2).toUpperCase();
@@ -172,6 +207,7 @@ public class KEGG2GraphML implements KEGGtranslator {
   /**
    * Configures the view that is used as rendering environment for some output
    * formats.
+   * @param view - Graph2DView
    */
   private static void configureView(Graph2DView view) {
     Graph2D graph = view.getGraph2D();
@@ -183,13 +219,15 @@ public class KEGG2GraphML implements KEGGtranslator {
     view.fitContent();
     view.setPaintDetailThreshold(0.0); // never switch to less detail mode
   }
-
+  
   /**
-   * 
-   * @param e
-   * @param e2
+   * Compares two edges.
+   * @param e - edge1
+   * @param e2 - edge2
    * @param graph
-   * @return
+   * @return true if and only if the two edges are completly equal, without
+   * considering the target or source node.
+   * More specific: Arrow shapes, lineType and labelTexts are equal.
    */
   public static boolean edgesEqualExceptTargets(Edge e, Edge e2, Graph2D graph) {
     EdgeRealizer er = graph.getRealizer(e);
@@ -200,74 +238,16 @@ public class KEGG2GraphML implements KEGGtranslator {
     return false;
   }
   
-  /**
-   * 
-   * @param s
-   * @return
-   */
-  public static boolean isNumber(String s) {
-    if (s==null || s.trim().length()==0) return false;
-    char[] m = s.toCharArray();
-    for (char c: m)
-      if (!Character.isDigit(c)) return false;
-    return true;
-  }
-  
   
   /**
-   * A simple static wrapper for the non-static Convert Method.
-   * @param p
-   * @param outFile
-   */
-  public static void KEGG2GraphML(Pathway p, String outFile) {
-    KEGG2GraphML k2g = new KEGG2GraphML();
-    k2g.translate(p, outFile);
-  }
-  
-  /**
-   * @param args
-   * @throws IOException 
-   */
-  public static void main(String[] args) throws IOException {
-    if (new File(KEGGtranslator.cacheFileName).exists() && 
-        new File(KEGGtranslator.cacheFileName).length()>0)
-      manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
-      
-    if (args!=null && args.length >0) {
-      File f = new File(args[0]);
-      if (f.isDirectory()) BatchKEGGtranslator.main(args);
-      else {
-        String outfile = args[0].substring(0, args[0].contains(".")?args[0].lastIndexOf("."):args[0].length())+".graphML";
-        if (args.length>1) outfile = args[1];
-        Pathway p = KeggParser.parse(args[0]).get(0);
-        KEGG2GraphML(p, outfile);
-        
-        if (manager.isCacheChangedSinceLastLoading())
-          KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, manager); // Remember already queried objects
-      }
-      return;
-    }
-    
-    //KeggParser.silent=false;
-    System.out.println("DEMO MODE");
-    System.out.println("Reading kegg pathway...");
-//    Pathway p = KeggParser.parse("files/KGMLsamplefiles/hsa04310.xml").get(0); //04115
-    Pathway p = KeggParser.parse("files/KGMLsamplefiles/hsa04010.xml").get(0); //04115
-    //Pathway p = KeggParser.parse("ko02010.xml").get(0);
-    //p = KeggParser.parse("http://kaas.genome.jp/kegg/KGML/KGML_v0.6.1/ko/ko00010.xml").get(0);
-    
-    System.out.println("Converting to GraphML");
-    //silent = false;
-    KEGG2GraphML(p, "files/KGMLsamplefiles/test.graphML");
-    KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, manager); // Remember already queried objects
-  }
-  
-  /**
-   * Tests, if two nodes do have exactly the same source and target nodes on their edges and if the edges do have the same shape (Arrow, LineType and description).
-   * @param n1
-   * @param n2
+   * Tests, if two nodes do have exactly the same source and target
+   * nodes on their edges and if the edges do have the same shape
+   * (Arrow, LineType and description).
+   * @param n1 - Node 1
+   * @param n2 - Node 2
    * @param graph
-   * @return
+   * @return true if and only if the nodes have the same edges, except
+   * the source of the edges.
    */
   public static boolean nodesHaveSameEdges(Node n1, Node n2, Graph2D graph) {
     if (n1.inDegree()!=n2.inDegree() || n1.outDegree()!=n2.outDegree()) return false;
@@ -289,7 +269,7 @@ public class KEGG2GraphML implements KEGGtranslator {
       if (!found) return false; // Edge from n1 not in n2
       e = e.nextInEdge();
     }
-
+    
     // Same for outEdges
     e = n1.firstOutEdge();
     while (e!=null) {
@@ -313,12 +293,15 @@ public class KEGG2GraphML implements KEGGtranslator {
   }
   
   /**
-   * 
-   * @param nl
+   * Calculates the distance between all nodes in the given list.
+   * Nodes that have a minimum distance above a given threshold
+   * are considered being outliers and get removed.
+   * @param nl - List of nodes
    * @param graph
-   * @return
+   * @param threshold - threshold for outlier detection (e.g. 50)
+   * @return filtered nodelist
    */
-  private static NodeList removeOutlier(NodeList nl, Graph2D graph) {
+  private static NodeList removeOutlier(NodeList nl, Graph2D graph, int threshold) {
     // Calculate minimal distances
     double[] minDists = new double[nl.size()];
     for (int j=0; j<nl.size(); j++) {
@@ -338,7 +321,7 @@ public class KEGG2GraphML implements KEGGtranslator {
     if (nl.size()<2) return nl; // one node
     
     for (int j=0; j<minDists.length; j++)
-      if (minDists[j]>50) toRemove.add(j);
+      if (minDists[j]>threshold) toRemove.add(j);
     
     // Nothing to do?
     if (toRemove.size()<1) return nl;
@@ -352,11 +335,11 @@ public class KEGG2GraphML implements KEGGtranslator {
     
     return nl;
   }
-
+  
   /**
    * Standard Setup for group nodes.
    * @param nl
-   * @param changeCaption = null if you don't want to change the caption.
+   * @param changeCaption - null if you don't want to change the caption.
    */
   private static NodeRealizer setupGroupNode(NodeLabel nl, String changeCaption) {
     GroupNodeRealizer nr = new GroupNodeRealizer();
@@ -381,49 +364,16 @@ public class KEGG2GraphML implements KEGGtranslator {
   }
   
   /**
-   * {@inheritDoc}
-   */
-  public boolean translate(Pathway p, String outFile) {
-    Graph2D graph = convert(p);
-    if (graph==null) return false;
-    return writeGraphToFile(outFile, graph);
-  }
-  
-  
-  /**
-   * Convert a Kegg Pathway to GraphML.
+   * Convert a Kegg Pathway to a yFiles Graph2D object.
    * You should write this pathway to disk with the internal writeGraphToFile method.
    * If you don't do so, all meta-information (entrez ids for labels, etc.) will be lost.
    */
-  public Graph2D convert(Pathway p) {
+  protected Graph2D translateWithoutPreprocessing(Pathway p) {
     Graph2D graph = new Graph2D();
     ArrayList<String> PWReferenceNodeTexts = new ArrayList<String>();
-    if (retrieveKeggAnnots) {
-      if (manager==null) manager = new KeggInfoManagement();
-      
-      // PreFetch infos. Enormous performance improvement!
-      ArrayList<String> preFetchIDs = new ArrayList<String>();
-      //preFetchIDs.add("GN:" + p.getOrg());
-      //preFetchIDs.add(p.getName());
-      for (Entry entry: p.getEntries()) {
-        for (String ko_id:entry.getName().split(" ")) {
-          if (ko_id.trim().equalsIgnoreCase("undefined")) continue; // "undefined" = group node, which contains "Components"
-          preFetchIDs.add(ko_id);
-        }
-      }
-      /*for (Reaction r:p.getReactions()) {      
-        for (String ko_id:r.getName().split(" ")) {
-          preFetchIDs.add(ko_id);
-        }
-      }*/
-      manager.precacheIDs(preFetchIDs.toArray(new String[preFetchIDs.size()]));
-      // Add relations?
-      // -------------------------
-    }
-    lastFileWasOverwritten=false;
+    boolean showProgressForRelations = KeggInfoManagement.offlineMode;
     
-    
-    //Erstellen von Graph Annotationen
+    //Create graph annotation maps
     NodeMap nodeDescription = graph.createNodeMap();
     NodeMap entityType = graph.createNodeMap();
     NodeMap nodeLabel = graph.createNodeMap();
@@ -444,7 +394,7 @@ public class KEGG2GraphML implements KEGGtranslator {
     //EdgeMap edgeURLs = graph.createEdgeMap();
     
     
-    // Tut zwar eh nicht, aber egal...
+    // Set the link
     if (p.getLink()!=null && p.getLink().length()!=0) {
       try {
         graph.setURL(new URL(p.getLink()));
@@ -457,26 +407,23 @@ public class KEGG2GraphML implements KEGGtranslator {
     HierarchyManager hm = graph.getHierarchyManager();
     if (hm==null) hm = new HierarchyManager(graph);
     
-    int aufrufeGesamt=p.getEntries().size(); //+p.getRelations().size(); // Relations gehen sehr schnell.
-    if (!retrieveKeggAnnots) aufrufeGesamt+=p.getRelations().size();
-    ProgressBar progress = new ProgressBar(aufrufeGesamt);
+    // Initialize a progress bar.
+    initProgressBar(p,showProgressForRelations,false);
     
     // Add nodes for all Entries
-    if (!silent) System.out.println("Creating nodes...");
     for (int i=0; i<p.getEntries().size(); i++) {
-      if (silent && !absoluteNoOutputs) progress.DisplayBar(null);
-      if (!silent) System.out.println(i + "/" + p.getEntries().size());
+      progress.DisplayBar("Node " + (i+1) + "/" + p.getEntries().size());
       Entry e = p.getEntries().get(i);
-      if (skipCompounds && e.getType().toString().equalsIgnoreCase("compound")) continue;
+      if (skipCompounds && e.getType().equals(EntryType.compound)) continue;
       
       Node n;
-      boolean isPathwayReference=false; // TODO: Anders Layouten ??? weglassen ???
+      boolean isPathwayReference=false;
       String name = e.getName().trim();
       if (name.toLowerCase().startsWith("path:") || e.getType().equals(EntryType.map)) isPathwayReference=true;
       
       
       if (e.hasGraphics()) {
-        /* XXX:
+        /* Example:
          *     <entry id="16" name="ko:K04467 ko:K07209 ko:K07210" type="ortholog">
                  <graphics name="IKBKA..." fgcolor="#000000" bgcolor="#FFFFFF"
                    type="rectangle" x="785" y="141" width="45" height="17"/>
@@ -495,18 +442,18 @@ public class KEGG2GraphML implements KEGGtranslator {
         }*/
         
         
-          
+        
         
         NodeRealizer nr;
         NodeLabel nl = new NodeLabel(name);
         
         // one of "rectangle, circle, roundrectangle, line, other"
         boolean addThisNodeToGorupNodeList=false;
-        if (e.getType().toString().trim().equalsIgnoreCase("group")) {
+        if (isGroupNode(e)) {
           groupNodeChildren.add(e.getComponents());
           addThisNodeToGorupNodeList = true;
           
-
+          
           // New Text
           String newText = null;
           if (nl.getText().length()==0 || nl.getText().equals("undefined")) {
@@ -525,46 +472,47 @@ public class KEGG2GraphML implements KEGGtranslator {
             newText = "Group";
           }
           nr = setupGroupNode(nl, newText);
-          
-        } else if (g.getType().toString().equals("rectangle")) {
+        } else if (g.getType().equals(GraphicsType.rectangle)) {
           nr = new ShapeNodeRealizer(ShapeNodeRealizer.RECT);
-        } else if (g.getType().toString().equals("circle")) {
+        } else if (g.getType().equals(GraphicsType.circle)) {
           nr = new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE);
-          nl.setFontSize(10); // ein bischen kleiner, sieht bei circles besser aus.
-        } else if (g.getType().toString().equals("roundrectangle")) {
+          nl.setFontSize(10); // looks better on small ellipses
+        } else if (g.getType().equals(GraphicsType.roundrectangle)) {
           nr = new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT);
-        //} else if (g.getType().toString().equals("line")) { // Vielleicht in neuerer yFiles version line verfuegbar?
+          //} else if (g.getType().toString().equals("line")) { // Vielleicht in neuerer yFiles version line verfuegbar?
           //nr = new ShapeNodeRealizer(ShapeNodeRealizer.TRAPEZOID);
         } else
           nr = new GenericNodeRealizer();
         
         try {
-          if (g.getBgcolor()!=null && g.getBgcolor().length()!=0 && !g.getBgcolor().trim().equalsIgnoreCase("none"))
+          if (g.isBGcolorSet())
             nr.setFillColor(ColorFromHTML(g.getBgcolor()));
         } catch (Throwable t) {t.printStackTrace();}
         
         try {
-          if (g.getFgcolor()!=null && g.getFgcolor().length()!=0 && !g.getFgcolor().trim().equalsIgnoreCase("none"))
+          if (g.isBGcolorSet())
             nl.setTextColor(ColorFromHTML(g.getFgcolor()));
         } catch (Throwable t) {t.printStackTrace();}
         
         nr.setLabel(nl);
         if (isPathwayReference && name.toUpperCase().startsWith("TITLE:")) {
-          // Name dieses Pathways
+          // Name of this pathway
           nl.setFontStyle(Font.BOLD);
           nl.setText(name); // name.substring("TITLE:".length()).trim()
           nr.setFillColor(Color.GREEN);
         } else if (isPathwayReference) {
-          // Reference auf einen anderen Pathway
+          // Reference to another pathway
           nr.setFillColor(Color.LIGHT_GRAY);
         }
         
         
-        // Links im Knotenlabel (und spaeter nochmal im Knoten) speichern.
+        // Store hyperlinks in the node-label (and later on in the node itself).
         String link = e.getLink();
         if (link!=null && link.length()!=0) {
           try {
-            nl.setUserData(new URL(link)); // In URL konvertieren, da er auch type speichert und URL besser ist als STRING
+            // Convert to URL, because type is infered of the submitted object
+            // and URL is better than STRING.
+            nl.setUserData(new URL(link));
           } catch (MalformedURLException e1) {
             nl.setUserData(link);
           }
@@ -585,6 +533,8 @@ public class KEGG2GraphML implements KEGGtranslator {
         }
         
       } else {
+        // Does not make much sense with autocompleteReactions, but
+        // showEntriesWithoutGraphAttribute=false
         if (showEntriesWithoutGraphAttribute)
           n = graph.createNode(0,0, name);
         else
@@ -597,93 +547,89 @@ public class KEGG2GraphML implements KEGGtranslator {
         // Remember node in KEGG Structure for further references.
         e.setCustom(n);
         
-
-        // KeggAdaptor. Achtung: Sehr langsam.
-        if (retrieveKeggAnnots) {
-          boolean hasMultipleIDs = false;
-          if (e.getName().trim().contains(" ")) hasMultipleIDs = true;
-          
-          String name2="",definition="",entrezIds2="",uniprotIds2="",eType="",ensemblIds2="";
-          for (String ko_id:e.getName().split(" ")) {
-            //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zusaetzlich: in sortedArrayList merken.
-            if (ko_id.trim().equalsIgnoreCase("undefined")) continue;
-            
-            KeggInfos infos = new KeggInfos(ko_id, manager);
-            
-            // "NCBI-GeneID:","UniProt:", "Ensembl:", ... aus dem GET rausparsen
-            if (infos.queryWasSuccessfull()) {
-              String oldText=graph.getRealizer(n).getLabelText();
-              
-              String exName = infos.getNames();
-              if (exName!=null && exName.length()!=0) {
-                int pos = exName.lastIndexOf(";");
-                if (pos>0 && pos<(exName.length()-1)) exName = exName.substring(pos+1, exName.length()).replace("\n", "").trim();
-                
-                if (!hasMultipleIDs) // Knotennamen nur anpassen, falls nicht mehrere IDs.
-                  graph.getRealizer(n).setLabelText(exName);
-                else if (oldText.length()==0) // ... oder wenn er bisher leer ist.
-                  graph.getRealizer(n).setLabelText(exName);
-              }
-              
-              String text = infos.getNames();
-              if (text!=null && text.length()!=0) name2+=(name2.length()!=0?",":"")+text.replace(",", "");
-              
-              if (e.getType().equals(EntryType.map)) { // => Link zu anderem Pathway oder Title-Node des aktuellem PW.
-                text = infos.getDescription();
-                if (text!=null && text.length()!=0) definition+=(definition.length()!=0?",":"")+text.replace(",", "").replace("\n", " ");
-              } else {
-                text = infos.getDefinition();
-                if (text!=null && text.length()!=0) definition+=(definition.length()!=0?",":"")+text.replace(",", "").replace("\n", " ");
-              }
-              
-              text = infos.getEntrez_id(); //KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n"); //adap.getEntrezIDs(ko_id);
-              if (text!=null && text.length()!=0) entrezIds2+=(entrezIds2.length()!=0?",":"")+text; //.replace(",", "");
-              text = infos.getUniprot_id(); //KeggAdaptor.extractInfo(infos, "UniProt:", "\n"); //adap.getUniprotIDs(ko_id);
-              if (text!=null && text.length()!=0) uniprotIds2+=(uniprotIds2.length()!=0?",":"")+text; //.replace(",", "");
-              text = infos.getEnsembl_id(); //KeggAdaptor.extractInfo(infos, "Ensembl:", "\n"); //adap.getEnsemblIDs(ko_id);
-              if (text!=null && text.length()!=0) ensemblIds2+=(ensemblIds2.length()!=0?",":"")+text; //.replace(",", "");
-              
-              ////eType+=(!eType.length()==0?",":"")+e.getType().toString();
-              //eType+=(!eType.length()==0?",":"");
-              //if (renameCompoundToSmallMolecule && e.getType().equals(EntryType.compound)) eType+="small molecule"; else eType+=e.getType().toString();
-              if (eType.length()==0) {
-                if (e.getType().equals(EntryType.compound))
-                  eType = "small molecule";
-                else if (e.getType().equals(EntryType.gene))
-                  eType = "protein";
-                else
-                  eType = e.getType().toString();
-              }
-              // XXX Fuer Jochens Annotationen (entityType):
-              // Jochen:  "protein", "protein in complex", "complex", "RNA", "DNA", "small molecule", "RNA in complex", "DNA in complex", "small molecule in complex", "pathway", "biological process"
-              // Mapping: gene/ortholog => protein. Group=>complex, compound=>complex, map=>pathway(/biolog. process)
-              //          enzyme & other fehlen.
-              // Au-ss-erdem: "bindsToChemicals" nicht gesetzt.
-            }
-          }
-          if (isPathwayReference) {
-            eType = "pathway";
-          }
-
-          nodeLabel.set(n, name2);
-          nodeDescription.set(n, definition);
-          entrezIds.set(n, entrezIds2);
-          uniprotIds.set(n, uniprotIds2);
-          ensemblIds.set(n, ensemblIds2);
-          entityType.set(n, eType);
-          
-          NodeRealizer nr = graph.getRealizer(n);
-          nodeColor.set(n, ColorToHTML(nr.getFillColor()) );
-          nodeName.set(n, nr.getLabelText());
-          nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
-          
-        }
-        keggOntIds.set(n, e.getName().replace(" ", ","));
-        if (e.getLink()!=null && e.getLink().length()!=0) nodeURLs.set(n, e.getLink());
-
-        if (isPathwayReference) PWReferenceNodeTexts.add(graph.getRealizer(n).getLabelText());
-      }
         
+        // KeggAdaptor.
+        boolean hasMultipleIDs = false;
+        if (e.getName().trim().contains(" ")) hasMultipleIDs = true;
+        
+        String name2="",definition="",entrezIds2="",uniprotIds2="",eType="",ensemblIds2="";
+        for (String ko_id:e.getName().split(" ")) {
+          //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zusaetzlich: in sortedArrayList merken.
+          if (ko_id.trim().equalsIgnoreCase("undefined") || e.hasComponents()) continue;
+          
+          KeggInfos infos = new KeggInfos(ko_id, manager);
+          
+          // "NCBI-GeneID:","UniProt:", "Ensembl:", ... aus dem GET rausparsen
+          if (infos.queryWasSuccessfull()) {
+            String oldText=graph.getRealizer(n).getLabelText();
+            
+            String exName = infos.getNames();
+            if (exName!=null && exName.length()!=0) {
+              int pos = exName.lastIndexOf(";");
+              if (pos>0 && pos<(exName.length()-1)) exName = exName.substring(pos+1, exName.length()).replace("\n", "").trim();
+              
+              if (!hasMultipleIDs) // Knotennamen nur anpassen, falls nicht mehrere IDs.
+                graph.getRealizer(n).setLabelText(exName);
+              else if (oldText.length()==0) // ... oder wenn er bisher leer ist.
+                graph.getRealizer(n).setLabelText(exName);
+            }
+            
+            String text = infos.getNames();
+            if (text!=null && text.length()!=0) name2+=(name2.length()!=0?",":"")+text.replace(",", "");
+            
+            if (e.getType().equals(EntryType.map)) { // => Link zu anderem Pathway oder Title-Node des aktuellem PW.
+              text = infos.getDescription();
+              if (text!=null && text.length()!=0) definition+=(definition.length()!=0?",":"")+text.replace(",", "").replace("\n", " ");
+            } else {
+              text = infos.getDefinition();
+              if (text!=null && text.length()!=0) definition+=(definition.length()!=0?",":"")+text.replace(",", "").replace("\n", " ");
+            }
+            
+            text = infos.getEntrez_id(); //KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n"); //adap.getEntrezIDs(ko_id);
+            if (text!=null && text.length()!=0) entrezIds2+=(entrezIds2.length()!=0?",":"")+text; //.replace(",", "");
+            text = infos.getUniprot_id(); //KeggAdaptor.extractInfo(infos, "UniProt:", "\n"); //adap.getUniprotIDs(ko_id);
+            if (text!=null && text.length()!=0) uniprotIds2+=(uniprotIds2.length()!=0?",":"")+text; //.replace(",", "");
+            text = infos.getEnsembl_id(); //KeggAdaptor.extractInfo(infos, "Ensembl:", "\n"); //adap.getEnsemblIDs(ko_id);
+            if (text!=null && text.length()!=0) ensemblIds2+=(ensemblIds2.length()!=0?",":"")+text; //.replace(",", "");
+            
+            ////eType+=(!eType.length()==0?",":"")+e.getType().toString();
+            //eType+=(!eType.length()==0?",":"");
+            if (eType.length()==0) { // Not yet set
+              if (e.getType().equals(EntryType.compound))
+                eType = "small molecule";
+              else if (e.getType().equals(EntryType.gene))
+                eType = "protein";
+              else
+                eType = e.getType().toString();
+            }
+            // XXX Fuer Jochens Annotationen (entityType):
+            // Jochen:  "protein", "protein in complex", "complex", "RNA", "DNA", "small molecule", "RNA in complex", "DNA in complex", "small molecule in complex", "pathway", "biological process"
+            // Mapping: gene/ortholog => protein. Group=>complex, compound=>complex, map=>pathway(/biolog. process)
+            //          enzyme & other fehlen.
+            // Außerdem: "bindsToChemicals" nicht gesetzt.
+          }
+        }
+        if (isPathwayReference) {
+          eType = "pathway";
+        }
+        
+        nodeLabel.set(n, name2);
+        nodeDescription.set(n, definition);
+        entrezIds.set(n, entrezIds2);
+        uniprotIds.set(n, uniprotIds2);
+        ensemblIds.set(n, ensemblIds2);
+        entityType.set(n, eType);
+        
+        NodeRealizer nr = graph.getRealizer(n);
+        nodeColor.set(n, ColorToHTML(nr.getFillColor()) );
+        nodeName.set(n, nr.getLabelText());
+        nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
+        
+      }
+      keggOntIds.set(n, e.getName().replace(" ", ","));
+      if (e.getLink()!=null && e.getLink().length()!=0) nodeURLs.set(n, e.getLink());
+      
+      if (isPathwayReference) PWReferenceNodeTexts.add(graph.getRealizer(n).getLabelText());
     }
     
     
@@ -714,7 +660,7 @@ public class KEGG2GraphML implements KEGGtranslator {
       
       // Set hirarchie
       hm.setParentNode(nl, parentGroupNodes.get(i));
-
+      
       // Reposition group node to fit content (2nd time is neccessary. Maybe yFiles bug...)
       graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
       graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
@@ -723,12 +669,9 @@ public class KEGG2GraphML implements KEGGtranslator {
     
     
     
-    
     // Add Edges for all Relations
-    if (!silent) System.out.println("Creating edges...");
     for (int i=0; i<p.getRelations().size(); i++) {
-      if (silent && !absoluteNoOutputs && !retrieveKeggAnnots) progress.DisplayBar(null);
-      if (!silent) System.out.println(i + "/" + p.getRelations().size());
+      if (showProgressForRelations) progress.DisplayBar("Relation " + (i+1) + "/" + p.getRelations().size());
       Relation r = p.getRelations().get(i);
       Entry one = p.getEntryForId(r.getEntry1());
       Entry two = p.getEntryForId(r.getEntry2());
@@ -751,7 +694,7 @@ public class KEGG2GraphML implements KEGGtranslator {
           el.setFontSize(8);
           er.addLabel(el);
           
-          if (st.getName().trim().equalsIgnoreCase("compound") && isNumber(st.getValue())) {
+          if (st.getName().trim().equalsIgnoreCase("compound") && Utils.isNumber(st.getValue(),true)) {
             Entry compNode = p.getEntryForId(Integer.parseInt(st.getValue()));
             if (compNode==null || compNode.getCustom()==null) {System.err.println("Could not find Compound Node."); graph.createEdge(nOne, nTwo, er); continue;}
             
@@ -790,10 +733,10 @@ public class KEGG2GraphML implements KEGGtranslator {
             }
             
             if (st.getEdgeColor()!=null && st.getEdgeColor().length()>0) {
-            	if (st.getEdgeColor().startsWith("#"))
-            	  er.setLineColor(ColorFromHTML(st.getEdgeColor()));
-            	else
-            	  System.err.println("Invalid edge color: " + st.getEdgeColor());
+              if (st.getEdgeColor().startsWith("#"))
+                er.setLineColor(ColorFromHTML(st.getEdgeColor()));
+              else
+                System.err.println("Invalid edge color: " + st.getEdgeColor());
             }
             
             if (nOne.getEdgeTo(nTwo)==null) {
@@ -812,7 +755,7 @@ public class KEGG2GraphML implements KEGGtranslator {
           edgeDescription.set(myEdge, r.getType().toString());
         }
       }
-
+      
     }
     
     
@@ -825,7 +768,7 @@ public class KEGG2GraphML implements KEGGtranslator {
         
         // Nur "Sinnvolle" zusammenfassungen vornehmen.       
         if (hm.isGroupNode(myNodes[i]) || hm.getParentNode(myNodes[i])!=null || !hm.isNormalNode(myNodes[i]) || myNodes[i].edges().size()<1) continue;
-          
+        
         for (int j=i+1; j<myNodes.length; j++) {
           if (hm.isGroupNode(myNodes[j]) || hm.getParentNode(myNodes[j])!=null || !hm.isNormalNode(myNodes[j])) continue;
           
@@ -836,7 +779,7 @@ public class KEGG2GraphML implements KEGGtranslator {
         }
         
         // Remove Outlier (More than 50px away from closest node)
-        nl = removeOutlier(nl,graph);
+        nl = removeOutlier(nl,graph, 50);
         
         if (nl.size()>1) {
           // Create new Group node and setup hirarchies
@@ -882,6 +825,9 @@ public class KEGG2GraphML implements KEGGtranslator {
       }
     }
     
+    /*
+    // Bezieht sich nur auf "Non-map nodes" (Also nicht auf Pathway referenzen).
+    public static boolean removeDegreeZeroNodes=true;
     if (removeDegreeZeroNodes) { // Verwaiste knoten loeschen
       Node[] nodes = graph.getNodeArray();
       for (Node n: nodes) {
@@ -889,7 +835,7 @@ public class KEGG2GraphML implements KEGGtranslator {
         
         if (n.degree()<1) graph.removeNode(n);
       }
-    }
+    }*/
     
     
     
@@ -929,59 +875,105 @@ public class KEGG2GraphML implements KEGGtranslator {
     }*/
     
     
-    // write out the graph using outputHandler
-    IOHandler outputHandler = new GraphMLIOHandler(); // new GMLIOHandler();
-    this.lastOutputHandler = outputHandler;
-    if (!silent) System.out.println("Writing file...");
-    if (outputHandler != null && outputHandler.canWrite()) {
-      Graph2DView view = new Graph2DView(graph);
-      configureView(view);
-
-      if (outputHandler instanceof GraphMLIOHandler) {
-        Graph2DGraphMLHandler ioh = ((GraphMLIOHandler) outputHandler).getGraphMLHandler() ;
-        
-        //addNodeMap(nodeLabel, ioh,"name");
-        addNodeMap(nodeLabel, ioh,"nodeLabel");
-        addNodeMap(entrezIds, ioh,"entrezIds");
-        addNodeMap(entityType, ioh,"type");
-        addNodeMap(nodeDescription, ioh,"description");
-        addNodeMap(keggOntIds, ioh,"keggIds");
-        addNodeMap(uniprotIds, ioh,"uniprotIds");
-        addNodeMap(ensemblIds, ioh,"ensemblIds");
-        addNodeMap(nodeURLs, ioh, "url");
-        
-        addNodeMap(nodeColor, ioh, "nodeColor");
-        addNodeMap(nodeName, ioh, "nodeName");
-        addNodeMap(nodePosition, ioh, "nodePosition");
-               
-        addEdgeMap(edgeDescription, ioh, "description");
-        addEdgeMap(interactionDescription, ioh, "interactionType");
-        
-      }
-  // Write file here. 
-
-    } else {
-      System.err.println("Y OutputHandler can't write.");
-    }
+    // Finalization: Zoom to fit content, etc.
+    // Disables: leads to very low resultions on JPG files.
+    //configureView(new Graph2DView(graph));
+    
+    /*
+     * Create a data provider that stores the names of all
+     * data providers (Maps).
+     */
+    GenericDataMap<DataMap, String> mapDescriptionMap = new GenericDataMap<DataMap, String>(mapDescription);
+    graph.addDataProvider(mapDescription, mapDescriptionMap);
+    
+    mapDescriptionMap.set(nodeLabel, "nodeLabel");
+    mapDescriptionMap.set(entrezIds, "entrezIds");
+    mapDescriptionMap.set(entityType, "type");
+    mapDescriptionMap.set(nodeDescription, "description");
+    mapDescriptionMap.set(keggOntIds, "keggIds");
+    mapDescriptionMap.set(uniprotIds, "uniprotIds");
+    mapDescriptionMap.set(ensemblIds, "ensemblIds");
+    mapDescriptionMap.set(nodeURLs, "url");
+    mapDescriptionMap.set(nodeColor, "nodeColor");
+    mapDescriptionMap.set(nodeName, "nodeName");
+    mapDescriptionMap.set(nodePosition, "nodePosition");
+    mapDescriptionMap.set(edgeDescription, "description");
+    mapDescriptionMap.set(interactionDescription, "interactionType");
+    
     return graph;
   }
-
-  public boolean writeGraphToFile(String outFile, Graph2D graph) {
-    if (lastOutputHandler==null || !lastOutputHandler.canWrite()) return false;
-    if (new File(outFile).exists()) lastFileWasOverwritten=true; // Remember that file was already there.
+  
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.AbstractKEGGtranslator#writeToFile(java.lang.Object, java.lang.String)
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean writeToFile(Graph2D graph, String outFile) {
+    
+    // initialize and check the IOHandler
+    if (outputHandler==null) {
+      outputHandler = new GraphMLIOHandler(); // new GMLIOHandler();
+    }
+    if (!outputHandler.canWrite()) {
+      System.err.println("Y OutputHandler can't write.");
+      return false;
+    }
+    
+    // Try to set metadata annotations
+    if (outputHandler instanceof GraphMLIOHandler) {
+      Graph2DGraphMLHandler ioh = ((GraphMLIOHandler) outputHandler).getGraphMLHandler() ;
+      
+      try {
+        GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(mapDescription);
+        
+        EdgeMap[] eg = graph.getRegisteredEdgeMaps();
+        if (eg!=null)
+          for (int i=0; i<eg.length;i++)
+            addDataMap(eg[i], ioh, mapDescriptionMap.getV(eg[i]));
+        NodeMap[] nm = graph.getRegisteredNodeMaps();
+        if (nm!=null)
+          for (int i=0; i<nm.length;i++)
+            addDataMap(nm[i], ioh, mapDescriptionMap.getV(nm[i]));
+        
+      } catch(Throwable e) {
+        System.err.println("Cannot write annotations to graph file.");
+        e.printStackTrace();
+      }
+      
+      // Zoom by default to fit content in graphML
+      configureView(new Graph2DView(graph));
+    }
+    // ----------------
+    
+    // Try to write the file.
     int retried=0;
+    if (new File(outFile).exists()) lastFileWasOverwritten=true;
     while (retried<3) {
       try {
-        lastOutputHandler.write(graph, outFile);
+        outputHandler.write(graph, outFile);
         return true; // Success => No more need to retry
       } catch (IOException iex) {
         retried++;
-        if (retried>2) System.err.println("Error while encoding file " + outFile + "\n" + iex);
+        if (retried>2) {
+          System.err.println("Error while encoding file " + outFile + "\n" + iex);
+          iex.printStackTrace();
+          break;
+        }
       }
     }
     return false;
   }
   
+  /**
+   * Modifies all labels of all nodes in the given graph.
+   * @param g - the graph to modiy
+   * @param removeSpeciesTitles -
+   * convert e.g. "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
+   * @param removeMultipleNodeNames -
+   * convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
+   * @return Graph2D g
+   */
   public static Graph2D modifyNodeLabels(Graph2D g, boolean removeSpeciesTitles, boolean removeMultipleNodeNames) {
     for (y.base.Node n:g.getNodeArray()) {
       String t = g.getLabelText(n);
@@ -1001,19 +993,166 @@ public class KEGG2GraphML implements KEGGtranslator {
   }
   
   /**
-   * {@inheritDoc}
+   * Convenient method to create a new KEGG2GraphML translator.
+   * @param manager - KeggInfoManagement to use for retrieving
+   * annotations.
+   * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
    */
-  public void translate(String infile, String outfile) {
-    Pathway p = KeggParser.parse(infile).get(0);
-    translate(p, outfile);
+  public static KEGG2yGraph createKEGG2GraphML(KeggInfoManagement manager) {
+    return new KEGG2yGraph(new GraphMLIOHandler(), manager);
   }
   
+  /**
+   * Convenient method to create a new KEGG2GML translator.
+   * @param manager - KeggInfoManagement to use for retrieving
+   * annotations.
+   * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
+   */
+  public static KEGG2yGraph createKEGG2GML(KeggInfoManagement manager) {
+    return new KEGG2yGraph(new GMLIOHandler(), manager);
+  }
   
   /**
-   * {@inheritDoc}
+   * Convenient method to create a new KEGG2JPG translator.
+   * @param manager - KeggInfoManagement to use for retrieving
+   * annotations.
+   * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
    */
-  public boolean isLastFileWasOverwritten() {
-    return lastFileWasOverwritten;
+  public static KEGG2yGraph createKEGG2JPG(KeggInfoManagement manager) {
+    return new KEGG2yGraph(new JPGIOHandler(), manager);
+  }
+  
+  /**
+   * Convenient method to create a new KEGG2GIF translator.
+   * @param manager - KeggInfoManagement to use for retrieving
+   * annotations.
+   * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
+   */
+  public static KEGG2yGraph createKEGG2GIF(KeggInfoManagement manager) {
+    return new KEGG2yGraph(new GIFIOHandler(), manager);
+  }
+  
+  /**
+   * Convenient method to create a new KEGG2TGF translator.
+   * @param manager - KeggInfoManagement to use for retrieving
+   * annotations.
+   * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
+   */
+  public static KEGG2yGraph createKEGG2TGF(KeggInfoManagement manager) {
+    return new KEGG2yGraph(new TGFIOHandler(), manager);
+  }
+  
+  /**
+   * Convenient method to create a new KEGG2YGF translator.
+   * @param manager - KeggInfoManagement to use for retrieving
+   * annotations.
+   * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
+   */
+  public static KEGG2yGraph createKEGG2YGF(KeggInfoManagement manager) {
+    return new KEGG2yGraph(new YGFIOHandler(), manager);
+  }
+  
+  /**
+   * @param args
+   * @throws IOException 
+   */
+  public static void main(String[] args) throws IOException {
+    KeggInfoManagement manager;
+    if (new File(KEGGtranslator.cacheFileName).exists()
+        && new File(KEGGtranslator.cacheFileName).length() > 0) {
+      manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
+    } else {
+      manager = new KeggInfoManagement();
+    }
+    KEGG2yGraph k2g = createKEGG2GraphML(manager);
+    // ---
+    
+    if (args != null && args.length > 0) {
+      File f = new File(args[0]);
+      if (f.isDirectory()) {
+        // Directory mode. Convert all files in directory.
+        BatchKEGGtranslator batch = new BatchKEGGtranslator();
+        batch.setOrgOutdir(args[0]);
+        if (args.length > 1)
+          batch.setChangeOutdirTo(args[1]);
+        batch.setTranslator(k2g);
+        batch.setOutFormat("graphML");
+        batch.parseDirAndSubDir();
+        
+      } else {
+        // Single file mode.
+        String outfile = args[0].substring(0,
+            args[0].contains(".") ? args[0].lastIndexOf(".") : args[0].length())
+            + "." + k2g.getOutputHandler().getFileNameExtension();
+        if (args.length > 1) outfile = args[1];
+        
+        Pathway p = KeggParser.parse(args[0]).get(0);
+        k2g.translate(p, outfile);
+      }
+      
+      // Remember already queried objects (save cache)
+      if (k2g.getKeggInfoManager().hasChanged()) {
+        KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, k2g.getKeggInfoManager());
+      }
+      
+      return;
+    }
+
+    // Just a few test cases here.
+    System.out.println("Demo mode.");
+    
+    long start = System.currentTimeMillis();
+    try {
+      // hsa04310 04115 hsa04010
+      k2g.translate("files/KGMLsamplefiles/hsa04010.xml", "files/KGMLsamplefiles/hsa04010." + k2g.getOutputHandler().getFileNameExtension());
+      //k2g.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010." + k2g.getOutputHandler().getFileNameExtension());
+      
+      // Remember already queried objects
+      if (k2g.getKeggInfoManager().hasChanged()) {
+        KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, k2g.getKeggInfoManager());
+      }
+      
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    
+    System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
+  }
+  
+  /**
+   * Add the given DataMap (e.g. NodeMap) to the given GraphHandler, 
+   * using the given description.
+   * Adds the map as InputDataAcceptor and OutputDataProvider.
+   * Keytype will be set to KeyType.STRING by this function.
+   * @param nm - the DataMap (NodeMap / EdgeMap)
+   * @param ioh - the GraphHandler (e.g. Graph2DGraphMLHandler)
+   * @param desc - the Description of the map
+   * @param scope - KeyScope (e.g. KeyScope.NODE)
+   */
+  private static void addDataMap(DataMap nm, GraphMLHandler ioh, String desc) {
+    KeyScope scope;
+    if (nm instanceof NodeMap)scope = KeyScope.NODE;
+    else if (nm instanceof EdgeMap)scope = KeyScope.EDGE;
+    else scope = KeyScope.ALL;
+    
+    addDataMap(nm, ioh, desc, KeyType.STRING, scope);//AttributeConstants.TYPE_STRING
+  }
+  
+  /**
+   * Add the given DataAcceptor (e.g. NodeMap) to the given GraphHandler, 
+   * using the given description.
+   * Adds the map as InputDataAcceptor and OutputDataProvider.
+   * @param nm - the DataAcceptor (NodeMap / EdgeMap)
+   * @param ioh - the GraphHandler (e.g. Graph2DGraphMLHandler)
+   * @param desc - Description
+   * @param keytype - KeyType (e.g. KeyType.STRING)
+   * @param scope - KeyScope (e.g. KeyScope.NODE)
+   */
+  private static void addDataMap(DataMap nm, GraphMLHandler ioh, String desc, KeyType keytype, KeyScope scope) {
+    ioh.addInputDataAcceptor (desc, nm, scope, keytype);
+    ioh.addOutputDataProvider(desc, nm, scope, keytype);
+    //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
   }
   
 }
