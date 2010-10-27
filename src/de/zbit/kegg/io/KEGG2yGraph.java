@@ -77,6 +77,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   private boolean groupNodesWithSameEdges=false;
   
   /**
+   * If set to true, all names will be shortened to one synonym.
+   * Else: all synonyms will be shown e.g. "DLAT, DLTA, PDC-E2, PDCE2"
+   */
+  protected boolean showShortNames = true;
+  
+  /**
    * Important: This determines the output format. E.g. a GraphMLIOHandler
    * will write a graphML file, a GMLIOHandler will write a GML file.
    * 
@@ -172,7 +178,21 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     this.outputHandler = outputHandler;
   }
   
+  /**
+   * See {@link #showShortNames}
+   * @return
+   */
+  public boolean isShowShortNames() {
+    return showShortNames;
+  }
   
+  /**
+   * See {@link #showShortNames}
+   * @param showShortNames
+   */
+  public void setShowShortNames(boolean showShortNames) {
+    this.showShortNames = showShortNames;
+  }
   
   /*===========================
    * FUNCTIONS
@@ -879,6 +899,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     // Disables: leads to very low resultions on JPG files.
     //configureView(new Graph2DView(graph));
     
+    // Shorten name
+    if (showShortNames) {
+      graph = modifyNodeLabels(graph,false,true);
+    }
+    
+    
     /*
      * Create a data provider that stores the names of all
      * data providers (Maps).
@@ -941,10 +967,22 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         e.printStackTrace();
       }
       
-      // Zoom by default to fit content in graphML
-      configureView(new Graph2DView(graph));
+      
+      
     }
     // ----------------
+    
+    // Zoom by default to fit content in graphML
+    if (outputHandler instanceof GraphMLIOHandler ||
+        outputHandler instanceof GMLIOHandler ||
+        outputHandler instanceof YGFIOHandler) {
+      configureView(new Graph2DView(graph));
+    }
+    
+    // => Moved to a global setting.
+    //if (outputHandler instanceof JPGIOHandler) {
+      //graph = modifyNodeLabels(graph,true,true);
+    //}
     
     // Try to write the file.
     int retried=0;
@@ -970,6 +1008,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @param g - the graph to modiy
    * @param removeSpeciesTitles -
    * convert e.g. "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
+   * BE CAREFUL WITH THAT: "HNF-4" is also converted to "HNF"!
    * @param removeMultipleNodeNames -
    * convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
    * @return Graph2D g

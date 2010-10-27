@@ -42,7 +42,6 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   private boolean considerRelations = true;
   
-  
   /**
    * If true, all nodes in white color (except for small molecules/ compounds)
    * will be removed from the graph. Kegg colors all nodes, which do NOT
@@ -54,15 +53,12 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   private boolean removeWhiteNodes = false; // TODO: Set to true, by default.
   
-  
   /**
    * If true, missing reactants and enzymes for reactions will be retrieved
    * from the KEGG-DB and added to the result file.
    * REQUIRES: {@link #retrieveKeggAnnots}
    */
   private boolean autocompleteReactions=true;
-  
-
   
   /**
    * This manager uses a cache and retrieved informations from the KeggDB. By
