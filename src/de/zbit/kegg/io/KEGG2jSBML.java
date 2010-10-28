@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -299,7 +298,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
    * @param p - the Kegg Pathway.
    * @return SBMLDocument
    */
-  protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
+  @Override
+protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     int level = 2;
     int version = 4;
     SBMLDocument doc = new SBMLDocument(level, version);
@@ -1044,17 +1044,15 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
   }
   
   
-  /**
-   * @param args
-   * @throws IllegalAccessException
-   * @throws InstantiationException
-   * @throws XMLStreamException
-   * @throws ClassNotFoundException 
-   * @throws IOException 
-   * @throws InvalidPropertiesFormatException 
-   * @throws SBMLException 
-   */
-  public static void main(String[] args) throws Exception {
+    /**
+     * @param args
+     * @throws IOException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     */
+    public static void main(String[] args) throws IOException {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network
     // load and heavily reduces computation time.
     KEGG2jSBML k2s;

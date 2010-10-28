@@ -1,15 +1,15 @@
 package de.zbit.kegg;
 
 import java.io.IOException;
-import java.util.InvalidPropertiesFormatException;
 import java.util.TreeMap;
 import java.util.prefs.BackingStoreException;
 
 import org.sbml.tolatex.LaTeXOptions;
 
 import de.zbit.gui.GUIOptions;
-import de.zbit.gui.cfg.SettingsDialog;
+import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.util.SBPreferences;
+import de.zbit.util.SBProperties;
 
 /**
  * This class is the main class for the KEGGTranslator project.
@@ -23,22 +23,26 @@ public class Translator {
      * @param args
      * @throws BackingStoreException
      * @throws IOException
-     * @throws InvalidPropertiesFormatException
      */
-    public static void main(String[] args)
-	    throws InvalidPropertiesFormatException, IOException,
-	    BackingStoreException {
+    public static void main(String[] args) throws IOException,
+	BackingStoreException {
 	String usage = "java Translator [options]";
 	TreeMap<String, Class<?>> defFileAndKeys = new TreeMap<String, Class<?>>();
 	defFileAndKeys.put(TranslatorOptions.CONFIG_FILE_LOCATION,
-		TranslatorOptions.class);
+	    TranslatorOptions.class);
 	defFileAndKeys.put(GUIOptions.CONFIG_FILE_LOCATION, GUIOptions.class);
 	defFileAndKeys.put(LaTeXOptions.CONFIG_FILE_LOCATION,
-		LaTeXOptions.class);
+	    LaTeXOptions.class);
 
-	SBPreferences.analyzeCommandLineArguments(defFileAndKeys, usage, args);
-	SettingsDialog d = new SettingsDialog("Settings");
-	d.showSettingsDialog();
+	SBProperties props = SBPreferences.analyzeCommandLineArguments(
+	    defFileAndKeys, usage, args);
+
+	// Should we start the GUI?
+	if (Boolean.parseBoolean(props.getProperty(GUIOptions.GUI.toString())
+		.toString())) {
+	    new TranslatorUI();
+	}
+
     }
 
 }

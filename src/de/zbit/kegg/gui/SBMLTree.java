@@ -1,21 +1,3 @@
-/*
- *  SBMLsqueezer creates rate equations for reactions in SBML files
- *  (http://sbml.org).
- *  Copyright (C) 2009 ZBIT, University of Tübingen, Andreas Dräger
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package de.zbit.kegg.gui;
 
 import java.awt.event.ActionEvent;
@@ -48,155 +30,147 @@ import org.sbml.jsbml.SBase;
  */
 public class SBMLTree extends JTree implements MouseListener, ActionListener {
 
-	/**
-	 * Generated serial version id
-	 */
-	private static final long serialVersionUID = -3081533906479036522L;
+    /**
+     * Generated serial version id
+     */
+    private static final long serialVersionUID = -3081533906479036522L;
 
-	/**
-	 * 
-	 */
-	private SBase currSBase;
+    /**
+     * 
+     */
+    private SBase currSBase;
 
-	/**
-	 * 
-	 */
-	private JPopupMenu popup;
+    /**
+     * 
+     */
+    private JPopupMenu popup;
 
-	/**
-	 * 
-	 */
-	private Set<ActionListener> setOfActionListeners;
+    /**
+     * 
+     */
+    private Set<ActionListener> setOfActionListeners;
 
-	/**
-	 * 
-	 * @param node
-	 */
-	public SBMLTree(TreeNode node) {
-		super(node);
-		init();
+    /**
+     * @param node
+     */
+    public SBMLTree(TreeNode node) {
+	super(node);
+	init();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
+    public void actionPerformed(ActionEvent e) {
+	if (popup != null) {
+	    popup.setVisible(false);
 	}
+	for (ActionListener al : setOfActionListeners) {
+	    e.setSource(currSBase);
+	    al.actionPerformed(e);
+	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	public void actionPerformed(ActionEvent e) {
-		if (popup != null) {
-			popup.setVisible(false);
+    /**
+     * @param al
+     */
+    public void addActionListener(ActionListener al) {
+	setOfActionListeners.add(al);
+    }
+
+    /**
+     * Initializes this object.
+     */
+    private void init() {
+	setOfActionListeners = new HashSet<ActionListener>();
+	// popup = new JPopupMenu();
+	addMouseListener(this);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     */
+    public void mouseClicked(MouseEvent e) {
+	if ((popup != null) && popup.isVisible()) {
+	    currSBase = null;
+	    popup.setVisible(false);
+	}
+	Object clickedOn = getClosestPathForLocation(e.getX(), e.getY())
+		.getLastPathComponent();
+	if (clickedOn instanceof ASTNode) {
+	    ASTNode ast = (ASTNode) clickedOn;
+	    System.out.println(ast.getType());
+	} else if ((e.getClickCount() == 2)
+		|| (e.getButton() == MouseEvent.BUTTON3)
+		&& setOfActionListeners.size() > 0) {
+	    if (clickedOn instanceof DefaultMutableTreeNode) {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) getSelectionPath()
+			.getLastPathComponent();
+		Object userObject = node.getUserObject();
+		if (userObject instanceof Reaction
+			|| userObject instanceof Model
+			|| userObject instanceof SBMLDocument) {
+		    if (userObject instanceof SBMLDocument) {
+			currSBase = ((SBMLDocument) userObject).getModel();
+		    } else {
+			currSBase = (SBase) userObject;
+		    }
+		    if (popup != null) {
+			popup.setLocation(e.getX()
+				+ ((int) getLocationOnScreen().getX()), e
+				.getY()
+				+ ((int) getLocationOnScreen().getY()));// e.getLocationOnScreen());
+			popup.setVisible(true);
+		    }
 		}
-		for (ActionListener al : setOfActionListeners) {
-			e.setSource(currSBase);
-			al.actionPerformed(e);
+		if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
+		    MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
+			    .getUserObject();
+		    JDialog dialog = new JDialog();
+		    JScrollPane scroll = new JScrollPane(new SBMLTree(mc
+			    .getMath()),
+			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		    dialog.getContentPane().add(scroll);
+		    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		    dialog.pack();
+		    dialog.setModal(true);
+		    dialog.setLocationRelativeTo(null);
+		    dialog.setVisible(true);
 		}
+	    }
 	}
+    }
 
-	/**
-	 * 
-	 * @param al
-	 */
-	public void addActionListener(ActionListener al) {
-		setOfActionListeners.add(al);
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+     */
+    public void mouseEntered(MouseEvent e) {
+    }
 
-	/**
-	 * Initializes this object.
-	 */
-	private void init() {
-		setOfActionListeners = new HashSet<ActionListener>();
-		// popup = new JPopupMenu();
-		addMouseListener(this);
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+     */
+    public void mouseExited(MouseEvent e) {
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-	 */
-	public void mouseClicked(MouseEvent e) {
-		if ((popup != null) && popup.isVisible()) {
-			currSBase = null;
-			popup.setVisible(false);
-		}
-		Object clickedOn = getClosestPathForLocation(e.getX(), e.getY())
-				.getLastPathComponent();
-		if (clickedOn instanceof ASTNode) {
-			ASTNode ast = (ASTNode) clickedOn;
-			System.out.println(ast.getType());
-		} else if ((e.getClickCount() == 2)
-				|| (e.getButton() == MouseEvent.BUTTON3)
-				&& setOfActionListeners.size() > 0) {
-			if (clickedOn instanceof DefaultMutableTreeNode) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) getSelectionPath()
-						.getLastPathComponent();
-				Object userObject = node.getUserObject();
-				if (userObject instanceof Reaction
-						|| userObject instanceof Model
-						|| userObject instanceof SBMLDocument) {
-					if (userObject instanceof SBMLDocument) {
-						currSBase = ((SBMLDocument) userObject).getModel();
-					} else {
-						currSBase = (SBase) userObject;
-					}
-					if (popup != null) {
-						popup.setLocation(e.getX()
-								+ ((int) getLocationOnScreen().getX()), e
-								.getY()
-								+ ((int) getLocationOnScreen().getY()));// e.getLocationOnScreen());
-						popup.setVisible(true);
-					}
-				}
-				if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
-					MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
-							.getUserObject();
-					JDialog dialog = new JDialog();
-					JScrollPane scroll = new JScrollPane(new SBMLTree(mc
-							.getMath()),
-							JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-							JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-					dialog.getContentPane().add(scroll);
-					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					dialog.pack();
-					dialog.setModal(true);
-					dialog.setLocationRelativeTo(null);
-					dialog.setVisible(true);
-				}
-			}
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+     */
+    public void mousePressed(MouseEvent e) {
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-	 */
-	public void mouseEntered(MouseEvent e) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-	 */
-	public void mouseExited(MouseEvent e) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
-	public void mousePressed(MouseEvent e) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-	 */
-	public void mouseReleased(MouseEvent e) {
-	}
+    /*
+     * (non-Javadoc)
+     * @see
+     * java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+     */
+    public void mouseReleased(MouseEvent e) {
+    }
 }
