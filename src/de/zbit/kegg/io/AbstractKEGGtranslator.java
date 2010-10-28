@@ -92,7 +92,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   private SBPreferences prefs;
   
   private void loadPreferences() {
-    try {
+    /*try {
       this.prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class, 
           TranslatorOptions.CONFIG_FILE_LOCATION);
     } catch (Exception e) {
@@ -100,7 +100,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       e.printStackTrace();
     }
     
-    removeOrphans=prefs.getBoolean(TranslatorOptions.REMOVE_ORPHANS);
+    removeOrphans=prefs.getBoolean(TranslatorOptions.REMOVE_ORPHANS);*/
   }
   
   /*===========================

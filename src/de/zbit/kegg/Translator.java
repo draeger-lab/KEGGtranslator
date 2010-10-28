@@ -1,5 +1,7 @@
 package de.zbit.kegg;
 
+import java.awt.Dialog;
+import java.awt.Window;
 import java.io.IOException;
 import java.util.TreeMap;
 import java.util.prefs.BackingStoreException;
@@ -7,6 +9,7 @@ import java.util.prefs.BackingStoreException;
 import org.sbml.tolatex.LaTeXOptions;
 
 import de.zbit.gui.GUIOptions;
+import de.zbit.gui.cfg.SettingsDialog;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.util.SBPreferences;
 import de.zbit.util.SBProperties;
@@ -36,6 +39,9 @@ public class Translator {
     
     SBProperties props = SBPreferences.analyzeCommandLineArguments(
         defFileAndKeys, usage, args);
+    
+    SettingsDialog d = new SettingsDialog((Dialog)null);
+    d.showSettingsDialog();
     
     // Should we start the GUI?
     if (Boolean.parseBoolean(props.getProperty(GUIOptions.GUI.toString())

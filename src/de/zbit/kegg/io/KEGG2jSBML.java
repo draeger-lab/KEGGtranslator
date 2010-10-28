@@ -1121,7 +1121,7 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     
     long start = System.currentTimeMillis();
     try {
-      //k2s.translate("files/KGMLsamplefiles/map04010hsa.xml", "files/KGMLsamplefiles/map04010hsa.sbml.xml");
+      //k2s.translate("files/KGMLsamplefiles/hsa04010.xml", "files/KGMLsamplefiles/hsa04010.sbml.xml");
       k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
       
       // Remember already queried objects

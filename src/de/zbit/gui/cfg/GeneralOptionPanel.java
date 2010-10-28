@@ -52,6 +52,7 @@ public class GeneralOptionPanel extends SettingsPanel {
   @Override
   public void init() {
     autoBuildPanel();
+    getJComponentForOption(TranslatorOptions.REMOVE_ORPHANS);
   }
   
   /* (non-Javadoc)
