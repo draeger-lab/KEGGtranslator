@@ -77,12 +77,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   private boolean groupNodesWithSameEdges=false;
   
   /**
-   * If set to true, all names will be shortened to one synonym.
-   * Else: all synonyms will be shown e.g. "DLAT, DLTA, PDC-E2, PDCE2"
-   */
-  protected boolean showShortNames = true;
-  
-  /**
    * Important: This determines the output format. E.g. a GraphMLIOHandler
    * will write a graphML file, a GMLIOHandler will write a GML file.
    * 
@@ -176,22 +170,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    */
   public void setOutputHandler(IOHandler outputHandler) {
     this.outputHandler = outputHandler;
-  }
-  
-  /**
-   * See {@link #showShortNames}
-   * @return
-   */
-  public boolean isShowShortNames() {
-    return showShortNames;
-  }
-  
-  /**
-   * See {@link #showShortNames}
-   * @param showShortNames
-   */
-  public void setShowShortNames(boolean showShortNames) {
-    this.showShortNames = showShortNames;
   }
   
   /*===========================
@@ -436,13 +414,22 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       Entry e = p.getEntries().get(i);
       if (skipCompounds && e.getType().equals(EntryType.compound)) continue;
       
-      Node n;
+      Node n = null;
       boolean isPathwayReference=false;
       String name = e.getName().trim();
       if (name.toLowerCase().startsWith("path:") || e.getType().equals(EntryType.map)) isPathwayReference=true;
       
       
+      // Get the graphics object, create a default one or skip this entry.
+      Graphics g = null;
       if (e.hasGraphics()) {
+        g = e.getGraphics();
+      } else if (showEntriesWithoutGraphAttribute || autocompleteReactions) {
+        g = new Graphics(e);
+      }
+      
+      // If it should get drawed, then create this node.
+      if (g!=null) {
         /* Example:
          *     <entry id="16" name="ko:K04467 ko:K07209 ko:K07210" type="ortholog">
                  <graphics name="IKBKA..." fgcolor="#000000" bgcolor="#FFFFFF"
@@ -452,7 +439,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
          */
         
         // Get name, description and other annotations via api (organism specific) possible!!
-        Graphics g = e.getGraphics();
+        //Graphics g = e.getGraphics();
         if (g.getName().length()!=0)
           name = g.getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
         /*if (g.getWidth()>0 && g.getHeight()>0) {
@@ -552,13 +539,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           parentGroupNodes.add(n);
         }
         
-      } else {
-        // Does not make much sense with autocompleteReactions, but
-        // showEntriesWithoutGraphAttribute=false
-        if (showEntriesWithoutGraphAttribute)
-          n = graph.createNode(0,0, name);
-        else
-          n=null;
       }
       
       
@@ -1023,8 +1003,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       }
       
       // Convert "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
-      if (removeMultipleNodeNames && t.contains(",")) {
-        t = t.substring(0, t.indexOf(",")-1);
+      if (removeMultipleNodeNames) {
+        t = shortenName(t);
         g.setLabelText(n, t);
       }
     }

@@ -17,6 +17,7 @@ import org.sbml.jsbml.SpeciesReference;
 import de.zbit.kegg.KeggTools;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
+import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 
@@ -200,14 +201,33 @@ public class CellDesignerUtils {
       sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:modification>\n");
       
       // Write annotation for ModifierSpeciesReference
-      s.getAnnotation().appendNoRDFAnnotation(String.format(
-          "<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
-          "cd_sa"+ s.getSpeciesInstance().getId()));
+      
+      // It happens, that a modifier occurs in multiple reactions. Take care of this here.
+      String currentAnnotation = s.getAnnotation().getNoRDFAnnotation();
+      if (currentAnnotation!=null && 
+          !s.getAnnotation().getNoRDFAnnotation().contains("<celldesigner:alias>")) {
+        s.getAnnotation().appendNoRDFAnnotation(String.format(
+            "<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
+            "cd_sa"+ s.getSpeciesInstance().getId()));
+      }
       
       // Write further annotations for the Modifying species.
-      s.getSpeciesInstance().getAnnotation().appendNoRDFAnnotation(String.format(
-          "<celldesigner:listOfCatalyzedReactions>\n<celldesigner:catalyzed reaction=\"%s\"/>\n</celldesigner:listOfCatalyzedReactions>\n",
-          sbReaction.getId()));
+      final String loKey = "<celldesigner:listOfCatalyzedReactions>";
+      // The key, we want to add
+      final String newKey = String.format("<celldesigner:catalyzed reaction=\"%s\"/>\n",sbReaction.getId()); 
+      currentAnnotation = s.getSpeciesInstance().getAnnotation().getNoRDFAnnotation();
+      int pos=-1;
+      if (currentAnnotation!=null) {
+        pos = currentAnnotation.indexOf(loKey);
+        if (pos>=0) {
+          s.getSpeciesInstance().getAnnotation().insertNoRDFAnnotation(newKey, pos+loKey.length()+1);
+        }
+      }
+      if (pos<0) {
+      s.getSpeciesInstance().getAnnotation().appendNoRDFAnnotation(
+          loKey+"\n" + newKey + "</celldesigner:listOfCatalyzedReactions>\n");
+      }
+      
     }
     sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:listOfModification>\n");
     
@@ -253,10 +273,14 @@ public class CellDesignerUtils {
     }
     target.append(">\n");
     
+    
+    // CellDesigner REQUIRES attributes like "bounds", so we have to
+    // create a new graphics object, if it's not already available.
+    Graphics g = (e.hasGraphics()?e.getGraphics():new Graphics(e));
     target.append("<celldesigner:activity>inactive</celldesigner:activity>\n");
-    if (e.hasGraphics())
-      target.append(String.format("<celldesigner:bounds x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\"/>\n",
-              e.getGraphics().getX(), e.getGraphics().getY(), e.getGraphics().getWidth(), e.getGraphics().getHeight()));
+    
+    target.append(String.format("<celldesigner:bounds x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\"/>\n",
+        g.getX(), g.getY(), g.getWidth(), g.getHeight()));
     target.append("<celldesigner:view state=\"usual\"/>\n");
     
     if (isGroupNode) {
@@ -276,8 +300,8 @@ public class CellDesignerUtils {
       target.append("<celldesigner:singleLine width=\"" + (isGroupNode ? "2.0" : (i == 1 ? "1.0" : "0.0")) + "\"/>\n");
       
       String col = "FFFFFF";
-      if (e.hasGraphics() && e.getGraphics().getBgcolor()!=null) {
-        col = e.getGraphics().getBgcolor().replace("#", "").toLowerCase();
+      if (g.isBGcolorSet()) {
+        col = g.getBgcolor().replace("#", "").toLowerCase();
       }
       target.append(String.format("<celldesigner:paint color=\""
           + (i == 1 ? "ff" : "3f")

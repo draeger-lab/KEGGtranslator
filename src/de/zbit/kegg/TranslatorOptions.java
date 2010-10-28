@@ -10,7 +10,8 @@ import de.zbit.util.Option;
  * @author wrzodek
  * @author Andreas Dr&auml;ger
  */
-public interface TranslatorOptions {
+public abstract interface TranslatorOptions {
+  
   /**
    * The path to the associated configuration file, which contains one default
    * value for each option defined in this interface.

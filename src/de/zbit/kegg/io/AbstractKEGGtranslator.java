@@ -9,12 +9,14 @@ import java.io.IOException;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggTools;
+import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.ProgressBar;
+import de.zbit.util.SBPreferences;
 
 
 /**
@@ -58,7 +60,16 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * from the KEGG-DB and added to the result file.
    * REQUIRES: {@link #retrieveKeggAnnots}
    */
-  private boolean autocompleteReactions=true;
+  protected boolean autocompleteReactions=true;
+  
+  /**
+   * If set to true, all names will be shortened to one synonym.
+   * Else: all synonyms will be shown e.g. only "DLAT" instead of
+   * "DLAT, DLTA, PDC-E2, PDCE2"
+   * XXX: Implementing classes must implement this functionality!
+   * You may use the {@link #shortenName(String)} function for that.
+   */
+  protected boolean showShortNames = true;
   
   /**
    * This manager uses a cache and retrieved informations from the KeggDB. By
@@ -78,6 +89,20 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected AbstractProgressBar progress=null;
   
   
+  private SBPreferences prefs;
+  
+  private void loadPreferences() {
+    try {
+      this.prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class, 
+          TranslatorOptions.CONFIG_FILE_LOCATION);
+    } catch (Exception e) {
+      // TODO: Defaults XML-Datei kaputt: Broken Jar File.
+      e.printStackTrace();
+    }
+    
+    removeOrphans=prefs.getBoolean(TranslatorOptions.REMOVE_ORPHANS);
+  }
+  
   /*===========================
    * CONSTRUCTORS
    * ===========================*/
@@ -88,6 +113,8 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   public AbstractKEGGtranslator(KeggInfoManagement manager) {
     if (manager==null) manager = new KeggInfoManagement();
     this.manager = manager;
+    
+    loadPreferences();
   }
 
   
@@ -148,6 +175,23 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   public void setRemoveWhiteNodes(boolean removeWhiteNodes) {
     this.removeWhiteNodes = removeWhiteNodes;
   }
+  
+  /**
+   * See {@link #showShortNames}
+   * @return
+   */
+  public boolean isShowShortNames() {
+    return showShortNames;
+  }
+  
+  /**
+   * See {@link #showShortNames}
+   * @param showShortNames
+   */
+  public void setShowShortNames(boolean showShortNames) {
+    this.showShortNames = showShortNames;
+  }
+  
   /**
    * See {@link #manager}
    * @param manager
@@ -238,9 +282,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     OutputFormat doc = translateWithoutPreprocessing(p);
     
     // Remember already queried objects
-    if (getKeggInfoManager().hasChanged()) {
-      KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, getKeggInfoManager());
-    }
+    // XXX: Disabled, because writing after every conversion is very time-consuming.
+    // Should be considered by calling classes when to write the cache.
+    //if (getKeggInfoManager().hasChanged()) {
+      //KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, getKeggInfoManager());
+    //}
     
     return doc;
   }
@@ -306,6 +352,20 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   public static boolean isGroupNode(Entry e) {
     EntryType t = e.getType();
     return (t.equals(EntryType.group) || e.getName().toLowerCase().trim().startsWith("group:") || e.hasComponents());
+  }
+  
+  /**
+   * Shorten a given Entry full-name.
+   * Convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..."
+   * to "PCK1".
+   * @param name
+   * @return short name.
+   */
+  protected static String shortenName(String name) {
+    if (name.contains(",")) {
+      return name.substring(0, name.indexOf(",")-1);
+    }
+    return name;
   }
 
   /**

@@ -367,7 +367,9 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     // Get PW infos from KEGG Api for Description and GO ids.
     KeggInfos pwInfos = new KeggInfos(p.getName(), manager); // NAME, DESCRIPTION, DBLINKS verwertbar
     if (pwInfos.queryWasSuccessfull()) {
-      model.appendNotes(String.format("%s<br/>\n", pwInfos.getDescription()));
+      if (pwInfos.getDescription()!=null) {
+        model.appendNotes(String.format("%s<br/>\n", pwInfos.getDescription()));
+      }
       
       // GO IDs
       if (pwInfos.getGo_id() != null) {
@@ -415,13 +417,21 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     if (addCellDesignerAnnots) cdu.addCellDesignerAnnotationToAllSpecies(p);
     
     // ------------------------------------------------------------------
+
+    // I noticed, that some reations occur multiple times in one KGML document,
+    // (maybe its intended? e.g. R00014 in hsa00010.xml)
+    List<String> processedReactions = new SortedArrayList<String>();
+    
     
     // All species added. Parse reactions and relations.
     for (Reaction r : p.getReactions()) {
-      org.sbml.jsbml.Reaction sbReaction = addKGMLReaction(r,p,model,compartment,reactionModifiers);
-
-      if (addCellDesignerAnnots && sbReaction!=null)
-        cdu.addCellDesignerAnnotationToReaction(sbReaction, r);
+      if (!processedReactions.contains(r.getName())) {
+        org.sbml.jsbml.Reaction sbReaction = addKGMLReaction(r,p,model,compartment,reactionModifiers);
+        
+        if (addCellDesignerAnnots && sbReaction!=null)
+          cdu.addCellDesignerAnnotationToReaction(sbReaction, r);
+        processedReactions.add(r.getName());
+      }
     }
     
     // ------------------------------------------------------------------
@@ -571,22 +581,27 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     String lName = r.getName().toLowerCase().trim();
     int modifierPos = reactionModifiers.indexOf(lName);
     if (modifierPos<0) return modifier;
-    
+        
     // Add the current item
     modifier.add(reactionModifiers.get(modifierPos).getInformation());
+    //reactionModifiers.remove(modifierPos);
     
     // Multiple modifiers possible
     
     // Add all previous items
     int modifierPos2=modifierPos;
     while ((--modifierPos2) >= 0 && reactionModifiers.get(modifierPos2).getIdentifier().equalsIgnoreCase(lName)) {
-      modifier.add(reactionModifiers.get(modifierPos2).getInformation());
+      if (!modifier.contains(reactionModifiers.get(modifierPos2).getInformation()));
+        modifier.add(reactionModifiers.get(modifierPos2).getInformation());
+      //reactionModifiers.remove(modifierPos2);
     }
     
     // Add all following items
     modifierPos2=modifierPos;
     while ((++modifierPos2) < reactionModifiers.size() && reactionModifiers.get(modifierPos2).getIdentifier().equalsIgnoreCase(lName)) {
-      modifier.add(reactionModifiers.get(modifierPos2).getInformation());
+      if (!modifier.contains(reactionModifiers.get(modifierPos2).getInformation()));
+        modifier.add(reactionModifiers.get(modifierPos2).getInformation());
+      //reactionModifiers.remove(modifierPos2);
     }    
     
     return modifier;
@@ -777,6 +792,11 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
         name = infos.getName();
       }
     }
+    
+    // Eventually cut at comma ("PCK1, MGC22652" => "PCK1").
+    if (showShortNames) {
+      name = shortenName(name);
+    }
     // ---
     
     // Initialize species object
@@ -823,7 +843,6 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
       } else { // "Metall oder etwas anderes, was definitiv nicht enzymatisch wirkt"
         modifier.setSBOTerm(ET_GeneralModifier2SBO); // 13 = Catalyst
       }
-      
       
       // Remember modifier for later association with reaction.
       reactionModifiers.add(new Info<String, ModifierSpeciesReference>(entry.getReaction().toLowerCase().trim(), modifier));
