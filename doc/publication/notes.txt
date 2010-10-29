@@ -13,6 +13,6 @@ Publizieren in Oxford Bioinformatics
 - Für Webservice: KGML downloaden und bereithalten.
 - Wir dürfen (und sollten) Jochens pathway visualizer mit-verwenden (und mit-publizieren?)
 
-- Geplante Erweiterung: libSBGN Anbindung
+- Geplante Erweiterung: libSBGN Anbindung (SBML => Funktional || SBGN => Grafische erweiterung, deshalb für relations geeignet).
 
 

@@ -85,6 +85,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   /**
    * This is used internally to identify a certain dataHandler in the Graph document.
+   * The content is not important, it should just be any defined static final string.
    */
   private final static String mapDescription="-MAP_DESCRIPTION-";
   
@@ -756,6 +757,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         }
       }
       
+    }
+
+    // Give a warning if we have no relations.
+    if (p.getRelations().size()<1) {
+      System.err.println("Warning: File does not contain any relations. Graph will look quite boring...");
     }
     
     

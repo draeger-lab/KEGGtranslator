@@ -35,14 +35,19 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   
   /**
    * Remove single, not linked nodes/species
+   * Defauls: Graphical representation: true, functional: false.
    */
-  private boolean removeOrphans = false; // TODO: Set to true, by default.
+  private boolean removeOrphans = false;
 
   /**
    * If false, all relations in the document will be skipped. Just like most
    * of the other very-basic converters.
+   * NOTE: Only makes sense in KEGG2SBML (or non-graphic-based-converters).
+   * Kegg2yGraph by default only considers realtions.
+   * 
+   * REMARK: This is optiona is currently IGNORED!
    */
-  private boolean considerRelations = true;
+  protected boolean considerRelations = true;
   
   /**
    * If true, all nodes in white color (except for small molecules/ compounds)
@@ -52,8 +57,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * 
    * Set this node to false if you convert generic pathways (not species
    * specific), since they ONLY contain white nodes.
+   * 
+   * Defauls: Graphical representation: false, functional: true.
    */
-  private boolean removeWhiteNodes = false; // TODO: Set to true, by default.
+  private boolean removeWhiteNodes = true;
   
   /**
    * If true, missing reactants and enzymes for reactions will be retrieved

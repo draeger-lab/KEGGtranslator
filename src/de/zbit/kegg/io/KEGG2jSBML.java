@@ -434,12 +434,14 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
       }
     }
     
+    // Give a warning if we have no reactions.
+    if (p.getReactions().size()<1 && !considerRelations) {
+      System.err.println("Warning: File does not contain any reactions.");
+      //  Consider setting 'considerRelations' to true.
+    }
+    
     // ------------------------------------------------------------------
-    
-    // TODO: Special reactions / relations.
-    
-    
-    
+
     
     
     // Removing nodes here (removeOrphans) does not work, because

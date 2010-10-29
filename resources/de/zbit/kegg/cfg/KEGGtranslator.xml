@@ -4,5 +4,20 @@
   <comment>
     Default configuration of KEGGtranslator.
   </comment>
+  
+  
+  <entry key="INPUT">.</entry>
+  <entry key="OUTPUT">.</entry>
+  <entry key="FORMAT">SMBL</entry>
+  
   <entry key="REMOVE_ORPHANS">true</entry>
+  <entry key="SHORT_NAMES">true</entry>
+  <entry key="REMOVE_WHITE_GENE_NODES">true</entry>
+  <entry key="AUTOCOMPLETE_REACTIONS">true</entry>
+  <entry key="OFFLINE_MODE">false</entry>
+
+  <entry key="MERGE_NODES_WITH_SAME_EDGES">false</entry>
+
+  <entry key="CELLDESIGNER_ANNOTATIONS">false</entry>
+
  </properties>
