@@ -6,10 +6,10 @@ package de.zbit.kegg.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggTools;
-import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -316,15 +316,18 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @return the generated document in OutputFormat.
    * @throws IOException - if the input file is not readable.
    */
-  public OutputFormat translate(File f) throws IOException {
-    if (f.exists() && f.isFile() && f.canRead()) {
-      Pathway p = KeggParser.parse(f.getAbsolutePath()).get(0);
-      OutputFormat doc = translate(p);
-      
-      return doc;
-    }
-    throw new IOException("Cannot read input file " + f.getAbsolutePath());
-  }
+	public OutputFormat translate(File f) throws IOException {
+		if (f.exists() && f.isFile() && f.canRead()) {
+			List<Pathway> l = KeggParser.parse(f.getAbsolutePath());
+			if (l.size() > 0) {
+				Pathway p = l.get(0);
+				OutputFormat doc = translate(p);
+				return doc;
+			}
+		}
+		throw new IOException(String.format("Cannot translate input file %s.", f
+				.getAbsolutePath()));
+	}
   
   /**
    * Initializes the given, or a new progressBar with the number of

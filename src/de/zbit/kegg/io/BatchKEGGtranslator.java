@@ -2,7 +2,7 @@ package de.zbit.kegg.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Pathway;
@@ -169,7 +169,7 @@ public class BatchKEGGtranslator {
         if (new File(outFileTemp).exists()) continue; // Skip already converted files.
         
         // Parse and convert all Pathways in XML file.
-        ArrayList<Pathway> pw=null;
+        List<Pathway> pw=null;
         try {
           pw = de.zbit.kegg.parser.KeggParser.parse(dir+fn);
         } catch (Throwable t) {t.printStackTrace();} // Show must go on...

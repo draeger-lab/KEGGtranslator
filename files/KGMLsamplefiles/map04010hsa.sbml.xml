@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" version="4">&#xd;
-  <model metaid="meta_path_map04010hsa" name="MAPK signaling pathway" id="path_map04010hsa">&#xd;
-    <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><h1>Model of “MAPK signaling pathway” in “Ras-specific guanine nucleotide-releasing factor 1”</h1>null<br/><a href="http://www.genome.jp/kegg/pathway/map/map04010hsa.gif"><img alt="http://www.genome.jp/kegg-bin/show_pathway?map04010hsa" src="http://www.genome.jp/kegg/pathway/map/map04010hsa.gif"/></a><br/><a href="http://www.genome.jp/dbget-bin/show_pathway?map04010hsa">Original Entry</a><br/><p>KGML Comment: “Creation date: Apr 08 2006 03:58:37 +0900 (JST)”<br/>KGML Version was: 0.6<br/></p></body></html>&#xd;
-</notes>&#xd;
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" xmlns:celldesigner="http://www.sbml.org/2001/ns/celldesigner" version="4">
+  <model metaid="meta_path_map04010hsa" name="MAPK signaling pathway" id="path_map04010hsa">
+    <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><h1>Model of “MAPK signaling pathway”</h1><a href="http://www.genome.jp/kegg/pathway/map/map04010hsa.gif"><img alt="http://www.genome.jp/kegg-bin/show_pathway?map04010hsa" src="http://www.genome.jp/kegg/pathway/map/map04010hsa.gif"/></a><br/><a href="http://www.genome.jp/dbget-bin/show_pathway?map04010hsa">Original Entry</a><br/><p>KGML Comment: “Creation date: Apr 08 2006 03:58:37 +0900 (JST)”<br/>KGML Version was: 0.6<br/></p></body></html>
+</notes>
     <annotation>
 <celldesigner:extension>
 <celldesigner:modelVersion>4.0</celldesigner:modelVersion>
@@ -61,7 +61,7 @@
 </celldesigner:complexSpeciesAlias>
 </celldesigner:listOfComplexSpeciesAliases>
 <celldesigner:listOfSpeciesAliases>
-<celldesigner:speciesAlias id="cd_saIns145P3" species="Ins145P3">
+<celldesigner:speciesAlias id="cd_saDiglyceride" species="Diglyceride">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="8" w="8" x="484" y="136"/>
 <celldesigner:view state="usual"/>
@@ -79,7 +79,7 @@
 </celldesigner:briefView>
 <celldesigner:info angle="0.0" state="empty"/>
 </celldesigner:speciesAlias>
-<celldesigner:speciesAlias id="cd_saCa2" species="Ca2">
+<celldesigner:speciesAlias id="cd_sacAMP" species="cAMP">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="8" w="8" x="446" y="123"/>
 <celldesigner:view state="usual"/>
@@ -97,7 +97,7 @@
 </celldesigner:briefView>
 <celldesigner:info angle="0.0" state="empty"/>
 </celldesigner:speciesAlias>
-<celldesigner:speciesAlias id="cd_saMAP4K4_HGK" species="MAP4K4_HGK">
+<celldesigner:speciesAlias id="cd_saIns145P3" species="Ins145P3">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="8" w="8" x="410" y="136"/>
 <celldesigner:view state="usual"/>
@@ -115,7 +115,7 @@
 </celldesigner:briefView>
 <celldesigner:info angle="0.0" state="empty"/>
 </celldesigner:speciesAlias>
-<celldesigner:speciesAlias id="cd_saPLA2G" species="PLA2G">
+<celldesigner:speciesAlias id="cd_saCa2" species="Ca2">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="8" w="8" x="314" y="175"/>
 <celldesigner:view state="usual"/>
@@ -133,7 +133,7 @@
 </celldesigner:briefView>
 <celldesigner:info angle="0.0" state="empty"/>
 </celldesigner:speciesAlias>
-<celldesigner:speciesAlias id="cd_saMAP2K5_MEK5" species="MAP2K5_MEK5">
+<celldesigner:speciesAlias id="cd_saCell_cycle" species="Cell_cycle">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="271" w="34" x="1301" y="601"/>
 <celldesigner:view state="usual"/>
@@ -151,7 +151,7 @@
 </celldesigner:briefView>
 <celldesigner:info angle="0.0" state="empty"/>
 </celldesigner:speciesAlias>
-<celldesigner:speciesAlias id="cd_saNLK" species="NLK">
+<celldesigner:speciesAlias id="cd_saApoptosis" species="Apoptosis">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="26" w="94" x="1217" y="623"/>
 <celldesigner:view state="usual"/>
@@ -169,7 +169,7 @@
 </celldesigner:briefView>
 <celldesigner:info angle="0.0" state="empty"/>
 </celldesigner:speciesAlias>
-<celldesigner:speciesAlias id="cd_saCDC25B" species="CDC25B">
+<celldesigner:speciesAlias id="cd_saWnt_signaling_pathway" species="Wnt_signaling_pathway">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="38" w="94" x="1039" y="852"/>
 <celldesigner:view state="usual"/>
@@ -187,7 +187,7 @@
 </celldesigner:briefView>
 <celldesigner:info angle="0.0" state="empty"/>
 </celldesigner:speciesAlias>
-<celldesigner:speciesAlias id="cd_saMSK" species="MSK">
+<celldesigner:speciesAlias id="cd_saAlzheimers_disease" species="Alzheimers_disease">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="38" w="94" x="1039" y="549"/>
 <celldesigner:view state="usual"/>
@@ -205,7 +205,7 @@
 </celldesigner:briefView>
 <celldesigner:info angle="0.0" state="empty"/>
 </celldesigner:speciesAlias>
-<celldesigner:speciesAlias id="cd_saMAPKAPK2" species="MAPKAPK2">
+<celldesigner:speciesAlias id="cd_saFocal_adhesion" species="Focal_adhesion">
 <celldesigner:activity>inactive</celldesigner:activity>
 <celldesigner:bounds h="38" w="104" x="301" y="453"/>
 <celldesigner:view state="usual"/>
@@ -250,37 +250,107 @@
 <celldesigner:listOfLayers/>
 <celldesigner:listOfBlockDiagrams/>
 </celldesigner:extension>
-          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-        <rdf:Description rdf:about="#meta_path_map04010hsa">&#xd;
-          <creator>&#xd;
-            <Bag>&#xd;
-              <li parseType="Resource">                <ORG parseType="Resource">&#xd;
-                  <Orgname>ZBIT, University of Tübingen, WSI-RA</Orgname>&#xd;
-                </ORG>&#xd;
-              </li>&#xd;
-            </Bag>&#xd;
-          </creator>&#xd;
-          <modified parseType="Resource">&#xd;
-            <W3CDTF>Thu Oct 21 15:37:34 CEST 2010</W3CDTF>&#xd;
-          </modified>&#xd;
-        <bqmodel:is>&#xd;
-          <Bag>&#xd;
-            <li resource="urn:miriam:kegg.pathway:map04010hsa"/>&#xd;
-          </Bag>&#xd;
-        </bqmodel:is>&#xd;
-        <bqbiol:occursIn>&#xd;
-        </bqbiol:occursIn>&#xd;
-      </rdf:Description>&#xd;
-    </rdf:RDF>&#xd;
-    <listOfCompartments>&#xd;
-      <compartment units="volume" size="1.0" id="default">&#xd;
-      </compartment>&#xd;
-    </listOfCompartments>&#xd;
-      <listOfSpecies>&#xd;
-      <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_Ins145P3" name="Ins(1,4,5)P3" initialAmount="1.0" id="Ins145P3">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00165">Original Kegg Entry</a><br/><p><b>Ins(1,4,5)P3</b></p><p><b>All given names:</b><br/>D-myo-Inositol 1,4,5-trisphosphate<br/>1D-myo-Inositol 1,4,5-trisphosphate<br/>Inositol 1,4,5-trisphosphate<br/>Ins(1,4,5)P3</p><p><b>Formula:</b> C6H15O15P3</p><p><b>Mass:</b> 419.9624</p></body></html>&#xd;
-</notes>&#xd;
+          <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+        <rdf:Description rdf:about="#meta_path_map04010hsa">
+          <creator>
+            <Bag>
+              <li parseType="Resource">                <ORG parseType="Resource">
+                  <Orgname>ZBIT, University of Tübingen, WSI-RA</Orgname>
+                </ORG>
+              </li>
+            </Bag>
+          </creator>
+          <modified parseType="Resource">
+            <W3CDTF>Thu Oct 21 15:52:11 CEST 2010</W3CDTF>
+          </modified>
+        <bqmodel:is>
+          <Bag>
+            <li resource="urn:miriam:kegg.pathway:map04010hsa"/>
+          </Bag>
+        </bqmodel:is>
+        </rdf:Description>
+      </rdf:RDF>
+    </annotation>
+    <listOfCompartments>
+      <compartment units="volume" size="1.0" id="default">
+      </compartment>
+    </listOfCompartments>
+      <listOfSpecies>
+      <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_Diglyceride" name="Diglyceride" initialAmount="1.0" id="Diglyceride">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00165">Original Kegg Entry</a><br/><p><b>Diglyceride</b></p><p><b>All given names:</b><br/>Diacylglycerol<br/>Diglyceride</p><p><b>Formula:</b> C5H6O5R2</p></body></html>
+</notes>
+        <annotation>
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
+<celldesigner:name>Diglyceride</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_Diglyceride">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.compound:C00165"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:obo.chebi:CHEBI:18035"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_cAMP" name="cAMP" initialAmount="1.0" id="cAMP">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00575">Original Kegg Entry</a><br/><p><b>cAMP</b></p><p><b>All given names:</b><br/>3',5'-Cyclic AMP<br/>Cyclic adenylic acid<br/>Cyclic AMP<br/>Adenosine 3',5'-phosphate<br/>Adenosine 3',5'-cyclic phosphate<br/>cAMP</p><p><b>Formula:</b> C10H12N5O6P</p><p><b>Mass:</b> 329.0525</p></body></html>
+</notes>
+        <annotation>
+<celldesigner:extension>
+<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
+<celldesigner:speciesIdentity>
+<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
+<celldesigner:name>cAMP</celldesigner:name>
+</celldesigner:speciesIdentity>
+</celldesigner:extension>
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_cAMP">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.compound:C00575"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:obo.chebi:CHEBI:17489"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:pubchem.substance:3854"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:3dmet:B01289"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:pdb-ccd:CMP"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_Ins145P3" name="Ins(1,4,5)P3" initialAmount="1.0" id="Ins145P3">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C01245">Original Kegg Entry</a><br/><p><b>Ins(1,4,5)P3</b></p><p><b>All given names:</b><br/>D-myo-Inositol 1,4,5-trisphosphate<br/>1D-myo-Inositol 1,4,5-trisphosphate<br/>Inositol 1,4,5-trisphosphate<br/>Ins(1,4,5)P3</p><p><b>Formula:</b> C6H15O15P3</p><p><b>Mass:</b> 419.9624</p></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
@@ -289,41 +359,41 @@
 <celldesigner:name>Ins(1,4,5)P3</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_Ins145P3">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.compound:C00165"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:obo.chebi:CHEBI:16595"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:pubchem.substance:4466"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:3dmet:B01422"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:pdb-ccd:I3P"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_Ca2" name="Ca2+" initialAmount="1.0" id="Ca2">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00575">Original Kegg Entry</a><br/><p><b>Ca2+</b></p><p><b>All given names:</b><br/>Calcium<br/>Ca2+</p><p><b>Formula:</b> Ca</p><p><b>Mass:</b> 39.9626</p></body></html>&#xd;
-</notes>&#xd;
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_Ins145P3">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.compound:C01245"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:obo.chebi:CHEBI:16595"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:pubchem.substance:4466"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:3dmet:B01422"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:pdb-ccd:I3P"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_Ca2" name="Ca2+" initialAmount="1.0" id="Ca2">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00076">Original Kegg Entry</a><br/><p><b>Ca2+</b></p><p><b>All given names:</b><br/>Calcium<br/>Ca2+</p><p><b>Formula:</b> Ca</p><p><b>Mass:</b> 39.9626</p></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
@@ -332,202 +402,151 @@
 <celldesigner:name>Ca2+</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_Ca2">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.compound:C00575"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:obo.chebi:CHEBI:29108"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:pubchem.substance:3376"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:pdb-ccd:CA"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_MAP4K4_HGK" name="MAP4K4, HGK" initialAmount="1.0" id="MAP4K4_HGK">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C01245">Original Kegg Entry</a><br/><p><b>Description for “MAP4K4, HGK”:</b> mitogen-activated protein kinase kinase kinase kinase 4 [EC:2.7.11.1]</p></body></html>&#xd;
-</notes>&#xd;
-        <annotation>
-<celldesigner:extension>
-<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
-<celldesigner:speciesIdentity>
-<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
-<celldesigner:name>MAP4K4,_space_HGK</celldesigner:name>
-</celldesigner:speciesIdentity>
-</celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_MAP4K4_HGK">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.compound:C01245"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_PLA2G" name="PLA2G" initialAmount="1.0" id="PLA2G">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00076">Original Kegg Entry</a><br/><p><b>Description for “PLA2G”:</b> phospholipase A2 [EC:3.1.1.4]</p></body></html>&#xd;
-</notes>&#xd;
-        <annotation>
-<celldesigner:extension>
-<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
-<celldesigner:speciesIdentity>
-<celldesigner:class>SIMPLE_MOLECULE</celldesigner:class>
-<celldesigner:name>PLA2G</celldesigner:name>
-</celldesigner:speciesIdentity>
-</celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_PLA2G">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.compound:C00076"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:isVersionOf>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:obo.go:GO:0004623"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:isVersionOf>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_MAP2K5_MEK5" name="MAP2K5, MEK5" initialAmount="1.0" id="MAP2K5_MEK5">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="">Original Kegg Entry</a><br/><p><b>Description for “MAP2K5, MEK5”:</b> mitogen-activated protein kinase kinase 5 [EC:2.7.12.2]</p></body></html>&#xd;
-</notes>&#xd;
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_Ca2">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.compound:C00076"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:obo.chebi:CHEBI:29108"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:pubchem.substance:3376"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:pdb-ccd:CA"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_Cell_cycle" name="Cell cycle" initialAmount="1.0" id="Cell_cycle">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="">Original Kegg Entry</a><br/><p><b>Cell cycle</b></p></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
 <celldesigner:speciesIdentity>
 <celldesigner:class>UNKNOWN</celldesigner:class>
-<celldesigner:name>MAP2K5,_space_MEK5</celldesigner:name>
+<celldesigner:name>Cell_space_cycle</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_MAP2K5_MEK5">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.pathway:map04110"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_NLK" name="NLK" initialAmount="1.0" id="NLK">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/kegg/pathway/map/map04210.html">Original Kegg Entry</a><br/><p><b>Description for “NLK”:</b> nemo like kinase [EC:2.7.11.24]</p></body></html>&#xd;
-</notes>&#xd;
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_Cell_cycle">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.pathway:map04110"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_Apoptosis" name="Apoptosis" initialAmount="1.0" id="Apoptosis">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/kegg/pathway/map/map04210.html">Original Kegg Entry</a><br/><p><b>Apoptosis</b></p></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
 <celldesigner:speciesIdentity>
 <celldesigner:class>UNKNOWN</celldesigner:class>
-<celldesigner:name>NLK</celldesigner:name>
+<celldesigner:name>Apoptosis</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_NLK">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.pathway:map04210"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_CDC25B" name="CDC25B" initialAmount="1.0" id="CDC25B">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/kegg/pathway/map/map04310.html">Original Kegg Entry</a><br/><p><b>Description for “CDC25B”:</b> cell division cycle 25B [EC:3.1.3.48]</p></body></html>&#xd;
-</notes>&#xd;
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_Apoptosis">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.pathway:map04210"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_Wnt_signaling_pathway" name="Wnt signaling pathway" initialAmount="1.0" id="Wnt_signaling_pathway">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/kegg/pathway/map/map04310.html">Original Kegg Entry</a><br/><p><b>Wnt signaling pathway</b></p></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
 <celldesigner:speciesIdentity>
 <celldesigner:class>UNKNOWN</celldesigner:class>
-<celldesigner:name>CDC25B</celldesigner:name>
+<celldesigner:name>Wnt_space_signaling_space_pathway</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_CDC25B">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.pathway:map04310"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_MSK" name="MSK" initialAmount="1.0" id="MSK">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/kegg/pathway/map/map05010.html">Original Kegg Entry</a><br/><p><b>Description for “MSK”:</b> mitogen-,stress activated protein kinases [EC:2.7.11.1]</p></body></html>&#xd;
-</notes>&#xd;
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_Wnt_signaling_pathway">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.pathway:map04310"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_Alzheimers_disease" name="Alzheimer's disease" initialAmount="1.0" id="Alzheimers_disease">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/kegg/pathway/map/map05010.html">Original Kegg Entry</a><br/><p><b>Alzheimer's disease</b></p></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
 <celldesigner:speciesIdentity>
 <celldesigner:class>UNKNOWN</celldesigner:class>
-<celldesigner:name>MSK</celldesigner:name>
+<celldesigner:name>Alzheimer's_space_disease</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_MSK">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.pathway:map05010"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_MAPKAPK2" name="MAPKAPK2" initialAmount="1.0" id="MAPKAPK2">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/kegg/pathway/map/map04510.html">Original Kegg Entry</a><br/><p><b>Description for “MAPKAPK2”:</b> mitogen-activated protein kinase-activated protein kinase 2 [EC:2.7.11.1]</p></body></html>&#xd;
-</notes>&#xd;
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_Alzheimers_disease">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.pathway:map05010"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000291" compartment="default" substanceUnits="substance" metaid="meta_Focal_adhesion" name="Focal adhesion" initialAmount="1.0" id="Focal_adhesion">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/kegg/pathway/map/map04510.html">Original Kegg Entry</a><br/><p><b>Focal adhesion</b></p></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
 <celldesigner:speciesIdentity>
 <celldesigner:class>UNKNOWN</celldesigner:class>
-<celldesigner:name>MAPKAPK2</celldesigner:name>
+<celldesigner:name>Focal_space_adhesion</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_MAPKAPK2">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.pathway:map04510"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_LPS" name="LPS" initialAmount="1.0" id="LPS">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00338">Original Kegg Entry</a><br/><p><b>LPS</b></p><p><b>All given names:</b><br/>Lipopolysaccharide<br/>LPS</p></body></html>&#xd;
-</notes>&#xd;
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_Focal_adhesion">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.pathway:map04510"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000247" compartment="default" substanceUnits="substance" metaid="meta_LPS" name="LPS" initialAmount="1.0" id="LPS">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="http://www.genome.jp/dbget-bin/www_bget?compound+C00338">Original Kegg Entry</a><br/><p><b>LPS</b></p><p><b>All given names:</b><br/>Lipopolysaccharide<br/>LPS</p></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
@@ -536,26 +555,26 @@
 <celldesigner:name>LPS</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">&#xd;
-            <rdf:Description rdf:about="#meta_LPS">&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:kegg.compound:C00338"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            <bqbiol:is>&#xd;
-              <Bag>&#xd;
-                <li resource="urn:miriam:obo.chebi:CHEBI:16412"/>&#xd;
-              </Bag>&#xd;
-            </bqbiol:is>&#xd;
-            </rdf:Description>&#xd;
-          </rdf:RDF>&#xd;
-        </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000253" compartment="default" substanceUnits="substance" metaid="meta_group" name="group:" initialAmount="1.0" id="group">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="">Original Kegg Entry</a><br/></body></html>&#xd;
-</notes>&#xd;
+                  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/">
+            <rdf:Description rdf:about="#meta_LPS">
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:kegg.compound:C00338"/>
+              </Bag>
+            </bqbiol:is>
+            <bqbiol:is>
+              <Bag>
+                <li resource="urn:miriam:obo.chebi:CHEBI:16412"/>
+              </Bag>
+            </bqbiol:is>
+            </rdf:Description>
+          </rdf:RDF>
+        </annotation>
+      </species>
+          <species sboTerm="SBO:0000253" compartment="default" substanceUnits="substance" metaid="meta_group" name="group:" initialAmount="1.0" id="group">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="">Original Kegg Entry</a><br/></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
@@ -564,12 +583,12 @@
 <celldesigner:name>group:</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                </annotation>&#xd;
-      </species>&#xd;
-          <species sboTerm="SBO:0000253" compartment="default" substanceUnits="substance" metaid="meta_wnt" name="wnt" initialAmount="1.0" id="wnt">&#xd;
-        <notes>&#xd;
-<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="">Original Kegg Entry</a><br/></body></html>&#xd;
-</notes>&#xd;
+                </annotation>
+      </species>
+          <species sboTerm="SBO:0000253" compartment="default" substanceUnits="substance" metaid="meta_wnt" name="wnt" initialAmount="1.0" id="wnt">
+        <notes>
+<html xmlns="http://www.w3.org/1999/xhtml"><body><a href="">Original Kegg Entry</a><br/></body></html>
+</notes>
         <annotation>
 <celldesigner:extension>
 <celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>
@@ -578,8 +597,8 @@
 <celldesigner:name>wnt</celldesigner:name>
 </celldesigner:speciesIdentity>
 </celldesigner:extension>
-                </annotation>&#xd;
-      </species>&#xd;
-    </listOfSpecies>&#xd;
-  </annotation>&#xd;
-</model></sbml>
+                </annotation>
+      </species>
+    </listOfSpecies>
+  </model>
+</sbml>
