@@ -3,8 +3,11 @@ package de.zbit.kegg.io;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Rectangle;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -984,7 +987,22 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     if (new File(outFile).exists()) lastFileWasOverwritten=true;
     while (retried<3) {
       try {
-        outputHandler.write(graph, outFile);
+      	
+        // Create a specific ouputStream, that removes all
+      	// y-Files-is-the-man--poser-strings.
+        OutputStream out = null;
+        if (outputHandler instanceof GraphMLIOHandler ||
+            outputHandler instanceof GMLIOHandler) {
+        	out = new YFilesWriter(new BufferedOutputStream(new FileOutputStream(outFile)));
+        }
+        
+        if (out==null)
+          outputHandler.write(graph, outFile);
+        else {
+      	  outputHandler.write(graph, out);
+      	  out.close();
+        }
+      	
         return true; // Success => No more need to retry
       } catch (IOException iex) {
         retried++;

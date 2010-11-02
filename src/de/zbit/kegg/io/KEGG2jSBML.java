@@ -50,11 +50,6 @@ import de.zbit.util.Utils;
 public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
   
   /**
-   * Version number of this translator
-   */
-  public static final String VERSION_NUMBER = "1.0.0";
-  
-  /**
    * Generate pure SBML or do you want to add CellDesigner annotations?
    */
   private boolean addCellDesignerAnnots = true;

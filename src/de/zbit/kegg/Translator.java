@@ -10,6 +10,8 @@ import java.util.prefs.BackingStoreException;
 import de.zbit.gui.GUIOptions;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.BatchKEGGtranslator;
+import de.zbit.kegg.io.KEGG2jSBML;
+import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.SBPreferences;
 import de.zbit.util.SBProperties;
@@ -18,6 +20,7 @@ import de.zbit.util.SBProperties;
  * This class is the main class for the KEGGTranslator project.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2010-10-25
  */
 public class Translator {
@@ -28,11 +31,6 @@ public class Translator {
    * @throws URISyntaxException 
    */
 	public static void main(String[] args) throws IOException, BackingStoreException, URISyntaxException {
-		//TreeMap<String, Class<?>> defFileAndKeys = new TreeMap<String, Class<?>>();
-		//defFileAndKeys.put(TranslatorOptions.CONFIG_FILE_LOCATION,TranslatorOptions.class);
-		//defFileAndKeys.put(GUIOptions.CONFIG_FILE_LOCATION, GUIOptions.class);
-		//defFileAndKeys.put(LaTeXOptions.CONFIG_FILE_LOCATION,LaTeXOptions.class);
-		//SBProperties props = SBPreferences.analyzeCommandLineArguments(defFileAndKeys, args);
 		
 		List<Class<?>> configList = new LinkedList<Class<?>>();
 		configList.add(TranslatorOptions.class);
@@ -45,7 +43,6 @@ public class Translator {
 		//PreferencesDialog.showPreferencesDialog();
 		
 		// Should we start the GUI?
-		//  Boolean.parseBoolean(props.getProperty(GUIOptions.GUI.toString()).toString())
 		if (args.length<1 || (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props)) ) {
 			new TranslatorUI();
 		} else {
@@ -62,8 +59,9 @@ public class Translator {
 	 * @param input - input file
 	 * @param output - output file
 	 * @return
+	 * @throws IOException 
 	 */
-	public static boolean translate(String format, String input, String output) {
+	public static boolean translate(String format, String input, String output) throws IOException {
 		
 		// Check and build input
 		File in = new File(input);
@@ -72,26 +70,29 @@ public class Translator {
 			return false;
 		}
 		
-		// Check and build output
-		File out = output==null? null: new File(output);
-		if (out == null  || output.length()<1 || out.isDirectory()) {
-			out = new File(input + '.' + format);
-			System.out.println("Writing to " + out);
-		}
-		if (!out.canWrite()) {
-			System.err.println("Cannot write to file " + out);
-			return false;
-		}
-		if (out.exists()) {
-			System.out.println("Overwriting exising file " + out);
-		}
-		
 		// Initiate the manager
 		KeggInfoManagement manager = TranslatorUI.getManager();
 		
 		// Check and build format
 		KEGGtranslator translator = BatchKEGGtranslator.getTranslator(format, manager);
 		if (translator==null) return false; // Error message already issued.
+		
+		// Check and build output
+		File out = output==null? null: new File(output);
+		if (out == null  || output.length()<1 || out.isDirectory()) {
+			String fileExtension = BatchKEGGtranslator.getFileExtension(translator);
+	    out = new File(removeFileExtension(input) + fileExtension);
+	    
+			System.out.println("Writing to " + out);
+		}
+		if (out.exists()) {
+			System.out.println("Overwriting exising file " + out);
+		}
+		out.createNewFile();
+		if (!out.canWrite()) {
+			System.err.println("Cannot write to file " + out);
+			return false;
+		}
 		
 		// Translate.
 		if (in.isDirectory()) {
@@ -111,6 +112,20 @@ public class Translator {
     }
 			
 	  return true;
+	}
+
+	/**
+	 * If the input has a file extension, it is removed.
+	 * else, the input is returned.
+	 * @param input
+	 * @return
+	 */
+	private static String removeFileExtension(String input) {
+		int pos = input.lastIndexOf('.');
+		if (pos>0) {
+			return input.substring(0, pos);
+		}
+		return input;
 	}
   
 }

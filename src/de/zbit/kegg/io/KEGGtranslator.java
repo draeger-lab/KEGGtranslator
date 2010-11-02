@@ -15,6 +15,11 @@ public interface KEGGtranslator {
   public final static String appName = "KEGGtranslator";
   
   /**
+   * Version number of this translator
+   */
+  public static final String VERSION_NUMBER = "1.0.0";
+  
+  /**
    * Filename of the KEGG cache file (implemented just
    * like the browser cache). Must be loded upon start
    * and saved upon exit.

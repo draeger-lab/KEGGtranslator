@@ -120,15 +120,10 @@ public class BatchKEGGtranslator {
     System.out.println("Parsing directory " + dir);
     
     
-    String fileExtension=".translated";
     if (translator==null) {
     	translator = getTranslator(outFormat, manager);
     }
-    if (translator instanceof KEGG2yGraph) {
-      fileExtension = ((KEGG2yGraph)translator).getOutputHandler().getFileNameExtension();
-    } else if (translator instanceof KEGG2jSBML) {
-		  fileExtension = ".sbml.xml";
-    }
+    String fileExtension = getFileExtension(translator);
 		  
     
     DirectoryParser dp = new DirectoryParser(dir);
@@ -218,6 +213,24 @@ public class BatchKEGGtranslator {
 		}
 		
 		return translator;
+	}
+	
+	/**
+	 * Returns the file extesion (with preceding dot) for the
+	 * given KEGGtranslator.
+	 * @param translator
+	 * @return
+	 */
+	public static String getFileExtension(KEGGtranslator translator) {
+		String fileExtension = ".translated";
+    if (translator instanceof KEGG2yGraph) {
+      fileExtension = ((KEGG2yGraph)translator).getOutputHandler().getFileNameExtension();
+    } else if (translator instanceof KEGG2jSBML) {
+		  fileExtension = ".sbml.xml";
+    }
+		if (!fileExtension.startsWith(".")) fileExtension = "." + fileExtension;
+		
+		return fileExtension;
 	}
   
   /**
