@@ -43,6 +43,7 @@ import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
+import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.extensions.GenericDataMap;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -105,6 +106,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   public KEGG2yGraph(IOHandler outputHandler, KeggInfoManagement manager) {
     super(manager);
     this.outputHandler = outputHandler;
+    
+    loadPreferences();
   }
   
   /*===========================
@@ -176,6 +179,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   /*===========================
    * FUNCTIONS
    * ===========================*/
+  
+  /** Load the default preferences from the SBPreferences object. */
+  private void loadPreferences() {
+  	groupNodesWithSameEdges = TranslatorOptions.MERGE_NODES_WITH_SAME_EDGES.getValue(prefs);
+  }
+
   
   /**
    * Converts an HTML color to an awt color.

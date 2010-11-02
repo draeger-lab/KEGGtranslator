@@ -122,37 +122,14 @@ public class BatchKEGGtranslator {
     
     String fileExtension=".translated";
     if (translator==null) {
-      if (outFormat.equalsIgnoreCase("sbml")) {
-        translator = new KEGG2jSBML(manager);
-        fileExtension = ".sbml.xml";
-        
-      } else if (outFormat.equalsIgnoreCase("GraphML")) {
-        translator = KEGG2yGraph.createKEGG2GraphML(manager);
-        
-      } else if (outFormat.equalsIgnoreCase("GML")) {
-        translator = KEGG2yGraph.createKEGG2GML(manager);
-
-      } else if (outFormat.equalsIgnoreCase("JPG")) {
-        translator = KEGG2yGraph.createKEGG2JPG(manager);
-        
-      } else if (outFormat.equalsIgnoreCase("GIF")) {
-        translator = KEGG2yGraph.createKEGG2GIF(manager);
-        
-      } else if (outFormat.equalsIgnoreCase("YGF")) {
-        translator = KEGG2yGraph.createKEGG2YGF(manager);
-        
-      } else if (outFormat.equalsIgnoreCase("TGF")) {
-        translator = KEGG2yGraph.createKEGG2TGF(manager);
-        
-      } else {
-        System.err.println("Unknwon output Format: '" + outFormat + "'.");
-        return;
-        
-      }
+    	translator = getTranslator(outFormat, manager);
     }
     if (translator instanceof KEGG2yGraph) {
       fileExtension = ((KEGG2yGraph)translator).getOutputHandler().getFileNameExtension();
+    } else if (translator instanceof KEGG2jSBML) {
+		  fileExtension = ".sbml.xml";
     }
+		  
     
     DirectoryParser dp = new DirectoryParser(dir);
     while (dp.hasNext()) {
@@ -204,6 +181,44 @@ public class BatchKEGGtranslator {
           ((AbstractKEGGtranslator) translator).getKeggInfoManager());
     }
   }
+
+  /**
+   * Returns a KeggTranslater for the given outFormat.
+   * @param outFormat
+   * @param manager
+   * @return
+   */
+	public static KEGGtranslator getTranslator(String outFormat, KeggInfoManagement manager) {
+		KEGGtranslator translator;
+		
+		if (outFormat.equalsIgnoreCase("sbml")) {
+		  translator = new KEGG2jSBML(manager);
+		  
+		} else if (outFormat.equalsIgnoreCase("GraphML")) {
+		  translator = KEGG2yGraph.createKEGG2GraphML(manager);
+		  
+		} else if (outFormat.equalsIgnoreCase("GML")) {
+		  translator = KEGG2yGraph.createKEGG2GML(manager);
+
+		} else if (outFormat.equalsIgnoreCase("JPG")) {
+		  translator = KEGG2yGraph.createKEGG2JPG(manager);
+		  
+		} else if (outFormat.equalsIgnoreCase("GIF")) {
+		  translator = KEGG2yGraph.createKEGG2GIF(manager);
+		  
+		} else if (outFormat.equalsIgnoreCase("YGF")) {
+		  translator = KEGG2yGraph.createKEGG2YGF(manager);
+		  
+		} else if (outFormat.equalsIgnoreCase("TGF")) {
+		  translator = KEGG2yGraph.createKEGG2TGF(manager);
+		  
+		} else {
+		  System.err.println("Unknwon output Format: '" + outFormat + "'.");
+		  translator = null;
+		}
+		
+		return translator;
+	}
   
   /**
    * Load or create a KeggInfoManager

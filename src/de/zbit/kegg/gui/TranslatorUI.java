@@ -134,9 +134,15 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	static {
 		ImageTools.initImages(TranslatorUI.class.getResource("img"));
 		GUITools.initLaF(KEGGtranslator.appName);
+		
+		KeggInfoManagement manager = getManager();
+		k2s = new KEGG2jSBML(manager);
+	}
+
+	public static KeggInfoManagement getManager() {
+		KeggInfoManagement manager;
 		if (new File(KEGGtranslator.cacheFileName).exists()
 				&& new File(KEGGtranslator.cacheFileName).length() > 0) {
-			KeggInfoManagement manager;
 			try {
 				manager = (KeggInfoManagement) KeggInfoManagement
 						.loadFromFilesystem(KEGGtranslator.cacheFileName);
@@ -144,10 +150,10 @@ public class TranslatorUI extends JFrame implements ActionListener,
 				e.printStackTrace();
 				manager = new KeggInfoManagement();
 			}
-			k2s = new KEGG2jSBML(manager);
 		} else {
-			k2s = new KEGG2jSBML();
+			manager = new KeggInfoManagement();
 		}
+		return manager;
 	}
 
 	/**
@@ -176,8 +182,8 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		try {
 			prefs = SBPreferences.getPreferencesFor(GUIOptions.class,
 					GUIOptions.CONFIG_FILE_LOCATION);
-			this.baseOpenDir = prefs.get(GUIOptions.OPEN_DIR);
-			this.baseSaveDir = prefs.get(GUIOptions.SAVE_DIR);
+			this.baseOpenDir = prefs.getString(GUIOptions.OPEN_DIR);
+			this.baseSaveDir = prefs.getString(GUIOptions.SAVE_DIR);
 			showGUI();
 		} catch (IOException exc) {
 			GUITools.showErrorMessage(this, exc, String.format(

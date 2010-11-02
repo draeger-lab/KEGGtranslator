@@ -26,6 +26,7 @@ import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
+import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -150,7 +151,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
    */
   public static int ET_Other2SBO = 285; // 285="material entity of unspecified nature"
   
-  
   /*===========================
    * CONSTRUCTORS
    * ===========================*/
@@ -168,6 +168,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
    */
   public KEGG2jSBML(KeggInfoManagement manager) {
     super(manager);
+    
+    loadPreferences();
   }
   
   /*===========================
@@ -240,6 +242,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
   /*===========================
    * FUNCTIONS
    * ===========================*/
+  
+  /** Load the default preferences from the SBPreferences object. */
+  private void loadPreferences() {
+  	addCellDesignerAnnots = TranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
+  }
   
   /**
    * Configures the SpeciesReference: Sets the name,

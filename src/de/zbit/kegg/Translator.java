@@ -1,11 +1,15 @@
 package de.zbit.kegg;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.prefs.BackingStoreException;
 
 import de.zbit.kegg.gui.TranslatorUI;
+import de.zbit.kegg.io.BatchKEGGtranslator;
+import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.SBPreferences;
+import de.zbit.util.SBProperties;
 
 /**
  * This class is the main class for the KEGGTranslator project.
@@ -27,7 +31,13 @@ public class Translator {
 		//defFileAndKeys.put(LaTeXOptions.CONFIG_FILE_LOCATION,LaTeXOptions.class);
 		//SBProperties props = SBPreferences.analyzeCommandLineArguments(defFileAndKeys, args);
 		
-		SBPreferences.analyzeCommandLineArguments(TranslatorOptions.class, args);
+		SBProperties props = SBPreferences.analyzeCommandLineArguments(TranslatorOptions.class, args);
+		System.out.println(props.getProperty("INPUT"));
+		System.out.println(TranslatorOptions.INPUT.getValue(props));
+		
+		// TODO: OUTPUT SHOULD BE NULL IF NOT SET IN COMMAND LINE ARGUMENTS.
+		System.out.println(props.getProperty("OUTPUT"));
+		System.out.println(TranslatorOptions.OUTPUT.getValue(props));
 		
 		// Demo
 		//PreferencesDialog d = new PreferencesDialog((Dialog)null);
@@ -38,9 +48,68 @@ public class Translator {
 		if (args.length<1) {
 			new TranslatorUI();
 		} else {
-			// TODO: Implement no-gui functionality.
+			translate(TranslatorOptions.FORMAT.getValue(props),
+				TranslatorOptions.INPUT.getValue(props),
+				TranslatorOptions.OUTPUT.getValue(props) );
 		}
 		
+	}
+	
+	/**
+	 * 
+	 * @param format - currently one of {SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}.
+	 * @param input - input file
+	 * @param output - output file
+	 * @return
+	 */
+	public static boolean translate(String format, File input, File output) {
+		
+		// Check and build input
+		File in = input; //new File(input);
+		if (!in.isFile() || !in.canRead()) {
+			System.err.println("Invalid or not-readable input file.");
+			return false;
+		}
+		
+		// Check and build output
+		File out = output; //output==null? null: new File(output);
+		if (out == null  || output.length()<1 || out.isDirectory()) {
+			out = new File(input.getPath() + '.' + format);
+			System.out.println("Writing to " + out);
+		}
+		if (!out.canWrite()) {
+			System.err.println("Cannot write to file " + out);
+			return false;
+		}
+		if (out.exists()) {
+			System.out.println("Overwriting exising file " + out);
+		}
+		
+		// Initiate the manager
+		KeggInfoManagement manager = TranslatorUI.getManager();
+		
+		// Check and build format
+		KEGGtranslator translator = BatchKEGGtranslator.getTranslator(format, manager);
+		if (translator==null) return false; // Error message already issued.
+		
+		// Translate.
+		if (in.isDirectory()) {
+		  BatchKEGGtranslator batch = new BatchKEGGtranslator();
+      batch.setOrgOutdir(in.getPath());
+      batch.setTranslator(translator);
+      if (output!=null && output.length()>0 && output.isDirectory()) {
+        batch.setChangeOutdirTo(output.getPath());
+      }
+      batch.parseDirAndSubDir();
+    } else {
+    	try {
+				translator.translate(in.getPath(), out.getPath());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    }
+			
+	  return true;
 	}
   
 }

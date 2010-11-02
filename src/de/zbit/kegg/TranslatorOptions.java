@@ -13,12 +13,6 @@ import de.zbit.util.Option;
  * @author Andreas Dr&auml;ger
  */
 public abstract interface TranslatorOptions {
-  
-  /**
-   * The path to the associated configuration file, which contains one default
-   * value for each option defined in this interface.
-   */
-  public static final String CONFIG_FILE_LOCATION = "cfg/KEGGtranslator.xml";
 
   /*
    * Most important options: input, output and file format.

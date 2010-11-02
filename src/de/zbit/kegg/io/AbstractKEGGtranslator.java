@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggTools;
+import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -26,7 +27,12 @@ import de.zbit.util.SBPreferences;
  * @author wrzodek
  */
 public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtranslator {
-
+	
+	/**
+	 * SBPreferences object to store all preferences for this class.
+	 */
+	protected SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class);
+	
   /**
    * Retrieve annotations from Kegg or use purely information available in the
    * document.
@@ -45,7 +51,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * NOTE: Only makes sense in KEGG2SBML (or non-graphic-based-converters).
    * Kegg2yGraph by default only considers realtions.
    * 
-   * REMARK: This is optiona is currently IGNORED!
+   * REMARK: This is option is currently IGNORED!
    */
   protected boolean considerRelations = true;
   
@@ -91,24 +97,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected boolean lastFileWasOverwritten = false;
   
   /**
-   * ProgressBar for Kegg2xConversion
+   * ProgressBar for Kegg2x translation
    */
   protected AbstractProgressBar progress=null;
   
-  
-  private SBPreferences prefs;
-  
-  private void loadPreferences() {
-    /*try {
-      this.prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class, 
-          TranslatorOptions.CONFIG_FILE_LOCATION);
-    } catch (Exception e) {
-      // TODO: Defaults XML-Datei kaputt: Broken Jar File.
-      e.printStackTrace();
-    }
-    
-    removeOrphans=prefs.getBoolean(TranslatorOptions.REMOVE_ORPHANS);*/
-  }
   
   /*===========================
    * CONSTRUCTORS
@@ -227,6 +219,22 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   public void setProgressBar(AbstractProgressBar progressBar) {
     this.progress = progressBar;
   }
+  
+  
+  
+  /*===========================
+   * FUNCTIONS
+   * ===========================*/
+  
+  /** Load the default preferences from the SBPreferences object. */
+  private void loadPreferences() {
+  	removeOrphans = TranslatorOptions.REMOVE_ORPHANS.getValue(prefs);
+  	retrieveKeggAnnots = !TranslatorOptions.OFFLINE_MODE.getValue(prefs);
+  	removeWhiteNodes = TranslatorOptions.REMOVE_WHITE_GENE_NODES.getValue(prefs);
+  	autocompleteReactions = TranslatorOptions.AUTOCOMPLETE_REACTIONS.getValue(prefs);
+  	showShortNames = TranslatorOptions.SHORT_NAMES.getValue(prefs);
+  }
+  
   
   /**
    * Preprocesses the given pathway:

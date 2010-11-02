@@ -15,10 +15,6 @@ import de.zbit.util.SBPreferences;
  * @author wrzodek
  */
 public class GeneralOptionPanel extends PreferencesPanel {
-
-	/**
-   * 
-   */
 	private static final long serialVersionUID = 6273038303582557299L;
 
 	/**
@@ -70,8 +66,7 @@ public class GeneralOptionPanel extends PreferencesPanel {
 	 */
 	@Override
 	protected SBPreferences loadPreferences() throws IOException {
-		return SBPreferences.getPreferencesFor(TranslatorOptions.class,
-				TranslatorOptions.CONFIG_FILE_LOCATION);
+		return SBPreferences.getPreferencesFor(TranslatorOptions.class);
 	}
 
 	/*
