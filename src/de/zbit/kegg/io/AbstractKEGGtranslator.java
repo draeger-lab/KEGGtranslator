@@ -17,7 +17,7 @@ import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.ProgressBar;
-import de.zbit.util.SBPreferences;
+import de.zbit.util.prefs.SBPreferences;
 
 
 /**

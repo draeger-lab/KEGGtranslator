@@ -32,14 +32,14 @@ import de.zbit.gui.ActionCommand;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.ImageTools;
+import de.zbit.gui.ProgressBarSwing;
 import de.zbit.gui.VerticalLayout;
 import de.zbit.gui.cfg.PreferencesDialog;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGGtranslator;
-import de.zbit.util.ProgressBarSwing;
-import de.zbit.util.SBPreferences;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * @author Andreas Dr&auml;ger
@@ -180,17 +180,12 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		super();
 		addWindowListener(this);
 		try {
-			prefs = SBPreferences.getPreferencesFor(GUIOptions.class,
-					GUIOptions.CONFIG_FILE_LOCATION);
+			prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
 			this.baseOpenDir = prefs.getString(GUIOptions.OPEN_DIR);
 			this.baseSaveDir = prefs.getString(GUIOptions.SAVE_DIR);
 			showGUI();
 		} catch (IOException exc) {
-			GUITools.showErrorMessage(this, exc, String.format(
-					"Cannot read configuration file %s.",
-					GUIOptions.CONFIG_FILE_LOCATION));
-			dispose();
-			System.exit(1);
+      // Impossible.
 		} catch (SBMLException exc) {
 			GUITools.showErrorMessage(this, exc);
 			dispose();

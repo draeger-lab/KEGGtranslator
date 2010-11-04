@@ -9,7 +9,7 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 
 import de.zbit.kegg.TranslatorOptions;
-import de.zbit.util.SBPreferences;
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * @author wrzodek
@@ -56,7 +56,7 @@ public class GeneralOptionPanel extends PreferencesPanel {
 	@Override
 	public void init() {
 		autoBuildPanel();
-		getJComponentForOption(TranslatorOptions.REMOVE_ORPHANS);
+		//getJComponentForOption(TranslatorOptions.REMOVE_ORPHANS);
 	}
 
 	/*

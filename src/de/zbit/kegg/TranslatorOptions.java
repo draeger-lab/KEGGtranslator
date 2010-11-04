@@ -6,17 +6,28 @@ package de.zbit.kegg;
 
 import java.io.File;
 
-import de.zbit.util.Option;
+import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.Option;
 
 /**
  * @author wrzodek
  * @author Andreas Dr&auml;ger
  */
-public abstract interface TranslatorOptions {
+public abstract interface TranslatorOptions extends KeyProvider {
 
   /*
    * Most important options: input, output and file format.
    */
+
+  public static final Option<Character> DEMO_CHAR = new Option<Character>("DEMO_CHAR",Character.class,
+      "Path and name of the source, KGML formatted, XML-file.", (short) 2, "-c", ',');
+  
+  public static final Option<String> DEMO_STRING = new Option<String>("DEMO_STRING",String.class,
+      "Path and name of the source, KGML formatted, XML-file.", (short) 2, "-str", "DefaultString");
+
+  public static final Option<Double> DEMO_NUMBER = new Option<Double>("DEMO_NUMBER",Double.class,
+      "Path and name of the source, KGML formatted, XML-file.", (short) 2, "-dnasfr", 5.0);
+  
   
   public static final Option<File> INPUT = new Option<File>("INPUT",File.class,
       "Path and name of the source, KGML formatted, XML-file.", (short) 2, "-i", new File(System.getProperty("user.dir")));
@@ -25,7 +36,8 @@ public abstract interface TranslatorOptions {
       "Path and name, where the translated file should be put.", (short) 2, "-o", new File(System.getProperty("user.dir")));
 
   public static final Option<String> FORMAT = new Option<String>("FORMAT",String.class,
-      "Target file format for the translation.","{SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}" ,(short) 2, "-f", "SBML");
+      "Target file format for the translation.",Option.buildRange(String.class, "{SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}"),
+      (short) 2, "-f", "SBML");
   
   /*
    * Generic translation options

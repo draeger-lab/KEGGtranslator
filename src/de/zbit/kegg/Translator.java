@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.prefs.BackingStoreException;
 
 import de.zbit.gui.GUIOptions;
+import de.zbit.gui.cfg.PreferencesDialog;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.BatchKEGGtranslator;
-import de.zbit.kegg.io.KEGG2jSBML;
-import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslator;
-import de.zbit.util.SBPreferences;
-import de.zbit.util.SBProperties;
+import de.zbit.util.prefs.SBPreferences;
+import de.zbit.util.prefs.SBProperties;
 
 /**
  * This class is the main class for the KEGGTranslator project.
@@ -40,10 +39,11 @@ public class Translator {
 		
 		// Demo
 		//PreferencesDialog d = new PreferencesDialog((Dialog)null);
-		//PreferencesDialog.showPreferencesDialog();
+		//GUITools.initLaF("");
+		PreferencesDialog.showPreferencesDialog(TranslatorOptions.class);
 		
 		// Should we start the GUI?
-		if (args.length<1 || (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props)) ) {
+		if (true || args.length<1 || (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props)) ) {
 			new TranslatorUI();
 		} else {
 			translate(TranslatorOptions.FORMAT.getValue(props),
