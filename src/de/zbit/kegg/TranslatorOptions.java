@@ -6,8 +6,11 @@ package de.zbit.kegg;
 
 import java.io.File;
 
+import de.zbit.io.SBFileFilter;
+import de.zbit.kegg.gui.FileFilterKGML;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.Range;
 
 /**
  * @author wrzodek
@@ -30,7 +33,7 @@ public abstract interface TranslatorOptions extends KeyProvider {
   
   
   public static final Option<File> INPUT = new Option<File>("INPUT",File.class,
-      "Path and name of the source, KGML formatted, XML-file.", (short) 2, "-i", new File(System.getProperty("user.dir")));
+      "Path and name of the source, KGML formatted, XML-file.", new Range<File>(File.class,new FileFilterKGML()), (short) 2, "-i", new File(System.getProperty("user.dir")));
 
   public static final Option<File> OUTPUT = new Option<File>("OUTPUT",File.class,
       "Path and name, where the translated file should be put.", (short) 2, "-o", new File(System.getProperty("user.dir")));

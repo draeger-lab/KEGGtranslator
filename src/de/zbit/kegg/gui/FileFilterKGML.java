@@ -5,6 +5,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
+import de.zbit.io.GeneralFileFilter;
 import de.zbit.io.OpenFile;
 
 /**
@@ -13,7 +14,7 @@ import de.zbit.io.OpenFile;
  * 
  * @author Andreas Dr&auml;ger
  */
-public class FileFilterKGML extends FileFilter implements java.io.FileFilter {
+public class FileFilterKGML extends GeneralFileFilter {
 
     /**
      * The maximal number of lines to check for characteristic identifier in
