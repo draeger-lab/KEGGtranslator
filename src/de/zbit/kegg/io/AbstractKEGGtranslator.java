@@ -192,6 +192,23 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   }
   
   /**
+   * See {@link #autocompleteReactions}
+   * @return 
+   */
+  public boolean isAutocompleteReactions() {
+    return autocompleteReactions;
+  }
+
+  /**
+   * See {@link #autocompleteReactions}
+   * @param 
+   */
+  public void setAutocompleteReactions(boolean autocompleteReactions) {
+    this.autocompleteReactions = autocompleteReactions;
+  }
+
+
+  /**
    * See {@link #manager}
    * @param manager
    */
