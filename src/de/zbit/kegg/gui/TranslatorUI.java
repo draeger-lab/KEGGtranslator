@@ -46,10 +46,10 @@ import de.zbit.util.prefs.SBPreferences;
  */
 public class TranslatorUI extends JFrame implements ActionListener,
 		WindowListener {
-
+	
 	/**
-	 * This is a enumeration of all possible commands this
-	 * {@link ActionListener} can process.
+	 * This is a enumeration of all possible commands this {@link ActionListener}
+	 * can process.
 	 * 
 	 * @author Andreas Dr&auml;ger
 	 */
@@ -74,7 +74,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		 * {@link Command} for LaTeX export.
 		 */
 		TO_LATEX;
-
+		
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -82,21 +82,21 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		 */
 		public String getName() {
 			switch (this) {
-			case OPEN_FILE:
-				return "Open";
-			case SAVE_FILE:
-				return "Save";
-			case TO_LATEX:
-				return "Export to LaTeX";
-			case PREFERENCES:
-				return "Preferences";
-			case EXIT:
-				return "Exit";
-			default:
-				return "Unknown";
+				case OPEN_FILE:
+					return "Open";
+				case SAVE_FILE:
+					return "Save";
+				case TO_LATEX:
+					return "Export to LaTeX";
+				case PREFERENCES:
+					return "Preferences";
+				case EXIT:
+					return "Exit";
+				default:
+					return "Unknown";
 			}
 		}
-
+		
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -104,33 +104,33 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		 */
 		public String getToolTip() {
 			switch (this) {
-			case OPEN_FILE:
-				return "Opens a new KEGG file.";
-			case SAVE_FILE:
-				return "Saves the currently opened model in one of the available formats.";
-			case TO_LATEX:
-				return "Converts the currently opened model to a LaTeX report file.";
-			case PREFERENCES:
-				return "Opens a dialog to configure all options for this program.";
-			case EXIT:
-				return "Closes this program.";
-			default:
-				return "Unknown";
+				case OPEN_FILE:
+					return "Opens a new KEGG file.";
+				case SAVE_FILE:
+					return "Saves the currently opened model in one of the available formats.";
+				case TO_LATEX:
+					return "Converts the currently opened model to a LaTeX report file.";
+				case PREFERENCES:
+					return "Opens a dialog to configure all options for this program.";
+				case EXIT:
+					return "Closes this program.";
+				default:
+					return "Unknown";
 			}
 		}
 	}
-
+	
 	/**
-	 * Speedup Kegg2SBML by loading already queried objects. Reduces network
-	 * load and heavily reduces computation time.
+	 * Speedup Kegg2SBML by loading already queried objects. Reduces network load
+	 * and heavily reduces computation time.
 	 */
 	private static KEGG2jSBML k2s;
-
+	
 	/**
 	 * Generated serial version id
 	 */
 	private static final long serialVersionUID = -3833481758555783529L;
-
+	
 	static {
 		ImageTools.initImages(TranslatorUI.class.getResource("img"));
 		GUITools.initLaF(KEGGtranslator.appName);
@@ -138,7 +138,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		KeggInfoManagement manager = getManager();
 		k2s = new KEGG2jSBML(manager);
 	}
-
+	
 	public static KeggInfoManagement getManager() {
 		KeggInfoManagement manager;
 		if (new File(KEGGtranslator.cacheFileName).exists()
@@ -155,7 +155,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		}
 		return manager;
 	}
-
+	
 	/**
 	 * Basis directory when opening files.
 	 */
@@ -172,7 +172,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 * The user's configuration.
 	 */
 	private SBPreferences prefs;
-
+	
 	/**
 	 * Shows a small GUI.
 	 */
@@ -192,7 +192,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 			System.exit(1);
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -201,42 +201,42 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 */
 	public void actionPerformed(ActionEvent e) {
 		switch (Command.valueOf(e.getActionCommand())) {
-		case OPEN_FILE:
-			// Translate KEGG file to SBML document.
-			if (isVisible()) {
-				setVisible(false);
-				removeAll();
-			}
-			try {
-				doc = translate(openFile());
-				showGUI();
-			} catch (Throwable exc) {
-				GUITools.showErrorMessage(this, exc);
-			}
-			break;
-		case SAVE_FILE:
-			saveFile();
-			break;
-		case TO_LATEX:
-			new LaTeXExportDialog(this, doc);
-			break;
-		case PREFERENCES:
-			PreferencesDialog.showPreferencesDialog();
-			break;
-		case EXIT:
-			dispose();
-			try {
-				prefs.flush();
-			} catch (BackingStoreException exc) {
-				GUITools.showErrorMessage(this, exc);
-			}
-			System.exit(0);
-		default:
-			System.err.printf("unsuported action: %s\n", e.getActionCommand());
-			break;
+			case OPEN_FILE:
+				// Translate KEGG file to SBML document.
+				if (isVisible()) {
+					setVisible(false);
+					removeAll();
+				}
+				try {
+					doc = translate(openFile());
+					showGUI();
+				} catch (Throwable exc) {
+					GUITools.showErrorMessage(this, exc);
+				}
+				break;
+			case SAVE_FILE:
+				saveFile();
+				break;
+			case TO_LATEX:
+				new LaTeXExportDialog(this, doc);
+				break;
+			case PREFERENCES:
+				PreferencesDialog.showPreferencesDialog();
+				break;
+			case EXIT:
+				dispose();
+				try {
+					prefs.flush();
+				} catch (BackingStoreException exc) {
+					GUITools.showErrorMessage(this, exc);
+				}
+				System.exit(0);
+			default:
+				System.err.printf("unsuported action: %s\n", e.getActionCommand());
+				break;
 		}
 	}
-
+	
 	/**
 	 * Creates a JMenuBar for this component that provides access to all Actions
 	 * definied in the enum Command.
@@ -253,16 +253,16 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		menu.add(GUITools.createJMenuItem(this, Command.EXIT));
 		bar.add(menu);
 		bar.add(GUITools.createJMenu("Edit", GUITools.createJMenuItem(this,
-				Command.PREFERENCES)));
+			Command.PREFERENCES)));
 		return bar;
 	}
-
+	
 	/**
 	 * Create and display a temporary loading panel with the given message and a
 	 * progress bar.
 	 * 
 	 * @param loadingMessage
-	 *            - the Message to display.
+	 *        - the Message to display.
 	 * @return JDialog
 	 */
 	private JDialog createLoadingJPanel(String loadingMessage) {
@@ -270,21 +270,21 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		Dimension panelSize = new java.awt.Dimension(400, 75);
 		JPanel p = new JPanel(new VerticalLayout());
 		p.setPreferredSize(panelSize);
-
+		
 		// Create the label and progressBar
 		JLabel jl = new JLabel(loadingMessage);
 		Font font = new java.awt.Font("Tahoma", Font.PLAIN, 12);
 		jl.setFont(font);
-
+		
 		JProgressBar prog = new JProgressBar();
 		prog.setPreferredSize(new Dimension(panelSize.width - 20,
-				panelSize.height / 4));
+			panelSize.height / 4));
 		p.add(jl, BorderLayout.NORTH);
 		p.add(prog, BorderLayout.CENTER);
-
+		
 		// Link the progressBar to the keggConverter
 		k2s.setProgressBar(new ProgressBarSwing(prog));
-
+		
 		// Display the panel in an jFrame
 		JDialog f = new JDialog();
 		f.setTitle(KEGGtranslator.appName);
@@ -294,16 +294,16 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		f.setLocationRelativeTo(null);
 		f.setVisible(true);
 		f.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-
+		
 		return f;
 	}
-
+	
 	/**
 	 * Open and display a KGML file.
 	 */
 	private File openFile() {
 		File file = GUITools.openFileDialog(this, baseOpenDir, false, false,
-				JFileChooser.FILES_ONLY, new FileFilterKGML());
+			JFileChooser.FILES_ONLY, new FileFilterKGML());
 		if (file != null) {
 			baseOpenDir = file.getParent();
 			prefs.put(GUIOptions.OPEN_DIR, baseOpenDir);
@@ -314,28 +314,27 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		}
 		return new File(baseOpenDir);
 	}
-
+	
 	/**
 	 * Save a conversion result to a file
 	 */
 	private void saveFile() {
 		if (isVisible() && (doc != null)) {
-			File file = GUITools.saveFileDialog(this, baseSaveDir, false,
-					false, JFileChooser.FILES_ONLY,
-					SBFileFilter.SBML_FILE_FILTER);
+			File file = GUITools.saveFileDialog(this, baseSaveDir, false, false,
+				JFileChooser.FILES_ONLY, SBFileFilter.SBML_FILE_FILTER);
 			if (file != null) {
 				try {
 					baseSaveDir = file.getParent();
 					prefs.put(GUIOptions.SAVE_DIR, baseSaveDir);
 					SBMLWriter.write(doc, file, "SBML from KEGG",
-							KEGG2jSBML.VERSION_NUMBER);
+						KEGG2jSBML.VERSION_NUMBER);
 				} catch (Throwable exc) {
 					GUITools.showErrorMessage(this, exc);
 				}
 			}
 		}
 	}
-
+	
 	/**
 	 * Displays an overview of the result of a conversion.
 	 * 
@@ -356,7 +355,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
-
+	
 	/**
 	 * This method translates a given KGML file into an SBMLDocument by calling
 	 * the dedicated method in {@link KEGG2jSBML}.
@@ -367,13 +366,13 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	private SBMLDocument translate(File f) {
 		JDialog load = null;
 		try {
-			load = createLoadingJPanel("Translating kegg pathway "
-					+ f.getName() + "...");
+			load = createLoadingJPanel("Translating kegg pathway " + f.getName()
+					+ "...");
 			this.doc = k2s.translate(f);
 			return doc;
 		} catch (Throwable exc) {
 			GUITools.showErrorMessage(this, exc, String.format(
-					"Could not read input file %s.", f.getAbsolutePath()));
+				"Could not read input file %s.", f.getAbsolutePath()));
 		} finally {
 			if (load != null) {
 				load.dispose();
@@ -381,7 +380,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		}
 		return null;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -390,16 +389,15 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 */
 	public void windowActivated(WindowEvent e) {
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
 	 */
 	public void windowClosed(WindowEvent e) {
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -413,7 +411,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 			GUITools.showErrorMessage(this, exc);
 		}
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -423,7 +421,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 */
 	public void windowDeactivated(WindowEvent e) {
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -433,7 +431,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 */
 	public void windowDeiconified(WindowEvent e) {
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -442,14 +440,13 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 */
 	public void windowIconified(WindowEvent e) {
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
 	public void windowOpened(WindowEvent e) {
 	}
-
+	
 }

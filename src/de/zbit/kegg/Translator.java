@@ -43,7 +43,8 @@ public class Translator {
 		PreferencesDialog.showPreferencesDialog(TranslatorOptions.class);
 		
 		// Should we start the GUI?
-		if (true || args.length<1 || (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props)) ) {
+		if ((args.length < 1)
+				|| (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props))) {
 			new TranslatorUI();
 		} else {
 			translate(TranslatorOptions.FORMAT.getValue(props),

@@ -4,9 +4,7 @@
 package de.zbit.gui.cfg;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.InvalidPropertiesFormatException;
-import java.util.List;
 
 import de.zbit.kegg.TranslatorOptions;
 import de.zbit.util.prefs.SBPreferences;
@@ -67,17 +65,6 @@ public class GeneralOptionPanel extends PreferencesPanel {
 	@Override
 	protected SBPreferences loadPreferences() throws IOException {
 		return SBPreferences.getPreferencesFor(TranslatorOptions.class);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.cfg.PreferencesPanel#checkPreferences()
-	 */
-	@Override
-	public List<String> checkPreferences() {
-		// TODO Auto-generated method stub
-		return new ArrayList<String>(0);
 	}
 
 }
