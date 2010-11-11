@@ -40,7 +40,7 @@ public class Translator {
 		// Demo
 		//PreferencesDialog d = new PreferencesDialog((Dialog)null);
 		//GUITools.initLaF("");
-		PreferencesDialog.showPreferencesDialog(TranslatorOptions.class);
+//		PreferencesDialog.showPreferencesDialog(TranslatorOptions.class);
 		
 		// Should we start the GUI?
 		if ((args.length < 1)
