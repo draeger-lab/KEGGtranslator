@@ -4,74 +4,89 @@
 package de.zbit.kegg.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.prefs.BackingStoreException;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 
+import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
-import org.sbml.jsbml.xml.stax.SBMLWriter;
+import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.gui.LaTeXExportDialog;
+import org.sbml.tolatex.io.LaTeXOptionsIO;
 
 import de.zbit.gui.ActionCommand;
-import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.ImageTools;
-import de.zbit.gui.ProgressBarSwing;
-import de.zbit.gui.VerticalLayout;
 import de.zbit.gui.cfg.PreferencesDialog;
 import de.zbit.io.SBFileFilter;
-import de.zbit.kegg.KeggInfoManagement;
-import de.zbit.kegg.io.KEGG2jSBML;
-import de.zbit.kegg.io.KEGGtranslator;
+import de.zbit.kegg.TranslatorOptions;
+import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
  * @author Andreas Dr&auml;ger
+ * @date 2010-11-12
  */
-public class TranslatorUI extends JFrame implements ActionListener,
-		WindowListener {
+public class TranslatorUI extends JFrame implements ActionListener {
 	
 	/**
-	 * This is a enumeration of all possible commands this {@link ActionListener}
-	 * can process.
 	 * 
 	 * @author Andreas Dr&auml;ger
+	 * @date 2010-11-12
 	 */
-	public static enum Command implements ActionCommand {
+	public static enum Action implements ActionCommand {
 		/**
-		 * {@link Command} that closes the program.
+		 * {@link Action} that closes the program.
 		 */
 		EXIT,
 		/**
-		 * {@link Command} to open a file.
+		 * {@link Action} that show the online help.
+		 */
+		HELP,
+		/**
+		 * This {@link Action} shows the people in charge for this program.
+		 */
+		HELP_ABOUT,
+		/**
+		 * {@link Action} that displays the license of this program.
+		 */
+		HELP_LICENSE,
+		/**
+		 * {@link Action} to open a file.
 		 */
 		OPEN_FILE,
 		/**
-		 * {@link Command} to configure the user's preferences.
+		 * {@link Action} to close a model that has been added to the
+		 * {@link JTabbedPane}.
+		 */
+		CLOSE_MODEL,
+		/**
+		 * {@link Action} to configure the user's preferences.
 		 */
 		PREFERENCES,
 		/**
-		 * {@link Command} to save the conversion result to a file.
+		 * {@link Action} to save the conversion result to a file.
 		 */
 		SAVE_FILE,
 		/**
-		 * {@link Command} for LaTeX export.
+		 * {@link Action} for LaTeX export.
 		 */
 		TO_LATEX;
 		
@@ -84,6 +99,8 @@ public class TranslatorUI extends JFrame implements ActionListener,
 			switch (this) {
 				case OPEN_FILE:
 					return "Open";
+				case CLOSE_MODEL:
+					return "Close";
 				case SAVE_FILE:
 					return "Save";
 				case TO_LATEX:
@@ -92,6 +109,12 @@ public class TranslatorUI extends JFrame implements ActionListener,
 					return "Preferences";
 				case EXIT:
 					return "Exit";
+				case HELP:
+					return "Online Help";
+				case HELP_ABOUT:
+					return "About";
+				case HELP_LICENSE:
+					return "License";
 				default:
 					return "Unknown";
 			}
@@ -106,6 +129,8 @@ public class TranslatorUI extends JFrame implements ActionListener,
 			switch (this) {
 				case OPEN_FILE:
 					return "Opens a new KEGG file.";
+				case CLOSE_MODEL:
+					return "Closes the currently opened model.";
 				case SAVE_FILE:
 					return "Saves the currently opened model in one of the available formats.";
 				case TO_LATEX:
@@ -114,6 +139,12 @@ public class TranslatorUI extends JFrame implements ActionListener,
 					return "Opens a dialog to configure all options for this program.";
 				case EXIT:
 					return "Closes this program.";
+				case HELP:
+					return "Displays the online help";
+				case HELP_ABOUT:
+					return "This shows who to contact if you encounter any problems with this program.";
+				case HELP_LICENSE:
+					return "Here you can see the license terms unter which this program is distributed.";
 				default:
 					return "Unknown";
 			}
@@ -121,76 +152,53 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	}
 	
 	/**
-	 * Speedup Kegg2SBML by loading already queried objects. Reduces network load
-	 * and heavily reduces computation time.
+	 * Generated serial version identifier.
 	 */
-	private static KEGG2jSBML k2s;
-	
-	/**
-	 * Generated serial version id
-	 */
-	private static final long serialVersionUID = -3833481758555783529L;
+	private static final long serialVersionUID = 6631262606716052915L;
 	
 	static {
+		ImageTools.initImages(LaTeXExportDialog.class.getResource("img"));
 		ImageTools.initImages(TranslatorUI.class.getResource("img"));
-		GUITools.initLaF(KEGGtranslator.appName);
-		
-		KeggInfoManagement manager = getManager();
-		k2s = new KEGG2jSBML(manager);
-	}
-	
-	public static KeggInfoManagement getManager() {
-		KeggInfoManagement manager;
-		if (new File(KEGGtranslator.cacheFileName).exists()
-				&& new File(KEGGtranslator.cacheFileName).length() > 0) {
-			try {
-				manager = (KeggInfoManagement) KeggInfoManagement
-						.loadFromFilesystem(KEGGtranslator.cacheFileName);
-			} catch (IOException e) {
-				e.printStackTrace();
-				manager = new KeggInfoManagement();
-			}
-		} else {
-			manager = new KeggInfoManagement();
-		}
-		return manager;
+		GUITools.initLaF("KEGGtranslator");
 	}
 	
 	/**
-	 * Basis directory when opening files.
+	 * Default directory path's for saving and opening files.
 	 */
-	private String baseOpenDir;
+	private String openDir, saveDir;
 	/**
-	 * Basis directory when saving files.
+	 * This is where we place all the converted models.
 	 */
-	private String baseSaveDir;
-	/**
-	 * The SBML document as a result of a successful conversion.
-	 */
-	private SBMLDocument doc;
-	/**
-	 * The user's configuration.
-	 */
-	private SBPreferences prefs;
+	private JTabbedPane tabbedPane;
 	
 	/**
-	 * Shows a small GUI.
+	 * 
 	 */
 	public TranslatorUI() {
-		super();
-		addWindowListener(this);
-		try {
-			prefs = SBPreferences.getPreferencesFor(GUIOptions.class);
-			this.baseOpenDir = prefs.getString(GUIOptions.OPEN_DIR);
-			this.baseSaveDir = prefs.getString(GUIOptions.SAVE_DIR);
-			showGUI();
-		} catch (IOException exc) {
-      // Impossible.
-		} catch (SBMLException exc) {
-			GUITools.showErrorMessage(this, exc);
-			dispose();
-			System.exit(1);
-		}
+		super("KEGGtranslator");
+		
+		// init preferences
+		SBPreferences prefs = SBPreferences
+				.getPreferencesFor(TranslatorOptions.class);
+		File file = new File(prefs.get(TranslatorOptions.INPUT));
+		this.openDir = file.isDirectory() ? file.getAbsolutePath() : file
+				.getParent();
+		file = new File(prefs.get(TranslatorOptions.OUTPUT));
+		this.saveDir = file.isDirectory() ? file.getAbsolutePath() : file
+				.getParent();
+		
+		// init GUI
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setJMenuBar(generateJMenuBar());
+		
+		Container container = getContentPane();
+		container.setLayout(new BorderLayout());
+		tabbedPane = new JTabbedPane();
+		container.add(tabbedPane, BorderLayout.CENTER);
+		
+		pack();
+		setMinimumSize(new Dimension(640, 480));
+		setLocationRelativeTo(null);
 	}
 	
 	/*
@@ -200,258 +208,212 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
-		switch (Command.valueOf(e.getActionCommand())) {
-			case OPEN_FILE:
-				// Translate KEGG file to SBML document.
-				if (isVisible()) {
-					setVisible(false);
-					removeAll();
-				}
-				try {
-					doc = translate(openFile());
-					showGUI();
-				} catch (Throwable exc) {
-				  exc.printStackTrace();
-					GUITools.showErrorMessage(this, exc);
-				}
-				break;
-			case SAVE_FILE:
-				saveFile();
-				break;
-			case TO_LATEX:
-				new LaTeXExportDialog(this, doc);
-				break;
-			case PREFERENCES:
-				PreferencesDialog.showPreferencesDialog();
-				break;
-			case EXIT:
-				dispose();
-				try {
-					prefs.flush();
-				} catch (BackingStoreException exc) {
-					GUITools.showErrorMessage(this, exc);
-				}
-				System.exit(0);
-			default:
-				System.err.printf("unsuported action: %s\n", e.getActionCommand());
-				break;
-		}
-	}
-	
-	/**
-	 * Creates a JMenuBar for this component that provides access to all Actions
-	 * definied in the enum Command.
-	 * 
-	 * @return
-	 */
-	private JMenuBar createJMenuBar() {
-		JMenuBar bar = new JMenuBar();
-		JMenu menu = new JMenu("File");
-		menu.add(GUITools.createJMenuItem(this, Command.OPEN_FILE));
-		menu.add(GUITools.createJMenuItem(this, Command.SAVE_FILE));
-		menu.add(GUITools.createJMenuItem(this, Command.TO_LATEX));
-		menu.addSeparator();
-		menu.add(GUITools.createJMenuItem(this, Command.EXIT));
-		bar.add(menu);
-		bar.add(GUITools.createJMenu("Edit", GUITools.createJMenuItem(this,
-			Command.PREFERENCES)));
-		return bar;
-	}
-	
-	/**
-	 * Create and display a temporary loading panel with the given message and a
-	 * progress bar.
-	 * 
-	 * @param loadingMessage
-	 *        - the Message to display.
-	 * @return JDialog
-	 */
-	private JDialog createLoadingJPanel(String loadingMessage) {
-		// Create the panel
-		Dimension panelSize = new java.awt.Dimension(400, 75);
-		JPanel p = new JPanel(new VerticalLayout());
-		p.setPreferredSize(panelSize);
-		
-		// Create the label and progressBar
-		JLabel jl = new JLabel(loadingMessage);
-		Font font = new java.awt.Font("Tahoma", Font.PLAIN, 12);
-		jl.setFont(font);
-		
-		JProgressBar prog = new JProgressBar();
-		prog.setPreferredSize(new Dimension(panelSize.width - 20,
-			panelSize.height / 4));
-		p.add(jl, BorderLayout.NORTH);
-		p.add(prog, BorderLayout.CENTER);
-		
-		// Link the progressBar to the keggConverter
-		k2s.setProgressBar(new ProgressBarSwing(prog));
-		
-		// Display the panel in an jFrame
-		JDialog f = new JDialog();
-		f.setTitle(KEGGtranslator.appName);
-		f.setSize(p.getPreferredSize());
-		f.setContentPane(p);
-		f.setPreferredSize(p.getPreferredSize());
-		f.setLocationRelativeTo(null);
-		f.setVisible(true);
-		f.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		
-		return f;
-	}
-	
-	/**
-	 * Open and display a KGML file.
-	 */
-	private File openFile() {
-		File file = GUITools.openFileDialog(this, baseOpenDir, false, false,
-			JFileChooser.FILES_ONLY, new FileFilterKGML());
-		if (file != null) {
-			baseOpenDir = file.getParent();
-			prefs.put(GUIOptions.OPEN_DIR, baseOpenDir);
-			return file;
-		} else {
-			dispose();
-			System.exit(0);
-		}
-		return new File(baseOpenDir);
-	}
-	
-	/**
-	 * Save a conversion result to a file
-	 */
-	private void saveFile() {
-		if (isVisible() && (doc != null)) {
-			File file = GUITools.saveFileDialog(this, baseSaveDir, false, false,
-				JFileChooser.FILES_ONLY, SBFileFilter.SBML_FILE_FILTER);
-			if (file != null) {
-				try {
-					baseSaveDir = file.getParent();
-					prefs.put(GUIOptions.SAVE_DIR, baseSaveDir);
-					SBMLWriter.write(doc, file, "SBML from KEGG",
-						KEGG2jSBML.VERSION_NUMBER);
-				} catch (Throwable exc) {
-					GUITools.showErrorMessage(this, exc);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Displays an overview of the result of a conversion.
-	 * 
-	 * @throws SBMLException
-	 * @throws IOException
-	 */
-	private void showGUI() throws SBMLException, IOException {
-		getContentPane().removeAll();
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setJMenuBar(createJMenuBar());
-		if (doc == null) {
-			// this.doc = translate(openFile());
-		} else {
-			getContentPane().
-			add(
-			  new SBMLModelSplitPane(
-			    doc.
-			    getModel()));
-			setTitle("SBML from KEGG " + doc.getModel().getId());
-		}
-		pack();
-		setLocationRelativeTo(null);
-		setVisible(true);
-	}
-	
-	/**
-	 * This method translates a given KGML file into an SBMLDocument by calling
-	 * the dedicated method in {@link KEGG2jSBML}.
-	 * 
-	 * @param f
-	 * @return
-	 */
-	private SBMLDocument translate(File f) {
-		JDialog load = null;
 		try {
-			load = createLoadingJPanel("Translating kegg pathway " + f.getName()
-					+ "...");
-			this.doc = k2s.translate(f);
-			return doc;
+			Action action = Action.valueOf(e.getActionCommand());
+			switch (action) {
+				case EXIT:
+					System.exit(0);
+				case OPEN_FILE:
+					openFile();
+					break;
+				case CLOSE_MODEL:
+					closeModel();
+					break;
+				case PREFERENCES:
+					PreferencesDialog.showPreferencesDialog();
+					break;
+				case SAVE_FILE:
+					saveFile();
+					break;
+				case TO_LATEX:
+					writeLaTeXReport(null);
+					break;
+				case HELP:
+					// TODO
+					JOptionPane.showMessageDialog(this, "TODO!");
+					break;
+				case HELP_ABOUT:
+					// TODO
+					JOptionPane.showMessageDialog(this, "TODO!");
+					break;
+				case HELP_LICENSE:
+					// TODO
+					JOptionPane.showMessageDialog(this, "TODO!");
+					break;
+				default:
+					System.out.println(action);
+					break;
+			}
 		} catch (Throwable exc) {
-			GUITools.showErrorMessage(this, exc, String.format(
-				"Could not read input file %s.", f.getAbsolutePath()));
-		} finally {
-			if (load != null) {
-				load.dispose();
-			}
-		}
-		return null;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
-	 */
-	public void windowActivated(WindowEvent e) {
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
-	 */
-	public void windowClosed(WindowEvent e) {
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
-	 */
-	public void windowClosing(WindowEvent e) {
-		try {
-			prefs.flush();
-		} catch (BackingStoreException exc) {
 			GUITools.showErrorMessage(this, exc);
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent
-	 * )
+	/**
+	 * Closes the currently selected model without saving if the user approves.
 	 */
-	public void windowDeactivated(WindowEvent e) {
+	private void closeModel() {
+		SBMLDocument doc = getSelectedDocument();
+		String title = null;
+		if (doc.isSetModel()) {
+			Model model = doc.getModel();
+			if (model.isSetName() || model.isSetId()) {
+				title = "model ";
+			}
+			if (model.isSetName()) {
+				title += model.getName();
+			} else if (model.isSetId()) {
+				title += model.getId();
+			}
+		}
+		if (title == null) {
+			title = "the currently selected SBML document";
+		}
+		if ((doc != null)
+				&& (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
+					StringUtil.toHTML(String.format(
+						"Do you really want to close %s without saving?", title), 60),
+					"Close selected document", JOptionPane.YES_NO_OPTION))) {
+			tabbedPane.remove(tabbedPane.getSelectedIndex());
+			if (tabbedPane.getTabCount() == 0) {
+				GUITools.setEnabled(false, getJMenuBar(), Action.SAVE_FILE,
+					Action.TO_LATEX, Action.CLOSE_MODEL);
+			}
+		}
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see
-	 * java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent
-	 * )
+	 * @return
 	 */
-	public void windowDeiconified(WindowEvent e) {
+	private JMenuBar generateJMenuBar() {
+		JMenuBar menuBar = new JMenuBar();
+		
+		/*
+		 * File menu
+		 */
+		JMenuItem openFile = GUITools.createJMenuItem(this, Action.OPEN_FILE,
+			UIManager.getIcon("ICON_OPEN"), KeyStroke.getKeyStroke('O',
+				InputEvent.CTRL_DOWN_MASK), 'O', true);
+		JMenuItem saveFile = GUITools.createJMenuItem(this, Action.SAVE_FILE,
+			UIManager.getIcon("ICON_SAVE"), KeyStroke.getKeyStroke('S',
+				InputEvent.CTRL_DOWN_MASK), 'S', false);
+		JMenuItem toLaTeX = GUITools.createJMenuItem(this, Action.TO_LATEX,
+			UIManager.getIcon("ICON_LATEX_TINY"), KeyStroke.getKeyStroke('E',
+				InputEvent.CTRL_DOWN_MASK), 'E', false);
+		JMenuItem close = GUITools.createJMenuItem(this, Action.CLOSE_MODEL, null,
+			KeyStroke.getKeyStroke('W', InputEvent.CTRL_DOWN_MASK), 'W', false);
+		JMenuItem exit = GUITools.createJMenuItem(this, Action.EXIT, KeyStroke
+				.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK));
+		menuBar.add(GUITools.createJMenu("File", openFile, saveFile, toLaTeX,
+			close, new JSeparator(), exit));
+		
+		/*
+		 * Edit menu
+		 */
+		JMenuItem preferences = GUITools.createJMenuItem(this, Action.PREFERENCES,
+			null, KeyStroke.getKeyStroke('E', InputEvent.ALT_GRAPH_DOWN_MASK), 'P',
+			true);
+		menuBar.add(GUITools.createJMenu("Edit", preferences));
+		
+		/*
+		 * Help menu
+		 */
+		JMenuItem help = GUITools.createJMenuItem(this, Action.HELP, UIManager
+				.getIcon("ICON_HELP_TINY"), KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+		JMenuItem about = GUITools.createJMenuItem(this, Action.HELP_ABOUT,
+			UIManager.getIcon("ICON_INFO_TINY"), KeyStroke.getKeyStroke(
+				KeyEvent.VK_F2, 0));
+		JMenuItem license = GUITools.createJMenuItem(this, Action.HELP_LICENSE,
+			UIManager.getIcon("ICON_LICENSE_TINY"), 'L');
+		JMenu helpMenu = GUITools.createJMenu("Help", help, about, license);
+		try {
+			menuBar.setHelpMenu(helpMenu);
+		} catch (Throwable exc) {
+			menuBar.add(helpMenu);
+		}
+		
+		return menuBar;
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see
-	 * java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+	 * @throws SBMLException
+	 * @throws IOException
 	 */
-	public void windowIconified(WindowEvent e) {
+	private void openFile() throws SBMLException, IOException {
+		File file = GUITools.openFileDialog(this, openDir, false, false,
+			JFileChooser.FILES_ONLY, new FileFilterKGML());
+		if (file != null) {
+			openDir = file.getParent();
+			SBMLDocument doc = translateFile(file);
+			String title = doc.isSetModel() && doc.getModel().isSetId() ? doc
+					.getModel().getId() : doc.toString();
+			tabbedPane.add(title, new SBMLModelSplitPane(doc));
+			GUITools.setEnabled(true, getJMenuBar(), Action.SAVE_FILE,
+				Action.TO_LATEX, Action.CLOSE_MODEL);
+		}
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
-	public void windowOpened(WindowEvent e) {
+	private void saveFile() {
+		File file = GUITools.saveFileDialog(this, saveDir, false, false, true,
+			JFileChooser.FILES_ONLY, SBFileFilter.SBML_FILE_FILTER,
+			SBFileFilter.IMAGE_FILE_FILTER, SBFileFilter.TeX_FILE_FILTER,
+			SBFileFilter.PDF_FILE_FILTER, SBFileFilter.TEXT_FILE_FILTER);
+		if (file != null) {
+			saveDir = file.getParent();
+			if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file)) {
+				writeLaTeXReport(file);
+			} else {
+				
+			}
+		}
 	}
 	
+	/**
+	 * 
+	 * @param file
+	 * @return
+	 */
+	private SBMLDocument translateFile(File file) {
+		// TODO Auto-generated method stub
+		SBMLDocument doc = new SBMLDocument(3, 1);
+		doc.createModel("model_" + (tabbedPane.getTabCount() + 1));
+		return doc;
+	}
+	
+	/**
+	 * 
+	 * @param targetFile
+	 *        can be null
+	 */
+	private void writeLaTeXReport(File targetFile) {
+		SBMLDocument doc = getSelectedDocument();
+		if ((doc != null) && LaTeXExportDialog.showDialog(this, doc, targetFile)) {
+			if (targetFile == null) {
+				SBPreferences prefsIO = SBPreferences
+						.getPreferencesFor(LaTeXOptionsIO.class);
+				targetFile = new File(prefsIO.get(LaTeXOptionsIO.REPORT_OUTPUT_FILE));
+			}
+			try {
+				SBML2LaTeX.convert(doc, targetFile, true);
+			} catch (Exception exc) {
+				GUITools.showErrorMessage(this, exc);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @return null if this GUI does not contain any {@link SBMLDocument}
+	 *         instances.
+	 */
+	private SBMLDocument getSelectedDocument() {
+		if (tabbedPane.getTabCount() > 0) { return ((SBMLModelSplitPane) tabbedPane
+				.getSelectedComponent()).getSBMLDocument(); }
+		return null;
+	}
 }
