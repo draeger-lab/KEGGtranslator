@@ -7,8 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
 
+import javax.swing.SwingUtilities;
+
 import de.zbit.gui.GUIOptions;
-import de.zbit.gui.cfg.PreferencesDialog;
+import de.zbit.kegg.gui.SBMLModelSplitPane;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
@@ -30,7 +32,7 @@ public class Translator {
    * @throws URISyntaxException 
    */
 	public static void main(String[] args) throws IOException, BackingStoreException, URISyntaxException {
-		
+		// --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
 		List<Class<?>> configList = new LinkedList<Class<?>>();
 		configList.add(TranslatorOptions.class);
 		configList.add(GUIOptions.class);
@@ -45,7 +47,11 @@ public class Translator {
 		// Should we start the GUI?
 		if ((args.length < 1)
 				|| (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props))) {
-			new TranslatorUI();
+		  SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
+	        new TranslatorUI();
+	      }
+	    });
 		} else {
 			translate(TranslatorOptions.FORMAT.getValue(props),
 				props.get(TranslatorOptions.INPUT),

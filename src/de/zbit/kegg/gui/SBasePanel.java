@@ -37,7 +37,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import org.jdom.JDOMException;
 import org.sbml.jsbml.AssignmentRule;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
@@ -71,7 +70,7 @@ import org.sbml.jsbml.util.StringTools;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeX;
 import org.sbml.tolatex.SBML2LaTeX;
-import org.sbml.tolatex.io.LaTeXExport;
+import org.sbml.tolatex.io.LaTeXReportGenerator;
 
 import atp.sHotEqn;
 import de.zbit.gui.LayoutHelper;
@@ -103,7 +102,7 @@ public class SBasePanel extends JPanel {
 
 	private int row;
 
-	private final LaTeXExport latexExport;
+	private final LaTeXReportGenerator latexExport;
 
 	/**
 	 * @param sbase
@@ -112,7 +111,7 @@ public class SBasePanel extends JPanel {
 	 */
 	public SBasePanel(SBase sbase) throws SBMLException, IOException {
 		super();
-		this.latexExport = new LaTeXExport();
+		this.latexExport = new LaTeXReportGenerator();
 		GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
 		latex = new LaTeX(false);
@@ -500,7 +499,6 @@ public class SBasePanel extends JPanel {
 	/**
 	 * @param sbase
 	 * @throws IOException
-	 * @throws JDOMException
 	 */
 	private void addProperties(SBase sbase) throws IOException {
 		lh.add(new JPanel(), 0, row, 1, 1, 0, 0);

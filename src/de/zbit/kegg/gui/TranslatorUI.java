@@ -211,6 +211,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 					doc = translate(openFile());
 					showGUI();
 				} catch (Throwable exc) {
+				  exc.printStackTrace();
 					GUITools.showErrorMessage(this, exc);
 				}
 				break;
@@ -348,7 +349,11 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		if (doc == null) {
 			// this.doc = translate(openFile());
 		} else {
-			getContentPane().add(new SBMLModelSplitPane(doc.getModel()));
+			getContentPane().
+			add(
+			  new SBMLModelSplitPane(
+			    doc.
+			    getModel()));
 			setTitle("SBML from KEGG " + doc.getModel().getId());
 		}
 		pack();
