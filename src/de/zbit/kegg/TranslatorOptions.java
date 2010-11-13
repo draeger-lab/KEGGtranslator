@@ -6,7 +6,6 @@ package de.zbit.kegg;
 
 import java.io.File;
 
-import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.gui.FileFilterKGML;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;

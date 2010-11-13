@@ -36,7 +36,7 @@ import de.zbit.gui.GUITools;
 import de.zbit.gui.ImageTools;
 import de.zbit.gui.ProgressBarSwing;
 import de.zbit.gui.VerticalLayout;
-import de.zbit.gui.cfg.PreferencesDialog;
+import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.io.KEGG2jSBML;
