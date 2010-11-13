@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.zbit.kegg.extensions;
+package de.zbit.kegg.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
