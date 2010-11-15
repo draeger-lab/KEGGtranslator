@@ -61,12 +61,9 @@ public class Translator {
 	
 	/**
 	 * 
-	 * @param format
-	 *        - currently one of {SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}.
-	 * @param input
-	 *        - input file
-	 * @param output
-	 *        - output file
+	 * @param format - currently one of {SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}.
+	 * @param input - input file
+	 * @param output - output file
 	 * @return
 	 * @throws IOException
 	 */
@@ -84,8 +81,7 @@ public class Translator {
 		KeggInfoManagement manager = getManager();
 		
 		// Check and build format
-		KEGGtranslator translator = BatchKEGGtranslator.getTranslator(format,
-			manager);
+		KEGGtranslator translator = BatchKEGGtranslator.getTranslator(format, manager);
 		if (translator == null) return false; // Error message already issued.
 			
 		// Check and build output

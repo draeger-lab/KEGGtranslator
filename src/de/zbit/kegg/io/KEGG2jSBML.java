@@ -18,6 +18,9 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
+import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.SBaseChangedEvent;
+import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.CVTerm.Qualifier;
@@ -47,7 +50,7 @@ import de.zbit.util.Utils;
  * XXX: Important to know: subtype.setValue contains replacement of &gt; to > !!!
  * TODO: Edges (sub types of relations) now may have colors.
  */
-public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> {
+public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements SBaseChangedListener {
   
   /**
    * Generate pure SBML or do you want to add CellDesigner annotations?
@@ -305,6 +308,7 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     int level = 2;
     int version = 4;
     SBMLDocument doc = new SBMLDocument(level, version);
+    doc.addChangeListener(this);
     
     // Reset lists and buffers.
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
@@ -490,7 +494,9 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     
     org.sbml.jsbml.Reaction sbReaction = model.createReaction();
     sbReaction.initDefaults();
-    sbReaction.setCompartment(compartment);
+    if (sbReaction.getLevel()>=3) {
+      sbReaction.setCompartment(compartment);
+    }
     Annotation rAnnot = new Annotation("");
     rAnnot.setAbout("");
     sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheuert... (Annotation darf nicht null sein, ist aber default null).
@@ -1141,4 +1147,25 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
   }
   
+    /* (non-Javadoc)
+     * @see org.sbml.jsbml.SBaseChangedListener#sbaseAdded(org.sbml.jsbml.SBase)
+     */
+    public void sbaseAdded(SBase sb) {
+      System.out.println("[ADD] " + sb.toString());
+    }
+
+    /* (non-Javadoc)
+     * @see org.sbml.jsbml.SBaseChangedListener#sbaseRemoved(org.sbml.jsbml.SBase)
+     */
+    public void sbaseRemoved(SBase sb) {
+      System.out.println("[RMV] " + sb.toString());
+    }
+
+    /* (non-Javadoc)
+     * @see org.sbml.jsbml.SBaseChangedListener#stateChanged(org.sbml.jsbml.SBaseChangedEvent)
+     */
+    public void stateChanged(SBaseChangedEvent ev) {
+      System.out.println("[CHG] " + ev.toString());
+    }
+    
 }

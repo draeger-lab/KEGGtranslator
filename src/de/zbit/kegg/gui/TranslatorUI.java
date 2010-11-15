@@ -33,6 +33,9 @@ import javax.swing.UIManager;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
+import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.SBaseChangedEvent;
+import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 import org.sbml.tolatex.io.LaTeXOptionsIO;
@@ -46,7 +49,10 @@ import de.zbit.gui.JHelpBrowser;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.io.SBFileFilter;
+import de.zbit.kegg.Translator;
 import de.zbit.kegg.TranslatorOptions;
+import de.zbit.kegg.io.AbstractKEGGtranslator;
+import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
@@ -421,12 +427,18 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 * 
 	 * @param file
 	 * @return
+	 * @throws IOException 
 	 */
-	private SBMLDocument translateFile(File file) {
+	@SuppressWarnings("unchecked")
+  private SBMLDocument translateFile(File file) throws IOException {
 		// TODO Auto-generated method stub
-		SBMLDocument doc = new SBMLDocument(3, 1);
-		doc.createModel("model_" + (tabbedPane.getTabCount() + 1));
-		return doc;
+		//SBMLDocument doc = new SBMLDocument(3, 1);
+		//doc.createModel("model_" + (tabbedPane.getTabCount() + 1));
+    //return doc;
+	  
+	  AbstractKEGGtranslator<SBMLDocument> translator = (AbstractKEGGtranslator<SBMLDocument>)
+	    BatchKEGGtranslator.getTranslator("sbml", Translator.getManager());
+	  return translator.translate(file);
 	}
 	
 	/**
@@ -515,4 +527,5 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 */
 	public void windowOpened(WindowEvent we) {
 	}
+
 }
