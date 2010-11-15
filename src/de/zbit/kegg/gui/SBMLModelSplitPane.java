@@ -31,6 +31,7 @@ import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
+import org.sbml.jsbml.SBaseChangedEvent;
 import org.sbml.jsbml.SBaseChangedListener;
 
 import de.zbit.gui.GUITools;
@@ -184,12 +185,9 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.sbml.squeezer.io.SBaseChangedListener#stateChanged(org.sbml.jlibsbml
-	 * .SBase)
+	 * @see org.sbml.jsbml.SBaseChangedListener#stateChanged(org.sbml.jsbml.SBaseChangedEvent)
 	 */
-	public void stateChanged(SBase sb) {
+	public void stateChanged(SBaseChangedEvent ev) {
 		// TreePath path = tree.getSelectionPath();
 		// init(sb.getModel(), true);
 		// tree.setSelectionPath(path);
