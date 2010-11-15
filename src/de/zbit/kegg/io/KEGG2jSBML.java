@@ -45,6 +45,7 @@ import de.zbit.util.Utils;
 /**
  * 
  * @author Clemens Wrzodek
+ * @author Andreas Dr&auml;ger
  * 
  * Notes:
  * XXX: Important to know: subtype.setValue contains replacement of &gt; to > !!!
