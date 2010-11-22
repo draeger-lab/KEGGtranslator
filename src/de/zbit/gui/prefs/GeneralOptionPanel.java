@@ -3,7 +3,6 @@ package de.zbit.gui.prefs;
 import java.io.IOException;
 import java.util.InvalidPropertiesFormatException;
 
-import de.zbit.gui.prefs.PreferencesPanelForKeyProvider;
 import de.zbit.kegg.TranslatorOptions;
 
 /**

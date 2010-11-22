@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -20,18 +21,25 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
@@ -195,6 +203,10 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 * This is where we place all the converted models.
 	 */
 	private JTabbedPane tabbedPane;
+	/**
+	 * This controls, which menu bar buttons are enabled and disabled.
+	 */
+	private ChangeListener tabbedPaneChange;
 	
 	/**
 	 * 
@@ -219,8 +231,25 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		Container container = getContentPane();
 		container.setLayout(new BorderLayout());
 		tabbedPane = new JTabbedPane();
-		tabbedPane.add(getDefaultPanel());
+		//tabbedPane.add(getDefaultPanel());
+		container.add(getTranslateToolBar(), BorderLayout.NORTH);
 		container.add(tabbedPane, BorderLayout.CENTER);
+		
+  	// Change active buttons, based on selection.
+		tabbedPaneChange = new ChangeListener() {
+      public void stateChanged(ChangeEvent e) {
+        Object o = ((JTabbedPane) e.getSource()).getSelectedComponent();
+        if (o instanceof SBMLModelSplitPane) {
+          GUITools.setEnabled(true, getJMenuBar(), Action.SAVE_FILE, Action.TO_LATEX, Action.CLOSE_MODEL);
+        } else if (o instanceof Graph2DView) {
+          GUITools.setEnabled(true, getJMenuBar(), Action.SAVE_FILE, Action.CLOSE_MODEL);
+          GUITools.setEnabled(false, getJMenuBar(),Action.TO_LATEX);
+        } else {
+          GUITools.setEnabled(false, getJMenuBar(), Action.SAVE_FILE, Action.TO_LATEX, Action.CLOSE_MODEL);
+        }
+      }
+    };
+		tabbedPane.addChangeListener(tabbedPaneChange);
 		
 		pack();
 		setMinimumSize(new Dimension(640, 480));
@@ -231,8 +260,9 @@ public class TranslatorUI extends JFrame implements ActionListener,
    * @return a simple panel that let's the user choose an input
    * file and ouput format.
    */
-  private Component getDefaultPanel() {
-    final JPanel r = new JPanel(new VerticalLayout());
+  private Component getTranslateToolBar() {
+    //final JPanel r = new JPanel(new VerticalLayout());
+    final JToolBar r = new JToolBar("Translet new file", JToolBar.HORIZONTAL);
     
     r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.INPUT));
     r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT));
@@ -467,28 +497,114 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		}
 	}
 
-  private void translateAndAddTab(File file, String format) throws IOException, SBMLException {
-    Object ret = translateFile(file, format);
-    if (ret instanceof SBMLDocument) {
-      SBMLDocument doc = (SBMLDocument) ret;
-      String title = doc.isSetModel() && doc.getModel().isSetId() ? doc
-          .getModel().getId() : doc.toString();
-      tabbedPane.add(title, new SBMLModelSplitPane(doc));
-      GUITools.setEnabled(true, getJMenuBar(), Action.SAVE_FILE,
-            Action.TO_LATEX, Action.CLOSE_MODEL);
-    } else if (ret instanceof Graph2D) {
-      Graph2D doc = (Graph2D) ret;
-      
-      //String title = TODO Get title from graph
-      String title = file.getName();
-      tabbedPane.setSelectedComponent(
-        tabbedPane.add(title, new Graph2DView(doc))
-      );
-      GUITools.setEnabled(true, getJMenuBar(), Action.SAVE_FILE, Action.CLOSE_MODEL);
-    }
+	/**
+	 * 
+	 * @param file
+	 * @param format
+	 * @throws IOException
+	 * @throws SBMLException
+	 */
+  private void translateAndAddTab(final File file, final String format) throws IOException, SBMLException {
+    final Component tb = tabbedPane.add(file.getName(), generateLoadingPanel());
+    tabbedPane.setSelectedComponent(tb);
+    
+    final SwingWorker<Object, Void> translator = new SwingWorker<Object, Void>() {
+      @Override
+      protected Object doInBackground() throws Exception {
+        return translateFile(file, format);
+      }
+      protected void done() {
+        // Get the resulting document and check and handle eventual errors.
+        Object ret;
+        try {
+          ret = get();
+        } catch (Exception e) {
+          e.printStackTrace();
+          GUITools.showErrorMessage(null, e);
+          tabbedPane.remove(tb);
+          tabbedPaneChange.stateChanged(new ChangeEvent(tabbedPane));
+          return;
+        }
+        
+        // Change the tab to the corresponding content.
+        if (ret instanceof SBMLDocument) {
+          SBMLDocument doc = (SBMLDocument) ret;
+          
+          // Set nice title
+          String title = doc.isSetModel() && doc.getModel().isSetId() ? doc.getModel().getId() : doc.toString();
+          tabbedPane.setTitleAt(tabbedPane.indexOfComponent(tb), title);
+          
+          // Create a new visualization of the model.
+          SBMLModelSplitPane pane;
+          try {
+            pane = new SBMLModelSplitPane(doc);
+          } catch (Exception e) {
+            e.printStackTrace();
+            GUITools.showErrorMessage(null, e);
+            tabbedPane.remove(tb);
+            tabbedPaneChange.stateChanged(new ChangeEvent(tabbedPane));
+            return;
+          }
+          tabbedPane.setComponentAt(tabbedPane.indexOfComponent(tb), pane);
+        } else if (ret instanceof Graph2D) {
+          Graph2D doc = (Graph2D) ret;
+          
+          // Create a new visualization of the model.
+          Graph2DView pane = new Graph2DView(doc);
+          tabbedPane.setComponentAt(tabbedPane.indexOfComponent(tb), pane);
+        } 
+        
+        tabbedPaneChange.stateChanged(new ChangeEvent(tabbedPane));
+      }
+    };
+    
+    // Run the worker
+    translator.execute();
   }
 	
-	/**
+  
+  /**
+   * Create and display a temporary loading panel with the given message and a
+   * progress bar.
+   * 
+   * @return JDialog
+   */
+  private JDialog generateLoadingPanel() {
+    // Create the panel
+    Dimension panelSize = new java.awt.Dimension(400, 75);
+    JPanel p = new JPanel(new VerticalLayout());
+    p.setPreferredSize(panelSize);
+    
+    // Create the label and progressBar
+    JLabel jl = new JLabel("Translating pathway...");
+    Font font = new java.awt.Font("Tahoma", Font.PLAIN, 12);
+    jl.setFont(font);
+    
+    JProgressBar prog = new JProgressBar();
+    prog.setPreferredSize(new Dimension(panelSize.width - 20,
+      panelSize.height / 4));
+    p.add(jl, BorderLayout.NORTH);
+    p.add(prog, BorderLayout.CENTER);
+    
+    // Link the progressBar to the keggConverter
+    //k2s.setProgressBar(new ProgressBarSwing(prog));
+    // TODO: Set ProgressBar on AbstractKeggTranslator instance
+    
+    // Display the panel in an jFrame
+    JDialog f = new JDialog();
+    f.setTitle(KEGGtranslator.appName);
+    f.setSize(p.getPreferredSize());
+    f.setContentPane(p);
+    f.setPreferredSize(p.getPreferredSize());
+    f.setLocationRelativeTo(null);
+    f.setVisible(true);
+    f.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    
+    return f;
+  }
+  
+
+  /**
 	 * 
 	 */
 	private void saveFile() {
