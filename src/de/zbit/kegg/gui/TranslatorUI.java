@@ -7,7 +7,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -21,35 +20,24 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.sbml.jsbml.Model;
-import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
-import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.gui.LaTeXExportDialog;
-import org.sbml.tolatex.io.LaTeXOptionsIO;
 
-import y.view.Graph2D;
-import y.view.Graph2DView;
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
@@ -58,15 +46,10 @@ import de.zbit.gui.JBrowserPane;
 import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.JHelpBrowser;
 import de.zbit.gui.SystemBrowser;
-import de.zbit.gui.VerticalLayout;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
-import de.zbit.io.SBFileFilter;
-import de.zbit.kegg.Translator;
 import de.zbit.kegg.TranslatorOptions;
-import de.zbit.kegg.io.AbstractKEGGtranslator;
-import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
@@ -74,10 +57,10 @@ import de.zbit.util.prefs.SBProperties;
 
 /**
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @date 2010-11-12
  */
-public class TranslatorUI extends JFrame implements ActionListener,
-		WindowListener {
+public class TranslatorUI extends JFrame implements ActionListener, WindowListener {
 	
 	/**
 	 * 
@@ -121,7 +104,12 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		/**
 		 * {@link Action} for LaTeX export.
 		 */
-		TO_LATEX;
+		TO_LATEX,
+		/**
+		 * Invisible {@link Action} that should be performed,
+		 * whenever an translation is done.
+		 */
+		TRANSLATION_DONE;
 		
 		/*
 		 * (non-Javadoc)
@@ -192,37 +180,31 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	static {
 		ImageTools.initImages(LaTeXExportDialog.class.getResource("img"));
 		ImageTools.initImages(TranslatorUI.class.getResource("img"));
-		GUITools.initLaF("KEGGtranslator");
+		GUITools.initLaF(KEGGtranslator.appName);
 	}
 	
 	/**
 	 * Default directory path's for saving and opening files.
+	 * Only init them once. Other classes should use these variables.
 	 */
-	private String openDir, saveDir;
+	public static String openDir, saveDir;
 	/**
 	 * This is where we place all the converted models.
 	 */
 	private JTabbedPane tabbedPane;
-	/**
-	 * This controls, which menu bar buttons are enabled and disabled.
-	 */
-	private ChangeListener tabbedPaneChange;
 	
 	/**
 	 * 
 	 */
 	public TranslatorUI() {
-		super("KEGGtranslator");
+		super(KEGGtranslator.appName);
 		
 		// init preferences
-		SBPreferences prefs = SBPreferences
-				.getPreferencesFor(TranslatorOptions.class);
+		SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class);
 		File file = new File(prefs.get(TranslatorOptions.INPUT));
-		this.openDir = file.isDirectory() ? file.getAbsolutePath() : file
-				.getParent();
+		openDir = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		file = new File(prefs.get(TranslatorOptions.OUTPUT));
-		this.saveDir = file.isDirectory() ? file.getAbsolutePath() : file
-				.getParent();
+		saveDir = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		
 		// init GUI
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -231,25 +213,15 @@ public class TranslatorUI extends JFrame implements ActionListener,
 		Container container = getContentPane();
 		container.setLayout(new BorderLayout());
 		tabbedPane = new JTabbedPane();
-		//tabbedPane.add(getDefaultPanel());
 		container.add(getTranslateToolBar(), BorderLayout.NORTH);
 		container.add(tabbedPane, BorderLayout.CENTER);
 		
-  	// Change active buttons, based on selection.
-		tabbedPaneChange = new ChangeListener() {
-      public void stateChanged(ChangeEvent e) {
-        Object o = ((JTabbedPane) e.getSource()).getSelectedComponent();
-        if (o instanceof SBMLModelSplitPane) {
-          GUITools.setEnabled(true, getJMenuBar(), Action.SAVE_FILE, Action.TO_LATEX, Action.CLOSE_MODEL);
-        } else if (o instanceof Graph2DView) {
-          GUITools.setEnabled(true, getJMenuBar(), Action.SAVE_FILE, Action.CLOSE_MODEL);
-          GUITools.setEnabled(false, getJMenuBar(),Action.TO_LATEX);
-        } else {
-          GUITools.setEnabled(false, getJMenuBar(), Action.SAVE_FILE, Action.TO_LATEX, Action.CLOSE_MODEL);
-        }
-      }
-    };
-		tabbedPane.addChangeListener(tabbedPaneChange);
+		// Change active buttons, based on selection.
+		tabbedPane.addChangeListener(new ChangeListener() {
+		  public void stateChanged(ChangeEvent e) {
+		    updateButtons();
+		  }
+		});
 		
 		pack();
 		setMinimumSize(new Dimension(640, 480));
@@ -265,9 +237,10 @@ public class TranslatorUI extends JFrame implements ActionListener,
     final JToolBar r = new JToolBar("Translet new file", JToolBar.HORIZONTAL);
     
     r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.INPUT));
+    //r.add(new JSeparator(JSeparator.VERTICAL));
     r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT));
     
-    JButton ok = new JButton("Translate");
+    JButton ok = new JButton("Translate now!");
     ok.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         File inFile = null; String format = null;
@@ -291,20 +264,8 @@ public class TranslatorUI extends JFrame implements ActionListener,
           if (inFile!=null && format!=null) break;
         }
         
-        // Check input
-        if (!TranslatorOptions.INPUT.getRange().isInRange(inFile)) {
-          JOptionPane.showMessageDialog(r, "Please select a valid input file.", KEGGtranslator.appName, JOptionPane.WARNING_MESSAGE);
-        } else if (!TranslatorOptions.FORMAT.getRange().isInRange(format)) {
-          JOptionPane.showMessageDialog(r, "Please select a valid output format.", KEGGtranslator.appName, JOptionPane.WARNING_MESSAGE);
-        } else {
-          // Tanslate and add tab.
-          try {
-            // TODO: Move to new thread and add progress bar.
-            translateAndAddTab(inFile, format);
-          } catch (Exception e1) {
-            GUITools.showErrorMessage(r, e1);
-          }
-        }
+        // Translate
+        createNewTab(inFile, format);
       }
     });
     r.add(ok);
@@ -313,6 +274,29 @@ public class TranslatorUI extends JFrame implements ActionListener,
     return r;
   }
 
+  /**
+   * Translate and create a new tab.
+   * @param inFile
+   * @param format
+   */
+  private void createNewTab(File inFile, String format) {
+    // Check input
+    if (!TranslatorOptions.INPUT.getRange().isInRange(inFile)) {
+      JOptionPane.showMessageDialog(this, "Please select a valid input file.", KEGGtranslator.appName, JOptionPane.WARNING_MESSAGE);
+    } else if (!TranslatorOptions.FORMAT.getRange().isInRange(format)) {
+      JOptionPane.showMessageDialog(this, "Please select a valid output format.", KEGGtranslator.appName, JOptionPane.WARNING_MESSAGE);
+    } else {
+      // Tanslate and add tab.
+      try {
+        openDir = inFile.getParent();
+        final Component tb = tabbedPane.add(inFile.getName(), new TranslatorPanel(inFile, format, this));
+        tabbedPane.setSelectedComponent(tb);
+      } catch (Exception e1) {
+        GUITools.showErrorMessage(this, e1);
+      }
+    }
+  }
+  
   /*
 	 * (non-Javadoc)
 	 * 
@@ -329,7 +313,7 @@ public class TranslatorUI extends JFrame implements ActionListener,
 				openFile();
 				break;
 			case CLOSE_MODEL:
-				closeModel();
+				closeTab();
 				break;
 			case PREFERENCES:
 				PreferencesDialog.showPreferencesDialog();
@@ -337,13 +321,24 @@ public class TranslatorUI extends JFrame implements ActionListener,
 			case SAVE_FILE:
 				saveFile();
 				break;
+			case TRANSLATION_DONE:
+			  TranslatorPanel source = (TranslatorPanel) e.getSource();
+			  if (e.getID()!=JOptionPane.OK_OPTION) {
+			    // If translation failed, remove the tab. The error
+			    // message has already been issued by the translator.
+			    tabbedPane.remove(source);
+			  } else {
+			    tabbedPane.setTitleAt(tabbedPane.indexOfComponent(source), source.getTitle());
+			  }
+			  updateButtons();
+			  break;
 			case TO_LATEX:
-				writeLaTeXReport(null);
+				writeLaTeXReport();
 				break;
 			case HELP:
 				GUITools.setEnabled(false, getJMenuBar(), Action.HELP);
 				JHelpBrowser.showOnlineHelp(this, this,
-						"KEGGtranslator - Online Help", getClass().getResource(
+				  KEGGtranslator.appName + " - Online Help", getClass().getResource(
 								"../html/help.html"));
 				break;
 			case HELP_ABOUT:
@@ -367,6 +362,16 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	}
 	
 	/**
+   * @param object
+   */
+  private void writeLaTeXReport() {
+    TranslatorPanel o = getCurrentlySelectedPanel();
+    if (o !=null) {
+      o.writeLaTeXReport(null);
+    }
+  }
+
+  /**
 	 * 
 	 * @param url
 	 * @param preferedWidth
@@ -390,36 +395,29 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	}
 
 	/**
-	 * Closes the currently selected model without saving if the user approves.
+	 * Closes the currently selected tabbed pane without saving if the user approves.
 	 */
-	private void closeModel() {
-		SBMLDocument doc = getSelectedDocument();
-		String title = null;
-		if (doc.isSetModel()) {
-			Model model = doc.getModel();
-			if (model.isSetName() || model.isSetId()) {
-				title = "model ";
-			}
-			if (model.isSetName()) {
-				title += model.getName();
-			} else if (model.isSetId()) {
-				title += model.getId();
-			}
+	private void closeTab() {
+	  if (tabbedPane.getSelectedIndex()<0) return;
+	  Component comp = tabbedPane.getSelectedComponent();
+		String title = comp.getName();
+		if (title == null || title.length()<1) {
+			title = "the currently selected document";
 		}
-		if (title == null) {
-			title = "the currently selected SBML document";
+		
+		// Check if document already has been saved
+		if (comp instanceof TranslatorPanel && !((TranslatorPanel)comp).isSaved()) {
+	    if ((JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this,
+        StringUtil.toHTML(String.format(
+          "Do you really want to close %s without saving?", title), 60),
+        "Close selected document", JOptionPane.YES_NO_OPTION))) {
+	      return;
+	    }
 		}
-		if ((doc != null)
-				&& (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this,
-					StringUtil.toHTML(String.format(
-						"Do you really want to close %s without saving?", title), 60),
-					"Close selected document", JOptionPane.YES_NO_OPTION))) {
-			tabbedPane.remove(tabbedPane.getSelectedIndex());
-			if (tabbedPane.getTabCount() == 0) {
-				GUITools.setEnabled(false, getJMenuBar(), Action.SAVE_FILE,
-					Action.TO_LATEX, Action.CLOSE_MODEL);
-			}
-		}
+		
+		// Close the document.
+	  tabbedPane.remove(tabbedPane.getSelectedIndex());
+	  updateButtons();
 	}
 	
 	/**
@@ -486,192 +484,58 @@ public class TranslatorUI extends JFrame implements ActionListener,
 	 * @throws IOException
 	 */
 	private void openFile() throws SBMLException, IOException {
+	  // Ask input file
 		File file = GUITools.openFileDialog(this, openDir, false, false,
 			JFileChooser.FILES_ONLY, new FileFilterKGML());
+		if (file==null || file.length()<1) return;
 		
-		// TODO: Add file format select JOPtionPane.
+		// Ask output format
+		JColumnChooser outputFormat = (JColumnChooser)
+		  PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT);
+		outputFormat.setTitle("Please select the output format");
+		JOptionPane.showMessageDialog(this, outputFormat, KEGGtranslator.appName, JOptionPane.QUESTION_MESSAGE);
+		String format = ((JColumnChooser) outputFormat).getSelectedItem().toString();
 		
-		if (file != null) {
-			openDir = file.getParent();
-			translateAndAddTab(file, "sbml");
-		}
+		// Translate
+		createNewTab(file, format);
 	}
 
-	/**
-	 * 
-	 * @param file
-	 * @param format
-	 * @throws IOException
-	 * @throws SBMLException
-	 */
-  private void translateAndAddTab(final File file, final String format) throws IOException, SBMLException {
-    final Component tb = tabbedPane.add(file.getName(), generateLoadingPanel());
-    tabbedPane.setSelectedComponent(tb);
-    
-    final SwingWorker<Object, Void> translator = new SwingWorker<Object, Void>() {
-      @Override
-      protected Object doInBackground() throws Exception {
-        return translateFile(file, format);
-      }
-      protected void done() {
-        // Get the resulting document and check and handle eventual errors.
-        Object ret;
-        try {
-          ret = get();
-        } catch (Exception e) {
-          e.printStackTrace();
-          GUITools.showErrorMessage(null, e);
-          tabbedPane.remove(tb);
-          tabbedPaneChange.stateChanged(new ChangeEvent(tabbedPane));
-          return;
-        }
-        
-        // Change the tab to the corresponding content.
-        if (ret instanceof SBMLDocument) {
-          SBMLDocument doc = (SBMLDocument) ret;
-          
-          // Set nice title
-          String title = doc.isSetModel() && doc.getModel().isSetId() ? doc.getModel().getId() : doc.toString();
-          tabbedPane.setTitleAt(tabbedPane.indexOfComponent(tb), title);
-          
-          // Create a new visualization of the model.
-          SBMLModelSplitPane pane;
-          try {
-            pane = new SBMLModelSplitPane(doc);
-          } catch (Exception e) {
-            e.printStackTrace();
-            GUITools.showErrorMessage(null, e);
-            tabbedPane.remove(tb);
-            tabbedPaneChange.stateChanged(new ChangeEvent(tabbedPane));
-            return;
-          }
-          tabbedPane.setComponentAt(tabbedPane.indexOfComponent(tb), pane);
-        } else if (ret instanceof Graph2D) {
-          Graph2D doc = (Graph2D) ret;
-          
-          // Create a new visualization of the model.
-          Graph2DView pane = new Graph2DView(doc);
-          tabbedPane.setComponentAt(tabbedPane.indexOfComponent(tb), pane);
-        } 
-        
-        tabbedPaneChange.stateChanged(new ChangeEvent(tabbedPane));
-      }
-    };
-    
-    // Run the worker
-    translator.execute();
-  }
-	
   
   /**
-   * Create and display a temporary loading panel with the given message and a
-   * progress bar.
-   * 
-   * @return JDialog
+   * Enables and disables buttons in the menu, depending on
+   * the current tabbed pane content.
    */
-  private JDialog generateLoadingPanel() {
-    // Create the panel
-    Dimension panelSize = new java.awt.Dimension(400, 75);
-    JPanel p = new JPanel(new VerticalLayout());
-    p.setPreferredSize(panelSize);
+  private void updateButtons() {
+    GUITools.setEnabled(false, getJMenuBar(), Action.SAVE_FILE, Action.TO_LATEX, Action.CLOSE_MODEL);
+    TranslatorPanel o = getCurrentlySelectedPanel();
+    if (o !=null) {
+      o.updateButtons(getJMenuBar());
+    }
+  }
+  
+  /**
+   * @return the currently selected TranslatorPanel from the {@link #tabbedPane},
+   * or null if either no or no valid selection exists.
+   */
+  private TranslatorPanel getCurrentlySelectedPanel() {
+    if (tabbedPane==null || tabbedPane.getSelectedIndex()<0) return null;
+    Object o = ((JTabbedPane) tabbedPane).getSelectedComponent();
+    if (o==null || !(o instanceof TranslatorPanel)) return null ;
     
-    // Create the label and progressBar
-    JLabel jl = new JLabel("Translating pathway...");
-    Font font = new java.awt.Font("Tahoma", Font.PLAIN, 12);
-    jl.setFont(font);
-    
-    JProgressBar prog = new JProgressBar();
-    prog.setPreferredSize(new Dimension(panelSize.width - 20,
-      panelSize.height / 4));
-    p.add(jl, BorderLayout.NORTH);
-    p.add(prog, BorderLayout.CENTER);
-    
-    // Link the progressBar to the keggConverter
-    //k2s.setProgressBar(new ProgressBarSwing(prog));
-    // TODO: Set ProgressBar on AbstractKeggTranslator instance
-    
-    // Display the panel in an jFrame
-    JDialog f = new JDialog();
-    f.setTitle(KEGGtranslator.appName);
-    f.setSize(p.getPreferredSize());
-    f.setContentPane(p);
-    f.setPreferredSize(p.getPreferredSize());
-    f.setLocationRelativeTo(null);
-    f.setVisible(true);
-    f.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-    
-    return f;
+    return ((TranslatorPanel)o);
   }
   
 
   /**
-	 * 
+	 * Saves the currently selected document to a file.
 	 */
 	private void saveFile() {
-		File file = GUITools.saveFileDialog(this, saveDir, false, false, true,
-			JFileChooser.FILES_ONLY, SBFileFilter.SBML_FILE_FILTER,
-			SBFileFilter.IMAGE_FILE_FILTER, SBFileFilter.TeX_FILE_FILTER,
-			SBFileFilter.PDF_FILE_FILTER, SBFileFilter.TEXT_FILE_FILTER);
-		if (file != null) {
-			saveDir = file.getParent();
-			if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file)) {
-				writeLaTeXReport(file);
-			} else {
-				
-			}
-		}
+    TranslatorPanel o = getCurrentlySelectedPanel();
+    if (o !=null) {
+      o.saveToFile();
+    }
 	}
 	
-	/**
-	 * 
-	 * @param file
-	 * @param format - desired output format
-	 * @return
-	 * @throws IOException 
-	 */
-	@SuppressWarnings("unchecked")
-  private Object translateFile(File file, String format) throws IOException {
-		// TODO Auto-generated method stub
-		//SBMLDocument doc = new SBMLDocument(3, 1);
-		//doc.createModel("model_" + (tabbedPane.getTabCount() + 1));
-    //return doc;
-	  
-	  AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<SBMLDocument>)
-	    BatchKEGGtranslator.getTranslator(format, Translator.getManager());
-	  return translator.translate(file);
-	}
-	
-	/**
-	 * 
-	 * @param targetFile
-	 *        can be null
-	 */
-	private void writeLaTeXReport(File targetFile) {
-		SBMLDocument doc = getSelectedDocument();
-		if ((doc != null) && LaTeXExportDialog.showDialog(this, doc, targetFile)) {
-			if (targetFile == null) {
-				SBPreferences prefsIO = SBPreferences
-						.getPreferencesFor(LaTeXOptionsIO.class);
-				targetFile = new File(prefsIO.get(LaTeXOptionsIO.REPORT_OUTPUT_FILE));
-			}
-			try {
-				SBML2LaTeX.convert(doc, targetFile, true);
-			} catch (Exception exc) {
-				GUITools.showErrorMessage(this, exc);
-			}
-		}
-	}
-	
-	/**
-	 * 
-	 * @return null if this GUI does not contain any {@link SBMLDocument}
-	 *         instances.
-	 */
-	private SBMLDocument getSelectedDocument() {
-		if (tabbedPane.getTabCount() > 0) { return ((SBMLModelSplitPane) tabbedPane
-				.getSelectedComponent()).getSBMLDocument(); }
-		return null;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
@@ -699,7 +563,9 @@ public class TranslatorUI extends JFrame implements ActionListener,
 				props.put(GUIOptions.SAVE_DIR, saveDir);
 				SBPreferences.saveProperties(GUIOptions.class, props);
 			} catch (BackingStoreException exc) {
-				GUITools.showErrorMessage(this, exc);
+			  exc.printStackTrace();
+			  // Unimportant error... don't bother the user here.
+				//GUITools.showErrorMessage(this, exc);
 			}
 		}
 	}
