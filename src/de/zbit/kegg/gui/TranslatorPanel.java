@@ -41,6 +41,8 @@ import de.zbit.kegg.Translator;
 import de.zbit.kegg.gui.TranslatorUI.Action;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
+import de.zbit.kegg.io.KEGG2jSBML;
+import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.StringUtil;
@@ -66,6 +68,10 @@ public class TranslatorPanel extends JPanel {
    * or failed with an error.
    */
   ActionListener translationListener = null;
+  /**
+   * We need to remember the translator for saving the file later on.
+   */
+  AbstractKEGGtranslator<?> translator = null;
   
   /**
    * Create a new translator-panel and initiates the translation.
@@ -91,10 +97,10 @@ public class TranslatorPanel extends JPanel {
     final AbstractProgressBar pb = generateLoadingPanel(this, "Translating pathway...");
     final JComponent thiss = this;
     
-    final SwingWorker<Object, Void> translator = new SwingWorker<Object, Void>() {
+    final SwingWorker<Object, Void> translateWorker = new SwingWorker<Object, Void>() {
       @Override
       protected Object doInBackground() throws Exception {
-        AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator.getTranslator(outputFormat, Translator.getManager());
+        translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator.getTranslator(outputFormat, Translator.getManager());
         translator.setProgressBar(pb);
         return translator.translate(inputFile);
       }
@@ -150,7 +156,7 @@ public class TranslatorPanel extends JPanel {
     };
     
     // Run the worker
-    translator.execute();
+    translateWorker.execute();
   }
   
 
@@ -254,8 +260,9 @@ public class TranslatorPanel extends JPanel {
       ff.add(SBFileFilter.YGF_FILE_FILTER);
       ff.add(SBFileFilter.TGF_FILE_FILTER);
       for (int i=0; i<ff.size(); i++) {
-        if (ff.get(i).toString().toLowerCase().startsWith(this.outputFormat.toLowerCase())) {
+        if (((SBFileFilter)ff.get(i)).getExtension().toLowerCase().startsWith(this.outputFormat.toLowerCase())) {
           ff.addFirst(ff.remove(i));
+          System.out.println(ff.get(0) + " on top.");
           break;
         }
       }
@@ -286,20 +293,27 @@ public class TranslatorPanel extends JPanel {
         "No writing access", JOptionPane.WARNING_MESSAGE);
     }
     
-    System.out.println(f);
-    System.out.println(fc.getFileFilter().getDescription());
-    // TODO: Continue saving work..
-    
-    saveToFile(f);
+    saveToFile(f, ((SBFileFilter)fc.getFileFilter()).getExtension());
   }
-  public void saveToFile(File file) {
-    // TODO: Implement.
+  public void saveToFile(File file, String format) {
+    format = format.toLowerCase().trim();
+    if (!file.getName().toLowerCase().endsWith(format)) {
+      file = new File(file.getPath() + '.' + format);
+    }
+      
     if (file != null) {
       TranslatorUI.saveDir = file.getParent();
-      if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file)) {
+      if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file) || format.equals("tex") || format.equals("pdf")) {
         writeLaTeXReport(file);
-      } else {
-        
+      } else if (translator instanceof KEGG2yGraph){
+        try {
+          ((KEGG2yGraph)translator).writeToFile((Graph2D) document, file.getPath(), format);
+        } catch (Exception e) {
+          e.printStackTrace();
+          GUITools.showErrorMessage(this, e);
+        }
+      } else if (translator instanceof KEGG2jSBML){
+        ((KEGG2jSBML)translator).writeToFile((SBMLDocument) document, file.getPath());
       }
     }
     

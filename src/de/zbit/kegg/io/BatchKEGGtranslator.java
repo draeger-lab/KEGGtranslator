@@ -188,6 +188,9 @@ public class BatchKEGGtranslator {
 		
 		if (outFormat.equalsIgnoreCase("sbml")) {
 		  translator = new KEGG2jSBML(manager);
+
+    } else if (outFormat.equalsIgnoreCase("LaTeX")) {
+      translator = new KEGG2jSBML(manager);
 		  
 		} else if (outFormat.equalsIgnoreCase("GraphML")) {
 		  translator = KEGG2yGraph.createKEGG2GraphML(manager);

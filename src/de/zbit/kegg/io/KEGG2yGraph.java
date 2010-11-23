@@ -1207,4 +1207,31 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
   }
   
+  /**
+   * @param document
+   * @param path
+   * @param format
+   * @throws Exception 
+   */
+  public void writeToFile(Graph2D graph, String outFile, String format) throws Exception {
+    IOHandler io;
+    if (format.equalsIgnoreCase("gif")) {
+      io = new GIFIOHandler();
+    } else if (format.equalsIgnoreCase("graphml")) {
+      io = new GraphMLIOHandler();
+    } else if (format.equalsIgnoreCase("gml")) {
+      io = new GMLIOHandler();
+    } else if (format.equalsIgnoreCase("ygf")) {
+      io = new YGFIOHandler();
+    } else if (format.equalsIgnoreCase("tgf")) {
+      io = new TGFIOHandler();
+    } else if (format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg")) {
+      io = new JPGIOHandler();
+    } else {
+      throw new Exception("Unknown output format.");
+    }
+    setOutputHandler(io);
+    writeToFile(graph, outFile);
+  }
+  
 }
