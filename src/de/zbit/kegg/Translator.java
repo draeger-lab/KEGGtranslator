@@ -11,6 +11,7 @@ import javax.swing.SwingUtilities;
 
 import de.zbit.gui.GUIOptions;
 import de.zbit.kegg.gui.TranslatorUI;
+import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.prefs.SBPreferences;
@@ -24,6 +25,11 @@ import de.zbit.util.prefs.SBProperties;
  * @date 2010-10-25
  */
 public class Translator {
+  /**
+   * The cache to be used by all KEGG interacting classes.
+   * Access via {@link #getManager()}.
+   */
+  private static KeggInfoManagement manager=null;
 	/**
 	 * @param args
 	 * @throws BackingStoreException
@@ -110,9 +116,11 @@ public class Translator {
 				batch.setChangeOutdirTo(output);
 			}
 			batch.parseDirAndSubDir();
+			// parseDir... is saving the cache.
 		} else {
 			try {
 				translator.translate(in.getPath(), out.getPath());
+				saveCache();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -125,21 +133,32 @@ public class Translator {
 	 * 
 	 * @return
 	 */
-	public static KeggInfoManagement getManager() {
-		KeggInfoManagement manager;
-		if (new File(KEGGtranslator.cacheFileName).exists()
-				&& new File(KEGGtranslator.cacheFileName).length() > 0) {
+	public synchronized static KeggInfoManagement getManager() {
+	  
+	  // Try to load from cache file
+		if (manager==null && new File(KEGGtranslator.cacheFileName).exists() && new File(KEGGtranslator.cacheFileName).length() > 0) {
 			try {
-				manager = (KeggInfoManagement) KeggInfoManagement
-						.loadFromFilesystem(KEGGtranslator.cacheFileName);
+				manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
 			} catch (IOException e) {
 				e.printStackTrace();
-				manager = new KeggInfoManagement();
 			}
-		} else {
+		}
+		
+		// Create new, if loading failed
+		if (manager==null) {
 			manager = new KeggInfoManagement();
 		}
+		
 		return manager;
+	}
+	
+	/**
+	 * Remember already queried KEGG objects (save cache)
+	 */
+	public synchronized static void saveCache() {
+    if (manager!=null && manager.hasChanged()) {
+      KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, manager);
+    }
 	}
 	
 	/**

@@ -20,17 +20,6 @@ public abstract interface TranslatorOptions extends KeyProvider {
   /*
    * Most important options: input, output and file format.
    */
-
-  public static final Option<Character> DEMO_CHAR = new Option<Character>("DEMO_CHAR",Character.class,
-      "Path and name of the source, KGML formatted, XML-file.", (short) 2, "-c", ',');
-  
-  public static final Option<String> DEMO_STRING = new Option<String>("DEMO_STRING",String.class,
-      "Path and name of the source, KGML formatted, XML-file.", (short) 2, "-str", "DefaultString");
-
-  public static final Option<Double> DEMO_NUMBER = new Option<Double>("DEMO_NUMBER",Double.class,
-      "Path and name of the source, KGML formatted, XML-file.", (short) 2, "-dnasfr", 5.0);
-  
-  
   public static final Option<File> INPUT = new Option<File>("INPUT",File.class,
       "Path and name of the source, KGML formatted, XML-file.", new Range<File>(File.class,new FileFilterKGML()), (short) 2, "-i", new File(System.getProperty("user.dir")));
 
@@ -75,4 +64,5 @@ public abstract interface TranslatorOptions extends KeyProvider {
   public static final Option<Boolean> CELLDESIGNER_ANNOTATIONS = new Option<Boolean>("CELLDESIGNER_ANNOTATIONS",Boolean.class,
       "If true, adds celldesigner annotations to the SBML-XML document.", (short) 2, "-cd", false);
   
+  // TODO: Make option groups.
 }

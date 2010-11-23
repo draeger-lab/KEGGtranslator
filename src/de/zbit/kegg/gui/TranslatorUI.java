@@ -39,6 +39,7 @@ import org.sbml.jsbml.SBMLException;
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 
 import de.zbit.gui.ActionCommand;
+import de.zbit.gui.FileDropHandler;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.ImageTools;
@@ -49,6 +50,7 @@ import de.zbit.gui.SystemBrowser;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
+import de.zbit.kegg.Translator;
 import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.StringUtil;
@@ -109,7 +111,12 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 		 * Invisible {@link Action} that should be performed,
 		 * whenever an translation is done.
 		 */
-		TRANSLATION_DONE;
+		TRANSLATION_DONE,
+    /**
+     * Invisible {@link Action} that should be performed,
+     * whenever a file has been droppen on this panel.
+     */
+		FILE_DROPPED;
 		
 		/*
 		 * (non-Javadoc)
@@ -192,6 +199,10 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 	 * This is where we place all the converted models.
 	 */
 	private JTabbedPane tabbedPane;
+	/**
+	 * A toolbar with input file, output format and "Translate"-Button.
+	 */
+	private JComponent translateToolBar;
 	
 	/**
 	 * 
@@ -207,13 +218,17 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 		saveDir = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		
 		// init GUI
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		// Do nothing is important! The actual closing is handled in "windowClosing()"
+		// which is not called on other close operations!
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		addWindowListener(this);
 		setJMenuBar(generateJMenuBar());
 		
 		Container container = getContentPane();
 		container.setLayout(new BorderLayout());
 		tabbedPane = new JTabbedPane();
-		container.add(getTranslateToolBar(), BorderLayout.NORTH);
+		translateToolBar = generateTranslateToolBar();
+		container.add(translateToolBar, BorderLayout.NORTH);
 		container.add(tabbedPane, BorderLayout.CENTER);
 		
 		// Change active buttons, based on selection.
@@ -222,6 +237,10 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 		    updateButtons();
 		  }
 		});
+		
+		// Make this panel responsive to drag'n drop events.
+		FileDropHandler dragNdrop = new FileDropHandler(this);
+		this.setTransferHandler(dragNdrop);
 		
 		pack();
 		setMinimumSize(new Dimension(640, 480));
@@ -232,37 +251,22 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
    * @return a simple panel that let's the user choose an input
    * file and ouput format.
    */
-  private Component getTranslateToolBar() {
+  private JComponent generateTranslateToolBar() {
     //final JPanel r = new JPanel(new VerticalLayout());
-    final JToolBar r = new JToolBar("Translet new file", JToolBar.HORIZONTAL);
+    final JToolBar r = new JToolBar("Translate new file", JToolBar.HORIZONTAL);
     
-    r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.INPUT));
+    SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class);
+    r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.INPUT, prefs, null));
     //r.add(new JSeparator(JSeparator.VERTICAL));
-    r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT));
+    r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, prefs, null));
     
+    // Button and action
     JButton ok = new JButton("Translate now!");
     ok.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        File inFile = null; String format = null;
-        
         // Get selected file and format
-        for (Component c: r.getComponents()) {
-          if (c.getName()==null) {
-            continue;
-          } else if (c.getName().equals(TranslatorOptions.INPUT.getOptionName()) &&
-              (FileSelector.class.isAssignableFrom(c.getClass()))) {
-            
-            try {
-              inFile = ((FileSelector)c).getSelectedFile();
-            } catch (IOException e1) {
-              GUITools.showErrorMessage(r, e1);
-            }
-          } else if (c.getName().equals(TranslatorOptions.FORMAT.getOptionName()) &&
-              (JColumnChooser.class.isAssignableFrom(c.getClass()))) {
-            format = ((JColumnChooser)c).getSelectedItem().toString();
-          }
-          if (inFile!=null && format!=null) break;
-        }
+        File inFile = getInputFile(r);
+        String format = getOutputFileFormat(r);
         
         // Translate
         createNewTab(inFile, format);
@@ -274,6 +278,50 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
     return r;
   }
 
+  /**
+   * Searches for any JComponent with "TranslatorOptions.FORMAT.getOptionName()" on it
+   * and returns the selected format. Use it e.g. with {@link #translateToolBar}. 
+   * @param r
+   * @return String - format.
+   */
+  private String getOutputFileFormat(JComponent r) {
+    String format = null;
+    for (Component c: r.getComponents()) {
+      if (c.getName()==null) {
+        continue;
+      } else if (c.getName().equals(TranslatorOptions.FORMAT.getOptionName()) &&
+          (JColumnChooser.class.isAssignableFrom(c.getClass()))) {
+        format = ((JColumnChooser)c).getSelectedItem().toString();
+        break;
+      }
+    }
+    return format;
+  }
+  
+  /**
+   * Searches for any JComponent with "TranslatorOptions.INPUT.getOptionName()" on it
+   * and returns the selected file. Use it e.g. with {@link #translateToolBar}. 
+   * @param r
+   * @return File - input file.
+   */
+  private File getInputFile(JComponent r) {
+    File inFile = null;
+    for (Component c: r.getComponents()) {
+      if (c.getName()==null) {
+        continue;
+      } else if (c.getName().equals(TranslatorOptions.INPUT.getOptionName()) &&
+          (FileSelector.class.isAssignableFrom(c.getClass()))) {
+        try {
+          inFile = ((FileSelector)c).getSelectedFile();
+        } catch (IOException e1) {
+          GUITools.showErrorMessage(r, e1);
+          e1.printStackTrace();
+        }
+      }
+    }
+    return inFile;
+  }
+  
   /**
    * Translate and create a new tab.
    * @param inFile
@@ -308,7 +356,9 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 			Action action = Action.valueOf(e.getActionCommand());
 			switch (action) {
 			case EXIT:
-				System.exit(0);
+				//System.exit(0); // NOOO!
+			  windowClosing(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+			  break;
 			case OPEN_FILE:
 				openFile();
 				break;
@@ -331,6 +381,11 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 			    tabbedPane.setTitleAt(tabbedPane.indexOfComponent(source), source.getTitle());
 			  }
 			  updateButtons();
+			  break;
+			case FILE_DROPPED:
+			  String format = getOutputFileFormat(translateToolBar);
+			  if (format==null || format.length()<1) return;
+			  createNewTab(((File)e.getSource()), format);
 			  break;
 			case TO_LATEX:
 				writeLaTeXReport();
@@ -556,18 +611,28 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
 	 */
 	public void windowClosing(WindowEvent we) {
+	  setVisible(false);
 		if (we.getSource() instanceof TranslatorUI) {
 			try {
+			  Translator.saveCache();
+			  
 				SBProperties props = new SBProperties();
 				props.put(GUIOptions.OPEN_DIR, openDir);
 				props.put(GUIOptions.SAVE_DIR, saveDir);
 				SBPreferences.saveProperties(GUIOptions.class, props);
+				
+				props = new SBProperties();
+				props.put(TranslatorOptions.INPUT, getInputFile(translateToolBar));
+				props.put(TranslatorOptions.FORMAT, getOutputFileFormat(translateToolBar));
+				SBPreferences.saveProperties(TranslatorOptions.class, props);
+				
 			} catch (BackingStoreException exc) {
 			  exc.printStackTrace();
 			  // Unimportant error... don't bother the user here.
 				//GUITools.showErrorMessage(this, exc);
 			}
 		}
+		System.exit(0);
 	}
 
 	/* (non-Javadoc)

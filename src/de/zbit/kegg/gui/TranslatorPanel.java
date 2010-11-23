@@ -144,6 +144,7 @@ public class TranslatorPanel extends JPanel {
           
           pane.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
           pane.fitContent(true);
+          pane.setFitContentOnResize(true);
         } 
         
         // Fire the listener

@@ -1,10 +1,10 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import de.zbit.kegg.KeggInfoManagement;
+import de.zbit.kegg.Translator;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.DirectoryParser;
 
@@ -113,7 +113,7 @@ public class BatchKEGGtranslator {
    */
   @SuppressWarnings("unchecked")
   private void parseDirAndSubDir(String dir) {
-    KeggInfoManagement manager = loadCache();
+    KeggInfoManagement manager = Translator.getManager();
     
     if (!dir.endsWith("/") && !dir.endsWith("\\"))
       if (dir.contains("\\")) dir+="\\"; else dir +="/";
@@ -170,11 +170,7 @@ public class BatchKEGGtranslator {
     }
     
     // Remember already queried objects (save cache)
-    if ((translator instanceof AbstractKEGGtranslator) &&
-        ((AbstractKEGGtranslator) translator).getKeggInfoManager().hasChanged()) {
-      KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, 
-          ((AbstractKEGGtranslator) translator).getKeggInfoManager());
-    }
+    Translator.saveCache();
   }
 
   /**
@@ -235,28 +231,6 @@ public class BatchKEGGtranslator {
 		
 		return fileExtension;
 	}
-  
-  /**
-   * Load or create a KeggInfoManager
-   * @return KeggInfoManagement
-   */
-  private KeggInfoManagement loadCache() {
-    KeggInfoManagement manager=null;
-    if (new File(KEGGtranslator.cacheFileName).exists()
-        && new File(KEGGtranslator.cacheFileName).length() > 0) {
-      try {
-        manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    
-    if (manager==null){
-      manager = new KeggInfoManagement();
-    }
-    
-    return manager;
-  }
   
   /**
    * 
