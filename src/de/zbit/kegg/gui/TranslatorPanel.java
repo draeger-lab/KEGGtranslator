@@ -138,7 +138,7 @@ public class TranslatorPanel extends JPanel {
           pane.setSize(getSize());
           //ViewMode mode = new NavigationMode();
           //pane.addViewMode(mode);
-          EditMode editMode = new EditMode();
+          EditMode editMode = new RestrictedEditMode();
           editMode.showNodeTips(true);
           pane.addViewMode(editMode);
           
@@ -249,8 +249,10 @@ public class TranslatorPanel extends JPanel {
   public void saveToFile() {
     LinkedList<FileFilter> ff = new LinkedList<FileFilter>();
     
+    SBFileFilter defaultFF;
     if (isSBML()) {
-      ff.add(SBFileFilter.SBML_FILE_FILTER);
+      defaultFF = SBFileFilter.SBML_FILE_FILTER;
+      ff.add(defaultFF);
       ff.add(SBFileFilter.TeX_FILE_FILTER);
       ff.add(SBFileFilter.PDF_FILE_FILTER);
     } else if (isGraphML()){
@@ -263,10 +265,10 @@ public class TranslatorPanel extends JPanel {
       for (int i=0; i<ff.size(); i++) {
         if (((SBFileFilter)ff.get(i)).getExtension().toLowerCase().startsWith(this.outputFormat.toLowerCase())) {
           ff.addFirst(ff.remove(i));
-          System.out.println(ff.get(0) + " on top.");
           break;
         }
       }
+      defaultFF = (SBFileFilter) ff.getFirst();
     } else {
       return;
     }
@@ -276,10 +278,18 @@ public class TranslatorPanel extends JPanel {
       //JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
     JFileChooser fc = GUITools.createJFileChooser(TranslatorUI.saveDir, false,
       false, JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
+    fc.setSelectedFile(inputFile.getPath().contains(".")?new File(inputFile.getPath().substring(0, inputFile.getPath().lastIndexOf('.'))):new File(inputFile.getPath()+'.'+defaultFF.getExtension()) );
     if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
     
     // Check file
     File f = fc.getSelectedFile();
+    String extension = ((SBFileFilter)fc.getFileFilter()).getExtension();
+    
+    // Append extension
+    if (!f.getName().contains(".")) {
+      f = new File(f.getPath() + '.' + extension);
+    }
+    
     boolean showOverride = f.exists();
     if (!f.exists()) try {
       f.createNewFile();
@@ -294,13 +304,13 @@ public class TranslatorPanel extends JPanel {
         "No writing access", JOptionPane.WARNING_MESSAGE);
     }
     
-    saveToFile(f, ((SBFileFilter)fc.getFileFilter()).getExtension());
+    saveToFile(f, extension);
   }
   public void saveToFile(File file, String format) {
-    format = format.toLowerCase().trim();
+    /*format = format.toLowerCase().trim();
     if (!file.getName().toLowerCase().endsWith(format)) {
       file = new File(file.getPath() + '.' + format);
-    }
+    }*/
       
     if (file != null) {
       TranslatorUI.saveDir = file.getParent();

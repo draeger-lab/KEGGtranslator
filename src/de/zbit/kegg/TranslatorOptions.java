@@ -9,12 +9,14 @@ import java.io.File;
 import de.zbit.kegg.gui.FileFilterKGML;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
+import de.zbit.util.prefs.OptionGroup;
 import de.zbit.util.prefs.Range;
 
 /**
  * @author wrzodek
  * @author Andreas Dr&auml;ger
  */
+@SuppressWarnings("unchecked")
 public abstract interface TranslatorOptions extends KeyProvider {
 
   /*
@@ -29,6 +31,11 @@ public abstract interface TranslatorOptions extends KeyProvider {
   public static final Option<String> FORMAT = new Option<String>("FORMAT",String.class,
       "Target file format for the translation.",Option.buildRange(String.class, "{SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}"),
       (short) 2, "-f", "SBML");
+  
+  public static final OptionGroup<Object> BASE_OPTIONS = new OptionGroup<Object>(
+      "Base options",
+      "Define the default input/ output files and the default output format.",
+      INPUT, OUTPUT, FORMAT);
   
   /*
    * Generic translation options
@@ -49,7 +56,13 @@ public abstract interface TranslatorOptions extends KeyProvider {
   // =! retrieveKeggAnnots
   public static final Option<Boolean> OFFLINE_MODE = new Option<Boolean>("OFFLINE_MODE",Boolean.class,
       "If true, no additional information will be retrieved from the KEGG-Server.", false);
+
   
+  public static final OptionGroup<Boolean> GENERIC_OPTIONS = new OptionGroup<Boolean>(
+      "Generic translation options",
+      "Define various options that are used in all translations.",
+      REMOVE_ORPHANS, SHORT_NAMES, REMOVE_WHITE_GENE_NODES, AUTOCOMPLETE_REACTIONS, OFFLINE_MODE);
+
   /*
    * Graphical, yFiles based translations
    */
@@ -57,6 +70,10 @@ public abstract interface TranslatorOptions extends KeyProvider {
   public static final Option<Boolean> MERGE_NODES_WITH_SAME_EDGES = new Option<Boolean>("MERGE_NODES_WITH_SAME_EDGES",Boolean.class,
       "If true, merges all nodes that have exactly the same relations (sources, targets and types).", (short) 2, "--merge", false);
   
+  public static final OptionGroup<Boolean> GRAPH_OPTIONS = new OptionGroup<Boolean>(
+      "Translation options for graphical outputs",
+      "Define various options that are used in yFiles based translations.",
+      MERGE_NODES_WITH_SAME_EDGES);
   /*
    * Funcional, SBML based translations
    */
@@ -64,5 +81,10 @@ public abstract interface TranslatorOptions extends KeyProvider {
   public static final Option<Boolean> CELLDESIGNER_ANNOTATIONS = new Option<Boolean>("CELLDESIGNER_ANNOTATIONS",Boolean.class,
       "If true, adds celldesigner annotations to the SBML-XML document.", (short) 2, "-cd", false);
   
-  // TODO: Make option groups.
+  
+  public static final OptionGroup<Boolean> SBML_OPTIONS = new OptionGroup<Boolean>(
+      "Translation options for SBML outputs",
+      "Define various options that are used in SBML based translations.",
+      CELLDESIGNER_ANNOTATIONS);
+  
 }

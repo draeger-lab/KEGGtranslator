@@ -337,8 +337,8 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
       // Tanslate and add tab.
       try {
         openDir = inFile.getParent();
-        final Component tb = tabbedPane.add(inFile.getName(), new TranslatorPanel(inFile, format, this));
-        tabbedPane.setSelectedComponent(tb);
+        tabbedPane.addTab(inFile.getName(), new TranslatorPanel(inFile, format, this));
+        //tabbedPane.setSelectedComponent(tb);
       } catch (Exception e1) {
         GUITools.showErrorMessage(this, e1);
       }
@@ -376,9 +376,9 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 			  if (e.getID()!=JOptionPane.OK_OPTION) {
 			    // If translation failed, remove the tab. The error
 			    // message has already been issued by the translator.
-			    tabbedPane.remove(source);
+			    tabbedPane.removeTabAt(tabbedPane.indexOfComponent(source));
 			  } else {
-			    tabbedPane.setTitleAt(tabbedPane.indexOfComponent(source), source.getTitle());
+			    tabbedPane.setTitleAt(tabbedPane.indexOfComponent(source),source.getTitle());
 			  }
 			  updateButtons();
 			  break;
@@ -451,11 +451,22 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 
 	/**
 	 * Closes the currently selected tabbed pane without saving if the user approves.
+	 * @return true, if the tab has been closed.
 	 */
-	private void closeTab() {
-	  if (tabbedPane.getSelectedIndex()<0) return;
-	  Component comp = tabbedPane.getSelectedComponent();
-		String title = comp.getName();
+	private boolean closeTab() {
+	  if (tabbedPane.getSelectedIndex()<0) return false;
+	  return closeTab(tabbedPane.getSelectedIndex());
+	}
+
+  /**
+   * Cloeses the tab at the specified index.
+   * @param index
+	 * @return true, if the tab has been closed.
+	 */
+	private boolean closeTab(int index) {
+	  if (index>=tabbedPane.getTabCount()) return false;
+	  Component comp = tabbedPane.getComponentAt(index);
+		String title = tabbedPane.getTitleAt(index);
 		if (title == null || title.length()<1) {
 			title = "the currently selected document";
 		}
@@ -466,13 +477,14 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
         StringUtil.toHTML(String.format(
           "Do you really want to close %s without saving?", title), 60),
         "Close selected document", JOptionPane.YES_NO_OPTION))) {
-	      return;
+	      return false;
 	    }
 		}
 		
 		// Close the document.
-	  tabbedPane.remove(tabbedPane.getSelectedIndex());
+	  tabbedPane.removeTabAt(index);
 	  updateButtons();
+	  return true;
 	}
 	
 	/**
@@ -540,9 +552,9 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 	 */
 	private void openFile() throws SBMLException, IOException {
 	  // Ask input file
-		File file = GUITools.openFileDialog(this, openDir, false, false,
+		File[] file = GUITools.openFileDialog(this, openDir, false, true,
 			JFileChooser.FILES_ONLY, new FileFilterKGML());
-		if (file==null || file.length()<1) return;
+		if (file==null || file.length<1) return;
 		
 		// Ask output format
 		JColumnChooser outputFormat = (JColumnChooser)
@@ -552,7 +564,9 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 		String format = ((JColumnChooser) outputFormat).getSelectedItem().toString();
 		
 		// Translate
-		createNewTab(file, format);
+		for (File f: file) {
+		  createNewTab(f, format);
+		}
 	}
 
   
@@ -611,8 +625,15 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
 	 */
 	public void windowClosing(WindowEvent we) {
-	  setVisible(false);
+	  
 		if (we.getSource() instanceof TranslatorUI) {
+		  // Close all tab. If user want's to save a tab first, cancel the closing process.
+		  while (((TranslatorUI)we.getSource()).tabbedPane.getTabCount()>0) {
+		    if (!((TranslatorUI)we.getSource()).closeTab(0)) return;
+		  }
+		  
+		  // Close the app and save caches.
+		  setVisible(false);
 			try {
 			  Translator.saveCache();
 			  
@@ -632,6 +653,7 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 				//GUITools.showErrorMessage(this, exc);
 			}
 		}
+		
 		System.exit(0);
 	}
 

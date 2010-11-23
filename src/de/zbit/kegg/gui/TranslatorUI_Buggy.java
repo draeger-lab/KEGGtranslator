@@ -316,7 +316,7 @@ public class TranslatorUI_Buggy extends JFrame implements ActionListener,
 	 * Open and display a KGML file.
 	 */
 	private File openFile() {
-		File file = GUITools.openFileDialog(this, baseOpenDir, false, false,
+		File file = GUITools.openFileDialog(this, baseOpenDir, false, 
 			JFileChooser.FILES_ONLY, new FileFilterKGML());
 		if (file != null) {
 			baseOpenDir = file.getParent();
