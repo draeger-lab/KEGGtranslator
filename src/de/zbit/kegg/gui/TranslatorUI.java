@@ -10,7 +10,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -62,7 +65,7 @@ import de.zbit.util.prefs.SBProperties;
  * @author Clemens Wrzodek
  * @date 2010-11-12
  */
-public class TranslatorUI extends JFrame implements ActionListener, WindowListener {
+public class TranslatorUI extends JFrame implements ActionListener, WindowListener, KeyListener, ItemListener {
 	
 	/**
 	 * 
@@ -203,6 +206,10 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 	 * A toolbar with input file, output format and "Translate"-Button.
 	 */
 	private JComponent translateToolBar;
+	/**
+	 * prefs is holding all project specific preferences
+	 */
+	private SBPreferences prefs;
 	
 	/**
 	 * 
@@ -211,7 +218,7 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 		super(KEGGtranslator.appName);
 		
 		// init preferences
-		SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class);
+		prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class);
 		File file = new File(prefs.get(TranslatorOptions.INPUT));
 		openDir = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		file = new File(prefs.get(TranslatorOptions.OUTPUT));
@@ -255,10 +262,9 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
     //final JPanel r = new JPanel(new VerticalLayout());
     final JToolBar r = new JToolBar("Translate new file", JToolBar.HORIZONTAL);
     
-    SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class);
-    r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.INPUT, prefs, null));
+    r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.INPUT, prefs, this));
     //r.add(new JSeparator(JSeparator.VERTICAL));
-    r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, prefs, null));
+    r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, prefs, this));
     
     // Button and action
     JButton ok = new JButton("Translate now!");
@@ -330,9 +336,9 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
   private void createNewTab(File inFile, String format) {
     // Check input
     if (!TranslatorOptions.INPUT.getRange().isInRange(inFile)) {
-      JOptionPane.showMessageDialog(this, "Please select a valid input file.", KEGGtranslator.appName, JOptionPane.WARNING_MESSAGE);
+      JOptionPane.showMessageDialog(this, '\''+inFile.getName()+"' is no valid input file.", KEGGtranslator.appName, JOptionPane.WARNING_MESSAGE);
     } else if (!TranslatorOptions.FORMAT.getRange().isInRange(format)) {
-      JOptionPane.showMessageDialog(this, "Please select a valid output format.", KEGGtranslator.appName, JOptionPane.WARNING_MESSAGE);
+      JOptionPane.showMessageDialog(this, '\''+format+"' is no valid output format.", KEGGtranslator.appName, JOptionPane.WARNING_MESSAGE);
     } else {
       // Tanslate and add tab.
       try {
@@ -367,6 +373,7 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 				break;
 			case PREFERENCES:
 				PreferencesDialog.showPreferencesDialog();
+				// TODO: Change input file and output format according to new settings.
 				break;
 			case SAVE_FILE:
 				saveFile();
@@ -679,6 +686,38 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
 	 */
 	public void windowOpened(WindowEvent we) {
+	}
+
+  /* (non-Javadoc)
+   * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
+   */
+	public void keyPressed(KeyEvent e) {
+	  // Preferences for the "input file"
+	  PreferencesPanel.setProperty(prefs, e.getSource());
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
+	 */
+	public void keyReleased(KeyEvent e) {
+	  // Preferences for the "input file"
+	  PreferencesPanel.setProperty(prefs, e.getSource());
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
+	 */
+	public void keyTyped(KeyEvent e) {
+	  // Preferences for the "input file"
+	  PreferencesPanel.setProperty(prefs, e.getSource());
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+	 */
+	public void itemStateChanged(ItemEvent e) {
+	  // Preferences for the "output format"
+	  PreferencesPanel.setProperty(prefs, e.getSource());
 	}
 
 }
