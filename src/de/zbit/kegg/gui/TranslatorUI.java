@@ -50,6 +50,7 @@ import de.zbit.gui.JBrowserPane;
 import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.JHelpBrowser;
 import de.zbit.gui.SystemBrowser;
+import de.zbit.gui.prefs.CommandLineHelp;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesDialog;
 import de.zbit.gui.prefs.PreferencesPanel;
@@ -357,6 +358,7 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 	 * @see
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
+	@SuppressWarnings("unchecked")
 	public void actionPerformed(ActionEvent e) {
 		try {
 			Action action = Action.valueOf(e.getActionCommand());
@@ -398,11 +400,12 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 				writeLaTeXReport();
 				break;
 			case HELP:
-				GUITools.setEnabled(false, getJMenuBar(), Action.HELP);
-				JHelpBrowser.showOnlineHelp(this, this,
-				  KEGGtranslator.appName + " - Online Help", getClass().getResource(
-								"../html/help.html"));
-				break;
+					GUITools.setEnabled(false, getJMenuBar(), Action.HELP);
+					JHelpBrowser.showOnlineHelp(this, this, KEGGtranslator.appName
+							+ " - Online Help", getClass().getResource("../html/help.html"),
+						CommandLineHelp.createHelpComponent(TranslatorOptions.class,
+							GUIOptions.class));
+					break;
 			case HELP_ABOUT:
 				JOptionPane.showMessageDialog(this, createJBrowser(
 						"../html/about.html", 380, 220, false), "About",
@@ -659,9 +662,10 @@ public class TranslatorUI extends JFrame implements ActionListener, WindowListen
 			  // Unimportant error... don't bother the user here.
 				//GUITools.showErrorMessage(this, exc);
 			}
+			
+			System.exit(0);
 		}
 		
-		System.exit(0);
 	}
 
 	/* (non-Javadoc)

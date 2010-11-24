@@ -11,7 +11,6 @@ import javax.swing.SwingUtilities;
 
 import de.zbit.gui.GUIOptions;
 import de.zbit.kegg.gui.TranslatorUI;
-import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.prefs.SBPreferences;
@@ -42,7 +41,7 @@ public class Translator {
 		List<Class<?>> configList = new LinkedList<Class<?>>();
 		configList.add(TranslatorOptions.class);
 		configList.add(GUIOptions.class);
-		
+				
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
 			TranslatorOptions.class, args);
 		
