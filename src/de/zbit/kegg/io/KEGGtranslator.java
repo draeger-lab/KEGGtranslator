@@ -12,7 +12,7 @@ public interface KEGGtranslator {
   /**
    * The name of the appplication.
    */
-  public final static String appName = "KEGGtranslator";
+  public final static String APPLICATION_NAME = "KEGGtranslator";
   
   /**
    * Version number of this translator

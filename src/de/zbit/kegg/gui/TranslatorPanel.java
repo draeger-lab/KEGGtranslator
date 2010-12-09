@@ -36,6 +36,7 @@ import y.view.Graph2DViewMouseWheelZoomListener;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.ProgressBarSwing;
 import de.zbit.gui.VerticalLayout;
+import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.gui.TranslatorUI.Action;
@@ -109,8 +110,7 @@ public class TranslatorPanel extends JPanel {
         // Get the resulting document and check and handle eventual errors.
         try {
           document = get();
-        } catch (Exception e) {
-          e.printStackTrace();
+        } catch (Throwable e) {
           GUITools.showErrorMessage(null, e);
           fireActionEvent(new ActionEvent(thiss,JOptionPane.ERROR,TranslatorUI.Action.TRANSLATION_DONE.toString()));
           return;
@@ -219,7 +219,7 @@ public class TranslatorPanel extends JPanel {
     } else {
       // Display the panel in an jFrame
       JDialog f = new JDialog();
-      f.setTitle(KEGGtranslator.appName);
+      f.setTitle(KEGGtranslator.APPLICATION_NAME);
       f.setSize(panel.getPreferredSize());
       f.setContentPane(panel);
       f.setPreferredSize(panel.getPreferredSize());
@@ -246,22 +246,22 @@ public class TranslatorPanel extends JPanel {
     return (document!=null && document instanceof Graph2D);
   }
   
-  public void saveToFile() {
+  public File saveToFile() {
     LinkedList<FileFilter> ff = new LinkedList<FileFilter>();
     
     SBFileFilter defaultFF;
     if (isSBML()) {
-      defaultFF = SBFileFilter.SBML_FILE_FILTER;
+      defaultFF = SBFileFilter.createSBMLFileFilter();
       ff.add(defaultFF);
-      ff.add(SBFileFilter.TeX_FILE_FILTER);
-      ff.add(SBFileFilter.PDF_FILE_FILTER);
+      ff.add(SBFileFilter.createTeXFileFilter());
+      ff.add(SBFileFilter.createPDFFileFilter());
     } else if (isGraphML()){
-      ff.add(SBFileFilter.GRAPHML_FILE_FILTER);
-      ff.add(SBFileFilter.GML_FILE_FILTER);
-      ff.add(SBFileFilter.JPEG_FILE_FILTER);        
-      ff.add(SBFileFilter.GIF_FILE_FILTER);
-      ff.add(SBFileFilter.YGF_FILE_FILTER);
-      ff.add(SBFileFilter.TGF_FILE_FILTER);
+      ff.add(SBFileFilter.createGraphMLFileFilter());
+      ff.add(SBFileFilter.createGMLFileFilter());
+      ff.add(SBFileFilter.createJPEGFileFilter());        
+      ff.add(SBFileFilter.createGIFFileFilter());
+      ff.add(SBFileFilter.createYGFFileFilter());
+      ff.add(SBFileFilter.createTGFFileFilter());
       for (int i=0; i<ff.size(); i++) {
         if (((SBFileFilter)ff.get(i)).getExtension().toLowerCase().startsWith(this.outputFormat.toLowerCase())) {
           ff.addFirst(ff.remove(i));
@@ -270,7 +270,7 @@ public class TranslatorPanel extends JPanel {
       }
       defaultFF = (SBFileFilter) ff.getFirst();
     } else {
-      return;
+      return null;
     }
     
     // We also need to know the selected file filter!
@@ -279,7 +279,7 @@ public class TranslatorPanel extends JPanel {
     JFileChooser fc = GUITools.createJFileChooser(TranslatorUI.saveDir, false,
       false, JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
     fc.setSelectedFile(inputFile.getPath().contains(".")?new File(inputFile.getPath().substring(0, inputFile.getPath().lastIndexOf('.'))):new File(inputFile.getPath()+'.'+defaultFF.getExtension()) );
-    if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+    if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return null;
     
     // Check file
     File f = fc.getSelectedFile();
@@ -296,7 +296,7 @@ public class TranslatorPanel extends JPanel {
     } catch (IOException e) {
       GUITools.showErrorMessage(this, e);
       e.printStackTrace();
-      return;
+      return null;
     }
     if (!f.canWrite() || f.isDirectory() || (showOverride && !GUITools.overwriteExistingFile(this, f))) {
       JOptionPane.showMessageDialog(this, StringUtil.toHTML(
@@ -304,9 +304,10 @@ public class TranslatorPanel extends JPanel {
         "No writing access", JOptionPane.WARNING_MESSAGE);
     }
     
-    saveToFile(f, extension);
+    return saveToFile(f, extension);
   }
-  public void saveToFile(File file, String format) {
+  
+  public File saveToFile(File file, String format) {
     /*format = format.toLowerCase().trim();
     if (!file.getName().toLowerCase().endsWith(format)) {
       file = new File(file.getPath() + '.' + format);
@@ -329,6 +330,7 @@ public class TranslatorPanel extends JPanel {
     }
     
     documentHasBeenSaved = true;
+    return file;
   }
   
   /**
@@ -345,13 +347,13 @@ public class TranslatorPanel extends JPanel {
    */
   public void updateButtons(JMenuBar menuBar) {
     if (isSBML()) {
-      GUITools.setEnabled(true, menuBar, Action.SAVE_FILE, Action.TO_LATEX, Action.CLOSE_MODEL);
+      GUITools.setEnabled(true, menuBar, BaseAction.FILE_SAVE, Action.TO_LATEX, BaseAction.FILE_CLOSE);
     } else if (isGraphML()) {
-      GUITools.setEnabled(true, menuBar, Action.SAVE_FILE, Action.CLOSE_MODEL);
+      GUITools.setEnabled(true, menuBar, BaseAction.FILE_SAVE, BaseAction.FILE_CLOSE);
       GUITools.setEnabled(false, menuBar,Action.TO_LATEX);
     } else {
       // E.g. when translation still in progress
-      GUITools.setEnabled(false, menuBar, Action.SAVE_FILE, Action.TO_LATEX, Action.CLOSE_MODEL);
+      GUITools.setEnabled(false, menuBar, BaseAction.FILE_SAVE, Action.TO_LATEX, BaseAction.FILE_CLOSE);
     }
   }
   
@@ -361,7 +363,7 @@ public class TranslatorPanel extends JPanel {
   public void writeLaTeXReport(File targetFile) {
     if (document==null) return;
     if (!isSBML()) {
-      GUITools.showMessage("This option is only available for SBML documents.", KEGGtranslator.appName);
+      GUITools.showMessage("This option is only available for SBML documents.", KEGGtranslator.APPLICATION_NAME);
       return;
     }
     

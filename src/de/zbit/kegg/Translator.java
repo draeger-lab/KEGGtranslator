@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.SwingUtilities;
@@ -13,6 +14,7 @@ import de.zbit.gui.GUIOptions;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
+import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
@@ -38,12 +40,9 @@ public class Translator {
 	public static void main(String[] args) throws IOException,
 		BackingStoreException, URISyntaxException {
 		// --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
-		List<Class<?>> configList = new LinkedList<Class<?>>();
-		configList.add(TranslatorOptions.class);
-		configList.add(GUIOptions.class);
-				
+						
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
-			TranslatorOptions.class, args);
+				getCommandLineOptions(), args);
 		
 		//		KeggInfoManagement manager = getManager();
 		//		k2s = new KEGG2jSBML(manager);
@@ -53,6 +52,7 @@ public class Translator {
 				|| (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props))) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
+					System.setProperty("user.language", Locale.ENGLISH.getLanguage());
 					TranslatorUI ui = new TranslatorUI();
 					ui.setVisible(true);
 				}
@@ -64,6 +64,16 @@ public class Translator {
 		
 	}
 	
+	/**
+	 * @return
+	 */
+	public static List<Class<? extends KeyProvider>> getCommandLineOptions() {
+		List<Class<? extends KeyProvider>> configList = new LinkedList<Class<? extends KeyProvider>>();
+		configList.add(TranslatorOptions.class);
+		configList.add(GUIOptions.class);
+		return configList;
+	}
+
 	/**
 	 * 
 	 * @param format - currently one of {SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}.
@@ -91,7 +101,7 @@ public class Translator {
 			
 		// Check and build output
 		File out = output == null ? null : new File(output);
-		if (out == null || output.length() < 1 || out.isDirectory()) {
+		if ((out == null) || (output.length() < 1) || out.isDirectory()) {
 			String fileExtension = BatchKEGGtranslator.getFileExtension(translator);
 			out = new File(removeFileExtension(input) + fileExtension);
 			

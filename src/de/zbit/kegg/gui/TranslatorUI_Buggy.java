@@ -135,7 +135,7 @@ public class TranslatorUI_Buggy extends JFrame implements ActionListener,
 	
 	static {
 		ImageTools.initImages(TranslatorUI_Buggy.class.getResource("img"));
-		GUITools.initLaF(KEGGtranslator.appName);
+		GUITools.initLaF(KEGGtranslator.APPLICATION_NAME);
 		
 		KeggInfoManagement manager = getManager();
 		k2s = new KEGG2jSBML(manager);
@@ -301,7 +301,7 @@ public class TranslatorUI_Buggy extends JFrame implements ActionListener,
 		
 		// Display the panel in an jFrame
 		JDialog f = new JDialog();
-		f.setTitle(KEGGtranslator.appName);
+		f.setTitle(KEGGtranslator.APPLICATION_NAME);
 		f.setSize(p.getPreferredSize());
 		f.setContentPane(p);
 		f.setPreferredSize(p.getPreferredSize());
@@ -335,7 +335,7 @@ public class TranslatorUI_Buggy extends JFrame implements ActionListener,
 	private void saveFile() {
 		if (isVisible() && (doc != null)) {
 			File file = GUITools.saveFileDialog(this, baseSaveDir, false, false,
-				JFileChooser.FILES_ONLY, SBFileFilter.SBML_FILE_FILTER);
+				JFileChooser.FILES_ONLY, SBFileFilter.createSBMLFileFilter());
 			if (file != null) {
 				try {
 					baseSaveDir = file.getParent();

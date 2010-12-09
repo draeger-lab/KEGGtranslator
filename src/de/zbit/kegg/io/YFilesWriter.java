@@ -30,7 +30,7 @@ public class YFilesWriter extends OutputStream implements Closeable {
 		// IMPORTANT NOTE: this MUST BE case sensitive, because
 		// Replacing occurences of yfiles will create incompatible
 		// files!
-		toReplace.put("yFiles", KEGGtranslator.appName);
+		toReplace.put("yFiles", KEGGtranslator.APPLICATION_NAME);
 		toReplace.put(y.util.YVersion.currentVersionString(), KEGGtranslator.VERSION_NUMBER);
 		
 		realOut = out;

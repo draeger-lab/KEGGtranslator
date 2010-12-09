@@ -193,7 +193,7 @@ public class SBasePanel extends JPanel {
 	private void addProperties(Constraint c) {
 		if (c.isSetMessage() || editable) {
 			lh.add(new JLabel("Message: "), 1, ++row, 1, 1, 1, 1);
-			JTextField tf = new JTextField(c.getMessage());
+			JTextField tf = new JTextField(c.getMessageString());
 			tf.setEditable(editable);
 			lh.add(tf, 3, ++row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
