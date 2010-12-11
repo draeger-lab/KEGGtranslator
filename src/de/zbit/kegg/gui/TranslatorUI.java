@@ -38,11 +38,13 @@ import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.ImageTools;
 import de.zbit.gui.JColumnChooser;
+import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.io.KEGGtranslator;
+import de.zbit.kegg.io.KEGGtranslatorHistory;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
@@ -354,15 +356,16 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.BaseFrame#openFile()
+	 * @see de.zbit.gui.BaseFrame#openFile(java.io.File[])
 	 */
-	public void openFile() {
+	public File[] openFile(File... files) {
 		// Ask input file
-		File[] file = GUITools.openFileDialog(this, openDir, false, true,
+		if ((files == null) || (files.length < 1)) {
+			files = GUITools.openFileDialog(this, openDir, false, true,
 				JFileChooser.FILES_ONLY, new FileFilterKGML());
-		if ((file == null) || (file.length < 1)) {
-			return;
+		}
+		if ((files == null) || (files.length < 1)) {
+			return files;
 		}
 
 		// Ask output format
@@ -375,9 +378,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				.toString();
 
 		// Translate
-		for (File f : file) {
+		for (File f : files) {
 			createNewTab(f, format);
 		}
+		return files;
 	}
 
 	/**
@@ -614,5 +618,20 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	public URL getURLOnlineUpdate() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getFileHistoryKeyProvider()
+	 */
+	@Override
+	public Class<? extends FileHistory> getFileHistoryKeyProvider() {
+		return KEGGtranslatorHistory.class;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#getMaximalFileHistorySize()
+	 */
+	public short getMaximalFileHistorySize() {
+		return 10;
 	}
 }
