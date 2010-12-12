@@ -595,7 +595,7 @@ public class SBasePanel extends JPanel {
 		sboTermField.setEditable(editable);
 		if (sbase.isSetSBOTerm()) {
 			sboTermField.setText(SBO.getTerm(sbase.getSBOTerm())
-					.getDescription().replace("\\,", ","));
+					.getDefinition().replace("\\,", ","));
 			sboTermField.setColumns(sboTermField.getText().length());
 		}
 		lh.add(sboTermField, 3, row, 1, 1, 1, 1);
