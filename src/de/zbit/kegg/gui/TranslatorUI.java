@@ -11,9 +11,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.prefs.BackingStoreException;
 
@@ -129,7 +129,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	private JTabbedPane tabbedPane;
 	/**
-	 * prefs is holding all project specific preferences
+	 * preferences is holding all project specific preferences
 	 */
 	private SBPreferences prefs;
 
@@ -428,15 +428,6 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
-	 */
-	public void windowActivated(WindowEvent we) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	public void keyPressed(KeyEvent e) {
@@ -480,6 +471,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * 
 	 * @see de.zbit.gui.BaseFrame#additionalFileMenuItems()
 	 */
+	@Override
 	protected JMenuItem[] additionalFileMenuItems() {
 		return new JMenuItem[] { GUITools.createJMenuItem(this,
 				Action.TO_LATEX, UIManager.getIcon("ICON_LATEX_16"), KeyStroke
@@ -616,8 +608,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#getURLOnlineUpdate()
 	 */
 	public URL getURLOnlineUpdate() {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return Translator.getURLOnlineUpdate();
+		} catch (MalformedURLException exc) {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)

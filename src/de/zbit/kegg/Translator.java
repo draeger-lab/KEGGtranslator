@@ -2,7 +2,9 @@ package de.zbit.kegg;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -74,6 +76,14 @@ public class Translator {
 		return configList;
 	}
 
+	/**
+	 * @throws MalformedURLException 
+	 * 
+	 */
+	public static URL getURLOnlineUpdate() throws MalformedURLException {
+		return new URL("http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/");
+	}
+	
 	/**
 	 * 
 	 * @param format - currently one of {SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}.
