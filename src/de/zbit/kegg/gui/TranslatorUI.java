@@ -532,23 +532,23 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		// Close the app and save caches.
 		setVisible(false);
 		try {
-			Translator.saveCache();
-
-			SBProperties props = new SBProperties();
-			props.put(GUIOptions.OPEN_DIR, openDir);
-			props.put(GUIOptions.SAVE_DIR, saveDir);
-			SBPreferences.saveProperties(GUIOptions.class, props);
-
-			props = new SBProperties();
-			if (getInputFile(toolBar) != null) {
-				props.put(TranslatorOptions.INPUT, getInputFile(toolBar));
-			}
-			props.put(TranslatorOptions.FORMAT, getOutputFileFormat(toolBar));
-			SBPreferences.saveProperties(TranslatorOptions.class, props);
-
+		  Translator.saveCache();
+		  
+		  SBProperties props = new SBProperties();
+		  if (getInputFile(toolBar) != null) {
+		    props.put(TranslatorOptions.INPUT, getInputFile(toolBar));
+		  }
+		  props.put(TranslatorOptions.FORMAT, getOutputFileFormat(toolBar));
+		  SBPreferences.saveProperties(TranslatorOptions.class, props);
+		  
+		  props = new SBProperties();
+		  props.put(GUIOptions.OPEN_DIR, openDir);
+		  props.put(GUIOptions.SAVE_DIR, saveDir);
+		  SBPreferences.saveProperties(GUIOptions.class, props);
+		  
 		} catch (BackingStoreException exc) {
-			exc.printStackTrace();
-			// Unimportant error... don't bother the user here.
+		  exc.printStackTrace();
+		  // Unimportant error... don't bother the user here.
 			// GUITools.showErrorMessage(this, exc);
 		}
 		dispose();
