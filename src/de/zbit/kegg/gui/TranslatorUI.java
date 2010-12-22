@@ -33,7 +33,6 @@ import org.sbml.tolatex.gui.LaTeXExportDialog;
 
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
-import de.zbit.gui.FileDropHandler;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.ImageTools;
@@ -72,12 +71,12 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		 * Invisible {@link Action} that should be performed, whenever an
 		 * translation is done.
 		 */
-		TRANSLATION_DONE,
+		TRANSLATION_DONE;
 		/**
 		 * Invisible {@link Action} that should be performed, whenever a file
 		 * has been droppen on this panel.
 		 */
-		FILE_DROPPED;
+		//FILE_DROPPED
 
 		/*
 		 * (non-Javadoc)
@@ -146,9 +145,6 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		file = new File(prefs.get(TranslatorOptions.OUTPUT));
 		saveDir = file.isDirectory() ? file.getAbsolutePath() : file
 				.getParent();
-		// Make this panel responsive to drag'n drop events.
-		FileDropHandler dragNdrop = new FileDropHandler(this);
-		this.setTransferHandler(dragNdrop);
 	}
 
 	/*
@@ -292,6 +288,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				}
 				updateButtons();
 				break;
+				/* Moved to BaseFrame.
 			case FILE_DROPPED:
 				String format = getOutputFileFormat(toolBar);
 				if ((format == null) || (format.length() < 1)) {
@@ -299,6 +296,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				}
 				createNewTab(((File) e.getSource()), format);
 				break;
+				*/
 			case TO_LATEX:
 				writeLaTeXReport();
 				break;
@@ -359,23 +357,28 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#openFile(java.io.File[])
 	 */
 	public File[] openFile(File... files) {
+	  boolean askOutputFormat = false;
+	  
 		// Ask input file
 		if ((files == null) || (files.length < 1)) {
 			files = GUITools.openFileDialog(this, openDir, false, true,
 				JFileChooser.FILES_ONLY, new FileFilterKGML());
+			
+			askOutputFormat=true;
 		}
 		if ((files == null) || (files.length < 1)) {
 			return files;
 		}
+		
+    // Ask output format
+    String format = getOutputFileFormat(toolBar);
+    if ( askOutputFormat || (format == null) || (format.length() < 1)) {
+      JColumnChooser outputFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, null, null);
+      outputFormat.setTitle("Please select the output format");
+      JOptionPane.showMessageDialog(this, outputFormat, KEGGtranslator.APPLICATION_NAME, JOptionPane.QUESTION_MESSAGE);
+      format = ((JColumnChooser) outputFormat).getSelectedItem().toString();
+    }
 
-		// Ask output format
-		JColumnChooser outputFormat = (JColumnChooser) PreferencesPanel
-				.getJComponentForOption(TranslatorOptions.FORMAT, null, null);
-		outputFormat.setTitle("Please select the output format");
-		JOptionPane.showMessageDialog(this, outputFormat,
-				KEGGtranslator.APPLICATION_NAME, JOptionPane.QUESTION_MESSAGE);
-		String format = ((JColumnChooser) outputFormat).getSelectedItem()
-				.toString();
 
 		// Translate
 		for (File f : files) {
