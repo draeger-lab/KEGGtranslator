@@ -67,6 +67,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		 * {@link Action} for LaTeX export.
 		 */
 		TO_LATEX,
+    /**
+     * {@link Action} for downloaing KGMLs.
+     */
+		DOWNLOAD_KGML,
 		/**
 		 * Invisible {@link Action} that should be performed, whenever an
 		 * translation is done.
@@ -102,6 +106,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			switch (this) {
 			case TO_LATEX:
 				return "Converts the currently opened model to a LaTeX report file.";
+			case DOWNLOAD_KGML:
+        return "Downloads KGML-formatted XML pathways from KEGG server.";
 			default:
 				return "Unknown";
 			}
@@ -259,7 +265,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				openDir = inFile.getParent();
 				tabbedPane.addTab(inFile.getName(), new TranslatorPanel(inFile,
 						format, this));
-				// tabbedPane.setSelectedComponent(tb);
+				tabbedPane.setSelectedIndex(tabbedPane.getComponentCount()-1);
 			} catch (Exception e1) {
 				GUITools.showErrorMessage(this, e1);
 			}
@@ -300,6 +306,14 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			case TO_LATEX:
 				writeLaTeXReport();
 				break;
+      case DOWNLOAD_KGML:
+        try {
+          tabbedPane.addTab(action.getName(), new TranslatorPanel(this));
+          tabbedPane.setSelectedIndex(tabbedPane.getComponentCount()-1);
+        } catch (Exception e1) {
+          GUITools.showErrorMessage(this, e1);
+        }
+        break;
 			default:
 				System.out.println(action);
 				break;
@@ -479,7 +493,12 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return new JMenuItem[] { GUITools.createJMenuItem(this,
 				Action.TO_LATEX, UIManager.getIcon("ICON_LATEX_16"), KeyStroke
 						.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK), 'E',
-				false) };
+				false),
+				GUITools.createJMenuItem(this,
+	        Action.DOWNLOAD_KGML, UIManager.getIcon("ICON_GEAR_16"), KeyStroke
+	            .getKeyStroke('D', InputEvent.CTRL_DOWN_MASK), 'D',
+	        true)
+	        };
 	}
 
 	/*
@@ -538,7 +557,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  
 		  props = new SBProperties();
 		  props.put(GUIOptions.OPEN_DIR, openDir);
-		  props.put(GUIOptions.SAVE_DIR, saveDir);
+		  if (saveDir!=null && saveDir.length()>1)
+		    props.put(GUIOptions.SAVE_DIR, saveDir);
 		  SBPreferences.saveProperties(GUIOptions.class, props);
 		  
 		} catch (BackingStoreException exc) {

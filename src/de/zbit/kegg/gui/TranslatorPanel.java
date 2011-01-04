@@ -7,12 +7,14 @@ package de.zbit.kegg.gui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -34,11 +36,15 @@ import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
 import de.zbit.gui.GUITools;
+import de.zbit.gui.JColumnChooser;
+import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.ProgressBarSwing;
 import de.zbit.gui.VerticalLayout;
 import de.zbit.gui.BaseFrame.BaseAction;
+import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.gui.TranslatorUI.Action;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
@@ -46,6 +52,8 @@ import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.FileDownload;
+import de.zbit.util.Reflect;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
 
@@ -56,8 +64,8 @@ import de.zbit.util.prefs.SBPreferences;
  */
 public class TranslatorPanel extends JPanel {
   private static final long serialVersionUID = 6030311193210321410L;
-  final File inputFile;
-  final String outputFormat;
+  File inputFile;
+  String outputFormat;
   boolean documentHasBeenSaved=false;
   
   /**
@@ -90,6 +98,98 @@ public class TranslatorPanel extends JPanel {
     translate();
   }
   
+  /**
+   * Puts a download-KGML-panel on this Translator panel and replaces it
+   * with the translation of the downloaded kgml, as soon as the user
+   * has choosen a pathway.
+   * @param translationResult
+   */
+  public TranslatorPanel(ActionListener translationResult) {
+    super();
+    setLayout(new BorderLayout());
+    setOpaque(false);
+    this.inputFile = null;
+    this.outputFormat = null;
+    this.translationListener = translationResult;
+    
+    showDownloadPanel(new LayoutHelper(this));
+  }
+  
+  public void showDownloadPanel(LayoutHelper lh) {
+    try {
+      final PathwaySelector selector = PathwaySelector.createPathwaySelectorPanel(Translator.getFunctionManager(), lh);
+      JComponent oFormat=null;
+      if ((outputFormat == null) || (outputFormat.length() < 1)) {
+        oFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, null, null);
+        oFormat =((JColumnChooser) oFormat).getColumnChooser();
+        lh.add("Please select the output format", oFormat, false);
+      }
+      final JComponent oFormatFinal = oFormat;
+
+      JButton okButton = new JButton("OK");
+      //okButton.addActionListener()
+      JPanel p2 = new JPanel();
+      p2.setLayout(new FlowLayout(FlowLayout.LEFT));
+      p2.add(okButton);
+      lh.add(p2);
+      okButton.setEnabled(GUITools.isEnabled(lh.getContainer()));
+      
+      // Action
+      final Container thiss = lh.getContainer();
+      okButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          // Show progress-bar
+          removeAll();
+          setLayout(new BorderLayout()); // LayoutHelper creates a GridBaglayout, reset it to default.
+          final AbstractProgressBar pb = generateLoadingPanel(thiss, "Downloading '" + selector.getSelectedPathway() + "' " +
+          		"for '"+selector.getOrganismSelector().getSelectedOrganism()+"'...");
+          FileDownload.ProgressBar = pb;
+          repaint();
+          
+          // Execute download and translation in new thread
+          final SwingWorker<String, Void> downloadWorker = new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() throws Exception {
+              return KGMLSelectAndDownload.evaluateOKButton(selector);
+            }
+            protected void done() {
+              String localFile=null;
+              try {
+                localFile = get();
+              } catch (Exception e) {
+                e.printStackTrace();
+                GUITools.showErrorMessage(thiss, e);
+              }
+              if (localFile!=null) {            
+                // Perform translation
+                inputFile = new File(localFile);
+                outputFormat = Reflect.invokeIfContains(oFormatFinal, "getSelectedItem").toString();
+                removeAll();
+                repaint();
+                
+                translate();
+                GUITools.packParentWindow(thiss);
+              } else {
+                // Remove the tab
+                thiss.getParent().remove(thiss);
+              }
+            }
+          };
+          downloadWorker.execute();
+          
+        }
+      });
+      
+      // Show the selector.
+      GUITools.enableOkButtonIfAllComponentsReady(lh.getContainer(), okButton);
+      if (lh.getContainer() instanceof JComponent) {
+        GUITools.setOpaqueForAllElements((JComponent)lh.getContainer(), false);
+      }
+    } catch (Throwable exc) {
+      GUITools.showErrorMessage(lh.getContainer(), exc);
+    }
+    
+  }
   
   /**
    * Translates the {@link #inputFile} to {@link #outputFormat}.
@@ -352,8 +452,13 @@ public class TranslatorPanel extends JPanel {
       GUITools.setEnabled(true, menuBar, BaseAction.FILE_SAVE, BaseAction.FILE_CLOSE);
       GUITools.setEnabled(false, menuBar,Action.TO_LATEX);
     } else {
-      // E.g. when translation still in progress
+      // E.g. when translation still in progress, or on download frame
       GUITools.setEnabled(false, menuBar, BaseAction.FILE_SAVE, Action.TO_LATEX, BaseAction.FILE_CLOSE);
+      
+      if (this.inputFile==null) {
+        // Download frame or invalid menu item
+        GUITools.setEnabled(true, menuBar, BaseAction.FILE_CLOSE);
+      }
     }
   }
   

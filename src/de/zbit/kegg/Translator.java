@@ -33,6 +33,12 @@ public class Translator {
    * Access via {@link #getManager()}.
    */
   private static KeggInfoManagement manager=null;
+  /**
+   * The cache to be used by all KEGG-Functions interacting classes.
+   * Access via {@link #getFunctionManager()}.
+   */
+  private static KeggFunctionManagement managerFunction=null;
+  
 	/**
 	 * @param args
 	 * @throws BackingStoreException
@@ -171,12 +177,34 @@ public class Translator {
 		return manager;
 	}
 	
+	 public synchronized static KeggFunctionManagement getFunctionManager() {
+	    
+	    // Try to load from cache file
+	    if (managerFunction==null && new File(KEGGtranslator.cacheFunctionFileName).exists() && new File(KEGGtranslator.cacheFunctionFileName).length() > 0) {
+	      try {
+	        managerFunction = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem(KEGGtranslator.cacheFunctionFileName);
+	      } catch (IOException e) {
+	        e.printStackTrace();
+	      }
+	    }
+	    
+	    // Create new, if loading failed
+	    if (managerFunction==null) {
+	      managerFunction = new KeggFunctionManagement();
+	    }
+	    
+	    return managerFunction;
+	  }
+	
 	/**
 	 * Remember already queried KEGG objects (save cache)
 	 */
 	public synchronized static void saveCache() {
     if (manager!=null && manager.hasChanged()) {
       KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, manager);
+    }
+    if (managerFunction!=null && managerFunction.isCacheChangedSinceLastLoading()) {
+      KeggFunctionManagement.saveToFilesystem(KEGGtranslator.cacheFunctionFileName, managerFunction);
     }
 	}
 	

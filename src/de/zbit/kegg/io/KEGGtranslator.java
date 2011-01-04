@@ -25,6 +25,12 @@ public interface KEGGtranslator {
    * and saved upon exit.
    */
   public static String cacheFileName = "keggdb.dat";
+  /**
+   * Filename of the KEGG function cache file (implemented just
+   * like the browser cache). Must be loded upon start
+   * and saved upon exit.
+   */  
+  public static String cacheFunctionFileName = "keggfc.dat";
   
 	/**
 	 * Translate a given KEGG Pathway and write it in the new format to outfile.
