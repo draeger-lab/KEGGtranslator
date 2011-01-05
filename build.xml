@@ -1,0 +1,192 @@
+<!-- ANT build script for yfiles obfuscation           -->
+<!-- The java based ANT tool is available from         -->
+<!-- http://jakarta.apache.org/ant                     -->
+<project name="KEGGtranslator with Obfuscation" default="obfuscate" basedir=".">
+
+  <target name="help">
+    <echo>
+      BLA
+    </echo>
+  </target>
+
+  <!-- define some properties that are used throughout the tasks -->
+  <target name="init">
+    <!-- the base directory of the yFiles installation -->
+    <property name="base" location="."/>
+    <!-- the path to the demo sources -->
+    <property name="src" location="${base}/src"/>
+    <!-- the path to the demo classes -->
+    <property name="classes" location="${base}/bin"/>
+    <!-- the unobfuscated yFiles jar file -->
+    <property name="yJar" location="${base}/lib/y.jar"/>
+    
+    <!-- the unobfuscated application jar file -->
+    <property name="appJar" value="KEGGtranslator.jar"/>
+    <!-- the obfuscated yFiles jar file -->
+    <property name="yJarObf" value="yObf.jar"/>
+    <!-- the obfuscated application jar file -->
+    <property name="appJarObf" value="KEGGtranslatorObf.jar"/>
+    <!-- the yGuard jar file containing the obfuscation task -->
+    <property name="yGuardJar" value="yguard.jar"/>
+    <!-- the log file geenrated by the obfuscation task -->
+    <property name="obfuscationLog" value="obfuscation-log.xml"/>
+  </target>
+
+  <!-- puts the application specific classes into application.jar. -->
+  <target name="jar" depends="init">
+    <delete file="${appJar}"/>
+    <jar jarfile="${appJar}">
+            <manifest>
+                <attribute name="Built-By" value="Wrzodek et al"/>
+                <attribute name="Main-Class" value="de.zbit.kegg.Translator"/>
+                <attribute name="SplashScreen-Image" value="de/zbit/kegg/gui/img/Logo.gif"/>
+            </manifest>
+      <!-- INCLUDE/ EXCLUDE DEMO-->
+      <!--<fileset dir="${src}">-->
+      <!--  <include name="demo/view/**/*.properties"/>-->
+      <!--  <exclude name="demo/view/**/resource/**"/>-->
+      <!--</fileset>-->
+            <fileset dir="${classes}">
+            	<exclude name="**/package.html"/>
+            </fileset>	
+            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/y.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/HotEqn.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jaxen-core.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jaxen-jdom.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jdom.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/keggapi.jar"/>
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/stax-api-1.0.1.jar"/> -->
+
+            <fileset dir="${base}/../SysBio/bin">
+              <exclude name="de/zbit/resources/liftover/*"/>
+            	<exclude name="**/package.html"/>
+            </fileset>
+            <zipfileset excludes="META-INF/*" src="${base}/../SysBio/lib/commons-discovery.jar"/>
+            <zipfileset excludes="META-INF/*" src="${base}/../SysBio/lib/commons-logging.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../SysBio/lib/jaxrpc.jar"/>
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../SysBio/lib/keggapi.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../SysBio/lib/wsdl4j.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../SysBio/lib/axis.jar"/>
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../SysBio/lib/Java5/saaj.jar"/>-->
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../SysBio/lib/WSDbfetch.jar"/>-->
+            <zipfileset excludes="META-INF/*" src="${base}/../SysBio/lib/commons-cli-1.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../SysBio/lib/argparser.jar"/>
+            
+            <fileset dir="${base}/../jSBML/bin">
+              <exclude name="log4j.properties"/> <!-- log4j.properties is in SBML2Latex and jSBML -->
+            </fileset>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/biojava.jar"/>
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/junit-4.8.jar"/>-->
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/log4j-1.2.8.jar"/>
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/stax-api-1.0.1.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/staxmate-2.0.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/xstream-1.3.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/jigsaw-dataParser.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/stax2-api-3.0.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF,META-INF/LICENSE*" src="${base}/../jSBML/lib/woodstox-core-lgpl-4.0.9.jar"/>
+            
+            <fileset dir="${base}/../SBML2LaTeX/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../SBML2LaTeX/lib/html2latex.jar"/>
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../SBML2LaTeX/lib/jaxen-core.jar"/> -->
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../SBML2LaTeX/lib/jaxen-jdom.jar"/> -->
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../SBML2LaTeX/lib/jdom.jar"/> -->
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../SBML2LaTeX/lib/saxpath.jar"/>
+      
+    </jar>
+  </target>
+
+  <!-- obfuscates y.jar and adjusts application.jar accordingly. -->
+  <!-- Generates the jar files yObf.jar and applicationObf.jar.  -->
+  <target name="obfuscate" depends="init">
+    <taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="${yGuardJar}"/>
+    <yguard>
+
+      <!-- obfuscate yFiles for public deployment -->
+      <inoutpair in="${yJar}" out="${yJarObf}"/>
+      <!-- adjust your application accordingly to work with the obfuscated yFiles jar  -->
+      <inoutpair in="${appJar}" out="${appJarObf}"/>
+
+      <!-- [OPTIONALLY] Keep the line number table and the source file attributes
+                 of the public part of the "application" -->
+      <attribute name="LineNumberTable,LocalVariableTable,SourceFile">
+        <patternset>
+          <include name="de.zbit.**"/>
+        </patternset>
+      </attribute>
+
+      <rename logfile="${obfuscationLog}" replaceClassNameStrings="true" mainclass="de.zbit.kegg.Translator">
+        <!-- conservemanifest="true" -->
+        <!-- use some unique package prefix for obfuscated classes to avoid name clashes -->
+        <property name="obfuscation-prefix" value="kgtrans"/>
+
+
+        <keep>
+        
+        	<package>
+        		<patternset>
+          	  <include name="de.**.*"/>
+        		</patternset>
+        	</package>
+
+          
+             <!-- Keep all method, field, and class names of the "application"             -->
+             <!-- This could be adjusted to your needs if you don't want to let            -->
+             <!-- your whole application unobfuscated.                                     -->
+             <!-- In that case simply add some more "exclude" statements as depicted below -->
+             <class classes="private" methods="private" fields="private">
+              <patternset>
+              	<!-- Do not obfuscate anything, by default -->
+               <include name="**.*"/>
+
+                <!-- Obfuscate all classes that make use of y.jar -->
+                <exclude name="de.zbit.kegg.gui.TranslatorPanel"/>
+                <exclude name="de.zbit.kegg.gui.RestrictedEditMode"/>
+                <exclude name="de.zbit.kegg.extensions.GenericDataMap"/>
+                <exclude name="de.zbit.kegg.io.KEGG2yGraph"/>
+                <exclude name="de.zbit.kegg.io.YFilesWriter"/>
+               
+               <!-- Obfuscate the included y.jar -->
+               <exclude name="y.**.*"/>
+              </patternset>
+             </class>
+        		
+        </keep>
+
+        <!-- make sure that the .properties files are renamed according to their               -->
+        <!-- corresponding class files, yFiles needs this to function properly when obfuscated -->
+        <adjust replaceName="true">
+          <include name="y/**/*.properties"/>
+        </adjust>
+      </rename>
+    </yguard>
+  </target>
+
+
+  <!-- executes the obfuscated application -->
+  <target name="run" depends="obfuscate">
+    <java classname="de.zbit.kegg.Translator" fork="true">
+      <classpath>
+        <pathelement location="${yJarObf}"/>
+        <pathelement location="${appJarObf}"/>
+      </classpath>
+    </java>
+  </target>
+
+  <!-- opens a small browser that shows the name mapping performed by yGuard. -->
+  <target name="show" depends="obfuscate">
+    <echo message="${obfuscationLog}"/>
+    <java jar="${yGuardJar}" fork="true">
+      <arg value="${obfuscationLog}"/>
+    </java>
+  </target>
+
+  <!-- Removes all that has been built -->
+  <target name="clean" depends="init">
+    <delete file="${yJarObf}"/>
+    <delete file="${appJar}"/>
+    <delete file="${appJarObf}"/>
+    <delete file="${obfuscationLog}"/>
+    <delete includeemptydirs="true" dir="${classes}"/>
+  </target>
+
+</project>

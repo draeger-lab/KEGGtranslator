@@ -181,7 +181,7 @@ public class Translator {
 		if (manager==null && new File(KEGGtranslator.cacheFileName).exists() && new File(KEGGtranslator.cacheFileName).length() > 0) {
 			try {
 				manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
-			} catch (IOException e) {
+			} catch (Throwable e) { // IOException or class cast, if class is moved.
 				e.printStackTrace();
 			}
 		}
@@ -200,7 +200,7 @@ public class Translator {
 	    if (managerFunction==null && new File(KEGGtranslator.cacheFunctionFileName).exists() && new File(KEGGtranslator.cacheFunctionFileName).length() > 0) {
 	      try {
 	        managerFunction = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem(KEGGtranslator.cacheFunctionFileName);
-	      } catch (IOException e) {
+	      } catch (Throwable e) { // IOException or class cast, if class is moved.
 	        e.printStackTrace();
 	      }
 	    }
