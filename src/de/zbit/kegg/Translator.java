@@ -1,5 +1,6 @@
 package de.zbit.kegg;
 
+import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -63,16 +64,32 @@ public class Translator {
 					System.setProperty("user.language", Locale.ENGLISH.getLanguage());
 					TranslatorUI ui = new TranslatorUI();
 					ui.setVisible(true);
+					hideSplashScreen();
 				}
 			});
 		} else {
 			translate(TranslatorOptions.FORMAT.getValue(props), props
 					.get(TranslatorOptions.INPUT), props.get(TranslatorOptions.OUTPUT));
+			hideSplashScreen();
 		}
-		
 	}
 	
 	/**
+   * The JVM command line allows to show splash screens. If the user made
+   * use of this functionality, the following code will hide the screen as soon
+   * as the application is ready.
+   */
+  private static void hideSplashScreen() {
+    try {
+      final SplashScreen splash = SplashScreen.getSplashScreen();
+      if (splash == null) {
+        return;
+      }
+      splash.close();
+    } catch (Throwable t) {}
+  }
+
+  /**
 	 * @return
 	 */
 	public static List<Class<? extends KeyProvider>> getCommandLineOptions() {

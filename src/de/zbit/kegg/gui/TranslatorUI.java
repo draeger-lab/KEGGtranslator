@@ -586,7 +586,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#getURLAboutMessage()
 	 */
 	public URL getURLAboutMessage() {
-		return getClass().getResource("../html/about.html");
+		//return getClass().getResource("../html/about.html");
+	  // "../" does not work inside a jar.
+		return Translator.class.getResource("html/about.html");
 	}
 
 	/*
@@ -595,7 +597,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#getURLLicense()
 	 */
 	public URL getURLLicense() {
-		return getClass().getResource("../html/license.html");
+		//return getClass().getResource("../html/license.html");
+   	// "../" does not work inside a jar.
+		return Translator.class.getResource("html/license.html");
 	}
 
 	/*
@@ -604,7 +608,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#getURLOnlineHelp()
 	 */
 	public URL getURLOnlineHelp() {
-		return getClass().getResource("../html/help.html");
+		//return getClass().getResource("../html/help.html");
+  	// "../" does not work inside a jar.
+	  return Translator.class.getResource("html/help.html");
 	}
 
 	/*
