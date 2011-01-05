@@ -54,8 +54,8 @@ import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileDownload;
 import de.zbit.util.Reflect;
-import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
+import de.zbit.util.prefs.SBProperties;
 
 /**
  * This should be used as a panel on a JTabbedPane.
@@ -120,7 +120,7 @@ public class TranslatorPanel extends JPanel {
       final PathwaySelector selector = PathwaySelector.createPathwaySelectorPanel(Translator.getFunctionManager(), lh);
       JComponent oFormat=null;
       if ((outputFormat == null) || (outputFormat.length() < 1)) {
-        oFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, null, null);
+        oFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, (SBProperties)null, null);
         oFormat =((JColumnChooser) oFormat).getColumnChooser();
         lh.add("Please select the output format", oFormat, false);
       }
@@ -398,13 +398,12 @@ public class TranslatorPanel extends JPanel {
       e.printStackTrace();
       return null;
     }
-    if (!f.canWrite() || f.isDirectory() || (showOverride && !GUITools.overwriteExistingFile(this, f))) {
-      JOptionPane.showMessageDialog(this, StringUtil.toHTML(
-        "Cannot write to file " + f.getAbsolutePath() + ".", 60),
-        "No writing access", JOptionPane.WARNING_MESSAGE);
-    }
-    
-    return saveToFile(f, extension);
+		if (!f.canWrite() || f.isDirectory()) {
+			GUITools.showNowWritingAccessWarning(this, f);
+    } else if (!showOverride || (showOverride && GUITools.overwriteExistingFile(this, f))) {
+    	return saveToFile(f, extension);
+		}
+		return null;
   }
   
   public File saveToFile(File file, String format) {

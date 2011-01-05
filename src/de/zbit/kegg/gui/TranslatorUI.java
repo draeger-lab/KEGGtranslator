@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.prefs.BackingStoreException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -35,7 +36,6 @@ import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
-import de.zbit.gui.ImageTools;
 import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.FileSelector;
@@ -68,7 +68,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		 */
 		TO_LATEX,
     /**
-     * {@link Action} for downloaing KGMLs.
+     * {@link Action} for downloading KGMLs.
      */
 		DOWNLOAD_KGML,
 		/**
@@ -120,8 +120,12 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	private static final long serialVersionUID = 6631262606716052915L;
 
 	static {
-		ImageTools.initImages(LaTeXExportDialog.class.getResource("img"));
-		ImageTools.initImages(TranslatorUI.class.getResource("img"));
+		LaTeXExportDialog.initImages();
+		String iconPaths[] = {};
+		for (String path : iconPaths) {
+			UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(
+				TranslatorUI.class.getResource("img/" + path)));
+		}
 	}
 
 	/**
@@ -354,7 +358,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			if ((JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this,
 					StringUtil.toHTML(String.format(
 							"Do you really want to close %s without saving?",
-							title), 60), "Close selected document",
+							title), GUITools.TOOLTIP_LINE_LENGTH), "Close selected document",
 					JOptionPane.YES_NO_OPTION))) {
 				return false;
 			}
@@ -387,7 +391,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
     // Ask output format
     String format = getOutputFileFormat(toolBar);
     if ( askOutputFormat || (format == null) || (format.length() < 1)) {
-      JColumnChooser outputFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, null, null);
+      JColumnChooser outputFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, (SBProperties)null, null);
       outputFormat.setTitle("Please select the output format");
       JOptionPane.showMessageDialog(this, outputFormat, KEGGtranslator.APPLICATION_NAME, JOptionPane.QUESTION_MESSAGE);
       format = ((JColumnChooser) outputFormat).getSelectedItem().toString();
