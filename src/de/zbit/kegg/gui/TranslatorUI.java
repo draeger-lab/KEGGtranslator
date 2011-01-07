@@ -121,7 +121,6 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	private static final long serialVersionUID = 6631262606716052915L;
 
 	static {
-		LaTeXExportDialog.initImages();
 		String iconPaths[] = {};
 		for (String path : iconPaths) {
 			UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(

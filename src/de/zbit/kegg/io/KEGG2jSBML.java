@@ -202,6 +202,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
   public void setTreatEntrysWithReactionDifferent(boolean b) {
     this.treatEntrysWithReactionDifferent = b;
   }
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.AbstractKEGGtranslator#isOutputFunctional()
+   */
+  @Override
+  public boolean isOutputFunctional() {
+    return true;
+  }
   
   /**
    * Returns the default compartment size.

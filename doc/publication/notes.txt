@@ -16,3 +16,7 @@ Publizieren in Oxford Bioinformatics
 - Geplante Erweiterung: libSBGN Anbindung (SBML => Funktional || SBGN => Grafische erweiterung, deshalb für relations geeignet).
 
 
+Lizenz:
+- Standard: GPL wegen HotEQ & to-LaTeX_dependencies
+- Abgespeckte Version ohne toLatex und HotEQ: L-GPL v3
+- Webservice: L-GPL v3

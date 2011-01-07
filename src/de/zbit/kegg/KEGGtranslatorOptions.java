@@ -21,7 +21,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    * If true, remove all nodes that have no edges, before translating the pathway.
    */
   public static final Option<Boolean> REMOVE_ORPHANS = new Option<Boolean>("REMOVE_ORPHANS",Boolean.class,
-      "If true, remove all nodes that have no edges, before translating the pathway.", (short) 2, "-ro", false);
+      "If true, remove all nodes that have no edges, before translating the pathway.", (short) 2, "-ro", true);
 
   /**
    * If true, shows only short names of all KEGG entries.
@@ -66,6 +66,8 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    */
   public static final Option<Boolean> MERGE_NODES_WITH_SAME_EDGES = new Option<Boolean>("MERGE_NODES_WITH_SAME_EDGES",Boolean.class,
       "If true, merges all nodes that have exactly the same relations (sources, targets and types).", (short) 2, "--merge", false);
+  public static final Option<Boolean> CREATE_EDGE_LABELS = new Option<Boolean>("CREATE_EDGE_LABELS",Boolean.class,
+      "If true, creates describing labels for each edge in the graph.", (short) 2, "--cel", false);
   
   /**
    * Define various options that are used in yFiles based translations.
@@ -74,7 +76,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   public static final OptionGroup<Boolean> GRAPH_OPTIONS = new OptionGroup<Boolean>(
       "Translation options for graphical outputs",
       "Define various options that are used in yFiles based translations.",
-      MERGE_NODES_WITH_SAME_EDGES);
+      MERGE_NODES_WITH_SAME_EDGES, CREATE_EDGE_LABELS);
   
   /*
    * Funcional, SBML based translations

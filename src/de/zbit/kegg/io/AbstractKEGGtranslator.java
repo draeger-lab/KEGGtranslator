@@ -207,6 +207,14 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     this.autocompleteReactions = autocompleteReactions;
   }
 
+  /**
+   * This function should return true, if the output should be used
+   * functionally. If false, only a graphical pahtway representation
+   * is created (e.g. reactions can be skipped).
+   * E.g. SBML is functional (returns true) and GraphML is graphical
+   * (returns false).
+   */
+  public abstract boolean isOutputFunctional();
 
   /**
    * See {@link #manager}
@@ -260,6 +268,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @param p
    */
   private void preProcessPathway(Pathway p) {
+    boolean functionalOutput = isOutputFunctional();
     if (!retrieveKeggAnnots) {
       KeggInfoManagement.offlineMode = true;
     } else {
@@ -267,18 +276,18 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       
       // Prefetch kegg information (enormas speed improvement).
       System.out.print("Fetching information from KEGG online resources... ");
-      KeggTools.preFetchInformation(p,manager,autocompleteReactions);
+      KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false);
       System.out.println("done.");
       
       // Auto-complete the reaction by adding all substrates, products and enzymes.
-      if (autocompleteReactions) {
+      if (autocompleteReactions && functionalOutput) {
         KeggTools.autocompleteReactions(p, manager);
       }
     }
     
     // Preprocess pathway
     if (removeOrphans) {
-      KeggTools.removeOrphans(p, considerRelations);
+      KeggTools.removeOrphans(p, functionalOutput?considerRelations:true,functionalOutput);
     }
     
     // Skip it, if it's white
@@ -397,9 +406,16 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @return short name.
    */
   protected static String shortenName(String name) {
-    if (name.contains(",")) {
+    /*if (name.contains(",")) {
       return name.substring(0, name.indexOf(",")-1);
+    }*/
+    String[] names = name.split(",");
+    for (String name2: names) {
+      if (name2.length()<name.length()) {
+        name = name2;
+      }
     }
+    
     return name;
   }
 

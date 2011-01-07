@@ -80,7 +80,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * to one node if this is set to true.
    */
   private boolean groupNodesWithSameEdges=false;
-  
+  /**
+   * Create labels for edges (activation, compound, phosphorylation, etc.)
+   * or not.
+   */
+  private boolean createEdgeLabels=false;
   /**
    * Important: This determines the output format. E.g. a GraphMLIOHandler
    * will write a graphML file, a GMLIOHandler will write a GML file.
@@ -163,6 +167,29 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     this.groupNodesWithSameEdges = groupNodesWithSameEdges;
   }
   /**
+   * If labels for edges are being generated or not.
+   * Examples: (activation, compound, phosphorylation, etc.)
+   * @return createEdgeLabel
+   */
+  public boolean isCreateEdgeLabels() {
+    return createEdgeLabels;
+  }
+  /**
+   * @see #isCreateEdgeLabels()
+   * @param createEdgeLabel the createEdgeLabel to set
+   */
+  public void setCreateEdgeLabels(boolean createEdgeLabels) {
+    this.createEdgeLabels = createEdgeLabels;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.AbstractKEGGtranslator#isOutputFunctional()
+   */
+  @Override
+  public boolean isOutputFunctional() {
+    return false;
+  }
+  /**
    * The IOHandler determines the output format.
    * May be GraphMLIOHandler or GMLIOHandler,...
    * @return
@@ -187,6 +214,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   /** Load the default preferences from the SBPreferences object. */
   private void loadPreferences() {
   	groupNodesWithSameEdges = KEGGtranslatorOptions.MERGE_NODES_WITH_SAME_EDGES.getValue(prefs);
+  	createEdgeLabels = KEGGtranslatorOptions.CREATE_EDGE_LABELS.getValue(prefs);
   }
 
   
@@ -704,9 +732,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         for (int stI=0; stI<r.getSubtypes().size(); stI++) {
           SubType st = r.getSubtypes().get(stI);
           EdgeRealizer er = new GenericEdgeRealizer();
-          EdgeLabel el = new EdgeLabel(st.getName());
-          el.setFontSize(8);
-          er.addLabel(el);
+          EdgeLabel el=null;
+          if (createEdgeLabels) {
+            el = new EdgeLabel(st.getName());
+            el.setFontSize(8);
+            er.addLabel(el);
+          }
           
           if (st.getName().trim().equalsIgnoreCase("compound") && Utils.isNumber(st.getValue(),true)) {
             Entry compNode = p.getEntryForId(Integer.parseInt(st.getValue()));
@@ -739,7 +770,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
                 er.setArrow(Arrow.NONE);
               } else if(value.equals("---")) {
                 er.setArrow(Arrow.NONE);
-              } else if (value.length()==2) {
+              } else if (value.length()==2 && el!=null) {
                 // +p +m und sowas...
                 el.setText(st.getValue());
                 el.setFontSize(10);
