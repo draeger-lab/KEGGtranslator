@@ -29,7 +29,8 @@ import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
-import de.zbit.kegg.TranslatorOptions;
+import de.zbit.kegg.KEGGtranslatorOptions;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -244,7 +245,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
   
   /** Load the default preferences from the SBPreferences object. */
   private void loadPreferences() {
-  	addCellDesignerAnnots = TranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
+  	addCellDesignerAnnots = KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
   }
   
   /**
@@ -1104,7 +1105,7 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
         if (args.length > 1)
           batch.setChangeOutdirTo(args[1]);
         batch.setTranslator(k2s);
-        batch.setOutFormat("sbml");
+        batch.setOutFormat(Format.SBML);
         batch.parseDirAndSubDir();
         
       } else {

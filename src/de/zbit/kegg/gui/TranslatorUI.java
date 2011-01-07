@@ -40,10 +40,11 @@ import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.Translator;
-import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.io.KEGGtranslator;
-import de.zbit.kegg.io.KEGGtranslatorHistory;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
@@ -140,7 +141,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	/**
 	 * preferences is holding all project specific preferences
 	 */
-	private SBPreferences prefs;
+	private SBPreferences prefsIO;
 
 	/**
 	 * 
@@ -148,13 +149,23 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	public TranslatorUI() {
 		super();
 		// init preferences
-		prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class);
-		File file = new File(prefs.get(TranslatorOptions.INPUT));
+		initPreferences();
+		File file = new File(prefsIO.get(KEGGtranslatorIOOptions.INPUT));
 		openDir = file.isDirectory() ? file.getAbsolutePath() : file
 				.getParent();
-		file = new File(prefs.get(TranslatorOptions.OUTPUT));
+		file = new File(prefsIO.get(KEGGtranslatorIOOptions.OUTPUT));
 		saveDir = file.isDirectory() ? file.getAbsolutePath() : file
 				.getParent();
+	}
+	
+	/**
+	 * Init preferences, if not already done.
+	 */
+	private void initPreferences() {
+		if (prefsIO == null) {
+			prefsIO = SBPreferences
+					.getPreferencesFor(KEGGtranslatorIOOptions.class);
+		}
 	}
 
 	/*
@@ -163,15 +174,16 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#createJToolBar()
 	 */
 	protected JToolBar createJToolBar() {
+		initPreferences();
 		// final JPanel r = new JPanel(new VerticalLayout());
 		final JToolBar r = new JToolBar("Translate new file",
 				JToolBar.HORIZONTAL);
 
-		r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.INPUT,
-				prefs, this));
+		r.add(PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.INPUT,
+				prefsIO, this));
 		// r.add(new JSeparator(JSeparator.VERTICAL));
-		r.add(PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT,
-				prefs, this));
+		r.add(PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT,
+				prefsIO, this));
 
 		// Button and action
 		JButton ok = new JButton("Translate now!", UIManager
@@ -209,7 +221,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			if (c.getName() == null) {
 				continue;
 			} else if (c.getName().equals(
-					TranslatorOptions.FORMAT.getOptionName())
+					KEGGtranslatorIOOptions.FORMAT.getOptionName())
 					&& (JColumnChooser.class.isAssignableFrom(c.getClass()))) {
 				format = ((JColumnChooser) c).getSelectedItem().toString();
 				break;
@@ -232,7 +244,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			if (c.getName() == null) {
 				continue;
 			} else if (c.getName().equals(
-					TranslatorOptions.INPUT.getOptionName())
+					KEGGtranslatorIOOptions.INPUT.getOptionName())
 					&& (FileSelector.class.isAssignableFrom(c.getClass()))) {
 				try {
 					inFile = ((FileSelector) c).getSelectedFile();
@@ -253,25 +265,32 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	private void createNewTab(File inFile, String format) {
 		// Check input
-		if (!TranslatorOptions.INPUT.getRange().isInRange(inFile)) {
+		if (!KEGGtranslatorIOOptions.INPUT.getRange().isInRange(inFile)) {
 			JOptionPane.showMessageDialog(this, '\'' + inFile.getName()
 					+ "' is no valid input file.",
 					KEGGtranslator.APPLICATION_NAME,
 					JOptionPane.WARNING_MESSAGE);
-		} else if (!TranslatorOptions.FORMAT.getRange().isInRange(format)) {
-			JOptionPane.showMessageDialog(this, '\'' + format
-					+ "' is no valid output format.",
-					KEGGtranslator.APPLICATION_NAME,
-					JOptionPane.WARNING_MESSAGE);
 		} else {
-			// Tanslate and add tab.
+			Format f = null;
 			try {
-				openDir = inFile.getParent();
-				tabbedPane.addTab(inFile.getName(), new TranslatorPanel(inFile,
-						format, this));
-				tabbedPane.setSelectedIndex(tabbedPane.getComponentCount()-1);
-			} catch (Exception e1) {
-				GUITools.showErrorMessage(this, e1);
+				f = Format.valueOf(format);
+			} catch (Throwable exc) {
+				JOptionPane.showMessageDialog(this, '\'' + format
+						+ "' is no valid output format.",
+						KEGGtranslator.APPLICATION_NAME,
+						JOptionPane.WARNING_MESSAGE);
+			}
+			if (f != null) {
+				// Tanslate and add tab.
+				try {
+					openDir = inFile.getParent();
+					tabbedPane.addTab(inFile.getName(), new TranslatorPanel(
+							inFile, f, this));
+					tabbedPane
+							.setSelectedIndex(tabbedPane.getComponentCount() - 1);
+				} catch (Exception e1) {
+					GUITools.showErrorMessage(this, e1);
+				}
 			}
 		}
 	}
@@ -391,7 +410,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
     // Ask output format
     String format = getOutputFileFormat(toolBar);
     if ( askOutputFormat || (format == null) || (format.length() < 1)) {
-      JColumnChooser outputFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, (SBProperties)null, null);
+      JColumnChooser outputFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, (SBProperties)null, null);
       outputFormat.setTitle("Please select the output format");
       JOptionPane.showMessageDialog(this, outputFormat, KEGGtranslator.APPLICATION_NAME, JOptionPane.QUESTION_MESSAGE);
       format = ((JColumnChooser) outputFormat).getSelectedItem().toString();
@@ -453,7 +472,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void keyPressed(KeyEvent e) {
 		// Preferences for the "input file"
-		PreferencesPanel.setProperty(prefs, e.getSource());
+		PreferencesPanel.setProperty(prefsIO, e.getSource());
 	}
 
 	/*
@@ -463,7 +482,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void keyReleased(KeyEvent e) {
 		// Preferences for the "input file"
-		PreferencesPanel.setProperty(prefs, e.getSource());
+		PreferencesPanel.setProperty(prefsIO, e.getSource());
 	}
 
 	/*
@@ -473,7 +492,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void keyTyped(KeyEvent e) {
 		// Preferences for the "input file"
-		PreferencesPanel.setProperty(prefs, e.getSource());
+		PreferencesPanel.setProperty(prefsIO, e.getSource());
 	}
 
 	/*
@@ -484,7 +503,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void itemStateChanged(ItemEvent e) {
 		// Preferences for the "output format"
-		PreferencesPanel.setProperty(prefs, e.getSource());
+		PreferencesPanel.setProperty(prefsIO, e.getSource());
 	}
 
 	/*
@@ -554,10 +573,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  
 		  SBProperties props = new SBProperties();
 		  if (getInputFile(toolBar) != null) {
-		    props.put(TranslatorOptions.INPUT, getInputFile(toolBar));
+		    props.put(KEGGtranslatorIOOptions.INPUT, getInputFile(toolBar));
 		  }
-		  props.put(TranslatorOptions.FORMAT, getOutputFileFormat(toolBar));
-		  SBPreferences.saveProperties(TranslatorOptions.class, props);
+		  props.put(KEGGtranslatorIOOptions.FORMAT, getOutputFileFormat(toolBar));
+		  SBPreferences.saveProperties(KEGGtranslatorOptions.class, props);
 		  
 		  props = new SBProperties();
 		  props.put(GUIOptions.OPEN_DIR, openDir);

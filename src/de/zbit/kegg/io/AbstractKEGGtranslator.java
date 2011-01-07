@@ -10,7 +10,7 @@ import java.util.List;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggTools;
-import de.zbit.kegg.TranslatorOptions;
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -31,7 +31,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
 	/**
 	 * SBPreferences object to store all preferences for this class.
 	 */
-	protected SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorOptions.class);
+	protected SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorOptions.class);
 	
   /**
    * Retrieve annotations from Kegg or use purely information available in the
@@ -245,11 +245,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   
   /** Load the default preferences from the SBPreferences object. */
   private void loadPreferences() {
-  	removeOrphans = TranslatorOptions.REMOVE_ORPHANS.getValue(prefs);
-  	retrieveKeggAnnots = !TranslatorOptions.OFFLINE_MODE.getValue(prefs);
-  	removeWhiteNodes = TranslatorOptions.REMOVE_WHITE_GENE_NODES.getValue(prefs);
-  	autocompleteReactions = TranslatorOptions.AUTOCOMPLETE_REACTIONS.getValue(prefs);
-  	showShortNames = TranslatorOptions.SHORT_NAMES.getValue(prefs);
+  	removeOrphans = KEGGtranslatorOptions.REMOVE_ORPHANS.getValue(prefs);
+  	retrieveKeggAnnots = !KEGGtranslatorOptions.OFFLINE_MODE.getValue(prefs);
+  	removeWhiteNodes = KEGGtranslatorOptions.REMOVE_WHITE_GENE_NODES.getValue(prefs);
+  	autocompleteReactions = KEGGtranslatorOptions.AUTOCOMPLETE_REACTIONS.getValue(prefs);
+  	showShortNames = KEGGtranslatorOptions.SHORT_NAMES.getValue(prefs);
   }
   
   

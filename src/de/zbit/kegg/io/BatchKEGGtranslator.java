@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.DirectoryParser;
 
@@ -26,7 +27,7 @@ public class BatchKEGGtranslator {
   /**
    * Possible: SBML & GraphML. Default to graphML
    */
-  private String outFormat = "GraphML";
+  private Format outFormat = Format.GraphML;
   
   /**
    * 
@@ -96,7 +97,7 @@ public class BatchKEGGtranslator {
    * 
    * @return
    */
-  public String getOutFormat() {
+  public Format getOutFormat() {
     return outFormat;
   }
   
@@ -111,7 +112,6 @@ public class BatchKEGGtranslator {
    * 
    * @param dir
    */
-  @SuppressWarnings("unchecked")
   private void parseDirAndSubDir(String dir) {
     KeggInfoManagement manager = Translator.getManager();
     
@@ -179,38 +179,39 @@ public class BatchKEGGtranslator {
    * @param manager
    * @return
    */
-	public static KEGGtranslator getTranslator(String outFormat, KeggInfoManagement manager) {
+	public static KEGGtranslator getTranslator(Format outFormat,
+			KeggInfoManagement manager) {
 		KEGGtranslator translator;
-		
-		if (outFormat.equalsIgnoreCase("sbml")) {
-		  translator = new KEGG2jSBML(manager);
-
-    } else if (outFormat.equalsIgnoreCase("LaTeX")) {
-      translator = new KEGG2jSBML(manager);
-		  
-		} else if (outFormat.equalsIgnoreCase("GraphML")) {
-		  translator = KEGG2yGraph.createKEGG2GraphML(manager);
-		  
-		} else if (outFormat.equalsIgnoreCase("GML")) {
-		  translator = KEGG2yGraph.createKEGG2GML(manager);
-
-		} else if (outFormat.equalsIgnoreCase("JPG")) {
-		  translator = KEGG2yGraph.createKEGG2JPG(manager);
-		  
-		} else if (outFormat.equalsIgnoreCase("GIF")) {
-		  translator = KEGG2yGraph.createKEGG2GIF(manager);
-		  
-		} else if (outFormat.equalsIgnoreCase("YGF")) {
-		  translator = KEGG2yGraph.createKEGG2YGF(manager);
-		  
-		} else if (outFormat.equalsIgnoreCase("TGF")) {
-		  translator = KEGG2yGraph.createKEGG2TGF(manager);
-		  
-		} else {
-		  System.err.println("Unknwon output Format: '" + outFormat + "'.");
-		  translator = null;
+		switch (outFormat) {
+		case SBML:
+			translator = new KEGG2jSBML(manager);
+			break;
+		case LaTeX:
+			translator = new KEGG2jSBML(manager);
+			break;
+		case GraphML:
+			translator = KEGG2yGraph.createKEGG2GraphML(manager);
+			break;
+		case GML:
+			translator = KEGG2yGraph.createKEGG2GML(manager);
+			break;
+		case JPG:
+			translator = KEGG2yGraph.createKEGG2JPG(manager);
+			break;
+		case GIF:
+			translator = KEGG2yGraph.createKEGG2GIF(manager);
+			break;
+		case YGF:
+			translator = KEGG2yGraph.createKEGG2YGF(manager);
+			break;
+		case TGF:
+			translator = KEGG2yGraph.createKEGG2TGF(manager);
+			break;
+		default:
+			System.err.println("Unknwon output Format: '" + outFormat + "'.");
+			translator = null;
+			break;
 		}
-		
 		return translator;
 	}
 	
@@ -260,7 +261,7 @@ public class BatchKEGGtranslator {
   /**
    * @param outFormat - "graphml" or "sbml".
    */
-  public void setOutFormat(String outFormat) {
+  public void setOutFormat(Format outFormat) {
     this.outFormat = outFormat;
   }
   

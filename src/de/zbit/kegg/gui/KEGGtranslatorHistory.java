@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.zbit.kegg.io;
+package de.zbit.kegg.gui;
 
 import de.zbit.gui.prefs.FileHistory;
 

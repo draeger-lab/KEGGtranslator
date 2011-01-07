@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.SwingUtilities;
@@ -17,6 +16,8 @@ import de.zbit.gui.GUIOptions;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
@@ -61,15 +62,15 @@ public class Translator {
 				|| (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props))) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					System.setProperty("user.language", Locale.ENGLISH.getLanguage());
 					TranslatorUI ui = new TranslatorUI();
 					ui.setVisible(true);
 					hideSplashScreen();
 				}
 			});
 		} else {
-			translate(TranslatorOptions.FORMAT.getValue(props), props
-					.get(TranslatorOptions.INPUT), props.get(TranslatorOptions.OUTPUT));
+			translate(KEGGtranslatorIOOptions.FORMAT.getValue(props),
+					props.get(KEGGtranslatorIOOptions.INPUT),
+					props.get(KEGGtranslatorIOOptions.OUTPUT));
 			hideSplashScreen();
 		}
 	}
@@ -94,7 +95,8 @@ public class Translator {
 	 */
 	public static List<Class<? extends KeyProvider>> getCommandLineOptions() {
 		List<Class<? extends KeyProvider>> configList = new LinkedList<Class<? extends KeyProvider>>();
-		configList.add(TranslatorOptions.class);
+		configList.add(KEGGtranslatorIOOptions.class);
+		configList.add(KEGGtranslatorOptions.class);
 		configList.add(GUIOptions.class);
 		return configList;
 	}
@@ -115,7 +117,7 @@ public class Translator {
 	 * @return
 	 * @throws IOException
 	 */
-	public static boolean translate(String format, String input, String output)
+	public static boolean translate(Format format, String input, String output)
 		throws IOException {
 		
 		// Check and build input

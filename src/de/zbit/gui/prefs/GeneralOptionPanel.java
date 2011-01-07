@@ -3,7 +3,7 @@ package de.zbit.gui.prefs;
 import java.io.IOException;
 import java.util.InvalidPropertiesFormatException;
 
-import de.zbit.kegg.TranslatorOptions;
+import de.zbit.kegg.KEGGtranslatorOptions;
 
 /**
  * @author wrzodek
@@ -16,6 +16,6 @@ public class GeneralOptionPanel extends PreferencesPanelForKeyProvider {
 	 * @throws IOException
 	 */
 	public GeneralOptionPanel() throws IOException {
-		super(TranslatorOptions.class);
+		super(KEGGtranslatorOptions.class);
 	}
 }

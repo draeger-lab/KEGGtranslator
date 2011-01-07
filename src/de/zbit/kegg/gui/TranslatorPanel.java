@@ -44,13 +44,14 @@ import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
-import de.zbit.kegg.TranslatorOptions;
 import de.zbit.kegg.gui.TranslatorUI.Action;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslator;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileDownload;
 import de.zbit.util.Reflect;
@@ -65,7 +66,7 @@ import de.zbit.util.prefs.SBProperties;
 public class TranslatorPanel extends JPanel {
   private static final long serialVersionUID = 6030311193210321410L;
   File inputFile;
-  String outputFormat;
+  Format outputFormat;
   boolean documentHasBeenSaved=false;
   
   /**
@@ -87,7 +88,7 @@ public class TranslatorPanel extends JPanel {
    * @param inputFile
    * @param outputFormat
    */
-  public TranslatorPanel(final File inputFile, final String outputFormat, ActionListener translationResult) {
+  public TranslatorPanel(final File inputFile, final Format outputFormat, ActionListener translationResult) {
     super();
     setLayout(new BorderLayout());
     setOpaque(false);
@@ -119,8 +120,8 @@ public class TranslatorPanel extends JPanel {
     try {
       final PathwaySelector selector = PathwaySelector.createPathwaySelectorPanel(Translator.getFunctionManager(), lh);
       JComponent oFormat=null;
-      if ((outputFormat == null) || (outputFormat.length() < 1)) {
-        oFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(TranslatorOptions.FORMAT, (SBProperties)null, null);
+      if ((outputFormat == null) || (outputFormat == null)) {
+        oFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, (SBProperties)null, null);
         oFormat =((JColumnChooser) oFormat).getColumnChooser();
         lh.add("Please select the output format", oFormat, false);
       }
@@ -163,7 +164,7 @@ public class TranslatorPanel extends JPanel {
               if (localFile!=null) {            
                 // Perform translation
                 inputFile = new File(localFile);
-                outputFormat = Reflect.invokeIfContains(oFormatFinal, "getSelectedItem").toString();
+                outputFormat = Format.valueOf(Reflect.invokeIfContains(oFormatFinal, "getSelectedItem").toString());
                 removeAll();
                 repaint();
                 
@@ -363,7 +364,7 @@ public class TranslatorPanel extends JPanel {
       ff.add(SBFileFilter.createYGFFileFilter());
       ff.add(SBFileFilter.createTGFFileFilter());
       for (int i=0; i<ff.size(); i++) {
-        if (((SBFileFilter)ff.get(i)).getExtension().toLowerCase().startsWith(this.outputFormat.toLowerCase())) {
+        if (((SBFileFilter)ff.get(i)).getExtension().toLowerCase().startsWith(this.outputFormat.toString().toLowerCase())) {
           ff.addFirst(ff.remove(i));
           break;
         }

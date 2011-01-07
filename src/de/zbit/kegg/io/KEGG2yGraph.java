@@ -46,8 +46,9 @@ import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
-import de.zbit.kegg.TranslatorOptions;
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.extensions.GenericDataMap;
+import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -185,7 +186,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   /** Load the default preferences from the SBPreferences object. */
   private void loadPreferences() {
-  	groupNodesWithSameEdges = TranslatorOptions.MERGE_NODES_WITH_SAME_EDGES.getValue(prefs);
+  	groupNodesWithSameEdges = KEGGtranslatorOptions.MERGE_NODES_WITH_SAME_EDGES.getValue(prefs);
   }
 
   
@@ -1128,7 +1129,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         if (args.length > 1)
           batch.setChangeOutdirTo(args[1]);
         batch.setTranslator(k2g);
-        batch.setOutFormat("graphML");
+        batch.setOutFormat(Format.GraphML);
         batch.parseDirAndSubDir();
         
       } else {
