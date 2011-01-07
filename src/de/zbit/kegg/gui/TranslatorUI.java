@@ -30,8 +30,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.sbml.tolatex.gui.LaTeXExportDialog;
-
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
@@ -40,7 +38,6 @@ import de.zbit.gui.JColumnChooser;
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
-import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
@@ -575,12 +572,13 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		    props.put(KEGGtranslatorIOOptions.INPUT, getInputFile(toolBar));
 		  }
 		  props.put(KEGGtranslatorIOOptions.FORMAT, getOutputFileFormat(toolBar));
-		  SBPreferences.saveProperties(KEGGtranslatorOptions.class, props);
+		  SBPreferences.saveProperties(KEGGtranslatorIOOptions.class, props);
 		  
-		  props = new SBProperties();
-		  props.put(GUIOptions.OPEN_DIR, openDir);
-		  if (saveDir!=null && saveDir.length()>1)
-		    props.put(GUIOptions.SAVE_DIR, saveDir);
+			props.clear();
+			props.put(GUIOptions.OPEN_DIR, openDir);
+			if (saveDir != null && saveDir.length() > 1) {
+				props.put(GUIOptions.SAVE_DIR, saveDir);
+			}
 		  SBPreferences.saveProperties(GUIOptions.class, props);
 		  
 		} catch (BackingStoreException exc) {

@@ -71,6 +71,7 @@ import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeX;
 import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.io.LaTeXReportGenerator;
+import org.sbml.tolatex.io.SBOTermFormatter;
 
 import atp.sHotEqn;
 import de.zbit.gui.LayoutHelper;
@@ -539,11 +540,13 @@ public class SBasePanel extends JPanel {
 			lh.add(new JLabel("MIRIAM annotation: "), 1, ++row, 1, 1, 1, 1);
 			StringBuilder sb = new StringBuilder();
 			sb.append("<html><body>");
-			if (sbase.getNumCVTerms() > 1)
+			if (sbase.getNumCVTerms() > 1) {
 				sb.append("<ul>");
+			}
 			for (CVTerm cvt : sbase.getCVTerms()) {
-				if (sbase.getNumCVTerms() > 1)
+				if (sbase.getNumCVTerms() > 1) {
 					sb.append("<li>");
+				}
 				String cvtString = cvt.toString();
 				for (int k = 0; k < cvt.getNumResources(); k++) {
 					String uri = cvt.getResourceURI(k);
@@ -556,14 +559,13 @@ public class SBasePanel extends JPanel {
 					if (loc.length > 0) {
 						String split[] = cvtString.split(uri);
 						StringBuilder sbu = new StringBuilder();
-						for (int l = 0; l < split.length - 1; l++) {
+						for (int l = 0; l < split.length; l++) {
 							if (l > 0) {
 								sbu.append(", ");
 							}
 							StringTools.append(sbu, split[l], "<a href=\"",
-									loc[0], "\">", uri, "</a>");
+									loc[0], "\">", uri, "</a>\n");
 						}
-						sbu.append(split[split.length - 1]);
 						cvtString = sbu.toString();
 					}
 				}
@@ -594,8 +596,7 @@ public class SBasePanel extends JPanel {
 		JTextField sboTermField = new JTextField();
 		sboTermField.setEditable(editable);
 		if (sbase.isSetSBOTerm()) {
-			sboTermField.setText(SBO.getTerm(sbase.getSBOTerm())
-					.getDefinition().replace("\\,", ","));
+			sboTermField.setText(SBOTermFormatter.getShortDefinition(SBO.getTerm(sbase.getSBOTerm())));
 			sboTermField.setColumns(sboTermField.getText().length());
 		}
 		lh.add(sboTermField, 3, row, 1, 1, 1, 1);
