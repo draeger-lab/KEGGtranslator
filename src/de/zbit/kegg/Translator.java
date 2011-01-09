@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.SwingUtilities;
@@ -53,13 +54,18 @@ public class Translator {
 						
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
+		if (props.containsKey(GUIOptions.LANGUAGE)) {
+			String userLanguage = props.get(GUIOptions.LANGUAGE);
+			if (!userLanguage.equals(System.getProperty("user.language"))) {
+				Locale.setDefault(new Locale(props.get(GUIOptions.LANGUAGE)));
+			}
+		}
 		
 		//		KeggInfoManagement manager = getManager();
 		//		k2s = new KEGG2jSBML(manager);
 		
 		// Should we start the GUI?
-		if ((args.length < 1)
-				|| (props.containsKey(GUIOptions.GUI) && GUIOptions.GUI.getValue(props))) {
+		if ((args.length < 1) || props.getBooleanProperty(GUIOptions.GUI)) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					TranslatorUI ui = new TranslatorUI();
