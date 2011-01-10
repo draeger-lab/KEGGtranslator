@@ -696,17 +696,18 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       }
       
       // Reposition group node to fit content
-      int offset = 5;
-      graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
-      graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
-      
-      // Set hirarchie
-      hm.setParentNode(nl, parentGroupNodes.get(i));
-      
-      // Reposition group node to fit content (2nd time is neccessary. Maybe yFiles bug...)
-      graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
-      graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
-      
+      if (nl.size()>0) {
+        int offset = 5;
+        graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
+        graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
+        
+        // Set hirarchie
+        hm.setParentNode(nl, parentGroupNodes.get(i));
+        
+        // Reposition group node to fit content (2nd time is neccessary. Maybe yFiles bug...)
+        graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
+        graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
+      }
     }
     
     

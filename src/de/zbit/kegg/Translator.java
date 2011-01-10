@@ -71,6 +71,7 @@ public class Translator {
 					TranslatorUI ui = new TranslatorUI();
 					ui.setVisible(true);
 					hideSplashScreen();
+					ui.toFront();
 				}
 			});
 		} else {
