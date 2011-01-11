@@ -540,10 +540,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#createMainComponent()
 	 */
 	protected Component createMainComponent() {
-	  ImageIcon logo = new ImageIcon(TranslatorUI.class.getResource("img/Logo.gif"));
+	  ImageIcon logo = new ImageIcon(TranslatorUI.class.getResource("img/Logo2.png"));
 	  
 	  // Crop animated loading bar from image.
-	  logo.setImage(ImageTools.cropImage(logo.getImage(), 0, 0, logo.getIconWidth(), logo.getIconHeight()-30));
+	  //logo.setImage(ImageTools.cropImage(logo.getImage(), 0, 0, logo.getIconWidth(), logo.getIconHeight()-30));
 	  
 	  // Create the tabbed pane, with the KeggTranslator logo.
 		tabbedPane = new JTabbedLogoPane(logo);
