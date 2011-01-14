@@ -1,6 +1,5 @@
 package de.zbit.kegg;
 
-import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -14,6 +13,7 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.SwingUtilities;
 
 import de.zbit.gui.GUIOptions;
+import de.zbit.gui.GUITools;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
@@ -51,7 +51,8 @@ public class Translator {
 	public static void main(String[] args) throws IOException,
 		BackingStoreException, URISyntaxException {
 		// --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
-						
+	  //Locale.setDefault(Locale.US);
+	  
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
 		if (props.containsKey(GUIOptions.LANGUAGE)) {
@@ -70,7 +71,7 @@ public class Translator {
 				public void run() {
 					TranslatorUI ui = new TranslatorUI();
 					ui.setVisible(true);
-					hideSplashScreen();
+					GUITools.hideSplashScreen();
 					ui.toFront();
 				}
 			});
@@ -78,24 +79,9 @@ public class Translator {
 			translate(KEGGtranslatorIOOptions.FORMAT.getValue(props),
 					props.get(KEGGtranslatorIOOptions.INPUT),
 					props.get(KEGGtranslatorIOOptions.OUTPUT));
-			hideSplashScreen();
+			GUITools.hideSplashScreen();
 		}
 	}
-	
-	/**
-   * The JVM command line allows to show splash screens. If the user made
-   * use of this functionality, the following code will hide the screen as soon
-   * as the application is ready.
-   */
-  private static void hideSplashScreen() {
-    try {
-      final SplashScreen splash = SplashScreen.getSplashScreen();
-      if (splash == null) {
-        return;
-      }
-      splash.close();
-    } catch (Throwable t) {}
-  }
 
   /**
 	 * @return

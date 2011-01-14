@@ -20,11 +20,22 @@
 \begin{abstract}
 
 \section{Summary:}
-Text Text Text  Text Text Text Text Text Text Text Text
-Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text.
+The KEGG PATHWAY database is today a widely used service for pathway based information. It contains manually drawn pathway maps with information about the genes, reactions and relations contained within a pathway.
+
+TODO: Eventuell noch irgendein Nebensatz, aus dem hervorgeht, dass Reaktionen nicht komplett sein müssen, sondern nur für visualisierung.
+
+Since KEGG introduces an own XML-format, parsers and translators are needed to process the pathway maps for usage in other applications and algorithms.
+
+We have developed KEGGtranslator, which is an easy-to-use stand-alone application that can translate KGML formatted XML-files to multiple output formats. Unlike other translators, KEGGtranslator supports a plethora of output formats, is able to complete the information in translated documents (i.e. MIRIAM annotations) beyond the scope of the XML-document and completes fragmentary reactions within the pathway to allow simulations on those.
+
+% [is able to complete [...] beyond the scope of the XML-document] by retrieving additional pathway information from the internet.
+
+%Es gibt ein paar andere translator, aber...
+%XML-grafisch ok, für simmulationen nicht so toll.
+%Translator nutzt KegggAdaptor, kann RkT vervollständigung, ist Stand-Alone-Application
 
 \section{Availability:}
-The application and a documentation is freely available at http://TODO-MAKE-HOMEPAGE
+KEGGtranslator is freely available as a webstart application and for download at http://TODO-MAKE-HOMEPAGE. KGML files can be downloaded within the application of manually from \url{ftp://ftp.genome.jp/pub/kegg/xml/kgml}.
 
 
 \section{Contact:} \href{Clemens.Wrzodek@uni-tuebingen.de}{Clemens.Wrzodek@uni-tuebingen.de}
