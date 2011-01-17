@@ -472,17 +472,29 @@ public class TranslatorPanel extends JPanel {
       return;
     }
     
-    SBMLDocument doc = (SBMLDocument) document;
+    final SBMLDocument doc = (SBMLDocument) document;
     if ((doc != null) && LaTeXExportDialog.showDialog(null, doc, targetFile)) {
       if (targetFile == null) {
         SBPreferences prefsIO = SBPreferences.getPreferencesFor(LaTeXOptionsIO.class);
         targetFile = new File(prefsIO.get(LaTeXOptionsIO.REPORT_OUTPUT_FILE));
       }
-      try {
-        SBML2LaTeX.convert(doc, targetFile, true);
-      } catch (Exception exc) {
-        GUITools.showErrorMessage(null, exc);
-      }
+      
+      // Run in background
+      final File finalTargetFile = targetFile;
+      SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+        @Override
+        protected Void doInBackground() throws Exception {
+          try {
+            SBML2LaTeX.convert(doc, finalTargetFile, true);
+          } catch (Exception exc) {
+            GUITools.showErrorMessage(null, exc);
+          }
+          return null;
+        }
+      };
+      worker.execute();
+      //---
+      
     }
   }
   
