@@ -77,7 +77,6 @@ import org.sbml.jsbml.util.StringTools;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeX;
 import org.sbml.tolatex.SBML2LaTeX;
-import org.sbml.tolatex.io.LaTeXReportGenerator;
 import org.sbml.tolatex.io.SBOTermFormatter;
 
 import atp.sHotEqn;
@@ -110,8 +109,6 @@ public class SBasePanel extends JPanel {
 
 	private int row;
 
-	private final LaTeXReportGenerator latexExport;
-
 	/**
 	 * @param sbase
 	 * @throws SBMLException
@@ -119,7 +116,6 @@ public class SBasePanel extends JPanel {
 	 */
 	public SBasePanel(SBase sbase) throws SBMLException, IOException {
 		super();
-		this.latexExport = new LaTeXReportGenerator();
 		GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
 		latex = new LaTeX(false);
@@ -490,10 +486,9 @@ public class SBasePanel extends JPanel {
 		lh.add(scroll, 1, ++row, 3, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		JPanel rEqPanel = new JPanel(new BorderLayout());
-		System.out.println(latexExport.reactionEquation(reaction).toString());
-		sHotEqn rEqn = new sHotEqn(latexExport.reactionEquation(reaction)
-				.toString());
-		JScrollPane s = new JScrollPane(rEqn,
+		ReactionPanel reactionPanel = new ReactionPanel(reaction);
+		reactionPanel.setBackground(Color.WHITE);
+		JScrollPane s = new JScrollPane(reactionPanel,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		s.setBorder(BorderFactory.createLoweredBevelBorder());
