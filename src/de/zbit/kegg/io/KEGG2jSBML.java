@@ -904,6 +904,7 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
    * @param src
    * @return
    */
+  @SuppressWarnings("unused")
   private ArrayList<ReactionComponent> splitGroupNodes (Pathway p, ArrayList<ReactionComponent> src) {
     // We can not use group nodes in SBML, so we need to split them to the
     // single components and treat every component individually.
