@@ -61,7 +61,10 @@ import de.zbit.gui.VerticalLayout;
 import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.SBFileFilter;
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.ext.RestrictedEditMode;
+import de.zbit.kegg.ext.TranslatorPanelOptions;
 import de.zbit.kegg.gui.TranslatorUI.Action;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
@@ -145,7 +148,7 @@ public class TranslatorPanel extends JPanel {
       }
       final JComponent oFormatFinal = oFormat;
 
-      JButton okButton = new JButton("OK");
+      JButton okButton = new JButton(GUITools.getOkButtonText());
       //okButton.addActionListener()
       JPanel p2 = new JPanel();
       p2.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -254,12 +257,32 @@ public class TranslatorPanel extends JPanel {
           Graph2DView pane = new Graph2DView((Graph2D) document);
           add(pane);
           
+          /*
+           * Get settings to control visualization behaviour
+           */
+          SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
+          
+          // Set KEGGtranslator logo as background
+          if (TranslatorPanelOptions.SHOW_LOGO_IN_GRAPH_BACKGROUND.getValue(prefs)) {
+            RestrictedEditMode.addBackgroundImage(getClass().getResource("img/Logo2.png"), pane);
+          }
+          //--
+          // Show Navigation and Overview
+          if (TranslatorPanelOptions.SHOW_NAVIGATION_AND_OVERVIEW_PANELS.getValue(prefs)) {
+            RestrictedEditMode.addOverviewAndNavigation(pane);
+          }
+          //--
+          
           pane.setSize(getSize());
           //ViewMode mode = new NavigationMode();
           //pane.addViewMode(mode);
           EditMode editMode = new RestrictedEditMode();
           editMode.showNodeTips(true);
           pane.addViewMode(editMode);
+          
+          if (TranslatorPanelOptions.SHOW_PROPERTIES_TABLE.getValue(prefs)) {
+            ((RestrictedEditMode)editMode).addPropertiesTable(pane);
+          }
           
           pane.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
           pane.fitContent(true);
@@ -279,7 +302,6 @@ public class TranslatorPanel extends JPanel {
     translateWorker.execute();
   }
   
-
   /**
    * @param actionEvent
    */

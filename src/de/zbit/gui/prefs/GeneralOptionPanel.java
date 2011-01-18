@@ -23,7 +23,6 @@
 package de.zbit.gui.prefs;
 
 import java.io.IOException;
-import java.util.InvalidPropertiesFormatException;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
 
@@ -34,7 +33,6 @@ public class GeneralOptionPanel extends PreferencesPanelForKeyProvider {
 	private static final long serialVersionUID = 6273038303582557299L;
 
 	/**
-	 * @throws InvalidPropertiesFormatException
 	 * @throws IOException
 	 */
 	public GeneralOptionPanel() throws IOException {

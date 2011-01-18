@@ -81,12 +81,29 @@ To our knowledge, these major deficiencies are not being corrected by other KEGG
 
 In the first step of a translation, KEGGtranslator reads the XML-file and puts all contained elements into an internal data structure. In addition to the XML-file, the KEGG database is queries via the KEGG API for each id in the document (pathway id, entries, recations, relations, substrates, products, etc.). This completes the sparse XML-document with comprehensive information. For example, multiple synonyms and miriam urns of many external databases (Ensembl, EntrezGene, UniProt, ChEBI, Gene Ontology, DrugBank, PDBeChem, and many more) are being assigned to genes.
 
-TODO: Preprocessing (remove white nodes, reaciton complete, etc.)
+TODO: Preprocessing (remove white nodes, reaciton complete, etc.) Auch erwaehnen, dass alle optionen ausschaltbar sind. 
 
-After these preprocessing steps, KEGGtranslator branches between two different conversion modes for the actual translation:
+After these preprocessing steps, KEGGtranslator branches between two different conversion modes for the actual translation: a functional translation (SBML) and a graphical translation (e.g. GraphML, GML). Depending on the chosen output format, KEGGtranslator determines the way to translate the KGML document.
+
+The functional translation is performed by converting the KGML code to a jSBML data structure. The focus here is to generate valid and specification-conform SBML code that eases e.g. a dynamic simulation of the pathway. Each entry (pathway references, genes, compounds, enzymes, reactions, reaction-modifiers, etc.) is being assigned multiple MIRIAM-URNs and an SBO-Term which describes best the function of the element. Addirionaly, notes are being assigned to each element with human-readable names and synonyms, a description of the element and links to pictures and further information. The user may also choose to add graphical information by putting CellDesigner annotations to the model. The key difference in this mode, to the graphical translation is, that the focus resides on reactions in KGML documents. Besides the already mentioned completion of reactions, each enzymatic modifier is correctly assigned to the reaction by building so called modifierSpeciesReferences. The reversibility of the reaction is annotated and a picture of the reaction equation is being put into the notes.
+
+We have integrated the SBML2LaTeX tool into KEGGtranslator, which allows users to automatically generate a LaTeX or PDF-report to document the SBML-code of the translated pathway.
+
+%
+%Functional:
+%CellDesigner Annots
+%Valid and unique SBML-code (ids, initial assignments, etc.)
+%MIRIAM URNs
+%SBO-Terms (closest guess)
+%Notes (Including pathway picture and links)
+%REACTIONS (with modififerSpeciesReferences, reversibel<-> irreversibel
 
 
-Auch erwaehnen, dass alle optionen ausschaltbar sind.
+In graphical translations, results can be saved as GraphML, GML or YGF and finally as images of type JPG, GIF, or TGF. In this mode, the KGML data structure is being converted to a yFiles data structure. The focus here lies on the visualization of the pathway. Relations are being translated by inserting arrows with the appropriate style. The styles are directly read from the KGML document. For example, dashed arrows without heads represent bindings or associations and a dotted arrow with a simply head illustrates an indirect effect. Please see the KGML specification for a complete list. As in the function translation, GraphML allows to define custom annotation elements. KEGGtranslator makes use of those, by putting several identifiers (e.g. EntrezGene or Ensembl) and descriptions to the single nodes. From the KGML-document, the shape of the node is translated as well as the colors and labels. Links to descriptive HTML-pages are being setup and hierarchical group nodes are being created for defined compounds. All these features lead to a nice graphical representation of the pathway that provides as many information about the elements as possible.
+
+
+
+
 
 
 

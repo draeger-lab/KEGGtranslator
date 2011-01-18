@@ -73,6 +73,14 @@ import de.zbit.util.Utils;
  * Notes:
  * XXX: Important to know: subtype.setValue contains replacement of &gt; to > !!!
  * TODO: Edges (sub types of relations) now may have colors.
+ * 
+ * TODO:
+ * AKTUELLE BUGS (anhand 'files\KGMLsamplefiles\hsa00010.xml'):
+ * - Notes werden nicht geschrieben
+ * - SBML wird nicht geschrieben (NullPointer)
+ * - MIRIAM URNs und andere infos werden bei e.g. 'rnR01061rnR01063' mit
+ *  leeren infos (zu viele kommas) aufgezählt,
+ * 
  */
 public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements SBaseChangedListener {
   
@@ -829,7 +837,19 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     if (!hasMultipleIDs) {
       // Be careful: very slow, uses Cache - so doesn't matter to query the same id one or more times.
       KeggInfos infos = new KeggInfos(entry.getName().trim(), manager);
-      if (infos.queryWasSuccessfull() && (infos.getName() != null)) {
+      if (infos.queryWasSuccessfull() && showShortNames && (infos.getNames() != null)) {
+        name = infos.getNames();
+        // Choose the shortest name.
+        String[] multiNames = name.split(";");
+        for(String cname:multiNames) {
+          cname = cname.replace("\n", "").trim();
+          if (cname.length()>0 && cname.length()<name.length()) {
+            name = cname;
+          }
+        }
+        
+        // ! showShortNames
+      } else if (infos.queryWasSuccessfull() && (infos.getName() != null)) {
         name = infos.getName();
       }
     }
@@ -1183,21 +1203,21 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
      * @see org.sbml.jsbml.SBaseChangedListener#sbaseAdded(org.sbml.jsbml.SBase)
      */
     public void sbaseAdded(SBase sb) {
-      System.out.println("[ADD] " + sb.toString());
+      //System.out.println("[ADD] " + sb.toString());
     }
 
     /* (non-Javadoc)
      * @see org.sbml.jsbml.SBaseChangedListener#sbaseRemoved(org.sbml.jsbml.SBase)
      */
     public void sbaseRemoved(SBase sb) {
-      System.out.println("[RMV] " + sb.toString());
+      //System.out.println("[RMV] " + sb.toString());
     }
 
     /* (non-Javadoc)
      * @see org.sbml.jsbml.SBaseChangedListener#stateChanged(org.sbml.jsbml.SBaseChangedEvent)
      */
     public void stateChanged(SBaseChangedEvent ev) {
-      System.out.println("[CHG] " + ev.toString());
+      //System.out.println("[CHG] " + ev.toString());
     }
     
 }

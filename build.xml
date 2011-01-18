@@ -140,8 +140,8 @@
 
                 <!-- Obfuscate all classes that make use of y.jar -->
                 <exclude name="de.zbit.kegg.gui.TranslatorPanel"/>
-                <exclude name="de.zbit.kegg.gui.RestrictedEditMode"/>
-                <exclude name="de.zbit.kegg.extensions.GenericDataMap"/>
+                <exclude name="de.zbit.kegg.ext.RestrictedEditMode"/>
+                <exclude name="de.zbit.kegg.ext.GenericDataMap"/>
                 <exclude name="de.zbit.kegg.io.KEGG2yGraph"/>
                 <exclude name="de.zbit.kegg.io.YFilesWriter"/>
                

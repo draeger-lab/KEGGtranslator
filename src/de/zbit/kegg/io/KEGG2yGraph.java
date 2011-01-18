@@ -118,7 +118,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * This is used internally to identify a certain dataHandler in the Graph document.
    * The content is not important, it should just be any defined static final string.
    */
-  private final static String mapDescription="-MAP_DESCRIPTION-";
+  public final static String mapDescription="-MAP_DESCRIPTION-";
   
   /*===========================
    * CONSTRUCTORS
@@ -629,9 +629,23 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
             
             String exName = infos.getNames();
             if (exName!=null && exName.length()!=0) {
-              int pos = exName.lastIndexOf(";");
-              if (pos>0 && pos<(exName.length()-1)) exName = exName.substring(pos+1, exName.length()).replace("\n", "").trim();
               
+              if (!showShortNames) {
+                // Take last name (mostly very descriptive)
+                int pos = exName.lastIndexOf(";");
+                if (pos>0 && pos<(exName.length()-1)) exName = exName.substring(pos+1, exName.length()).replace("\n", "").trim();
+              } else {
+                // Choose the shortest name.
+                String[] multiNames = exName.split(";");
+                for(String cname:multiNames) {
+                  cname = cname.replace("\n", "").trim();
+                  if (cname.length()>0 && cname.length()<exName.length()) {
+                    exName = cname;
+                  }
+                }
+              }
+              
+              // Eventually assign new name.
               if (!hasMultipleIDs) // Knotennamen nur anpassen, falls nicht mehrere IDs.
                 graph.getRealizer(n).setLabelText(exName);
               else if (oldText.length()==0) // ... oder wenn er bisher leer ist.
