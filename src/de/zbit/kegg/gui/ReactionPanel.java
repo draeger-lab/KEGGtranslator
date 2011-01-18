@@ -32,8 +32,12 @@ import javax.swing.JPanel;
 import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SimpleSpeciesReference;
+import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.util.StringTools;
+import org.sbml.tolatex.LaTeXOptions;
+
+import de.zbit.util.prefs.SBPreferences;
 
 /**
  * 
@@ -54,6 +58,10 @@ public class ReactionPanel extends JPanel {
 	 * 
 	 */
 	private Reaction reaction;
+	/**
+	 * 
+	 */
+	private SBPreferences prefs;
 	
 	/**
 	 * 
@@ -62,13 +70,15 @@ public class ReactionPanel extends JPanel {
 	public ReactionPanel(Reaction reaction) {
 		super();
 		this.reaction = reaction;
+		this.prefs = SBPreferences.getPreferencesFor(LaTeXOptions.class);
 		int fontSize = getFont().getSize();
-		preferredWith = (createString(reaction.getListOfReactants(), false, true)
-				.length()
+		this.preferredWith = (createString(reaction.getListOfReactants(), false,
+			true).length()
 				+ createString(reaction.getListOfModifiers(), true, true).length() + createString(
 			reaction.getListOfProducts(), true, false).length())
 				* fontSize;
-		preferredHeight = reaction.isReversible() ? fontSize * 5 : fontSize * 3;
+		this.preferredHeight = reaction.isReversible() ? fontSize * 5
+				: fontSize * 3;
 	}
 	
 	/**
@@ -85,6 +95,7 @@ public class ReactionPanel extends JPanel {
 		if (leadingBlank) {
 			sb.append(' ');
 		}
+		String name;
 		if (listOf.size() > 0) {
 			SimpleSpeciesReference specRef;
 			for (int i = 0; i < listOf.size(); i++) {
@@ -96,7 +107,15 @@ public class ReactionPanel extends JPanel {
 						sb.append(' ');
 					}
 				}
-				sb.append(specRef.getSpecies());
+				Species species = specRef.getSpeciesInstance();
+				if ((species != null)
+						&& prefs.getBoolean(LaTeXOptions.PRINT_NAMES_IF_AVAILABLE)
+						&& species.isSetName()) {
+					name = species.getName();
+				} else {
+					name = specRef.getSpecies();
+				}
+				sb.append(name);
 				if (i < listOf.size() - 1) {
 					sb.append((specRef instanceof SpeciesReference) ? " + " : ", ");
 				}
@@ -122,14 +141,25 @@ public class ReactionPanel extends JPanel {
 	private void drawReactionArrow(int x, int y, double length, int fontSize,
 		Graphics g) {
 		int x2 = (int) (x + length), y2, width = fontSize / 3, height = fontSize / 4;
+		
 		if (reaction.isReversible()) {
 			y2 = y - width;
 			int y3 = y2 + height;
 			g.drawLine(x, y2, x2, y2);
-			g.drawLine(x2, y2, x2 - width, y2 - height);
 			g.drawLine(x, y3, x2, y3);
+			
+			Polygon rightArrow = new Polygon(new int[] { x2 - width / 2,
+					x2 - width / 2, x2 }, new int[] { y2, y2 - height / 2, y2 }, 3);
+			g.fillPolygon(rightArrow);
+			Polygon leftArrow = new Polygon(new int[] { x, x + width / 2,
+					x + width / 2 }, new int[] { y3, y3 + height / 2, y3 }, 3);
+			g.fillPolygon(leftArrow);
+			
+			g.drawLine(x2, y2, x2 - width, y2 - height);
 			g.drawLine(x, y3, x + width, y3 + height);
+			
 		} else {
+			height = fontSize / 3;
 			y2 = y - width;
 			g.drawLine(x, y2, x2 - 1, y2);
 			Polygon p = new Polygon(new int[] { x2 - width, x2, x2 - width },
@@ -185,7 +215,5 @@ public class ReactionPanel extends JPanel {
 			preferredHeight = fontSize + y;
 		}
 	}
-	
-	
 	
 }

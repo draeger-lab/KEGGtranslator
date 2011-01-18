@@ -50,7 +50,7 @@ public class ReactionPanelTest {
 	 */
 	public static void main(String[] args) throws XMLStreamException,
 		SBMLException {
-		SBMLDocument doc = createSimpleSBMLDocument(1, 0, 0, true);
+		SBMLDocument doc = createSimpleSBMLDocument(1, 2, 2, false);
 		System.out.println(SBMLWriter.writeSBMLToString(doc));
 		JFrame f = new JFrame("Reaction test");
 		JPanel panel = new ReactionPanel(doc.getModel().getReaction(0));
