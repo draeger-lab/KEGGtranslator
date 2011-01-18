@@ -1,17 +1,24 @@
 /*
- * SBMLsqueezer creates rate equations for reactions in SBML files
- * (http://sbml.org).
- * Copyright (C) 2009 ZBIT, University of Tübingen, Andreas Dräger
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (c) 2011 Center for Bioinformatics of the University of Tuebingen.
+ * 
+ * This file is part of KEGGtranslator, a program to convert KGML files from the
+ * KEGG database into various other formats, e.g., SBML, GraphML, and many more.
+ * Please visit <http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator> to
+ * obtain the latest version of KEGGtranslator.
+ * 
+ * KEGGtranslator is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.
+ * 
+ * KEGGtranslator is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with KEGGtranslator. If not, see
+ * <http://www.gnu.org/licenses/lgpl.html>.
  */
 package de.zbit.kegg.gui;
 
@@ -458,14 +465,17 @@ public class SBasePanel extends JPanel {
 				.max(reaction.getNumModifiers(), reaction.getNumProducts()))][3];
 		String colNames[] = new String[] { "Reactants", "Modifiers", "Products" };
 		int count = 0;
-		for (SpeciesReference specRef : reaction.getListOfReactants())
+		for (SpeciesReference specRef : reaction.getListOfReactants()) {
 			rmp[count++][0] = specRef.getSpeciesInstance().toString();
+		}
 		count = 0;
-		for (ModifierSpeciesReference mSpecRef : reaction.getListOfModifiers())
+		for (ModifierSpeciesReference mSpecRef : reaction.getListOfModifiers()) {
 			rmp[count++][1] = mSpecRef.getSpeciesInstance().toString();
+		}
 		count = 0;
-		for (SpeciesReference specRef : reaction.getListOfProducts())
+		for (SpeciesReference specRef : reaction.getListOfProducts()) {
 			rmp[count++][2] = specRef.getSpeciesInstance().toString();
+		}
 		JTable table = new JTable(rmp, colNames);
 		table.setPreferredScrollableViewportSize(new Dimension(200, (table
 				.getRowCount() + 1)
@@ -480,6 +490,7 @@ public class SBasePanel extends JPanel {
 		lh.add(scroll, 1, ++row, 3, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		JPanel rEqPanel = new JPanel(new BorderLayout());
+		System.out.println(latexExport.reactionEquation(reaction).toString());
 		sHotEqn rEqn = new sHotEqn(latexExport.reactionEquation(reaction)
 				.toString());
 		JScrollPane s = new JScrollPane(rEqn,
@@ -492,9 +503,10 @@ public class SBasePanel extends JPanel {
 				.createTitledBorder(" Reaction equation "));
 		lh.add(rEqPanel, 1, ++row, 3, 1, 1, 1);
 		lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
-		if (reaction.isSetKineticLaw())
+		if (reaction.isSetKineticLaw()) {
 			lh.add(new SBasePanel(reaction.getKineticLaw()), 1, ++row, 3, 1, 1,
 					1);
+		}
 	}
 
 	/**
