@@ -29,6 +29,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -555,25 +556,22 @@ public class SBasePanel extends JPanel {
 					sb.append("<li>");
 				}
 				String cvtString = cvt.toString();
+				LinkedList<String> replacedURIs = new LinkedList<String>();
 				for (int k = 0; k < cvt.getNumResources(); k++) {
 					String uri = cvt.getResourceURI(k);
-					String loc[];
-					try {
-						loc = SBML2LaTeX.getMIRIAMparser().getLocations(uri);
-					} catch (Exception e) {
-						throw new IOException(e.getMessage());
-					}
-					if (loc.length > 0) {
-						String split[] = cvtString.split(uri);
-						StringBuilder sbu = new StringBuilder();
-						for (int l = 0; l < split.length; l++) {
-							if (l > 0) {
-								sbu.append(", ");
-							}
-							StringTools.append(sbu, split[l], "<a href=\"",
-									loc[0], "\">", uri, "</a>\n");
-						}
-						cvtString = sbu.toString();
+					if (!replacedURIs.contains(uri)) {
+					  replacedURIs.add(uri);
+					  String loc[];
+					  try {
+					    loc = SBML2LaTeX.getMIRIAMparser().getLocations(uri);
+					  } catch (Exception e) {
+					    throw new IOException(e.getMessage());
+					  }
+					  if (loc.length > 0) {
+					    // The old code here was wrong!
+					    cvtString = cvtString.replace(uri,
+					      "<a href=\""+loc[0]+"\">"+uri+"</a>\n");
+					  }
 					}
 				}
 				sb.append(cvtString);

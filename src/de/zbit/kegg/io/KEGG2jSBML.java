@@ -77,9 +77,6 @@ import de.zbit.util.Utils;
  * TODO:
  * AKTUELLE BUGS (anhand 'files\KGMLsamplefiles\hsa00010.xml'):
  * - Notes werden nicht geschrieben
- * - SBML wird nicht geschrieben (NullPointer)
- * - MIRIAM URNs und andere infos werden bei e.g. 'rnR01061rnR01063' mit
- *  leeren infos (zu viele kommas) aufgezählt,
  * 
  */
 public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements SBaseChangedListener {
@@ -563,7 +560,7 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     CVTerm rePWs = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
     
     for (String ko_id : r.getName().split(" ")) {
-      reID.addResource(KeggInfos.getMiriamURIforKeggID(r.getName()));
+      reID.addResource(KeggInfos.getMiriamURIforKeggID(ko_id));
       
       // Retrieve further information via Kegg API
       KeggInfos infos = new KeggInfos(ko_id, manager);
@@ -595,7 +592,10 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
         
         if (rePWs != null && infos.getPathways() != null) {
           for (String pwId : infos.getPathways().split(",")) {
-            rePWs.addResource(KeggInfos.miriam_urn_kgPathway + KeggInfos.suffix(pwId));
+            String urn = KeggInfos.miriam_urn_kgPathway + KeggInfos.suffix(pwId);
+            if (!rePWs.getResources().contains(urn)){
+              rePWs.addResource(urn);
+            }
           }
         }
       }
@@ -1035,7 +1035,10 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     for (String go_id : goIDs.split(" ")) {
       if (go_id.length() != 7 || !containsOnlyDigits(go_id))
         continue; // Invalid GO id.
-      mtGoID.addResource(KeggInfos.getGo_id_with_MiriamURN(go_id));
+      String urn = KeggInfos.getGo_id_with_MiriamURN(go_id);
+      if (!mtGoID.getResources().contains(urn)) {
+        mtGoID.addResource(urn);
+      }
     }
   }
   
@@ -1051,7 +1054,10 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
   private static void appendAllIds(String IDs, CVTerm myCVterm, String miriam_URNPrefix) {
     if (IDs==null || IDs.length()<1) return;
     for (String id : IDs.split(" ")) {
-      myCVterm.addResource(miriam_URNPrefix + KeggInfos.suffix(id));
+      String urn = miriam_URNPrefix + KeggInfos.suffix(id);
+      if (!myCVterm.getResources().contains(urn)) {
+        myCVterm.addResource(urn);
+      }
     }
   }
   
@@ -1078,7 +1084,10 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     // Add every id to CVTerm.
     for (String id : IDs.split(" ")) {
       // Add prefix + id (with or without ":").
-      myCVterm.addResource(miriam_URNPrefix + (id.contains(":") ? id.trim() : s + ":" + id.trim()));
+      String urn = miriam_URNPrefix + (id.contains(":") ? id.trim() : s + ":" + id.trim());
+      if (!myCVterm.getResources().contains(urn)) {
+        myCVterm.addResource(urn);
+      }
     }
   }
   
