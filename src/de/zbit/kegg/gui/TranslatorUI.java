@@ -51,6 +51,8 @@ import javax.swing.event.ChangeListener;
 
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 
+import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
+
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
@@ -285,10 +287,12 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	private void createNewTab(File inFile, String format) {
 		// Check input
 		if (!KEGGtranslatorIOOptions.INPUT.getRange().isInRange(inFile)) {
-			JOptionPane.showMessageDialog(this, '\'' + inFile.getName()
-					+ "' is no valid input file.",
-					KEGGtranslator.APPLICATION_NAME,
-					JOptionPane.WARNING_MESSAGE);
+		  String message = "The given file is no valid input file.";
+		  if (inFile!=null) {
+		    message = '\'' + inFile.getName() + "' is no valid input file.";
+		  }
+			JOptionPane.showMessageDialog(this, message,
+					KEGGtranslator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
 		} else {
 			Format f = null;
 			try {

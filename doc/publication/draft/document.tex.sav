@@ -34,7 +34,7 @@ We have developed KEGGtranslator, which is an easy-to-use stand-alone applicatio
 %Translator nutzt KegggAdaptor, kann RkT vervollständigung, ist Stand-Alone-Application
 
 \section{Availability:}
-KEGGtranslator is freely available as a webstart application and for download at http://TODO-MAKE-HOMEPAGE. KGML files can be downloaded within the application of manually from \url{ftp://ftp.genome.jp/pub/kegg/xml/kgml}.
+KEGGtranslator is freely available as a webstart application and for download at http://TODO-MAKE-HOMEPAGE. KGML files can be downloaded within the application of manually from {ftp://ftp.genome.jp/pub/kegg/xml/kgml}.
 
 
 \section{Contact:} \href{Clemens.Wrzodek@uni-tuebingen.de}{Clemens.Wrzodek@uni-tuebingen.de}
@@ -79,9 +79,11 @@ To our knowledge, these major deficiencies are not being corrected by other KEGG
 
 \section{Translation of KGML-files}
 
-In the first step of a translation, KEGGtranslator reads the XML-file and puts all contained elements into an internal data structure. In addition to the XML-file, the KEGG database is queries via the KEGG API for each id in the document (pathway id, entries, recations, relations, substrates, products, etc.). This completes the sparse XML-document with comprehensive information. For example, multiple synonyms and miriam urns of many external databases (Ensembl, EntrezGene, UniProt, ChEBI, Gene Ontology, DrugBank, PDBeChem, and many more) are being assigned to genes.
+In the first step of a translation, KEGGtranslator reads the XML-file and puts all contained elements into an internal data structure. In addition to the XML-file, the KEGG database is queries via the KEGG API \cite{KEGGapi} for each id in the document (pathway id, entries, reactions, relations, substrates, products, etc.). This completes the sparse XML-document with comprehensive information. For example, multiple synonyms identifier of many external databases (Ensembl, EntrezGene, UniProt, ChEBI, Gene Ontology, DrugBank, PDBeChem, and many more) are being assigned to genes.
 
-TODO: Preprocessing (remove white nodes, reaciton complete, etc.) Auch erwaehnen, dass alle optionen ausschaltbar sind. 
+After this initial step various preprocessing operations are performed on the pathway. The user may choose, if he wants to remove white nodes (genes, that are not occurring in the current organism), remove orphans (nodes without any reactions or relations) and if he wants to let KEGGtranslator autocomplete reactions.
+
+TODO: Preprocessing (remove white nodes, reaciton complete, etc.) Auch erwaehnen, dass alle optionen ausschaltbar sind.
 
 After these preprocessing steps, KEGGtranslator branches between two different conversion modes for the actual translation: a functional translation (SBML) and a graphical translation (e.g. GraphML, GML). Depending on the chosen output format, KEGGtranslator determines the way to translate the KGML document.
 
@@ -89,148 +91,26 @@ The functional translation is performed by converting the KGML code to a jSBML d
 
 We have integrated the SBML2LaTeX tool into KEGGtranslator, which allows users to automatically generate a LaTeX or PDF-report to document the SBML-code of the translated pathway.
 
-In graphical translations, results can be saved as GraphML, GML or YGF and finally as images of type JPG, GIF, or TGF. In this mode, the KGML data structure is being converted to a yFiles data structure. The focus here lies on the visualization of the pathway. Relations are being translated by inserting arrows with the appropriate style. The styles are directly read from the KGML document. For example, dashed arrows without heads represent bindings or associations and a dotted arrow with a simply head illustrates an indirect effect. Please see the KGML specification for a complete list. As in the function translation, GraphML allows to define custom annotation elements. KEGGtranslator makes use of those, by putting several identifiers (e.g. EntrezGene or Ensembl) and descriptions to the single nodes. From the KGML-document, the shape of the node is translated as well as the colors and labels. Links to descriptive HTML-pages are being setup and hierarchical group nodes are being created for defined compounds. All these features lead to a nice graphical representation of the pathway that provides as many information about the elements as possible.
-
-Functional:
-CellDesigner Annots
-Valid and unique SBML-code (ids, initial assignments, etc.)
-MIRIAM URNs
-SBO-Terms (closest guess)
-Notes (Including pathway picture and links)
-REACTIONS (with modififerSpeciesReferences, reversibel<-> irreversibel
-
+%
+%Functional:
+%CellDesigner Annots
+%Valid and unique SBML-code (ids, initial assignments, etc.)
+%MIRIAM URNs
+%SBO-Terms (closest guess)
+%Notes (Including pathway picture and links)
+%REACTIONS (with modififerSpeciesReferences, reversibel<-> irreversibel
 
 
+In graphical translations, results can be saved as GraphML, GML or YGF and finally as images of type JPG, GIF, or TGF. In this mode, the KGML data structure is being converted to a yFiles \cite{yFiles} data structure. The focus here lies on the visualization of the pathway. Relations are being translated by inserting arrows with the appropriate style, which is given in the KGML document. For example, dashed arrows without heads represent bindings or associations and a dotted arrow with a simply head illustrates an indirect effect. Please see the KGML specification \cite{KGMLspecification} for a complete list. As in the functional translation, GraphML allows to define custom annotation elements. KEGGtranslator makes use of those, by putting several identifiers (e.g. EntrezGene or Ensembl) and descriptions to the single nodes. From the KGML-document, the shape of the node is translated as well as the colors and labels. Links to descriptive HTML-pages are being setup and hierarchical group nodes are being created for defined compounds. All these features lead to a nice graphical representation of the pathway that provides as many information about the elements as possible.
 
 
-
-
-\begin{methods}
-\section{Methods}
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-\begin{itemize}
-\item for bulleted list, use itemize
-\item for bulleted list, use itemize
-\item for bulleted list, use itemize
-\end{itemize}
-
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text.
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-
-
-\begin{table}[!t]
-\processtable{This is table caption\label{Tab:01}}
-{\begin{tabular}{llll}\toprule
-head1 & head2 & head3 & head4\\\midrule
-row1 & row1 & row1 & row1\\
-row2 & row2 & row2 & row2\\
-row3 & row3 & row3 & row3\\
-row4 & row4 & row4 & row4\\\botrule
-\end{tabular}}{This is a footnote}
-\end{table}
-
-\end{methods}
-
-\begin{figure}[!tpb]%figure1
-%\centerline{\includegraphics{fig01.eps}}
-\caption{Caption, caption.}\label{fig:01}
-\end{figure}
-
-\begin{figure}[!tpb]%figure2
-%\centerline{\includegraphics{fig02.eps}}
-\caption{Caption, caption.}\label{fig:02}
-\end{figure}
 
 \section{Discussion}
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text.
+% Easy-to-use, help & tooptips, stand alone, java (systemunabhaengig)
 
 
+%\section{Conclusion}
 
-
-Table~\ref{Tab:01} shows that Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that
-the above method Text Text. Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that
-the above method Text Text. Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that
-the above method Text Text.
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%     please remove the " % " symbol from \centerline{\includegraphics{fig01.eps}}
-%     as it may ignore the figures.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-
-
-\section{Conclusion}
-
-(Table~\ref{Tab:01}) Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.
-
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-
-
-
-
-\begin{enumerate}
-\item this is item, use enumerate
-\item this is item, use enumerate
-\item this is item, use enumerate
-\end{enumerate}
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text.
-
-
-
-
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text
 
 
 \section*{Acknowledgement}

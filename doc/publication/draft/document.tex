@@ -1,6 +1,9 @@
 %% See http://www.oxfordjournals.org/our_journals/bioinformatics/for_authors/general.html for author information
 
 \documentclass{bioinfo}
+
+\usepackage{url}  % Formatting web addresses
+
 \copyrightyear{2011}
 \pubyear{2011}
 
@@ -20,9 +23,7 @@
 \begin{abstract}
 
 \section{Summary:}
-The KEGG PATHWAY database is today a widely used service for pathway based information. It contains manually drawn pathway maps with information about the genes, reactions and relations contained within a pathway. To model these pathways, KEGG introduced an own XML-format and parsers and translators are needed to process the pathway maps for usage in other applications and algorithms.
-
-TODO: Eventuell noch irgendein Nebensatz, aus dem hervorgeht, dass Reaktionen nicht komplett sein müssen, sondern nur für visualisierung.
+The KEGG PATHWAY database is today a widely used service for pathway based information. It contains manually drawn pathway maps with information about the genes, reactions and relations contained within a pathway. To model these pathways, KEGG is using an own XML-format. Parsers and translators are needed to process the pathway maps for usage in other applications and algorithms.
 
 
 We have developed KEGGtranslator, which is an easy-to-use stand-alone application that can translate KGML formatted XML-files to multiple output formats. Unlike other translators, KEGGtranslator supports a plethora of output formats, is able to complete the information in translated documents (i.e. MIRIAM annotations) beyond the scope of the XML-document and amends missing components to fragmentary reactions within the pathway to allow simulations on those.
@@ -34,7 +35,7 @@ We have developed KEGGtranslator, which is an easy-to-use stand-alone applicatio
 %Translator nutzt KegggAdaptor, kann RkT vervollständigung, ist Stand-Alone-Application
 
 \section{Availability:}
-KEGGtranslator is freely available as a webstart application and for download at http://TODO-MAKE-HOMEPAGE. KGML files can be downloaded within the application of manually from \url{ftp://ftp.genome.jp/pub/kegg/xml/kgml}.
+KEGGtranslator is freely available as a webstart application and for download at \url{http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator/}. KGML files can be downloaded within the application of manually from \url{ftp://ftp.genome.jp/pub/kegg/xml/kgml}.
 
 
 \section{Contact:} \href{Clemens.Wrzodek@uni-tuebingen.de}{Clemens.Wrzodek@uni-tuebingen.de}
@@ -44,20 +45,18 @@ KEGGtranslator is freely available as a webstart application and for download at
 
 \section{Introduction}
 
-Many academic researchers who want to use pathway based information are using the KEGG Pathway database.
+Many academic researchers, who want to use pathway based information are using the KEGG PATHWAY database \cite{Kanehisa2000}. The database, established in 1995, contains maps for various pathways and is strongly related to the other KEGG databases, by assigning all elements KEGG identifier only. These maps are visualized on the web and can be downloaded without charge (for academics) as xml-files that are using the KEGG Markup Language (KGML) \cite{KGML}.
 
-TODO: Mehr Infos zu der DB. und mit dem KGML format und XML dateien überleiten.
+However, the content of these KGML-formatted xml-files is limited. Gene names are often not very readable and elements are not well annotated. The reason for this is that KEGG releases those xml-files primarily for graphical visualizations of the pathway. For creating fully functional models of the pathway, the content of the xml-file is not sufficient.
 
-However, the content of these KGML-formatted xml-files is limited. Gene names are often not very readable and elements are not well annotated. The reason for this is that KEGG releases those xml-files primary for graphical visualizations of the pathway. For creating functional models of the pathway, the content of the xml-file is not sufficient.
+KEGGtranslator reads and completes the content of the XML-file with live-annotation of all genes and reactions using the KEGG API \cite{KEGGapi}. Minor deficiencies are corrected (i.e. the name of a gene), new information is being added (i.e. multiple MIRIAM identifier for each gene and reaction, or SBO terms describing the function) and some crucial deficiencies are addressed:
 
-KEGGtranslator completes the translated content of the XML-file with live-annotation of all genes and reactions. Minor deficiencies are corrected (i.e. the name of a gene), new information is being added (i.e. multiple MIRIAM identifier for each gene and reaction or SBO terms describing the function) and some crucial deficiencies are addressed:
+KEGG uses colors in the visualization of a pathway to annotate organism specific orthologous genes. Nodes in green represent biological entities that occur in the current organism. Nodes in white represent biological entities, that correspond to genes that are occurring in this pathway in other species, but not in the current one. Translating all those nodes into new models, without caring for the node color, would lead to a model, containing invalid genes in the pathway.
 
-KEGG uses colors in the visualization of a pathway to annotate organism specific orthologous genes. Nodes in green represent biological entities that occur in the current organism. Nodes in white represent biological entities, that correspond to genes that are occurring in this pathway in other species, but not in the current one. Translating all those nodes into function models, without caring for the node color would lead to a model, containing invalid genes in the pathway.
-
-Another major deficiency are the reactions. The XML-files only contain those parts of the reaction, that are needed for the graphical representation of the pathway. But they do not always contain the complete chemical equation. KEGGtranslator is able to lookup each reaction and amend the missing components to reactions. This leads to more complete and function correct pathway models.
+Another major deficiency are the reactions. The XML-files only contain those parts of the reaction, that are needed for the graphical representation of the pathway. But they do not always contain the complete chemical equation (see figure \ref{fig:01}). KEGGtranslator is able to lookup each reaction and amend the missing components to reactions. This leads to more complete and functional correct pathway models.
 
 
-%Beispiel aus Glycloyse (000010)
+%Beispiel aus Glycloyse (hsa00010.xml)
 %XML file contains:
 %===================
 %    <reaction name="rn:R05198" type="reversible">
@@ -70,24 +69,20 @@ Another major deficiency are the reactions. The XML-files only contain those par
 %===================
 %Ethanol + 2 Cytochrome c <=> 2 Ferrocytochrome c + Acetaldehyde
 %C00469 + 2 C00524 <=> 2 C00126 + C00084
-
-
-TODO: bild um das mit white/green nodes zu zeigen und bild um das mit reaktions zu zeigen
+%TODO: bild um das mit white/green nodes zu zeigen und bild um das mit reaktions zu zeigen
 
 To our knowledge, these major deficiencies are not being corrected by other KEGG converters.
 
 
 \section{Translation of KGML-files}
 
-In the first step of a translation, KEGGtranslator reads the XML-file and puts all contained elements into an internal data structure. In addition to the XML-file, the KEGG database is queries via the KEGG API for each id in the document (pathway id, entries, recations, relations, substrates, products, etc.). This completes the sparse XML-document with comprehensive information. For example, multiple synonyms and miriam urns of many external databases (Ensembl, EntrezGene, UniProt, ChEBI, Gene Ontology, DrugBank, PDBeChem, and many more) are being assigned to genes.
+In the first step of a translation, KEGGtranslator reads the XML-file and puts all contained elements into an internal data structure. In addition to the XML-file, the KEGG database is queries via the KEGG API for each id in the document (pathway id, entries, reactions, relations, substrates, products, etc.). This completes the sparse XML-document with comprehensive information. For example, multiple synonyms, identifier of many external databases (Ensembl, EntrezGene, UniProt, ChEBI, Gene Ontology, DrugBank, PDBeChem, and many more) are being assigned to genes.
 
-TODO: Preprocessing (remove white nodes, reaciton complete, etc.) Auch erwaehnen, dass alle optionen ausschaltbar sind. 
+After this initial step, various preprocessing operations are performed on the pathway. The user may choose if he wants to remove white nodes (genes, that are not occurring in the current organism), remove orphans (nodes without any reactions or relations) and if he wants to let KEGGtranslator autocomplete reactions.
 
 After these preprocessing steps, KEGGtranslator branches between two different conversion modes for the actual translation: a functional translation (SBML) and a graphical translation (e.g. GraphML, GML). Depending on the chosen output format, KEGGtranslator determines the way to translate the KGML document.
 
-The functional translation is performed by converting the KGML code to a jSBML data structure. The focus here is to generate valid and specification-conform SBML code that eases e.g. a dynamic simulation of the pathway. Each entry (pathway references, genes, compounds, enzymes, reactions, reaction-modifiers, etc.) is being assigned multiple MIRIAM-URNs and an SBO-Term which describes best the function of the element. Addirionaly, notes are being assigned to each element with human-readable names and synonyms, a description of the element and links to pictures and further information. The user may also choose to add graphical information by putting CellDesigner annotations to the model. The key difference in this mode, to the graphical translation is, that the focus resides on reactions in KGML documents. Besides the already mentioned completion of reactions, each enzymatic modifier is correctly assigned to the reaction by building so called modifierSpeciesReferences. The reversibility of the reaction is annotated and a picture of the reaction equation is being put into the notes.
-
-We have integrated the SBML2LaTeX tool into KEGGtranslator, which allows users to automatically generate a LaTeX or PDF-report to document the SBML-code of the translated pathway.
+The functional translation is performed by converting the KGML code to a jSBML data structure (TODO:JSBMLCitation). The focus here is to generate valid and specification-conform SBML (Level 2 Version 4) code that eases e.g. a dynamic simulation of the pathway. Each entry (pathway references, genes, compounds, enzymes, reactions, reaction-modifiers, etc.) is being assigned multiple MIRIAM-URNs and an SBO-Term, which describes best the function of the element. Additionally, notes are being assigned to each element with human-readable names and synonyms, a description of the element and links to pictures and further information. The user may also choose to add graphical information by putting CellDesigner annotations to the model. The key difference in this mode, to the graphical translation, is that the focus lies on reactions in KGML documents. Besides the already mentioned completion of reactions, each enzymatic modifier is correctly assigned to the reaction by building so called modifierSpeciesReferences. The reversibility of the reaction is annotated and a picture of the reaction equation is being put into the notes. As a final step, we have integrated the SBML2LaTeX \cite{SBML2LaTeX} tool into KEGGtranslator, which allows users to automatically generate a LaTeX or PDF-report to document the SBML-code of the translated pathway. Kinetics may be added by using the SBMLSqueezer \cite{SBMLSqueezer} tool after the translation.
 
 %
 %Functional:
@@ -99,144 +94,39 @@ We have integrated the SBML2LaTeX tool into KEGGtranslator, which allows users t
 %REACTIONS (with modififerSpeciesReferences, reversibel<-> irreversibel
 
 
-In graphical translations, results can be saved as GraphML, GML or YGF and finally as images of type JPG, GIF, or TGF. In this mode, the KGML data structure is being converted to a yFiles data structure. The focus here lies on the visualization of the pathway. Relations are being translated by inserting arrows with the appropriate style. The styles are directly read from the KGML document. For example, dashed arrows without heads represent bindings or associations and a dotted arrow with a simply head illustrates an indirect effect. Please see the KGML specification for a complete list. As in the function translation, GraphML allows to define custom annotation elements. KEGGtranslator makes use of those, by putting several identifiers (e.g. EntrezGene or Ensembl) and descriptions to the single nodes. From the KGML-document, the shape of the node is translated as well as the colors and labels. Links to descriptive HTML-pages are being setup and hierarchical group nodes are being created for defined compounds. All these features lead to a nice graphical representation of the pathway that provides as many information about the elements as possible.
+In graphical translations, results can be saved as GraphML, GML or YGF and finally as images of type JPG, GIF, or TGF. In this mode, the KGML data structure is being converted to a yFiles \cite{yFiles} data structure. The focus here lies on the visualization of the pathway. Relations are being translated by inserting arrows with the appropriate style, which is given in the KGML document. For example, dashed arrows without heads represent bindings or associations and a dotted arrow with a simply head illustrates an indirect effect. Please see the KGML specification \cite{KGML} for a complete list. As in the functional translation, GraphML allows to define custom annotation elements. KEGGtranslator makes use of those, by putting several identifiers (e.g. EntrezGene or Ensembl) and descriptions to the single nodes. From the KGML-document, the shape of the node is translated as well as the colors and labels. Links to descriptive HTML-pages are being setup and hierarchical group nodes are being created for defined compounds. All these features lead to a nice graphical representation of the pathway that provides as many information about the elements as possible.
 
-
-
-
-
-
-
-\begin{methods}
-\section{Methods}
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-\begin{itemize}
-\item for bulleted list, use itemize
-\item for bulleted list, use itemize
-\item for bulleted list, use itemize
-\end{itemize}
-
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text.
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-
-
-\begin{table}[!t]
-\processtable{This is table caption\label{Tab:01}}
-{\begin{tabular}{llll}\toprule
-head1 & head2 & head3 & head4\\\midrule
-row1 & row1 & row1 & row1\\
-row2 & row2 & row2 & row2\\
-row3 & row3 & row3 & row3\\
-row4 & row4 & row4 & row4\\\botrule
-\end{tabular}}{This is a footnote}
-\end{table}
-
-\end{methods}
-
-\begin{figure}[!tpb]%figure1
-%\centerline{\includegraphics{fig01.eps}}
-\caption{Caption, caption.}\label{fig:01}
+\begin{figure}[t]%figure1
+\centerline{
+  \noindent\includegraphics[width=1.0\columnwidth]{img/final.png}
+}
+\caption{Screenshot of KEGGtranslator. The list of all output formats is shown in the upper right corner. On the center, a translated GraphML pathway is displayed. The lower right corner demonstrates the need for autocompleting reactions: on the upper half one can see the KGML-file with only one substrate and product. On the lower half, the complete reaction equation is shown. As one can see, one substrate and product is missing in the XML-document.}\label{fig:01}
 \end{figure}
 
-\begin{figure}[!tpb]%figure2
-%\centerline{\includegraphics{fig02.eps}}
-\caption{Caption, caption.}\label{fig:02}
+
+\begin{figure}[htb]%figure2
+\centerline{
+  \noindent\includegraphics[width=1.0\columnwidth]{img/final2.png}
+}
+\caption{Alternative picture for Fig. \ref{fig:01}. We have to choose one of those.}\label{fig:02}
 \end{figure}
 
 \section{Discussion}
+%\section{Conclusion}
+KEGGtranslator is a stand-alone application with a graphical user interface, that runs on every operating system that has a java virtual machine. There are tools for converting KGML to SBML (e.g. KEGGconverter \cite{KEGGconverter} and KEGG2SBML \cite{KEGG2SBML}) and for converting KGML to graph structures in R (KEGGgraph \cite{KEGGgraph}). But, to our knowledge, no stand-alone KEGG converter exists that is able to translate KGML formatted files to various output formats. In contrast to all other KEGG converting tools, KEGGtranslator comes with important functionalities like the autocompletion of reactions or the annotation of each element of the translated file, using various identifiers.
 
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text.
+Because of the variety of output formats, the pathways converted with KEGGtranslator can easily be opened in other applications. Further processing steps can be done quickly because a node or edge has many more information and identifier that just a name. And dynamic simulations on pathways can be done accurate with complete reactions.
 
+%Because of these functionalities, the pathways converted with KEGGtranslator can easily be used for further processing. I.e. assigning
 
-
-
-Table~\ref{Tab:01} shows that Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that
-the above method Text Text. Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that
-the above method Text Text. Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that
-the above method Text Text.
+% Easy-to-use, help & tooptips, stand alone, java (systemunabhaengig)
+%The application is purely written in java and makes use of the jSBML library. That makes it, in contrast to libSBML based applications, runnable on all operating systems that have a java virtual machine.
 
 
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%     please remove the " % " symbol from \centerline{\includegraphics{fig01.eps}}
-%     as it may ignore the figures.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
-
-
-\section{Conclusion}
-
-(Table~\ref{Tab:01}) Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.
-
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-
-
-
-
-
-\begin{enumerate}
-\item this is item, use enumerate
-\item this is item, use enumerate
-\item this is item, use enumerate
-\end{enumerate}
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text  Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text.
-
-
-
-
-
-
-Text Text Text Text Text Text  Text Text Text Text Text Text Text Text Text  Text Text Text Text Text Text. Figure \ref{fig:02} shows that the above method  Text Text Text Text
-
+%TODO: Outlook: Webservice, libSBGN, (API)
 
 \section*{Acknowledgement}
-Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to know about  text text text text
+Text Text Text Text Text Text  Text Text.
 
 \paragraph{Funding\textcolon} Text Text Text Text Text Text  Text Text.
 
@@ -245,41 +135,11 @@ Text Text Text Text Text Text  Text Text.  \citealp{Boffelli03} might want to kn
 %\bibliographystyle{plainnat}
 %\bibliographystyle{abbrv}
 %\bibliographystyle{bioinformatics}
-%
 %\bibliographystyle{plain}
-%
 %\bibliography{Document}
 
 
-\begin{thebibliography}{}
-\bibitem[Bofelli {\it et~al}., 2000]{Boffelli03} Bofelli,F., Name2, Name3 (2003) Article title, {\it Journal Name}, {\bf 199}, 133-154.
+\bibliographystyle{abbrv}
+\bibliography{KEGGtranslator}
 
-\bibitem[Bag {\it et~al}., 2001]{Bag01} Bag,M., Name2, Name3 (2001) Article title, {\it Journal Name}, {\bf 99}, 33-54.
-
-\bibitem[Yoo \textit{et~al}., 2003]{Yoo03}
-Yoo,M.S. \textit{et~al}. (2003) Oxidative stress regulated genes
-in nigral dopaminergic neurnol cell: correlation with the known
-pathology in Parkinson's disease. \textit{Brain Res. Mol. Brain
-Res.}, \textbf{110}(Suppl. 1), 76--84.
-
-\bibitem[Lehmann, 1986]{Leh86}
-Lehmann,E.L. (1986) Chapter title. \textit{Book Title}. Vol.~1, 2nd edn. Springer-Verlag, New York.
-
-\bibitem[Crenshaw and Jones, 2003]{Cre03}
-Crenshaw, B.,III, and Jones, W.B.,Jr (2003) The future of clinical
-cancer management: one tumor, one chip. \textit{Bioinformatics},
-doi:10.1093/bioinformatics/btn000.
-
-\bibitem[Auhtor \textit{et~al}. (2000)]{Aut00}
-Auhtor,A.B. \textit{et~al}. (2000) Chapter title. In Smith, A.C.
-(ed.), \textit{Book Title}, 2nd edn. Publisher, Location, Vol. 1, pp.
-???--???.
-
-\bibitem[Bardet, 1920]{Bar20}
-Bardet, G. (1920) Sur un syndrome d'obesite infantile avec
-polydactylie et retinite pigmentaire (contribution a l'etude des
-formes cliniques de l'obesite hypophysaire). PhD Thesis, name of
-institution, Paris, France.
-
-\end{thebibliography}
 \end{document}

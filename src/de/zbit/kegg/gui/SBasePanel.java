@@ -90,6 +90,7 @@ import de.zbit.util.StringUtil;
  * given {@link SBase} in a GUI.
  * 
  * @author Andreas Dr&auml;ger
+ * @author Clemens Wrzodek
  * @since 1.3
  */
 @SuppressWarnings("deprecation")

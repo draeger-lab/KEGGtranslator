@@ -63,6 +63,8 @@ import y.view.Overview;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.kegg.io.KEGG2yGraph;
+import de.zbit.util.EscapeChars;
+import de.zbit.util.StringUtil;
 
 /**
  * An edit mode for y Files, that allow no creating of new Nodes or edges.
@@ -205,7 +207,9 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
           Point p = e.getPoint(); 
           int row = propTable.rowAtPoint(p);
           int column = propTable.columnAtPoint(p);
-          propTable.setToolTipText(String.valueOf(propTable.getValueAt(row,column)));
+          propTable.setToolTipText(
+            StringUtil.toHTML( EscapeChars.forHTML(String.valueOf(propTable.getValueAt(row,column))) , 120)
+          );
         }
       });
       propTable.addMouseListener(new MouseAdapter() {
