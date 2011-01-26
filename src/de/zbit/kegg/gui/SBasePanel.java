@@ -74,11 +74,11 @@ import org.sbml.jsbml.StoichiometryMath;
 import org.sbml.jsbml.Symbol;
 import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
-import org.sbml.jsbml.util.StringTools;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
-import org.sbml.jsbml.util.compilers.LaTeX;
+import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.io.SBOTermFormatter;
+import org.sbml.tolatex.util.LaTeX;
 
 import atp.sHotEqn;
 import de.zbit.gui.LayoutHelper;
@@ -103,7 +103,7 @@ public class SBasePanel extends JPanel {
 
 	private final LayoutHelper lh;
 
-	private final LaTeX latex;
+	private final LaTeXCompiler latex;
 
 	private static final int preferedWidth = 450;
 
@@ -120,7 +120,7 @@ public class SBasePanel extends JPanel {
 		super();
 		GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
-		latex = new LaTeX(false);
+		latex = new LaTeXCompiler(false);
 		lh = new LayoutHelper(this, gbl);
 		editable = false;
 		row = -1;

@@ -51,7 +51,7 @@ public class ReactionPanelTest {
 	public static void main(String[] args) throws XMLStreamException,
 		SBMLException {
 		SBMLDocument doc = createSimpleSBMLDocument(1, 2, 2, false);
-		System.out.println(SBMLWriter.writeSBMLToString(doc));
+		System.out.println((new SBMLWriter()).writeSBMLToString(doc));
 		JFrame f = new JFrame("Reaction test");
 		JPanel panel = new ReactionPanel(doc.getModel().getReaction(0));
 		panel.setBackground(Color.WHITE);

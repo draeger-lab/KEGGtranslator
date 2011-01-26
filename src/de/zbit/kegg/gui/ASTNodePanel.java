@@ -35,7 +35,7 @@ import javax.swing.SpinnerNumberModel;
 import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.SBMLException;
-import org.sbml.jsbml.util.compilers.LaTeX;
+import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 
 import atp.sHotEqn;
 import de.zbit.gui.LayoutHelper;
@@ -133,7 +133,7 @@ public class ASTNodePanel extends JPanel {
 	    }
 	}
 
-	sHotEqn preview = new sHotEqn(node.compile(new LaTeX()).toString());
+	sHotEqn preview = new sHotEqn(node.compile(new LaTeXCompiler()).toString());
 	preview.setBorder(BorderFactory.createLoweredBevelBorder());
 	JScrollPane scroll = new JScrollPane(preview,
 	    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,

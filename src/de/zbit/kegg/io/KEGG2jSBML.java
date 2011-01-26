@@ -23,7 +23,6 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +38,6 @@ import org.sbml.jsbml.History;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
-import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SBaseChangedEvent;
 import org.sbml.jsbml.SBaseChangedListener;
@@ -49,9 +47,9 @@ import org.sbml.jsbml.CVTerm.Qualifier;
 import org.sbml.jsbml.CVTerm.Type;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
-import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -319,14 +317,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
   public boolean writeToFile(SBMLDocument doc, String outFile) {
     if (new File(outFile).exists()) lastFileWasOverwritten=true;
     try {
-      SBMLWriter.write(doc, outFile);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-      return false;
-    } catch (XMLStreamException e) {
-      e.printStackTrace();
-      return false;
-    } catch (SBMLException e) {
+      SBMLWriter writer = new SBMLWriter();
+      writer.write(doc, outFile);
+    } catch (Exception e) {
       e.printStackTrace();
       return false;
     }

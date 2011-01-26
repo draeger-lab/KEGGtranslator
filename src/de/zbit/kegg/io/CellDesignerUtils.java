@@ -136,7 +136,7 @@ public class CellDesignerUtils {
   private void closeOpenSpeciesTags(Model model) {
     // Close open species CD tags.
     for (Species s : model.getListOfSpecies()) {
-      String a = s.getAnnotation().getNoRDFAnnotation();
+      String a = s.getAnnotation().getNonRDFannotation();
       if (a != null && a.length() > 0 && a.contains("celldesigner")) {
         s.getAnnotation().appendNoRDFAnnotation("</celldesigner:extension>\n");
       }
@@ -221,9 +221,9 @@ public class CellDesignerUtils {
       // Write annotation for ModifierSpeciesReference
       
       // It happens, that a modifier occurs in multiple reactions. Take care of this here.
-      String currentAnnotation = s.getAnnotation().getNoRDFAnnotation();
+      String currentAnnotation = s.getAnnotation().getNonRDFannotation();
       if (currentAnnotation!=null && 
-          !s.getAnnotation().getNoRDFAnnotation().contains("<celldesigner:alias>")) {
+          !s.getAnnotation().getNonRDFannotation().contains("<celldesigner:alias>")) {
         s.getAnnotation().appendNoRDFAnnotation(String.format(
             "<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
             "cd_sa"+ s.getSpeciesInstance().getId()));
@@ -233,7 +233,7 @@ public class CellDesignerUtils {
       final String loKey = "<celldesigner:listOfCatalyzedReactions>";
       // The key, we want to add
       final String newKey = String.format("<celldesigner:catalyzed reaction=\"%s\"/>\n",sbReaction.getId()); 
-      currentAnnotation = s.getSpeciesInstance().getAnnotation().getNoRDFAnnotation();
+      currentAnnotation = s.getSpeciesInstance().getAnnotation().getNonRDFannotation();
       int pos=-1;
       if (currentAnnotation!=null) {
         pos = currentAnnotation.indexOf(loKey);
