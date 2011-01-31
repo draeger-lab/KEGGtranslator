@@ -51,8 +51,6 @@ import javax.swing.event.ChangeListener;
 
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
@@ -142,7 +140,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	private static final long serialVersionUID = 6631262606716052915L;
 
 	static {
-		String iconPaths[] = {};
+		String iconPaths[] = {"KEGGtranslatorIcon_16.png"};
 		for (String path : iconPaths) {
 			UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(
 				TranslatorUI.class.getResource("img/" + path)));
@@ -177,6 +175,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		file = new File(prefsIO.get(KEGGtranslatorIOOptions.OUTPUT));
 		saveDir = file.isDirectory() ? file.getAbsolutePath() : file
 				.getParent();
+		Object icon = UIManager.get("KEGGtranslatorIcon_16");
+		if ((icon != null) && (icon instanceof ImageIcon)) {
+			setIconImage(((ImageIcon) icon).getImage());
+		}
 	}
 	
 	/**
