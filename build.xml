@@ -37,9 +37,11 @@
     <delete file="${appJar}"/>
     <jar jarfile="${appJar}">
             <manifest>
-                <attribute name="Built-By" value="Wrzodek et al"/>
+                <attribute name="Built-By" value="Center for Bioinformatics Tuebingen (ZBIT)"/>
                 <attribute name="Main-Class" value="de.zbit.kegg.Translator"/>
                 <attribute name="SplashScreen-Image" value="de/zbit/kegg/gui/img/Logo.gif"/>
+            	<attribute name="Xdock:name" value="KEGGtranslator"/>
+            	<attribute name="Xdock:icon" value="de/zbit/kegg/gui/img/KEGGtranslatorIcon.png"/>
             </manifest>
       <!-- INCLUDE/ EXCLUDE DEMO-->
       <!--<fileset dir="${src}">-->
