@@ -368,7 +368,7 @@ protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
     annot.setAbout("#" + model.getMetaId());
     model.setAnnotation(annot);
     model.setHistory(hist);
-    model.appendNotes("<html xmlns=\"http://www.w3.org/1999/xhtml\"><body>");
+    model.appendNotes("<notes><body xmlns=\"http://www.w3.org/1999/xhtml\">");
     
     // CellDesigner Annotations
     if (addCellDesignerAnnots) {
