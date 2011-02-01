@@ -311,8 +311,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 					openDir = inFile.getParent();
 					tabbedPane.addTab(inFile.getName(), new TranslatorPanel(
 							inFile, f, this));
-					tabbedPane
-							.setSelectedIndex(tabbedPane.getComponentCount() - 1);
+					tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 				} catch (Exception e1) {
 					GUITools.showErrorMessage(this, e1);
 				}
@@ -357,7 +356,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
       case DOWNLOAD_KGML:
         try {
           tabbedPane.addTab(action.getName(), new TranslatorPanel(this));
-          tabbedPane.setSelectedIndex(tabbedPane.getComponentCount()-1);
+          tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
         } catch (Exception e1) {
           GUITools.showErrorMessage(this, e1);
         }
@@ -388,7 +387,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @return true, if the tab has been closed.
 	 */
 	private boolean closeTab(int index) {
-		if (index >= tabbedPane.getTabCount())
+		if (index<0 || index >= tabbedPane.getTabCount())
 			return false;
 		Component comp = tabbedPane.getComponentAt(index);
 		String title = tabbedPane.getTitleAt(index);
