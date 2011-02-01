@@ -51,7 +51,10 @@ public class ReactionPanelTest {
 	public static void main(String[] args) throws XMLStreamException,
 		SBMLException {
 		SBMLDocument doc = createSimpleSBMLDocument(1, 2, 2, false);
-		System.out.println((new SBMLWriter()).writeSBMLToString(doc));
+		SBMLWriter writer = new SBMLWriter();
+		writer.setIndentationCount(2);
+		writer.setIndentationChar(' ');
+		System.out.println(writer.writeSBMLToString(doc));
 		JFrame f = new JFrame("Reaction test");
 		JPanel panel = new ReactionPanel(doc.getModel().getReaction(0));
 		panel.setBackground(Color.WHITE);
@@ -74,6 +77,8 @@ public class ReactionPanelTest {
 		int i;
 		SBMLDocument doc = new SBMLDocument(2, 4);
 		Model model = doc.createModel("MyModel");
+		model.setNotes("<notes><body xmlns=\"http://www.w3.org/1999/xhtml\">Bla bla</body></notes>");
+		model.appendNotes("bla bla");
 		Compartment c = model.createCompartment("default");
 		Species substrates[] = new Species[numReactants];
 		Species products[] = new Species[numProducts];
