@@ -80,7 +80,7 @@ public class Translator {
 		if (props.containsKey(GUIOptions.LANGUAGE)) {
 			String userLanguage = props.get(GUIOptions.LANGUAGE);
 			if (!userLanguage.equals(System.getProperty("user.language"))) {
-				Locale.setDefault(new Locale(props.get(GUIOptions.LANGUAGE)));
+				Locale.setDefault(new Locale(userLanguage));
 			}
 		}
 		
