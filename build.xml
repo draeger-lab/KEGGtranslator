@@ -1,7 +1,7 @@
 <!-- ANT build script for yfiles obfuscation           -->
 <!-- The java based ANT tool is available from         -->
 <!-- http://jakarta.apache.org/ant                     -->
-<project name="KEGGtranslator with Obfuscation" default="obfuscate" basedir=".">
+<project name="KEGGtranslator with Obfuscation" default="run" basedir=".">
 
   <target name="help">
     <echo>
@@ -99,7 +99,7 @@
 
   <!-- obfuscates y.jar and adjusts application.jar accordingly. -->
   <!-- Generates the jar files yObf.jar and applicationObf.jar.  -->
-  <target name="obfuscate" depends="init">
+  <target name="obfuscate" depends="jar">
     <taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="${yGuardJar}"/>
     <yguard>
 

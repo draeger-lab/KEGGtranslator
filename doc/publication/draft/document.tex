@@ -4,10 +4,13 @@
 
 \usepackage{url}  % Formatting web addresses
 
+\def\TTra{\textsuperscript{\texttrademark}\,}
+
 \copyrightyear{2011}
 \pubyear{2011}
 
 \begin{document}
+\application
 \firstpage{1}
 
 \title[KEGGtranslator]{KEGGtranslator: visualizing and translating the KEGG pathway database} %% TODO: Irgendwas mit modelling oder simulation oder so klingt besser.
@@ -23,10 +26,10 @@
 \begin{abstract}
 
 \section{Summary:}
-The KEGG PATHWAY database is today a widely used service for pathway based information. It contains manually drawn pathway maps with information about the genes, reactions and relations contained within a pathway. To model these pathways, KEGG is using an own XML-format. Parsers and translators are needed to process the pathway maps for usage in other applications and algorithms.
+Nowadays, the KEGG PATHWAY database provides a widely used service for pathway based information. It contains manually drawn pathway maps with information about the genes, reactions and relations contained within a pathway. To store these pathways, KEGG uses an own XML-format. Parsers and translators are needed to process the pathway maps for usage in other applications and algorithms.
 
 
-We have developed KEGGtranslator, which is an easy-to-use stand-alone application that can translate KGML formatted XML-files to multiple output formats. Unlike other translators, KEGGtranslator supports a plethora of output formats, is able to complete the information in translated documents (i.e. MIRIAM annotations) beyond the scope of the XML-document and amends missing components to fragmentary reactions within the pathway to allow simulations on those.
+We have developed KEGGtranslator, which is an easy-to-use stand-alone application that can translate KGML formatted XML-files into multiple output formats. Unlike other translators, KEGGtranslator supports a plethora of output formats, is able to augment the information in translated documents (e.g., MIRIAM annotations) beyond the scope of the XML-document, and amends missing components to fragmentary reactions within the pathway to allow simulations on those.
 
 % [is able to complete [...] beyond the scope of the XML-document] by retrieving additional pathway information from the internet.
 
@@ -35,25 +38,38 @@ We have developed KEGGtranslator, which is an easy-to-use stand-alone applicatio
 %Translator nutzt KegggAdaptor, kann RkT vervollständigung, ist Stand-Alone-Application
 
 \section{Availability:}
-KEGGtranslator is freely available as a webstart application and for download at \url{http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator/}. KGML files can be downloaded within the application of manually from \url{ftp://ftp.genome.jp/pub/kegg/xml/kgml}.
+KEGGtranslator is freely available as a webstart application and for download at \url{http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/}. KGML files can be downloaded within the application or manually from \url{ftp://ftp.genome.jp/pub/kegg/xml/kgml}.
 
 
-\section{Contact:} \href{Clemens.Wrzodek@uni-tuebingen.de}{Clemens.Wrzodek@uni-tuebingen.de}
+\section{Contact:} \href{clemens.wrzodek@uni-tuebingen.de}{clemens.wrzodek@uni-tuebingen.de}
 \end{abstract}
 
 %% TODO: Availability and Implementation section (Java, runs on most OS, blablabla)
 
 \section{Introduction}
 
-Many academic researchers, who want to use pathway based information are using the KEGG PATHWAY database \cite{Kanehisa2000}. The database, established in 1995, contains maps for various pathways and is strongly related to the other KEGG databases, by assigning all elements KEGG identifier only. These maps are visualized on the web and can be downloaded without charge (for academics) as xml-files that are using the KEGG Markup Language (KGML) \cite{KGML}.
+%Aufbau:
+%Kern problem: KGML-Format der Pathways.
+%1. Kegg ist toll weil...
+%2. Man könnte so viel tun (Bilder, Simulation, Graph-Anwendungen(Operation), Stöchimetrische analysen (zB lineare abhängigkeiten), GSEA)
+%3. Aber das Format ist ungeeignet
+%4. Daher gibt es mehrere Konverter, die folgendes können
+%5. Das genügt nicht weil
+%6. Jetzt gibt es endlich KGtrans, das viel besser ist weil,...
+%7. Im folgenden werden die Merkmale näher erläutert.
 
-However, the content of these KGML-formatted xml-files is limited. Gene names are often not very readable and elements are not well annotated. The reason for this is that KEGG releases those xml-files primarily for graphical visualizations of the pathway. For creating fully functional models of the pathway, the content of the xml-file is not sufficient.
 
-KEGGtranslator reads and completes the content of the XML-file with live-annotation of all genes and reactions using the KEGG API \cite{KEGGapi}. Minor deficiencies are corrected (i.e. the name of a gene), new information is being added (i.e. multiple MIRIAM identifier for each gene and reaction, or SBO terms describing the function) and some crucial deficiencies are addressed:
 
-KEGG uses colors in the visualization of a pathway to annotate organism specific orthologous genes. Nodes in green represent biological entities that occur in the current organism. Nodes in white represent biological entities, that correspond to genes that are occurring in this pathway in other species, but not in the current one. Translating all those nodes into new models, without caring for the node color, would lead to a model, containing invalid genes in the pathway.
 
-Another major deficiency are the reactions. The XML-files only contain those parts of the reaction, that are needed for the graphical representation of the pathway. But they do not always contain the complete chemical equation (see figure \ref{fig:01}). KEGGtranslator is able to lookup each reaction and amend the missing components to reactions. This leads to more complete and functional correct pathway models.
+Many academic researchers, who want to use pathway-based information, utilize the KEGG PATHWAY database \cite{Kanehisa2000}. The database, established in 1995, contains manually created maps for various pathways. These maps are visualized on the web and can be downloaded free of charge (for academics) as XML-files in the KEGG Markup Language (KGML) \cite{KGML}. The elements in a pathway XML (such as reactions or genes) are usually identified by a KEGG identifier only. Thus, KEGG PATHWAY is strongly related to other KEGG databases, that resolve and further describe the identifiers.
+
+However, the content of these KGML-formatted XML-files is limited. Gene names are often not readable and elements are not well annotated. The reason for this is that KEGG releases those XML-files primarily for graphical visualizations of the pathway. For creating fully functional models of the pathway, the content of the XML-file is not sufficient.
+
+KEGGtranslator reads and completes the content of the XML-file by retrieving online-annotation of all genes and reactions using the KEGG API \cite{KEGGapi}. Minor deficiencies are corrected (e.g., the name of a gene), new information is added (e.g., multiple MIRIAM identifier for each gene and reaction \cite{Novere2005}, or SBO terms describing the function) and some crucial deficiencies are addressed:
+
+KEGG uses colors in the visualization of a pathway to annotate organism-specific orthologous genes. Nodes in green represent biological entities that occur in the current organism. Nodes in white represent biological entities, that correspond to genes that occurre in this pathway in other species, but not in the current one. Translating all those nodes into new models, without caring for the node color, would lead to a model, containing invalid genes in the pathway.
+
+Another major deficiency are incomplete reactions. The XML-files only contain those parts of a reaction, that are needed for the graphical representation of the pathway. But they do not always contain the complete chemical equation (see figure \ref{fig:01}). KEGGtranslator is able to lookup each reaction and amend the missing components to reactions. This leads to more complete and functional correct pathway models.
 
 
 %Beispiel aus Glycloyse (hsa00010.xml)
@@ -76,13 +92,13 @@ To our knowledge, these major deficiencies are not being corrected by other KEGG
 
 \section{Translation of KGML-files}
 
-In the first step of a translation, KEGGtranslator reads the XML-file and puts all contained elements into an internal data structure. In addition to the XML-file, the KEGG database is queries via the KEGG API for each id in the document (pathway id, entries, reactions, relations, substrates, products, etc.). This completes the sparse XML-document with comprehensive information. For example, multiple synonyms, identifier of many external databases (Ensembl, EntrezGene, UniProt, ChEBI, Gene Ontology, DrugBank, PDBeChem, and many more) are being assigned to genes.
+In the first step of a translation, KEGGtranslator reads the XML-file and puts all contained elements into an internal data structure. In addition to the XML-file, the KEGG database is queried via the KEGG API for each id in the document (pathway id, entries, reactions, relations, substrates, products, etc.). This completes the sparse XML-document with comprehensive information. For example, multiple synonyms, identifier of many external databases (Ensembl, EntrezGene, UniProt, ChEBI, Gene Ontology, DrugBank, PDBeChem, and many more) are being assigned to genes and other elements.
 
-After this initial step, various preprocessing operations are performed on the pathway. The user may choose if he wants to remove white nodes (genes, that are not occurring in the current organism), remove orphans (nodes without any reactions or relations) and if he wants to let KEGGtranslator autocomplete reactions.
+After this initial step, various preprocessing operations are performed on the pathway. The user may choose to remove white nodes, remove orphans (isolated nodes without any reactions or relations) and if KEGGtranslator should autocomplete reactions.
 
-After these preprocessing steps, KEGGtranslator branches between two different conversion modes for the actual translation: a functional translation (SBML) and a graphical translation (e.g. GraphML, GML). Depending on the chosen output format, KEGGtranslator determines the way to translate the KGML document.
+After these preprocessing steps, KEGGtranslator branches between two different conversion modes for the actual translation: a functional translation (SBML) and a graphical translation (e.g., GraphML, GML). Depending on the chosen output format, KEGGtranslator determines the way to translate the KGML document.
 
-The functional translation is performed by converting the KGML code to a jSBML data structure (TODO:JSBMLCitation). The focus here is to generate valid and specification-conform SBML (Level 2 Version 4) code that eases e.g. a dynamic simulation of the pathway. Each entry (pathway references, genes, compounds, enzymes, reactions, reaction-modifiers, etc.) is being assigned multiple MIRIAM-URNs and an SBO-Term, which describes best the function of the element. Additionally, notes are being assigned to each element with human-readable names and synonyms, a description of the element and links to pictures and further information. The user may also choose to add graphical information by putting CellDesigner annotations to the model. The key difference in this mode, to the graphical translation, is that the focus lies on reactions in KGML documents. Besides the already mentioned completion of reactions, each enzymatic modifier is correctly assigned to the reaction by building so called modifierSpeciesReferences. The reversibility of the reaction is annotated and a picture of the reaction equation is being put into the notes. As a final step, we have integrated the SBML2LaTeX \cite{SBML2LaTeX} tool into KEGGtranslator, which allows users to automatically generate a LaTeX or PDF-report to document the SBML-code of the translated pathway. Kinetics may be added by using the SBMLSqueezer \cite{SBMLSqueezer} tool after the translation.
+The functional translation is performed by converting the KGML code to a JSBML data structure (TODO:JSBMLCitation). The focus here is to generate valid and specification-conform SBML (Level 2 Version 4) code that eases, e.g., a dynamic simulation of the pathway. Multiple MIRIAM URNs and an SBO Term, which describes best the function of the element, is assigned to each entry of the pathway (pathway references, genes, compounds, enzymes, reactions, reaction-modifiers, etc.). Additionally, notes are assigned to each element with human-readable names and synonyms, a description of the element and links to pictures and further information. The user may also choose to add graphical information by putting CellDesigner annotations to the model. The key difference in this mode, to the graphical translation, is that the focus lies on reactions in KGML documents. Besides the already mentioned completion of reactions, each enzymatic modifier is correctly assigned to the reaction by building so-called \texttt{modifierSpeciesReferences}. The reversibility of the reaction is annotated and a picture of the reaction equation is being put into the notes. As a final step, we have integrated the SBML2\LaTeX \cite{SBML2LaTeX} tool into KEGGtranslator, which allows users to automatically generate a \LaTeX or PDF-report to document the SBML-code of the translated pathway. Kinetics may be added by using the SBMLsqueezer \cite{SBMLSqueezer} tool after the translation.
 
 %
 %Functional:
@@ -94,7 +110,7 @@ The functional translation is performed by converting the KGML code to a jSBML d
 %REACTIONS (with modififerSpeciesReferences, reversibel<-> irreversibel
 
 
-In graphical translations, results can be saved as GraphML, GML or YGF and finally as images of type JPG, GIF, or TGF. In this mode, the KGML data structure is being converted to a yFiles \cite{yFiles} data structure. The focus here lies on the visualization of the pathway. Relations are being translated by inserting arrows with the appropriate style, which is given in the KGML document. For example, dashed arrows without heads represent bindings or associations and a dotted arrow with a simply head illustrates an indirect effect. Please see the KGML specification \cite{KGML} for a complete list. As in the functional translation, GraphML allows to define custom annotation elements. KEGGtranslator makes use of those, by putting several identifiers (e.g. EntrezGene or Ensembl) and descriptions to the single nodes. From the KGML-document, the shape of the node is translated as well as the colors and labels. Links to descriptive HTML-pages are being setup and hierarchical group nodes are being created for defined compounds. All these features lead to a nice graphical representation of the pathway that provides as many information about the elements as possible.
+In graphical translations, results can be saved as GraphML, GML or YGF and finally as images of type JPG, GIF, or TGF. In this mode, the KGML data structure is being converted to a yFiles \cite{yFiles} data structure. The focus here lies on the visualization of the pathway. Relations are being translated by inserting arrows with the appropriate style, which is given in the KGML document. For example, dashed arrows without heads represent bindings or associations and a dotted arrow with a simple head illustrates an indirect effect. Please see the KGML specification \cite{KGML} for a complete list. As in the functional translation, GraphML allows to define custom annotation elements. KEGGtranslator makes use of those, by putting several identifiers (e.g., EntrezGene or Ensembl) and descriptions to the single nodes. From the KGML document, the shape of the node is translated as well as the colors and labels. Links to descriptive HTML pages are being setup and hierarchical group nodes are being created for defined compounds. All these features lead to a graphical representation of the pathway that provides as many information about the elements as possible.
 
 \begin{figure}[t]%figure1
 \centerline{
@@ -113,22 +129,22 @@ In graphical translations, results can be saved as GraphML, GML or YGF and final
 
 \section{Discussion}
 %\section{Conclusion}
-KEGGtranslator is a stand-alone application with a graphical user interface, that runs on every operating system that has a java virtual machine. There are tools for converting KGML to SBML (e.g. KEGGconverter \cite{KEGGconverter} and KEGG2SBML \cite{KEGG2SBML}) and for converting KGML to graph structures in R (KEGGgraph \cite{KEGGgraph}). But, to our knowledge, no stand-alone KEGG converter exists that is able to translate KGML formatted files to various output formats. In contrast to all other KEGG converting tools, KEGGtranslator comes with important functionalities like the autocompletion of reactions or the annotation of each element of the translated file, using various identifiers.
+KEGGtranslator is a stand-alone application with a graphical user interface that runs on every operating system for which a Java\TTra virtual machine is available. There are tools for converting KGML to SBML (e.g., KEGGconverter \cite{KEGGconverter} and KEGG2SBML \cite{KEGG2SBML}) and for converting KGML to graph structures in R (KEGGgraph \cite{KEGGgraph}). But, to our knowledge, no stand-alone KEGG converter exists that is able to translate KGML formatted files to such a variety of output formats. In contrast to all other KEGG converting tools, KEGGtranslator comes with important functionalities like the autocompletion of reactions or the annotation of each element of the translated file, using various identifiers, and possesses a graphical user interface.
 
-Because of the variety of output formats, the pathways converted with KEGGtranslator can easily be opened in other applications. Further processing steps can be done quickly because a node or edge has many more information and identifier that just a name. And dynamic simulations on pathways can be done accurate with complete reactions.
+Because of the variety of output formats, the pathways converted with KEGGtranslator can easily be opened in other applications. Further processing steps can be done quickly because a node or edge has much more information and identifier that just a name. And dynamic simulations on pathways can be done accurate with complete reactions.
 
 %Because of these functionalities, the pathways converted with KEGGtranslator can easily be used for further processing. I.e. assigning
 
 % Easy-to-use, help & tooptips, stand alone, java (systemunabhaengig)
-%The application is purely written in java and makes use of the jSBML library. That makes it, in contrast to libSBML based applications, runnable on all operating systems that have a java virtual machine.
+%The application is purely written in java and makes use of the JSBML library. That makes it, in contrast to libSBML based applications, runnable on all operating systems that have a java virtual machine.
 
 
 %TODO: Outlook: Webservice, libSBGN, (API)
 
 \section*{Acknowledgement}
-Text Text Text Text Text Text  Text Text.
+Akira Funahashi, Toshiaki Katayama
 
-\paragraph{Funding\textcolon} Text Text Text Text Text Text  Text Text.
+\paragraph{Funding\textcolon} Spher4Sys, BMBF, MARCAR, Virtualliver, NGFN
 
 %\bibliographystyle{natbib}
 %\bibliographystyle{achemnat}
