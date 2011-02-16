@@ -37,11 +37,12 @@
     <delete file="${appJar}"/>
     <jar jarfile="${appJar}">
             <manifest>
-                <attribute name="Main-Class" value="de.zbit.kegg.Translator"/>
+              <attribute name="Main-Class" value="de.zbit.kegg.Translator"/>
             	<attribute name="Built-By" value="Center for Bioinformatics Tuebingen (ZBIT)"/>
-                <attribute name="SplashScreen-Image" value="de/zbit/kegg/gui/img/Logo.gif"/>
-            	<attribute name="Xdock:name" value="KEGGtranslator"/>
-            	<attribute name="Xdock:icon" value="de/zbit/kegg/gui/img/KEGGtranslatorIcon_256.png"/>
+              <attribute name="SplashScreen-Image" value="de/zbit/kegg/gui/img/Logo.gif"/>
+            	<!-- Die folgenden 2 Attribute sind leider keine gültigen manifest attribute. -->
+            	<!--<attribute name="Xdock:name" value="KEGGtranslator"/>-->
+              <!--<attribute name="Xdock:icon" value="de/zbit/kegg/gui/img/KEGGtranslatorIcon_256.png"/>-->
             </manifest>
       <!-- INCLUDE/ EXCLUDE DEMO-->
       <!--<fileset dir="${src}">-->
@@ -77,13 +78,13 @@
             <fileset dir="${base}/../jSBML/bin">
               <exclude name="log4j.properties"/> <!-- log4j.properties is in SBML2Latex and jSBML -->
             </fileset>
-            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/biojava.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/biojava-1.7-ontology.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/junit-4.8.jar"/>-->
             <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/log4j-1.2.8.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/stax-api-1.0.1.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/staxmate-2.0.0.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/xstream-1.3.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/jigsaw-dataParser.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/jigsaw-dateParser.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${base}/../jSBML/lib/stax2-api-3.0.3.jar"/>
             <zipfileset excludes="META-INF/*.SF,META-INF/LICENSE*" src="${base}/../jSBML/lib/woodstox-core-lgpl-4.0.9.jar"/>
             

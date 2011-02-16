@@ -61,7 +61,6 @@ import de.zbit.gui.VerticalLayout;
 import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.SBFileFilter;
-import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.RestrictedEditMode;
 import de.zbit.kegg.ext.TranslatorPanelOptions;
@@ -390,6 +389,7 @@ public class TranslatorPanel extends JPanel {
   public File saveToFile() {
     LinkedList<FileFilter> ff = new LinkedList<FileFilter>();
     
+    // Create list of available ouput file filters
     SBFileFilter defaultFF;
     if (isSBML()) {
       defaultFF = SBFileFilter.createSBMLFileFilter();
@@ -426,11 +426,12 @@ public class TranslatorPanel extends JPanel {
     File f = fc.getSelectedFile();
     String extension = ((SBFileFilter)fc.getFileFilter()).getExtension();
     
-    // Append extension
+    // Eventually append extension to output file
     if (!f.getName().contains(".")) {
       f = new File(f.getPath() + '.' + extension);
     }
     
+    // Check if file exists and is writable
     boolean showOverride = f.exists();
     if (!f.exists()) try {
       f.createNewFile();
@@ -442,11 +443,20 @@ public class TranslatorPanel extends JPanel {
 		if (!f.canWrite() || f.isDirectory()) {
 			GUITools.showNowWritingAccessWarning(this, f);
     } else if (!showOverride || (showOverride && GUITools.overwriteExistingFile(this, f))) {
+      // This is the usual case
     	return saveToFile(f, extension);
 		}
 		return null;
   }
   
+  /**
+   * This does the real saving work, without checking write acces,
+   * file exists, etc. and without asking the user anything.
+   * 
+   * @param file
+   * @param format
+   * @return the saved file.
+   */
   public File saveToFile(File file, String format) {
     /*format = format.toLowerCase().trim();
     if (!file.getName().toLowerCase().endsWith(format)) {
