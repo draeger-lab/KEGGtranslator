@@ -16,6 +16,11 @@
  * agreement is provided in the file named "LICENSE.txt" included with
  * this software distribution and also available online as
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * 
+ * There are special restrictions for this file. Each procedure that
+ * is using the yFiles API must stick to their license restrictions.
+ * Please see the following link for more information
+ * <http://www.yworks.com/en/products_yfiles_sla.html>.
  * ---------------------------------------------------------------------
  */
 package de.zbit.kegg.io;
