@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.SwingUtilities;
@@ -120,6 +121,7 @@ public class Translator {
 	 * 
 	 */
 	public static URL getURLOnlineUpdate() throws MalformedURLException {
+	  // TODO: Nach cogSys ändern.
 		return new URL("http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/");
 	}
 	
