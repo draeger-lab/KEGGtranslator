@@ -37,5 +37,5 @@ public class GeneralOptionPanel extends PreferencesPanelForKeyProvider {
 	 */
 	public GeneralOptionPanel() throws IOException {
 		super(KEGGtranslatorOptions.class);
-	}
+	}	
 }
