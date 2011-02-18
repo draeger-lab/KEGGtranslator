@@ -33,6 +33,7 @@ import de.zbit.util.DirectoryParser;
 /**
  * 
  * @author Clemens Wrzodek
+ * @since 1.0
  */
 public class BatchKEGGtranslator {
   

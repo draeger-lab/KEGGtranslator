@@ -71,6 +71,7 @@ import de.zbit.util.prefs.SBProperties;
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @date 2010-11-12
+ * @since 1.0
  */
 public class TranslatorUI extends BaseFrame implements ActionListener,
 		KeyListener, ItemListener {

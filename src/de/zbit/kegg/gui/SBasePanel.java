@@ -76,7 +76,6 @@ import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.io.SBOTermFormatter;
-import org.sbml.tolatex.util.LaTeX;
 
 import atp.sHotEqn;
 import de.zbit.gui.LayoutHelper;
@@ -89,7 +88,7 @@ import de.zbit.util.StringUtil;
  * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
- * @since 1.3
+ * @since 1.0 (originates from SBMLsqueezer 1.3)
  */
 @SuppressWarnings("deprecation")
 public class SBasePanel extends JPanel {

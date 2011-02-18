@@ -41,6 +41,7 @@ import de.zbit.util.prefs.SBPreferences;
  * stuff should be implemented into this class.
  * 
  * @author Clemens Wrzodek
+ * @since 1.0
  */
 public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtranslator {
 	

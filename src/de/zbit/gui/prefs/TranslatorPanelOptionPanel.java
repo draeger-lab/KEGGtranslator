@@ -27,6 +27,7 @@ import de.zbit.kegg.ext.TranslatorPanelOptions;
 /**
  * Enable an option tab for the {@link TranslatorPanelOptionPanel}.
  * @author Clemens Wrzodek
+ * @since 1.0
  */
 public class TranslatorPanelOptionPanel extends PreferencesPanelForKeyProvider {
   private static final long serialVersionUID = 4932259635453073817L;

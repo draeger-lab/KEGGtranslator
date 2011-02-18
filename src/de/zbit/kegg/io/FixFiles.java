@@ -34,6 +34,7 @@ import de.zbit.util.DirectoryParser;
  * Much faster than re-generating all files.
  * 
  * @author Clemens Wrzodek
+ * @since 1.0
  */
 public class FixFiles {
   

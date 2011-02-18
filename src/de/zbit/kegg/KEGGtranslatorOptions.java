@@ -30,6 +30,7 @@ import de.zbit.util.prefs.OptionGroup;
  * 
  * @author Clemens Wrzodek
  * @author Andreas Dr&auml;ger
+ * @since 1.0
  */
 public abstract interface KEGGtranslatorOptions extends KeyProvider {
   

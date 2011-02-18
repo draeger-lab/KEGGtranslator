@@ -41,6 +41,7 @@ import de.zbit.gui.LayoutHelper;
 /**
  * @author Andreas Dr&auml;ger
  * @date 2010-05-11
+ * @since 1.0
  */
 public class ASTNodePanel extends JPanel {
 

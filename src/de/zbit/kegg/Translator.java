@@ -48,6 +48,7 @@ import de.zbit.util.prefs.SBProperties;
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @date 2010-10-25
+ * @since 1.0
  */
 public class Translator {
   /**

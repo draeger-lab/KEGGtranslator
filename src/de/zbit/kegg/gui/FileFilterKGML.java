@@ -33,6 +33,7 @@ import de.zbit.io.OpenFile;
  * {@link FileFilter} that recognizes KGML files. It also accepts directories.
  * 
  * @author Andreas Dr&auml;ger
+ * @since 1.0
  */
 public class FileFilterKGML extends GeneralFileFilter {
 

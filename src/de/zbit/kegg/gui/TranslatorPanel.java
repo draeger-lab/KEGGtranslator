@@ -85,6 +85,7 @@ import de.zbit.util.prefs.SBProperties;
  * This should be used as a panel on a JTabbedPane.
  * It handles all the translating and visualizing, etc. of a KEGG pathway.
  * @author Clemens Wrzodek
+ * @since 1.0
  */
 public class TranslatorPanel extends JPanel {
   private static final long serialVersionUID = 6030311193210321410L;

@@ -26,6 +26,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * Generic interface for {@link KEGGtranslator}s.
  * 
  * @author Clemens Wrzodek
+ * @since 1.0
  */
 public interface KEGGtranslator {
   

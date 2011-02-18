@@ -38,6 +38,7 @@ import y.base.DataMap;
  * some required yFiles interfaces.
  * 
  * @author Clemens Wrzodek
+ * @since 1.0
  */
 public class GenericDataMap<K, V> implements DataMap {
   /**
