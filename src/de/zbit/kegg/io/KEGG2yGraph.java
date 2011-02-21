@@ -972,7 +972,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Shorten name
     if (showShortNames) {
-      graph = modifyNodeLabels(graph,false,true);
+      graph = modifyNodeLabels(graph,nodeName,false,true);
     }
     
     
@@ -1092,6 +1092,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   /**
    * Modifies all labels of all nodes in the given graph.
    * @param g - the graph to modiy
+   * @param nodeName - a list to store the node names separately
    * @param removeSpeciesTitles -
    * convert e.g. "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
    * BE CAREFUL WITH THAT: "HNF-4" is also converted to "HNF"!
@@ -1099,19 +1100,21 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
    * @return Graph2D g
    */
-  public static Graph2D modifyNodeLabels(Graph2D g, boolean removeSpeciesTitles, boolean removeMultipleNodeNames) {
+  public static Graph2D modifyNodeLabels(Graph2D g, NodeMap nodeName, boolean removeSpeciesTitles, boolean removeMultipleNodeNames) {
     for (y.base.Node n:g.getNodeArray()) {
       String t = g.getLabelText(n);
       // Convert "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
       if (removeSpeciesTitles && t.contains("-")) {
         t = t.substring(0, t.indexOf("-")-1);
         g.setLabelText(n, t);
+        if (nodeName!=null) nodeName.set(n, t);
       }
       
       // Convert "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
       if (removeMultipleNodeNames) {
         t = shortenName(t);
         g.setLabelText(n, t);
+        if (nodeName!=null) nodeName.set(n, t);
       }
     }
     return g;
