@@ -363,7 +363,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     hist.addCreator(creator);
     hist.addModifiedDate(Calendar.getInstance().getTime());
     Annotation annot = new Annotation();
-    annot.setAbout("#" + model.getMetaId());
+    //annot.setAbout("#" + model.getMetaId());
     model.setAnnotation(annot);
     model.setHistory(hist);
     StringBuffer notes = new StringBuffer(notesStartString);
@@ -525,9 +525,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     if (sbReaction.getLevel()>=3) {
       sbReaction.setCompartment(compartment);
     }
-    Annotation rAnnot = new Annotation("");
-    rAnnot.setAbout("");
-    sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheuert... (Annotation darf nicht null sein, ist aber default null).
+    
+    //Annotation rAnnot = new Annotation("");
+    //rAnnot.setAbout(""); // IMPORTANT: Emtpy is wrong. it is being corrected in further on.
+    //sbReaction.setAnnotation(rAnnot); // manchmal ist jSBML schon bescheuert... (Annotation darf nicht null sein, ist aber default null).
+    
     StringBuffer notes = new StringBuffer(notesStartString);
     
     // Add substrates/ products
@@ -606,7 +608,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     sbReaction.setNotes(notes.toString());
     sbReaction.setMetaId("meta_" + sbReaction.getId());
     sbReaction.setSBOTerm(231); // interaction. Most generic SBO Term possible, for a reaction.
-    rAnnot.setAbout("#" + sbReaction.getMetaId());
+    //rAnnot.setAbout("#" + sbReaction.getMetaId());
     
     return sbReaction;
   }
@@ -868,9 +870,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     spec.setId(NameToSId(name.replace(' ', '_')));
     spec.setMetaId("meta_" + spec.getId());
     
-    Annotation specAnnot = new Annotation("");
-    specAnnot.setAbout("");
-    spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
+    //Annotation specAnnot = new Annotation("");
+    //specAnnot.setAbout("");
+    //spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
     StringBuffer notes = new StringBuffer(notesStartString);
     notes.append(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
     notes.append(notesEndString);
@@ -883,9 +885,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
       // spec.setSBOTerm(ET_SpecialReactionCase2SBO);
       ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
       
-      Annotation tempAnnot = new Annotation("");
-      tempAnnot.setAbout("");
-      modifier.setAnnotation(tempAnnot);
+      // Annotation is empty in ModifierSpeciesReference
+      //Annotation tempAnnot = new Annotation("");
+      //tempAnnot.setAbout("");
+      //modifier.setAnnotation(tempAnnot);
+      
       if (addCellDesignerAnnots) {
         modifier.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
         modifier.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
@@ -924,12 +928,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
      * 
      * } }
      */
-    specAnnot.addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
+    spec.getAnnotation().addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
     addMiriamURNs(entry, spec);
     
     // Finally, add the fully configured species.
     spec.setName(name);
-    specAnnot.setAbout("#" + spec.getMetaId());
+    //specAnnot.setAbout("#" + spec.getMetaId());
     entry.setCustom(spec); // Remember node in KEGG Structure for further references.
     // NOT here, because it may depend on other entries, that are not yet processed.
     //if (addCellDesignerAnnots) addCellDesignerAnnotationToSpecies(spec, entry);

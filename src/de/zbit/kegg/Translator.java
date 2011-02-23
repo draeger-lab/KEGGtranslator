@@ -72,7 +72,6 @@ public class Translator {
 		BackingStoreException, URISyntaxException {
 		// --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
 	  //Locale.setDefault(Locale.US);
-	  
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
 		/*if (props.containsKey(GUIOptions.LANGUAGE)) {
