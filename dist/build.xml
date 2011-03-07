@@ -86,10 +86,13 @@
     	
     	      <filelist dir="${base}" files="libquaqua.jnilib,libquaqua64.jnilib"/>
 
-            <fileset dir="${SysBioPath}/bin">
-              <exclude name="de/zbit/resources/liftover/*"/>
-            	<exclude name="**/package.html"/>
-            </fileset>
+<!-- Uncomment for SysBio classes instead of compiled jar. -->
+<!--      <fileset dir="${SysBioPath}/bin"> -->
+<!--              <exclude name="de/zbit/resources/liftover/*"/> -->
+<!--            	<exclude name="**/package.html"/> -->
+<!--        </fileset> -->
+    	      <zipfileset excludes="META-INF/*,de/zbit/resources/liftover/*,**/package.html" src="${base}/lib/sysbio_v1_light.jar"/>
+    	
             <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-discovery.jar"/>
             <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-logging.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/jaxrpc.jar"/>

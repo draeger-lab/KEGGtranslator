@@ -314,7 +314,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     if (new File(outFile).exists()) lastFileWasOverwritten=true;
     try {
       SBMLWriter writer = new SBMLWriter();
-      writer.write(doc, outFile);
+      writer.write(doc, outFile, KEGGtranslator.APPLICATION_NAME, KEGGtranslator.VERSION_NUMBER);
     } catch (Exception e) {
       e.printStackTrace();
       return false;
