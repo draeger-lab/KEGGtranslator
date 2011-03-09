@@ -110,6 +110,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			switch (this) {
 			case TO_LATEX:
 				return "Export to LaTeX";
+      case DOWNLOAD_KGML:
+        return "Download KGML";
+        
 			default:
 				return StringUtil.firstLetterUpperCase(toString().toLowerCase()
 						.replace('_', ' '));
@@ -453,7 +456,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	private void updateButtons() {
 		GUITools.setEnabled(false, getJMenuBar(), BaseAction.FILE_SAVE,
-				Action.TO_LATEX, BaseAction.FILE_CLOSE);
+				//Action.TO_LATEX,
+				BaseAction.FILE_CLOSE);
 		TranslatorPanel o = getCurrentlySelectedPanel();
 		if (o != null) {
 			o.updateButtons(getJMenuBar());
@@ -536,10 +540,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	@Override
 	protected JMenuItem[] additionalFileMenuItems() {
-		return new JMenuItem[] { GUITools.createJMenuItem(this,
+		return new JMenuItem[] {
+		    /*GUITools.createJMenuItem(this,
 				Action.TO_LATEX, UIManager.getIcon("ICON_LATEX_16"), KeyStroke
 						.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK), 'E',
-				false),
+				false),*/
 				GUITools.createJMenuItem(this,
 	        Action.DOWNLOAD_KGML, UIManager.getIcon("ICON_GEAR_16"), KeyStroke
 	            .getKeyStroke('D', InputEvent.CTRL_DOWN_MASK), 'D',
