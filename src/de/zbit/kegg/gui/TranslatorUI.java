@@ -21,6 +21,7 @@
 package de.zbit.kegg.gui;
 
 import java.awt.Component;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -32,6 +33,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.ImageIcon;
@@ -141,8 +144,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	private static final long serialVersionUID = 6631262606716052915L;
 
-	static {
-		String iconPaths[] = {"KEGGtranslatorIcon_16.png"};
+	static {    
+		String iconPaths[] = {"KEGGtranslatorIcon_16.png","KEGGtranslatorIcon_32.png","KEGGtranslatorIcon_48.png","KEGGtranslatorIcon_128.png","KEGGtranslatorIcon_256.png"};
 		for (String path : iconPaths) {
 			UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(
 				TranslatorUI.class.getResource("img/" + path)));
@@ -177,10 +180,17 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		file = new File(prefsIO.get(KEGGtranslatorIOOptions.OUTPUT));
 		saveDir = file.isDirectory() ? file.getAbsolutePath() : file
 				.getParent();
-		Object icon = UIManager.get("KEGGtranslatorIcon_16");
-		if ((icon != null) && (icon instanceof ImageIcon)) {
-			setIconImage(((ImageIcon) icon).getImage());
+		// Depending on the current OS, we should add the following image
+		// icons: 16x16, 32x32, 48x48, 128x128 (MAC), 256x256 (Vista).
+		int[] resolutions=new int[]{16,32,48,128,256};
+		List<Image> icons = new LinkedList<Image>();
+		for (int res: resolutions) {
+		  Object icon = UIManager.get("KEGGtranslatorIcon_"+res);
+		  if ((icon != null) && (icon instanceof ImageIcon)) {
+		    icons.add(((ImageIcon) icon).getImage());
+		  }
 		}
+		setIconImages(icons);
 	}
 	
 	/**

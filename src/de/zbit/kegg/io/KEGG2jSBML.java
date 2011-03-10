@@ -551,7 +551,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     
     // Miriam identifier
     CVTerm reID = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_IS);
-    CVTerm rePWs = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
+    CVTerm rePWs = new CVTerm(); rePWs.setQualifierType(Type.BIOLOGICAL_QUALIFIER); rePWs.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
     
     for (String ko_id : r.getName().split(" ")) {
       reID.addResource(KeggInfos.getMiriamURIforKeggID(ko_id));
@@ -576,11 +576,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
         notes.append(String.format("<a href=\"%s%s\">", prefix, suffix));
         notes.append(String.format("<img src=\"%s%s\"/></a>\n", prefix, suffix));
         if (infos.getPathwayDescriptions() != null) {
-          notes.append("<b>Occurs in:</b><br/>\n");
+          notes.append("<br/>\n<b>Occurs in:</b><br/>\n");
+          notes.append("<ul>\n");
           for (String desc : infos.getPathwayDescriptions().split(",")) { // e.g. ",Glycolysis / Gluconeogenesis,Metabolic pathways"
-            notes.append(desc + "<br/>\n");
+            notes.append("<li>"+ desc + "</li>\n");
           }
-          notes.append("<br/>\n");
+          notes.append("</ul><br/>\n");
         }
         notes.append("</p>");
         
