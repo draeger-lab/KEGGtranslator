@@ -51,6 +51,7 @@ import de.zbit.gui.GUITools;
  * 
  * @author Andreas Dr&auml;ger
  * @since 1.0 (originates from SBMLsqueezer 1.3)
+ * @version $Rev$
  */
 public class SBMLModelSplitPane extends JSplitPane implements
 		TreeSelectionListener, SBaseChangedListener {

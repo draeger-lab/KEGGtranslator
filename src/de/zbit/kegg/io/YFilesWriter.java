@@ -39,6 +39,7 @@ import java.util.Map;
  * such that no notes of yFiles are being written to the file.
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public class YFilesWriter extends OutputStream implements Closeable {
 	private Map<String, String> toReplace;

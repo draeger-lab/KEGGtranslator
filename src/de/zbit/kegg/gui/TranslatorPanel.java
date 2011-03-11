@@ -67,7 +67,6 @@ import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.RestrictedEditMode;
 import de.zbit.kegg.ext.TranslatorPanelOptions;
-import de.zbit.kegg.gui.TranslatorUI.Action;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -86,6 +85,7 @@ import de.zbit.util.prefs.SBProperties;
  * It handles all the translating and visualizing, etc. of a KEGG pathway.
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public class TranslatorPanel extends JPanel {
   private static final long serialVersionUID = 6030311193210321410L;
@@ -390,6 +390,10 @@ public class TranslatorPanel extends JPanel {
     return (document!=null && document instanceof Graph2D);
   }
   
+  /**
+   * 
+   * @return
+   */
   public File saveToFile() {
     LinkedList<FileFilter> ff = new LinkedList<FileFilter>();
     
@@ -441,7 +445,6 @@ public class TranslatorPanel extends JPanel {
       f.createNewFile();
     } catch (IOException e) {
       GUITools.showErrorMessage(this, e);
-      e.printStackTrace();
       return null;
     }
 		if (!f.canWrite() || f.isDirectory()) {
@@ -501,13 +504,13 @@ public class TranslatorPanel extends JPanel {
    */
   public void updateButtons(JMenuBar menuBar) {
     if (isSBML()) {
-      GUITools.setEnabled(true, menuBar, BaseAction.FILE_SAVE, Action.TO_LATEX, BaseAction.FILE_CLOSE);
+      GUITools.setEnabled(true, menuBar, BaseAction.FILE_SAVE, /*Action.TO_LATEX,*/ BaseAction.FILE_CLOSE);
     } else if (isGraphML()) {
       GUITools.setEnabled(true, menuBar, BaseAction.FILE_SAVE, BaseAction.FILE_CLOSE);
-      GUITools.setEnabled(false, menuBar,Action.TO_LATEX);
+//      GUITools.setEnabled(false, menuBar,Action.TO_LATEX);
     } else {
       // E.g. when translation still in progress, or on download frame
-      GUITools.setEnabled(false, menuBar, BaseAction.FILE_SAVE, Action.TO_LATEX, BaseAction.FILE_CLOSE);
+      GUITools.setEnabled(false, menuBar, BaseAction.FILE_SAVE, /*Action.TO_LATEX,*/ BaseAction.FILE_CLOSE);
       
       if (this.inputFile==null) {
         // Download frame or invalid menu item

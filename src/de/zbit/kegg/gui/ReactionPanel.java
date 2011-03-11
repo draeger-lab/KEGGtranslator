@@ -42,6 +42,7 @@ import de.zbit.util.prefs.SBPreferences;
  * @author Andreas Dr&auml;ger
  * @date 2011-01-18
  * @since 1.0
+ * @version $Rev$
  */
 public class ReactionPanel extends JPanel {
 	

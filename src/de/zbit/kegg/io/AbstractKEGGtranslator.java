@@ -42,6 +42,7 @@ import de.zbit.util.prefs.SBPreferences;
  * 
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtranslator {
 	

@@ -30,6 +30,7 @@ import de.zbit.util.prefs.OptionGroup;
  * Contains options for the {@link TranslatorPanel}.
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public abstract interface TranslatorPanelOptions extends KeyProvider{
   

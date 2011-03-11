@@ -75,6 +75,7 @@ import de.zbit.util.prefs.SBProperties;
  * @author Clemens Wrzodek
  * @date 2010-11-12
  * @since 1.0
+ * @version $Rev$
  */
 public class TranslatorUI extends BaseFrame implements ActionListener,
 		KeyListener, ItemListener {
@@ -85,10 +86,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @date 2010-11-12
 	 */
 	public static enum Action implements ActionCommand {
-		/**
-		 * {@link Action} for LaTeX export.
-		 */
-		TO_LATEX,
+//		/**
+//		 * {@link Action} for LaTeX export.
+//		 */
+//		TO_LATEX,
     /**
      * {@link Action} for downloading KGMLs.
      */
@@ -111,8 +112,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		 */
 		public String getName() {
 			switch (this) {
-			case TO_LATEX:
-				return "Export to LaTeX";
+//			case TO_LATEX:
+//				return "Export to LaTeX";
       case DOWNLOAD_KGML:
         return "Download KGML";
         
@@ -129,8 +130,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		 */
 		public String getToolTip() {
 			switch (this) {
-			case TO_LATEX:
-				return "Converts the currently opened model to a LaTeX report file.";
+//			case TO_LATEX:
+//				return "Converts the currently opened model to a LaTeX report file.";
 			case DOWNLOAD_KGML:
         return "Downloads KGML-formatted XML pathways from KEGG server.";
 			default:
@@ -362,9 +363,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				createNewTab(((File) e.getSource()), format);
 				break;
 				*/
-			case TO_LATEX:
-				writeLaTeXReport();
-				break;
+//			case TO_LATEX:
+//				writeLaTeXReport();
+//				break;
       case DOWNLOAD_KGML:
         try {
           tabbedPane.addTab(action.getName(), new TranslatorPanel(this));
@@ -382,15 +383,15 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		}
 	}
 
-	/**
-	 * @param object
-	 */
-	private void writeLaTeXReport() {
-		TranslatorPanel o = getCurrentlySelectedPanel();
-		if (o != null) {
-			o.writeLaTeXReport(null);
-		}
-	}
+//	/**
+//	 * @param object
+//	 */
+//	private void writeLaTeXReport() {
+//		TranslatorPanel o = getCurrentlySelectedPanel();
+//		if (o != null) {
+//			o.writeLaTeXReport(null);
+//		}
+//	}
 
 	/**
 	 * Closes the tab at the specified index.

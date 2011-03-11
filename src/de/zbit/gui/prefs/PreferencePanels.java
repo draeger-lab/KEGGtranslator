@@ -23,6 +23,7 @@ package de.zbit.gui.prefs;
 
 /**
  * @author Clemens Wrzodek
+ * @since 1.0
  * @version $Rev$
  */
 public class PreferencePanels {

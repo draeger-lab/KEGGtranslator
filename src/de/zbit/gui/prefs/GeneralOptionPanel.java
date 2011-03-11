@@ -27,6 +27,7 @@ import de.zbit.kegg.KEGGtranslatorOptions;
 /**
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public class GeneralOptionPanel extends PreferencesPanelForKeyProvider {
 	private static final long serialVersionUID = 6273038303582557299L;

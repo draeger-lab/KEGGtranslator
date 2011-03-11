@@ -73,6 +73,7 @@ import de.zbit.util.StringUtil;
  * An edit mode for y Files, that allow no creating of new Nodes or edges.
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public class RestrictedEditMode extends EditMode implements Graph2DSelectionListener {
  

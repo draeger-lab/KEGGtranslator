@@ -39,6 +39,7 @@ import y.base.DataMap;
  * 
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public class GenericDataMap<K, V> implements DataMap {
   /**

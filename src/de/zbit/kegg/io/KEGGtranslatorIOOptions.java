@@ -35,6 +35,7 @@ import de.zbit.util.prefs.Range;
  * @author Clemens Wrzodek
  * @date 2011-01-07
  * @since 1.0
+ * @version $Rev$
  */
 public interface KEGGtranslatorIOOptions extends KeyProvider {
 

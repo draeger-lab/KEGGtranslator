@@ -89,6 +89,7 @@ import de.zbit.util.StringUtil;
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @since 1.0 (originates from SBMLsqueezer 1.3)
+ * @version $Rev$
  */
 @SuppressWarnings("deprecation")
 public class SBasePanel extends JPanel {

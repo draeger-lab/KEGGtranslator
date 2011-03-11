@@ -48,6 +48,7 @@ import org.sbml.jsbml.SBase;
  * @author Simon Sch&auml;fer
  * @author Andreas Dr&auml;ger
  * @since 1.0
+ * @version $Rev$
  */
 public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	

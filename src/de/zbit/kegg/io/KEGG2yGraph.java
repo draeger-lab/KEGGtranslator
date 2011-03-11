@@ -88,6 +88,7 @@ import de.zbit.util.Utils;
  * KEGG2yGraph converter.
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   

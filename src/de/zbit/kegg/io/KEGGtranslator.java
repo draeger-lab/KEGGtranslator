@@ -27,6 +27,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * 
  * @author Clemens Wrzodek
  * @since 1.0
+ * @version $Rev$
  */
 public interface KEGGtranslator {
   

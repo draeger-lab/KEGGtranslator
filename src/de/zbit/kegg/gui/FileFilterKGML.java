@@ -34,6 +34,7 @@ import de.zbit.io.OpenFile;
  * 
  * @author Andreas Dr&auml;ger
  * @since 1.0
+ * @version $Rev$
  */
 public class FileFilterKGML extends GeneralFileFilter {
 

@@ -40,6 +40,7 @@ import org.sbml.jsbml.xml.stax.SBMLWriter;
 /**
  * @author Andreas Dr&auml;ger
  * @since 1.0
+ * @version $Rev$
  */
 public class ReactionPanelTest {
 	
