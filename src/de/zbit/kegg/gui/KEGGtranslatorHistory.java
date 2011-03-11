@@ -24,7 +24,7 @@ import de.zbit.gui.prefs.FileHistory;
 
 /**
  * This interface is only needed to distinguish between files that have been
- * loaded by KEGtranslator from those files that have been used by other
+ * loaded by KEGGtranslator from those files that have been used by other
  * programs. With the help of this interface the correct keys will be loaded
  * from the user's configuration, because of the specific package in which
  * this extension of {@link FileHistory} is located.
