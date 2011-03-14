@@ -513,7 +513,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void keyPressed(KeyEvent e) {
 		// Preferences for the "input file"
-		PreferencesPanel.setProperty(prefsIO, e.getSource());
+		PreferencesPanel.setProperty(prefsIO, e.getSource(), true);
 	}
 
 	/*
@@ -523,7 +523,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void keyReleased(KeyEvent e) {
 		// Preferences for the "input file"
-		PreferencesPanel.setProperty(prefsIO, e.getSource());
+		PreferencesPanel.setProperty(prefsIO, e.getSource(), true);
 	}
 
 	/*
@@ -533,7 +533,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void keyTyped(KeyEvent e) {
 		// Preferences for the "input file"
-		PreferencesPanel.setProperty(prefsIO, e.getSource());
+		PreferencesPanel.setProperty(prefsIO, e.getSource(), true);
 	}
 
 	/*
@@ -544,7 +544,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void itemStateChanged(ItemEvent e) {
 		// Preferences for the "output format"
-		PreferencesPanel.setProperty(prefsIO, e.getSource());
+		PreferencesPanel.setProperty(prefsIO, e.getSource(), true);
 	}
 
 	/*
