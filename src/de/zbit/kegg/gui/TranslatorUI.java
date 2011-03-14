@@ -215,8 +215,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		final JToolBar r = new JToolBar("Translate new file",
 				JToolBar.HORIZONTAL);
 
-		r.add(PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.INPUT,
-				prefsIO, this));
+		JComponent jc = PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.INPUT, prefsIO, this);
+		// Allow a change of Focus (important!)
+		if (jc instanceof FileSelector) ((FileSelector)jc).removeInputVerifier();
+		r.add(jc);
+		
 		// r.add(new JSeparator(JSeparator.VERTICAL));
 		r.add(PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT,
 				prefsIO, this));
@@ -618,8 +621,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  Translator.saveCache();
 		  
 		  SBProperties props = new SBProperties();
-		  if (getInputFile(toolBar) != null) {
-		    props.put(KEGGtranslatorIOOptions.INPUT, getInputFile(toolBar));
+		  File f = getInputFile(toolBar);
+		  if (f != null && KEGGtranslatorIOOptions.INPUT.getRange().isInRange(f)) {
+		    props.put(KEGGtranslatorIOOptions.INPUT, f);
 		  }
 		  props.put(KEGGtranslatorIOOptions.FORMAT, getOutputFileFormat(toolBar));
 		  SBPreferences.saveProperties(KEGGtranslatorIOOptions.class, props);
