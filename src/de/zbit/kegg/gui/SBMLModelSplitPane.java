@@ -101,9 +101,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 	 */
 	private JScrollPane createRightComponent(ASTNode node) throws SBMLException,
 		IOException {
-		return new JScrollPane(new ASTNodePanel(node),
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		return new JScrollPane(new ASTNodePanel(node));
 	}
 	
 	/**
@@ -116,9 +114,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		IOException {
 		JPanel p = new JPanel();
 		p.add(new SBasePanel(sbase));
-		JScrollPane scroll = new JScrollPane(p,
-			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane scroll = new JScrollPane(p);
 		return scroll;
 	}
 	

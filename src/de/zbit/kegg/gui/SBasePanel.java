@@ -77,7 +77,6 @@ import org.sbml.jsbml.util.compilers.LaTeXCompiler;
 import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.io.SBOTermFormatter;
 
-import atp.sHotEqn;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.util.StringUtil;
@@ -286,8 +285,7 @@ public class SBasePanel extends JPanel {
 			}
 			laTeXpreview.append(LaTeXCompiler.eqEnd);
 			JPanel preview = new JPanel(new BorderLayout());
-			preview.add(new sHotEqn(laTeXpreview.toString()),
-					BorderLayout.CENTER);
+			//preview.add(new sHotEqn(laTeXpreview.toString()), BorderLayout.CENTER);
 			preview.setBackground(Color.WHITE);
 			preview.setBorder(BorderFactory.createLoweredBevelBorder());
 			Dimension d = new Dimension(preferedWidth, 120);
@@ -693,16 +691,16 @@ public class SBasePanel extends JPanel {
 			JPanel p = new JPanel(new GridLayout(1, 1));
 			p.setBorder(BorderFactory.createTitledBorder(" "
 					+ sMath.getClass().getCanonicalName() + ' '));
-			sHotEqn eqn;
+			
+			/*sHotEqn eqn;
 			try {
-				eqn = new sHotEqn(sMath.getMath().compile(latex).toString()
-						.replace("\\\\", "\\"));
-
+				eqn = new sHotEqn(sMath.getMath().compile(latex).toString().replace("\\\\", "\\"));
 				eqn.setBorder(BorderFactory.createLoweredBevelBorder());
 				p.add(eqn);
 			} catch (SBMLException e) {
 				e.printStackTrace();
-			}
+			}*/
+			
 			lh.add(p, 3, ++row, 1, 1, 1, 1);
 			lh.add(new JPanel(), 1, ++row, 5, 1, 0, 0);
 		} else {

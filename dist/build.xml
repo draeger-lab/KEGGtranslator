@@ -77,7 +77,7 @@
             	<exclude name="**/package.html"/>
             </fileset>	
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/y.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/HotEqn.jar"/>
+            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/HotEqn.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jaxen-core.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jaxen-jdom.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jdom.jar"/>
