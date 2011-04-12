@@ -56,7 +56,7 @@ import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
-import de.zbit.gui.JColumnChooser;
+import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.JTabbedLogoPane;
 import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.FileSelector;
@@ -261,8 +261,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				continue;
 			} else if (c.getName().equals(
 					KEGGtranslatorIOOptions.FORMAT.getOptionName())
-					&& (JColumnChooser.class.isAssignableFrom(c.getClass()))) {
-				format = ((JColumnChooser) c).getSelectedItem().toString();
+					&& (JLabeledComponent.class.isAssignableFrom(c.getClass()))) {
+				format = ((JLabeledComponent) c).getSelectedItem().toString();
 				break;
 			}
 		}
@@ -309,17 +309,15 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  if (inFile!=null) {
 		    message = '\'' + inFile.getName() + "' is no valid input file.";
 		  }
-			JOptionPane.showMessageDialog(this, message,
-					KEGGtranslator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this, message, KEGGtranslator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
 		} else {
 			Format f = null;
 			try {
 				f = Format.valueOf(format);
 			} catch (Throwable exc) {
-				JOptionPane.showMessageDialog(this, '\'' + format
-						+ "' is no valid output format.",
-						KEGGtranslator.APPLICATION_NAME,
-						JOptionPane.WARNING_MESSAGE);
+			  exc.printStackTrace();
+				JOptionPane.showMessageDialog(this, '\'' + format + "' is no valid output format.",
+						KEGGtranslator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
 			}
 			if (f != null) {
 				// Tanslate and add tab.
@@ -450,10 +448,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
     // Ask output format
     String format = getOutputFileFormat(toolBar);
     if ( askOutputFormat || (format == null) || (format.length() < 1)) {
-      JColumnChooser outputFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, null);
+      JLabeledComponent outputFormat = (JLabeledComponent) PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, null);
       outputFormat.setTitle("Please select the output format");
       JOptionPane.showMessageDialog(this, outputFormat, KEGGtranslator.APPLICATION_NAME, JOptionPane.QUESTION_MESSAGE);
-      format = ((JColumnChooser) outputFormat).getSelectedItem().toString();
+      format =  outputFormat.getSelectedItem().toString();
     }
 
 

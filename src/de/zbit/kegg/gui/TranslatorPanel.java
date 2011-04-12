@@ -57,7 +57,7 @@ import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
 import de.zbit.gui.GUITools;
-import de.zbit.gui.JColumnChooser;
+import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.ProgressBarSwing;
 import de.zbit.gui.VerticalLayout;
@@ -145,8 +145,8 @@ public class TranslatorPanel extends JPanel {
       final PathwaySelector selector = PathwaySelector.createPathwaySelectorPanel(Translator.getFunctionManager(), lh);
       JComponent oFormat=null;
       if ((outputFormat == null) || (outputFormat == null)) {
-        oFormat = (JColumnChooser) PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, (SBProperties)null, null);
-        oFormat =((JColumnChooser) oFormat).getColumnChooser();
+        oFormat = PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, (SBProperties)null, null);
+        oFormat =((JLabeledComponent) oFormat).getColumnChooser();
         lh.add("Please select the output format", oFormat, false);
       }
       final JComponent oFormatFinal = oFormat;
