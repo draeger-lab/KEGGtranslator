@@ -146,7 +146,7 @@ public class TranslatorPanel extends JPanel {
       JComponent oFormat=null;
       if ((outputFormat == null) || (outputFormat == null)) {
         oFormat = PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, (SBProperties)null, null);
-        oFormat =((JLabeledComponent) oFormat).getColumnChooser();
+        oFormat =((JLabeledComponent) oFormat).getColumnChooser(); // Trim
         lh.add("Please select the output format", oFormat, false);
       }
       final JComponent oFormatFinal = oFormat;
