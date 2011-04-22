@@ -229,6 +229,9 @@ public class BatchKEGGtranslator {
 		case TGF:
 			translator = KEGG2yGraph.createKEGG2TGF(manager);
 			break;
+		case SBGNML:
+			translator  = new KEGG2SBGN(manager);
+			break;
 		default:
 			System.err.println("Unknwon output Format: '" + outFormat + "'.");
 			translator = null;

@@ -3,16 +3,18 @@
 ###################
 
 Clemens Wrzodek (1)
-  clemens.wrzodek@uni-tuebingen.de
+  clemens.wrzodek@uni-tuebingen.de, University of Tuebingen
 Andreas Dräger (1)
-  andreas.draeger@uni-tuebingen.de
+  andreas.draeger@uni-tuebingen.de, University of Tuebingen
   
 ###################
 #  Contributors   #
 ###################
 
+Martijn van Iersel
+  mvaniersel@gmail.com, Netherlands Consortium for Systems Biology
 Andreas Zell (1)
-  andreas.zell@uni-tuebingen.de
+  andreas.zell@uni-tuebingen.de, University of Tuebingen
 
 ###################
 #     Alumni      #

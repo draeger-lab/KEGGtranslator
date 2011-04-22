@@ -53,6 +53,10 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 		/**
 		 * 
 		 */
+		SBGNML,
+		/**
+		 * 
+		 */
 		LaTeX,
 		/**
 		 * 
