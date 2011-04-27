@@ -73,17 +73,16 @@ public class Translator {
 		BackingStoreException, URISyntaxException {
 		// --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
 	  //Locale.setDefault(Locale.US);
+	  GUIOptions.GUI.setDefaultValue(Boolean.FALSE);
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
+		
 		/*if (props.containsKey(GUIOptions.LANGUAGE)) {
 			String userLanguage = props.get(GUIOptions.LANGUAGE);
 			if (!userLanguage.equals(System.getProperty("user.language"))) {
 				Locale.setDefault(new Locale(userLanguage));
 			}
 		}*/
-		
-		//		KeggInfoManagement manager = getManager();
-		//		k2s = new KEGG2jSBML(manager);
 		
 		// Should we start the GUI?
 		if ((args.length < 1) || props.getBooleanProperty(GUIOptions.GUI)) {
@@ -135,8 +134,8 @@ public class Translator {
 		throws IOException {
 		
 		// Check and build input
-		File in = new File(input);
-		if (!in.isFile() || !in.canRead()) {
+		File in = input==null?null:new File(input);
+		if (in==null || !in.canRead()) { // in might also be a directory
 			System.err.println("Invalid or not-readable input file.");
 			return false;
 		}
@@ -150,19 +149,23 @@ public class Translator {
 			
 		// Check and build output
 		File out = output == null ? null : new File(output);
-		if ((out == null) || (output.length() < 1) || out.isDirectory()) {
-			String fileExtension = BatchKEGGtranslator.getFileExtension(translator);
-			out = new File(removeFileExtension(input) + fileExtension);
-			
-			System.out.println("Writing to " + out);
-		}
-		if (out.exists()) {
-			System.out.println("Overwriting exising file " + out);
-		}
-		out.createNewFile();
-		if (!out.canWrite()) {
-			System.err.println("Cannot write to file " + out);
-			return false;
+		if (!in.isDirectory()) { // else: batch-mode
+		  if ((out == null) || (output.length() < 1) || out.isDirectory()) {
+		    String fileExtension = BatchKEGGtranslator.getFileExtension(translator);
+		    out = new File(removeFileExtension(input) + fileExtension);
+		    
+		    System.out.println("Writing to " + out);
+		  }
+		  
+		  // Further check out
+		  if (out.exists()) {
+		    System.out.println("Overwriting exising file " + out);
+		  }
+		  out.createNewFile();
+		  if (!out.canWrite()) {
+		    System.err.println("Cannot write to file " + out);
+		    return false;
+		  }
 		}
 		
 		// Translate.

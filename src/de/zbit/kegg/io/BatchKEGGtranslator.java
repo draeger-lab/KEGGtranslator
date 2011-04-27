@@ -25,6 +25,7 @@ import java.util.List;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.gui.FileFilterKGML;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.DirectoryParser;
@@ -52,7 +53,9 @@ public class BatchKEGGtranslator {
   private Format outFormat = Format.GraphML;
   
   /**
-   * 
+   * The actual translator that is used for the translation.
+   * Will be initialized with {@link #outFormat} and
+   * {@link KeggInfoManagement}.
    */
   private KEGGtranslator translator;
   
@@ -151,16 +154,23 @@ public class BatchKEGGtranslator {
     DirectoryParser dp = new DirectoryParser(dir);
     while (dp.hasNext()) {
       String fn = dp.next();
+      File inFile = new File(dir+fn);
       
       //if (fn.equals("gml")|| fn.equals("metabolic")) continue;
       
-      if (new File(dir+fn).isDirectory()) {
+      if (inFile.isDirectory()) {
         parseDirAndSubDir(dir + fn);
-      } else if (fn.toLowerCase().trim().endsWith(".xml")) {
+        
+      } else if (FileFilterKGML.isKGML(inFile)) {
         // Test if outFile already exists. Assumes: 1 Pathway per file. (should be true for all files... not crucial if assumption is wrong)
         String myDir = getAndCreateOutDir(dir);
         String outFileTemp = myDir + fn.trim().substring(0, fn.trim().length()-4) + fileExtension;
-        if (new File(outFileTemp).exists()) continue; // Skip already converted files.
+        if (new File(outFileTemp).exists()) {
+          System.out.println("Skipping '"+inFile+"' file already exists.");
+          continue; // Skip already converted files.
+        } else {
+          System.out.println("Converting '"+inFile+"' ..."); 
+        }
         
         // Parse and convert all Pathways in XML file.
         List<Pathway> pw=null;

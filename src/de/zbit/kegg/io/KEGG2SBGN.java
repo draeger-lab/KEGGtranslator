@@ -35,6 +35,10 @@ import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Pathway;
 
 /**
+ * <p> Note:<br/>
+ * Martijn want to be mentioned in 'Acknoledgments', in case of a publication
+ * of this methid.</p>
+ * 
  * @author Martijn van Iersel
  * @author Andreas Dr&auml;ger
  * @date 2011-04-22

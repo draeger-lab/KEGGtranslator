@@ -46,7 +46,7 @@ public class FileFilterKGML extends GeneralFileFilter {
      * valid KGML file.
      */
     private static final int MAX_LINES_TO_PARSE = 20;
-
+    
     /*
      * (non-Javadoc)
      * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
@@ -54,26 +54,34 @@ public class FileFilterKGML extends GeneralFileFilter {
     @Override
     public boolean accept(File f) {
       if (f==null) return false;
-	if (f.isDirectory()) {
-	    return true;
-	}
-	if (f.getName().toUpperCase().endsWith(".XML")) {
-	    try {
-		BufferedReader br = OpenFile.openFile(f.getAbsolutePath());
-		String line;
-		for (int i = 0; br.ready() && (i < MAX_LINES_TO_PARSE); i++) {
-		    line = br.readLine();
-		    if (line.toUpperCase().startsWith("<!DOCTYPE")
-			    && line
-				    .contains("http://www.genome.jp/kegg/xml/KGML")) {
-			return true;
-		    }
-		}
-	    } catch (Throwable e) {
-		return false;
-	    }
-	}
-	return false;
+      if (f.isDirectory()) {
+        return true;
+      }
+      return isKGML(f);
+    }
+
+    /**
+     * Checks a) if the file endswith XML and b) if the doctype is KGML.
+     * @param f
+     * @return true if and only if the file is a KGML formatted file.
+     */
+    public static boolean isKGML(File f) {
+      if (f.getName().toUpperCase().endsWith(".XML")) {
+        try {
+          BufferedReader br = OpenFile.openFile(f.getAbsolutePath());
+          String line;
+          for (int i = 0; br.ready() && (i < MAX_LINES_TO_PARSE); i++) {
+            line = br.readLine();
+            if (line.toUpperCase().startsWith("<!DOCTYPE")
+                && line.contains("KGML")) { // "http://www.genome.jp/kegg/xml/KGML"
+              return true;
+            }
+          }
+        } catch (Throwable e) {
+          return false;
+        }
+      }
+      return false;
     }
 
     /*
