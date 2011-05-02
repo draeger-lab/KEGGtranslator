@@ -239,9 +239,12 @@ public class BatchKEGGtranslator {
 		case TGF:
 			translator = KEGG2yGraph.createKEGG2TGF(manager);
 			break;
+	    /*
+	     * REMOVED, PLease only insert working items here.
+	     * As soon as SBGNML really works, we can include it here.
 		case SBGNML:
 			translator  = new KEGG2SBGN(manager);
-			break;
+			break;*/
 		default:
 			System.err.println("Unknwon output Format: '" + outFormat + "'.");
 			translator = null;

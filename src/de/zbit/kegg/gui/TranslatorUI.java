@@ -148,8 +148,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	static {    
 		String iconPaths[] = {"KEGGtranslatorIcon_16.png","KEGGtranslatorIcon_32.png","KEGGtranslatorIcon_48.png","KEGGtranslatorIcon_128.png","KEGGtranslatorIcon_256.png"};
 		for (String path : iconPaths) {
-			UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(
-				TranslatorUI.class.getResource("img/" + path)));
+		  URL url = TranslatorUI.class.getResource("img/" + path);
+		  if (url!=null) {
+			  UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(url));
+		  }
 		}
 		LaTeXExportDialog.initImages();
 	}
@@ -582,6 +584,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#createMainComponent()
 	 */
 	protected Component createMainComponent() {
+	  // If you encounter an exception here PUT THE RESOURCES FOLDER ON YOUR CLASS PATH!
 	  ImageIcon logo = new ImageIcon(TranslatorUI.class.getResource("img/Logo2.png"));
 	  
 	  // Crop animated loading bar from image.
