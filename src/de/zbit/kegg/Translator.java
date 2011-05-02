@@ -45,6 +45,9 @@ import de.zbit.util.prefs.SBProperties;
 /**
  * This class is the main class for the KEGGTranslator project.
  * 
+ * <p>Recommended VM-Arguments:
+ * "-splash:bin/de/zbit/kegg/gui/img/Logo.gif -Duser.language=en -Duser.country=US"
+ * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @date 2010-10-25
