@@ -129,14 +129,16 @@ public class BatchKEGGtranslator {
   }
   
   /**
-   * 
+   * If called without a specific directory, uses
+   * the {@link #orgOutdir} as input directory.
    */
   public void parseDirAndSubDir() {
     parseDirAndSubDir(orgOutdir);
   }
   
   /**
-   * 
+   * Automatic batch translation of all KGML files in dir
+   * and all subdirectories.
    * @param dir
    */
   private void parseDirAndSubDir(String dir) {

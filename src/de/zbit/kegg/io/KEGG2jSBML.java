@@ -33,6 +33,7 @@ import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.History;
+import org.sbml.jsbml.JSBML;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
@@ -1137,6 +1138,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
   
   
   /**
+   * Provides some direct access to KEGG2JSBML functionalities.
    * @param args
    * @throws IOException
    * @throws IllegalAccessException
@@ -1147,7 +1149,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
   public static void main(String[] args) throws IOException {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network
     // load and heavily reduces computation time.
-    KEGG2jSBML k2s;
+    AbstractKEGGtranslator<SBMLDocument> k2s;
     if (new File(KEGGtranslator.cacheFileName).exists()
         && new File(KEGGtranslator.cacheFileName).length() > 0) {
       KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
