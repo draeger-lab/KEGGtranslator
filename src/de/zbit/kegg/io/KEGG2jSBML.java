@@ -62,19 +62,19 @@ import de.zbit.util.SortedArrayList;
 import de.zbit.util.Utils;
 
 /**
- * KEGG2JSBML converter.
+ * KEGG2JSBML converter (also KGML2JSBML).
  * 
  * @author Clemens Wrzodek
  * @author Andreas Dr&auml;ger
  * @since 1.0
  * @version $Rev$
- * 
- * Notes:
- * XXX: Important to know: subtype.setValue contains replacement of &gt; to > !!!
- * TODO: Edges (sub types of relations) now may have colors.
- * 
  */
 public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements SBaseChangedListener {
+  /*
+   * General Notes:
+   * XXX: Important to know: subtype.setValue contains replacement of &gt; to > !!!
+   * TODO: Edges (sub types of relations) now may have colors.
+   */
   
   /**
    * Generate pure SBML or do you want to add CellDesigner annotations?
