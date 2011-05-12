@@ -1,6 +1,11 @@
 <html>
   <head>
     <title>KEGGtranslator - Online Help</title>
+    <style type="text/css">
+      <!--
+      .typewriter-blue {font-family:'courier new',courier,monospace; color:#0000C0;}
+      -->
+    </style>
   </head>
   <body>
     <h1>KEGGtranslator - Online Help</h1>
@@ -14,6 +19,15 @@ KEGGtranslator converts KEGG files (KGML formatted XML-files) to SBML, GML, Grap
 <p>
 You can find further information and help about this application at the KEGGtranslator homepage at http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator/
 </p>
+
+
+<p><b>Batch processing:</b><br/>
+KEGGtranslator can be used to batch convert multiple KGML formatted XML-files. To use this feature, simply give a folder as input argument, together with the desired output format and optional additional options. For example,
+<p class="typewriter-blue">
+  java -jar KEGGtranslator.jar --input C:/ --format SBML
+</p>
+will convert all KEGG files, found on drive C (including subdirectories) to SBML files.
+
 
   </body>
 </html>

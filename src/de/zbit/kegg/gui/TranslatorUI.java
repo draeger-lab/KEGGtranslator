@@ -71,6 +71,8 @@ import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
+ * The main UI of KEGGtranslator.
+ * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
  * @date 2010-11-12

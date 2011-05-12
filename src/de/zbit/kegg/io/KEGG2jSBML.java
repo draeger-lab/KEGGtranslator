@@ -661,7 +661,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     CVTerm cvtKGID = new CVTerm(); cvtKGID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
     CVTerm cvtEntrezID = new CVTerm(); cvtEntrezID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS);
     CVTerm cvtOmimID = new CVTerm(); cvtOmimID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_IS);
-    CVTerm cvtHgncID = new CVTerm(); cvtHgncID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtHgncID.setBiologicalQualifierType(Qualifier.BQB_IS);
     CVTerm cvtEnsemblID = new CVTerm(); cvtEnsemblID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS);
     CVTerm cvtUniprotID = new CVTerm(); cvtUniprotID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_IS);
     CVTerm cvtChebiID = new CVTerm(); cvtChebiID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtChebiID.setBiologicalQualifierType(Qualifier.BQB_IS);
@@ -751,7 +750,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     if (cvtKGID.getNumResources() > 0) spec.addCVTerm(cvtKGID);
     if (cvtEntrezID.getNumResources() > 0) spec.addCVTerm(cvtEntrezID);
     if (cvtOmimID.getNumResources() > 0) spec.addCVTerm(cvtOmimID);
-    if (cvtHgncID.getNumResources() > 0) spec.addCVTerm(cvtHgncID);
     if (cvtEnsemblID.getNumResources() > 0) spec.addCVTerm(cvtEnsemblID);
     if (cvtUniprotID.getNumResources() > 0) spec.addCVTerm(cvtUniprotID);
     if (cvtChebiID.getNumResources() > 0) spec.addCVTerm(cvtChebiID);

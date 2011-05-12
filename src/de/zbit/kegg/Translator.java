@@ -43,7 +43,7 @@ import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
- * This class is the main class for the KEGGTranslator project.
+ * This class is the main class for the KEGGtranslator project.
  * 
  * <p>Recommended VM-Arguments:
  * "-splash:bin/de/zbit/kegg/gui/img/Logo.gif -Duser.language=en -Duser.country=US"
@@ -204,7 +204,16 @@ public class Translator {
 			try {
 				manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
 			} catch (Throwable e) { // IOException or class cast, if class is moved.
-				e.printStackTrace();
+			  e.printStackTrace();
+			  // Delete invalid cache file
+			  try {
+			    File f = new File(KEGGtranslator.cacheFileName);
+			    if (f.exists() && f.canRead()) {
+			      System.out.println("Deleting invalid cache file " + f.getName());
+			      f.delete();
+			    }
+			  } catch (Throwable t) {}
+			  
 			}
 		}
 		
@@ -224,6 +233,15 @@ public class Translator {
 	        managerFunction = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem(KEGGtranslator.cacheFunctionFileName);
 	      } catch (Throwable e) { // IOException or class cast, if class is moved.
 	        e.printStackTrace();
+	        
+	        // Delete invalid cache file
+	        try {
+	          File f = new File(KEGGtranslator.cacheFunctionFileName);
+	          if (f.exists() && f.canRead()) {
+	            System.out.println("Deleting invalid cache file " + f.getName());
+	            f.delete();
+	          }
+	        } catch (Throwable t) {}
 	      }
 	    }
 	    

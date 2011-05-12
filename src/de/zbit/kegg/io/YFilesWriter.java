@@ -32,11 +32,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This class replaces <ul>
- * <li>yFiles with {@link #KEGGtranslator}.appName</li>
- * <li>yFiles version number with {@link #KEGGtranslator}.VERSION_NUMBER</li>
- * </ul>
- * such that no notes of yFiles are being written to the file.
+ * This class creates an {@link OutputStream} that can be used with
+ * the yFiles Java library. It ensures that KEGGtranslator name 
+ * ({@link KEGGtranslator#APPLICATION_NAME}) and version
+ * number ({@link KEGGtranslator#VERSION_NUMBER}) is written to each
+ * file, which allows for easier debugging of written graph files.
  * @author Clemens Wrzodek
  * @since 1.0
  * @version $Rev$
@@ -48,11 +48,22 @@ public class YFilesWriter extends OutputStream implements Closeable {
 	
 	private StringBuffer current;
 	
+	/**
+	 * 
+	 * @param out
+	 */
 	public YFilesWriter(OutputStream out) {
 		toReplace = new HashMap<String, String>();
 		// IMPORTANT NOTE: this MUST BE case sensitive, because
 		// Replacing occurences of yfiles will create incompatible
 		// files!
+		/*
+     * Replaces <ul>
+     * <li>yFiles with {@link KEGGtranslator#APPLICATION_NAME}</li>
+     * <li>yFiles version number with {@link KEGGtranslator#VERSION_NUMBER}</li>
+     * </ul>
+     * such that no notes of yFiles are being written to the file.
+		 */
 		toReplace.put("yFiles", KEGGtranslator.APPLICATION_NAME);
 		toReplace.put(y.util.YVersion.currentVersionString(), KEGGtranslator.VERSION_NUMBER);
 		

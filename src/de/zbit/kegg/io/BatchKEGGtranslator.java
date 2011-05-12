@@ -32,6 +32,8 @@ import de.zbit.util.DirectoryParser;
 
 
 /**
+ * Translate multiple KGML files to the desired
+ * {@link KEGGtranslatorIOOptions#FORMAT}.
  * 
  * @author Clemens Wrzodek
  * @since 1.0

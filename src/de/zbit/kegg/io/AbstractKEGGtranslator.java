@@ -418,8 +418,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   
   /**
    * Shorten a given Entry full-name.
-   * Convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..."
-   * to "PCK1".
+   * <p>Convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..."
+   * to "PCK1". Splits at ", " not at "," to preserve entries
+   * like "Ins(1,4,5)P3".
+   * <p>Returns the shortest resulting name.
    * @param name
    * @return short name.
    */
@@ -427,14 +429,14 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     /*if (name.contains(",")) {
       return name.substring(0, name.indexOf(",")-1);
     }*/
-    String[] names = name.split(",");
+    String[] names = name.split(", ");
     for (String name2: names) {
       if (name2.length()<name.length()) {
         name = name2;
       }
     }
     
-    return name;
+    return name.trim();
   }
 
   /**

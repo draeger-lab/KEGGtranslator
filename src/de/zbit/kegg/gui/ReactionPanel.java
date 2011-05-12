@@ -38,6 +38,7 @@ import org.sbml.tolatex.LaTeXOptions;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
+ * {@link JPanel} for visualization of JSBML {@link Reaction}s.
  * 
  * @author Andreas Dr&auml;ger
  * @date 2011-01-18

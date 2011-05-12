@@ -25,6 +25,9 @@ import java.io.IOException;
 import de.zbit.kegg.KEGGtranslatorOptions;
 
 /**
+ * This class is collected by reflection and will lead to a automatic
+ * generation of a SWING options dialog for {@link KEGGtranslatorOptions}.
+ * 
  * @author Clemens Wrzodek
  * @since 1.0
  * @version $Rev$

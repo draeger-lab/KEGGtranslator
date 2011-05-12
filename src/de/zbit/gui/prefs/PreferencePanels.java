@@ -22,6 +22,10 @@ package de.zbit.gui.prefs;
 
 
 /**
+ * This class contains a collection of all preferences (classes
+ * extending {@link PreferencesPanelForKeyProvider}) that are used
+ * in this application.
+ * 
  * @author Clemens Wrzodek
  * @since 1.0
  * @version $Rev$

@@ -85,7 +85,12 @@ import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.Utils;
 
 /**
- * KEGG2yGraph converter.
+ * KEGG2yGraph converter. Can generate, e.g., GML or GraphML
+ * and many more graph-based output formats.
+ * 
+ * <p>Keywords: KEGG2GraphML, KEGG2GML, KEGG2JPG,
+ * KGML2GraphML, KGML2GML, KGML2JPG.  
+ * 
  * @author Clemens Wrzodek
  * @since 1.0
  * @version $Rev$
@@ -632,7 +637,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           if (infos.queryWasSuccessfull()) {
             String oldText=graph.getRealizer(n).getLabelText();
             
-            String exName = infos.getNames();
+            // KEGG always provides multiple names for an entry.
+            String exName = infos.getNames();            
             if (exName!=null && exName.length()!=0) {
               
               if (!showShortNames) {
@@ -656,6 +662,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
               else if (oldText.length()==0) // ... oder wenn er bisher leer ist.
                 graph.getRealizer(n).setLabelText(exName);
             }
+            
+            
             
             String text = infos.getNames();
             if (text!=null && text.length()!=0) name2+=(name2.length()!=0?",":"")+text.replace(",", "");

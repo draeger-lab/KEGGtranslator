@@ -30,8 +30,9 @@ import de.zbit.util.DirectoryParser;
 
 
 /**
- * Small bugfixes in generated graphML files.
- * Much faster than re-generating all files.
+ * Small bugfixes to update translated documents of older
+ * KEGGtranslator releases to the latest version.
+ * This is much faster than re-generating all files.
  * 
  * @author Clemens Wrzodek
  * @since 1.0

@@ -83,6 +83,7 @@ import de.zbit.util.prefs.SBProperties;
 /**
  * This should be used as a panel on a JTabbedPane.
  * It handles all the translating and visualizing, etc. of a KEGG pathway.
+ * 
  * @author Clemens Wrzodek
  * @since 1.0
  * @version $Rev$

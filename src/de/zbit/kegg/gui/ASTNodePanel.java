@@ -37,6 +37,9 @@ import org.sbml.jsbml.SBMLException;
 import de.zbit.gui.LayoutHelper;
 
 /**
+ * Creates a {@link JPanel} for an {@link ASTNode}.
+ * This class is required for visualizing SBML documents.
+ * 
  * @author Andreas Dr&auml;ger
  * @date 2010-05-11
  * @since 1.0
