@@ -37,6 +37,14 @@ import java.util.Map;
  * ({@link KEGGtranslator#APPLICATION_NAME}) and version
  * number ({@link KEGGtranslator#VERSION_NUMBER}) is written to each
  * file, which allows for easier debugging of written graph files.
+ * 
+ * <p><i>Note:<br/>
+ * Due to yFiles license requirements, we have to obfuscate this class
+ * in the JAR release of this application. Thus, this class
+ * can not be found by using the class name.<br/> If you can provide us
+ * with a proof of possessing a yFiles license yourself, we can send you
+ * an unobfuscated release of KEGGtranslator.</i></p>
+ * 
  * @author Clemens Wrzodek
  * @since 1.0
  * @version $Rev$
