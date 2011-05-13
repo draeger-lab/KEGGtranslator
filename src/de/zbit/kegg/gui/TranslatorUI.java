@@ -103,7 +103,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		TRANSLATION_DONE;
 		/**
 		 * Invisible {@link Action} that should be performed, whenever a file
-		 * has been droppen on this panel.
+		 * has been dropped on this panel.
 		 */
 		//FILE_DROPPED
 
@@ -690,6 +690,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	  return Translator.class.getResource("html/help.html");
 	}
 
+  
 	/*
 	 * (non-Javadoc)
 	 * 

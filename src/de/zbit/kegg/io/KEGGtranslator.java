@@ -32,24 +32,24 @@ import de.zbit.kegg.parser.pathway.Pathway;
 public interface KEGGtranslator {
   
   /**
-   * The name of the appplication.
+   * The name of the application.
    */
   public final static String APPLICATION_NAME = "KEGGtranslator";
   
   /**
    * Version number of this translator
    */
-  public static final String VERSION_NUMBER = "1.0.0";
+  public static final String VERSION_NUMBER = "1.1.0";
   
   /**
    * Filename of the KEGG cache file (implemented just
-   * like the browser cache). Must be loded upon start
+   * like the browser cache). Must be loaded upon start
    * and saved upon exit.
    */
   public static String cacheFileName = "keggdb.dat";
   /**
    * Filename of the KEGG function cache file (implemented just
-   * like the browser cache). Must be loded upon start
+   * like the browser cache). Must be loaded upon start
    * and saved upon exit.
    */  
   public static String cacheFunctionFileName = "keggfc.dat";
