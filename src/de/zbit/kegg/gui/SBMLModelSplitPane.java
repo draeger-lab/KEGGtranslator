@@ -225,6 +225,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			}
 			setDividerLocation(proportionalLocation);
 		} else {
+		  System.out.println("node class " + node.getClass().getName() + " is unknown.");
 			// displayURL(helpURL);
 		}
 	}
