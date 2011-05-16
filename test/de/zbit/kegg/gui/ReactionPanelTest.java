@@ -3,7 +3,7 @@
  * 
  * This file is part of KEGGtranslator, a program to convert KGML files from the
  * KEGG database into various other formats, e.g., SBML, GraphML, and many more.
- * Please visit <http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator> to
+ * Please visit <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  * 
  * KEGGtranslator is free software: you can redistribute it and/or modify it

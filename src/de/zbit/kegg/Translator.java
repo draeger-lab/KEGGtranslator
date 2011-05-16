@@ -121,8 +121,7 @@ public class Translator {
 	 * 
 	 */
 	public static URL getURLOnlineUpdate() throws MalformedURLException {
-	  // TODO: Nach cogSys ändern.
-		return new URL("http://www.ra.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/");
+		return new URL("http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/");
 	}
 	
 	/**
