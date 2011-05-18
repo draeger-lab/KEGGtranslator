@@ -38,7 +38,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * A (not yet fully implemented) implementation of KEGG2SBGN.
  * 
  * <p> Note:<br/>
- * Martijn want to be mentioned in 'Acknowledgments', in case of a publication
+ * Martijn should be mentioned in 'Acknowledgments', in case of a publication
  * of this method.</p>
  * 
  * @author Martijn van Iersel
