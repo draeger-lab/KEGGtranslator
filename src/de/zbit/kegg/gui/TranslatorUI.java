@@ -65,6 +65,7 @@ import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
+import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
@@ -92,6 +93,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 //		 * {@link Action} for LaTeX export.
 //		 */
 //		TO_LATEX,
+    /**
+     * {@link Action} for new instances of {@link AbstractProgressBar}s.
+     * This will display the progress in the {@link #statusBar}.
+     */
+	  NEW_PROGRESSBAR,
     /**
      * {@link Action} for downloading KGMLs.
      */
@@ -379,8 +385,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
           GUITools.showErrorMessage(this, e1);
         }
         break;
-			default:
-				System.out.println(action);
+      case NEW_PROGRESSBAR:
+        getStatusBar().showProgress((AbstractProgressBar)e.getSource());
+        break;
+      default:
+        System.out.println(action);
 				break;
 			}
 		} catch (Throwable exc) {
@@ -398,7 +407,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 //		}
 //	}
 
-	/**
+  /**
 	 * Closes the tab at the specified index.
 	 * 
 	 * @param index

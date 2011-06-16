@@ -34,6 +34,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -97,6 +98,7 @@ import de.zbit.util.prefs.SBProperties;
  */
 public class TranslatorPanel extends JPanel {
   private static final long serialVersionUID = 6030311193210321410L;
+  public static final transient Logger log = Logger.getLogger(TranslatorPanel.class.getName());
   File inputFile;
   Format outputFormat;
   boolean documentHasBeenSaved=false;
@@ -193,7 +195,8 @@ public class TranslatorPanel extends JPanel {
                 e.printStackTrace();
                 GUITools.showErrorMessage(thiss, e);
               }
-              if (localFile!=null) {            
+              if (localFile!=null) {
+                log.info("Pathway download successful.");
                 // Perform translation
                 inputFile = new File(localFile);
                 outputFormat = Format.valueOf(Reflect.invokeIfContains(oFormatFinal, "getSelectedItem").toString());
@@ -203,6 +206,7 @@ public class TranslatorPanel extends JPanel {
                 translate();
                 GUITools.packParentWindow(thiss);
               } else {
+                log.warning("Pathway download failed.");
                 // Remove the tab
                 thiss.getParent().remove(thiss);
               }
@@ -240,6 +244,7 @@ public class TranslatorPanel extends JPanel {
       }
       protected void done() {
         removeAll();
+        log.info("Pathway translation complete.");
         // Get the resulting document and check and handle eventual errors.
         try {
           document = get();
@@ -348,19 +353,22 @@ public class TranslatorPanel extends JPanel {
     Dimension panelSize = new Dimension(400, 75);
     
     // Create the panel
-    Container panel = new JPanel(new VerticalLayout());
+    JPanel panel = new JPanel(new VerticalLayout());
     panel.setPreferredSize(panelSize);
+    panel.setOpaque(false);
     
     // Create the label and progressBar
-    JLabel jl = new JLabel((loadingText!=null && loadingText.length()>0)?loadingText:"Please wait...");
+    loadingText = (loadingText!=null && loadingText.length()>0)?loadingText:"Please wait...";
+    JLabel jl = new JLabel(loadingText);
+    log.info(loadingText);
     //Font font = new java.awt.Font("Tahoma", Font.PLAIN, 12);
     //jl.setFont(font);
     
     JProgressBar prog = new JProgressBar();
     prog.setPreferredSize(new Dimension(panelSize.width - 20,
       panelSize.height / 4));
-    panel.add(jl, BorderLayout.NORTH);
-    panel.add(prog, BorderLayout.CENTER);
+    panel.add(jl);//, BorderLayout.NORTH);
+    panel.add(prog);//, BorderLayout.CENTER);
     
     if (panel instanceof JComponent) {
       GUITools.setOpaqueForAllElements((JComponent) panel, false);
@@ -380,7 +388,18 @@ public class TranslatorPanel extends JPanel {
       f.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
     }
     
-    return new ProgressBarSwing(prog);
+    // Make progressBar
+    ProgressBarSwing pb = new ProgressBarSwing(prog);
+    
+    // Inform others of this action
+    ActionEvent newBar = new ActionEvent(pb, JOptionPane.DEFAULT_OPTION, "NEW_PROGRESSBAR");
+    if (parent instanceof TranslatorPanel) {
+      ((TranslatorPanel)parent).fireActionEvent(newBar);
+    } else if (parent instanceof TranslatorUI) {
+      ((TranslatorUI)parent).actionPerformed(newBar);
+    }
+    
+    return  pb;
   }
   
   
