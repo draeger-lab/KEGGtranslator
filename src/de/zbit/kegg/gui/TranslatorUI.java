@@ -662,7 +662,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	@SuppressWarnings("unchecked")
 	public Class<? extends KeyProvider>[] getCommandLineOptions() {
-		return Translator.getCommandLineOptions().toArray(new Class[0]);
+	  List<Class<? extends KeyProvider>> l = Translator.getCommandLineOptions();
+		return l.toArray(new Class[0]);
 	}
 
 	/*
