@@ -347,7 +347,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       Node node = (Node) nodeOrEdge;
       
       NodeMap[] nm = graph.getRegisteredNodeMaps();
-      if (nm!=null)
+      if (nm!=null) {
         for (int i=0; i<nm.length;i++) {
           //tm.setValueAt(nm[i].get(node), (index++), 1);
           Object c = nm[i].get(node);
@@ -355,8 +355,8 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
             headers.add(getNiceCaption(mapDescriptionMap.getV(nm[i])));
             content.add(c.toString().replace(";", "; "));
           }
-          
         }
+      }
       
     } if (nodeOrEdge instanceof Edge) {
       Edge edge = (Edge) nodeOrEdge;

@@ -1000,7 +1000,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     graph.addDataProvider(mapDescription, mapDescriptionMap);
     
     mapDescriptionMap.set(nodeLabel, "nodeLabel");
-    mapDescriptionMap.set(entrezIds, "entrezIds");
+    mapDescriptionMap.set(entrezIds, "entrezIds"); // String "entrezIds" is also hardcoded in TranslatorTools.java!
     mapDescriptionMap.set(entityType, "type");
     mapDescriptionMap.set(nodeDescription, "description");
     mapDescriptionMap.set(keggOntIds, "keggIds");

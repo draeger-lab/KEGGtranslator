@@ -57,12 +57,12 @@ import y.view.EditMode;
 import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
+import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.LayoutHelper;
 import de.zbit.gui.ProgressBarSwing;
 import de.zbit.gui.VerticalLayout;
-import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
@@ -118,6 +118,11 @@ public class TranslatorPanel extends JPanel {
   AbstractKEGGtranslator<?> translator = null;
   
   /**
+   * Allows the programmer to store any additional data along with this panel.
+   */
+  Object object=null;
+  
+  /**
    * Create a new translator-panel and initiates the translation.
    * @param inputFile
    * @param outputFormat
@@ -131,6 +136,42 @@ public class TranslatorPanel extends JPanel {
     this.translationListener = translationResult;
     
     translate();
+  }
+  
+  /**
+   * Initiates a download and translation of the given pathway.
+   * @param organism Organism kegg abbreviation (e.g., "mmu")
+   * @param pathwayID pathway identifier (e.g., "mmu00010")
+   * @param outputFormat
+   * @param translationResult
+   */
+  public TranslatorPanel(final String organism, final String pathwayID, 
+    final Format outputFormat, ActionListener translationResult) {
+    super();
+    setLayout(new BorderLayout());
+    setOpaque(false);
+    this.inputFile = null;
+    this.outputFormat = null;
+    this.translationListener = translationResult;
+    
+    // Execute download and translation in new thread
+    showTemporaryLoadingPanel(pathwayID, organism);
+    final SwingWorker<String, Void> downloadWorker = new SwingWorker<String, Void>() {
+      @Override
+      protected String doInBackground() throws Exception {
+        return KGMLSelectAndDownload.downloadPathway(organism, pathwayID, false);
+      }
+      protected void done() {
+        String localFile=null;
+        try {
+          localFile = get();
+        } catch (Exception e) {
+          GUITools.showErrorMessage(null, e);
+        }
+        pathwayDownloadComplete(localFile, outputFormat);
+      }
+    };
+    downloadWorker.execute();
   }
   
   /**
@@ -173,13 +214,8 @@ public class TranslatorPanel extends JPanel {
       final Container thiss = lh.getContainer();
       okButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          // Show progress-bar
-          removeAll();
-          setLayout(new BorderLayout()); // LayoutHelper creates a GridBaglayout, reset it to default.
-          final AbstractProgressBar pb = generateLoadingPanel(thiss, "Downloading '" + selector.getSelectedPathway() + "' " +
-          		"for '"+selector.getOrganismSelector().getSelectedOrganism()+"'...");
-          FileDownload.ProgressBar = pb;
-          repaint();
+          showTemporaryLoadingPanel(selector.getSelectedPathway(),
+            selector.getOrganismSelector().getSelectedOrganism());
           
           // Execute download and translation in new thread
           final SwingWorker<String, Void> downloadWorker = new SwingWorker<String, Void>() {
@@ -195,21 +231,8 @@ public class TranslatorPanel extends JPanel {
                 e.printStackTrace();
                 GUITools.showErrorMessage(thiss, e);
               }
-              if (localFile!=null) {
-                log.info("Pathway download successful.");
-                // Perform translation
-                inputFile = new File(localFile);
-                outputFormat = Format.valueOf(Reflect.invokeIfContains(oFormatFinal, "getSelectedItem").toString());
-                removeAll();
-                repaint();
-                
-                translate();
-                GUITools.packParentWindow(thiss);
-              } else {
-                log.warning("Pathway download failed.");
-                // Remove the tab
-                thiss.getParent().remove(thiss);
-              }
+              pathwayDownloadComplete(localFile,
+                Format.valueOf(Reflect.invokeIfContains(oFormatFinal, "getSelectedItem").toString()));
             }
           };
           downloadWorker.execute();
@@ -226,6 +249,36 @@ public class TranslatorPanel extends JPanel {
       GUITools.showErrorMessage(lh.getContainer(), exc);
     }
     
+  }
+  
+  private void showTemporaryLoadingPanel(String pwName, String organism) {
+    // Show progress-bar
+    removeAll();
+    setLayout(new BorderLayout()); // LayoutHelper creates a GridBaglayout, reset it to default.
+    final AbstractProgressBar pb = generateLoadingPanel(this, "Downloading '" + pwName + "' " +
+        "for '"+organism+"'...");
+    FileDownload.ProgressBar = pb;
+    repaint();
+  }
+  
+  private void pathwayDownloadComplete(String localFile, Format outputFormat) {
+    //String localFile=null;
+
+    if (localFile!=null) {
+      log.info("Pathway download successful.");
+      // Perform translation
+      this.inputFile = new File(localFile);
+      this.outputFormat = outputFormat;
+      removeAll();
+      repaint();
+      
+      translate();
+      GUITools.packParentWindow(this);
+    } else {
+      log.warning("Pathway download failed.");
+      // Remove the tab
+      this.getParent().remove(this);
+    }
   }
   
   /**
@@ -581,6 +634,31 @@ public class TranslatorPanel extends JPanel {
       
     }
   }
+  
+  /**
+   * @return the translated document, which is either a {@link Graph2D} object (if {@link #isGraphML()} is true)
+   * or an {@link SBMLDocument} if {@link #isSBML()} is true.
+   */
+  public Object getDocument() {
+    return document;
+  }
+
+  /**
+   * @see #setData(Object)
+   * @return the object, stored with {@link #setData(Object)}
+   */
+  public Object getData() {
+    return object;
+  }
+
+  /**
+   * Allows the programmer to store any additional data along with this panel.
+   * @param object the object to set
+   */
+  public void setData(Object object) {
+    this.object = object;
+  }
+  
   
   
 }

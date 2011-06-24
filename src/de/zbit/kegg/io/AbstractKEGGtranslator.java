@@ -23,10 +23,12 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggTools;
 import de.zbit.kegg.KEGGtranslatorOptions;
+import de.zbit.kegg.TranslatorTools;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -45,6 +47,7 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  */
 public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtranslator {
+  public static final transient Logger log = Logger.getLogger(AbstractKEGGtranslator.class.getName());
 	
 	/**
 	 * SBPreferences object to store all preferences for this class.
@@ -293,9 +296,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       KeggInfoManagement.offlineMode = false;
       
       // Prefetch kegg information (enormas speed improvement).
-      System.out.print("Fetching information from KEGG online resources... ");
+      //System.out.print("Fetching information from KEGG online resources... ");
+      log.info("Fetching information from KEGG online resources... ");
       KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false);
-      System.out.println("done.");
+      log.info("Information fetched. Translating pathway... ");
+      //System.out.println("done.");
       
       // Auto-complete the reaction by adding all substrates, products and enzymes.
       if (autocompleteReactions && functionalOutput) {

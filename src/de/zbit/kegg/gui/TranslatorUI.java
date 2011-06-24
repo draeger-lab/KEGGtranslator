@@ -333,8 +333,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				// Tanslate and add tab.
 				try {
 					openDir = inFile.getParent();
-					tabbedPane.addTab(inFile.getName(), new TranslatorPanel(
-							inFile, f, this));
+					tabbedPane.addTab(inFile.getName(), new TranslatorPanel(inFile, f, this));
 					tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 				} catch (Exception e1) {
 					GUITools.showErrorMessage(this, e1);
@@ -729,14 +728,6 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		} catch (MalformedURLException exc) {
 			return null;
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#getFileHistoryKeyProvider()
-	 */
-	@Override
-	public Class<? extends FileHistory> getFileHistoryKeyProvider() {
-		return KEGGtranslatorHistory.class;
 	}
 
 	/* (non-Javadoc)
