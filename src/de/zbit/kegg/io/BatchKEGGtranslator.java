@@ -195,7 +195,7 @@ public class BatchKEGGtranslator {
             e.printStackTrace();
           }
           
-          if (translator.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, sp�ter aber schon => ein anderer prezess macht das selbe bereits.
+          if (translator.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, spaeter aber schon => ein anderer prozess macht das selbe bereits.
             System.out.println("It looks like another instance is processing the same files. Going to next subfolder.");
             return; // Function is recursive.
           }

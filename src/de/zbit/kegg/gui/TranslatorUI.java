@@ -58,7 +58,6 @@ import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.JTabbedLogoPane;
-import de.zbit.gui.prefs.FileHistory;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.kegg.Translator;
@@ -567,12 +566,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return new JMenuItem[] {
 		    /*GUITools.createJMenuItem(this,
 				Action.TO_LATEX, UIManager.getIcon("ICON_LATEX_16"), KeyStroke
-						.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK), 'E',
-				false),*/
+						.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK), 'E', false),*/
 				GUITools.createJMenuItem(this,
-	        Action.DOWNLOAD_KGML, UIManager.getIcon("ICON_GEAR_16"), KeyStroke
-	            .getKeyStroke('D', InputEvent.CTRL_DOWN_MASK), 'D',
-	        true)
+	      Action.DOWNLOAD_KGML, UIManager.getIcon("ICON_GEAR_16"), KeyStroke
+	            .getKeyStroke('D', InputEvent.CTRL_DOWN_MASK), 'D', true)
 	        };
 	}
 

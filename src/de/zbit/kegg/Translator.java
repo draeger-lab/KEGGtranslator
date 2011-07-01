@@ -38,6 +38,7 @@ import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
+import de.zbit.util.logging.LogUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
@@ -74,6 +75,7 @@ public class Translator {
 	 */
 	public static void main(String[] args) throws IOException,
 		BackingStoreException, URISyntaxException {
+	  LogUtil.initializeLogging((String[])null);
 		// --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
 	  //Locale.setDefault(Locale.US);
 	  GUIOptions.GUI.setDefaultValue(Boolean.FALSE);
@@ -218,7 +220,7 @@ public class Translator {
 		
 		// Create new, if loading failed
 		if (manager==null) {
-			manager = new KeggInfoManagement();
+			manager = new KeggInfoManagement(5000);
 		}
 		
 		return manager;
@@ -246,7 +248,7 @@ public class Translator {
 	    
 	    // Create new, if loading failed
 	    if (managerFunction==null) {
-	      managerFunction = new KeggFunctionManagement();
+	      managerFunction = new KeggFunctionManagement(5000);
 	    }
 	    
 	    return managerFunction;

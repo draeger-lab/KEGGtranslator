@@ -66,23 +66,26 @@ public class FileFilterKGML extends GeneralFileFilter {
      * @return true if and only if the file is a KGML formatted file.
      */
     public static boolean isKGML(File f) {
+      boolean retVal = false;
       if (f.getName().toUpperCase().endsWith(".XML")) {
         try {
           BufferedReader br = OpenFile.openFile(f.getAbsolutePath());
           String line;
           for (int i = 0; br.ready() && (i < MAX_LINES_TO_PARSE); i++) {
             line = br.readLine();
-            if (line.toUpperCase().startsWith("<!DOCTYPE")
+            if (line.toUpperCase().trim().startsWith("<!DOCTYPE")
                 && line.contains("KGML")) {
               // Removed: "http://www.genome.jp/kegg/xml/KGML"
-              return true;
+              retVal = true;
+              break;
             }
           }
+          br.close();
         } catch (Throwable e) {
-          return false;
+          retVal = false;
         }
       }
-      return false;
+      return retVal;
     }
 
     /*

@@ -99,12 +99,12 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
   }
   
   @Override
-  protected  Node   createNode(Graph2D graph, double x, double y) {
+  protected Node createNode(Graph2D graph, double x, double y) {
     // do nothing
     return null;
   }
   @Override
-   protected  Node   createNode(Graph2D graph, double x, double y, Node parent) {
+   protected Node createNode(Graph2D graph, double x, double y, Node parent) {
     // do nothing
     return null;
   }
@@ -122,6 +122,15 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     renderer.setMode(DefaultBackgroundRenderer.CENTERED);
     renderer.setColor(Color.white);
     pane.setBackgroundRenderer(renderer);
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.EditMode#getNodeTip(y.base.Node)
+   */
+  @Override
+  protected String getNodeTip(Node arg0) {
+    // TODO Auto-generated method stub
+    return super.getNodeTip(arg0);
   }
   
   /**

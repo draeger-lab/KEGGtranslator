@@ -25,10 +25,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggTools;
-import de.zbit.kegg.KEGGtranslatorOptions;
-import de.zbit.kegg.TranslatorTools;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -436,7 +435,9 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     }*/
     String[] names = name.split(", ");
     for (String name2: names) {
-      if (name2.length()<name.length()) {
+      // E.g. 308800 has name "Tyr, C" and "C" is not that helpful
+      // => At least 2 digits in name and shortest one.
+      if (name2.length()>1 && name2.length()<name.length()) {
         name = name2;
       }
     }

@@ -22,6 +22,8 @@ package de.zbit.kegg;
 
 import java.awt.Color;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,16 +62,19 @@ public class TranslatorTools {
   
   
   /**
-   * Highlight all given GeneIDs in RED color.
+   * Highlight all given GeneIDs in RED color. And selects these nodes.
    * @param graph translated pathway with annotated geneIDs
    * @param ncbiGeneIDs geneIDs to color in Red.
    */
   public void highlightGenes(Iterable<Integer> ncbiGeneIDs) {
-    Map<Integer, Node> id2node = getGeneID2NodeMap();
+    Map<Integer, List<Node>> id2node = getGeneID2NodeMap();
     for (Integer integer : ncbiGeneIDs) {
-      Node n = id2node.get(integer);
-      if (n!=null) {
-        graph.getRealizer(n).setFillColor(Color.RED);
+      List<Node> nList = id2node.get(integer);
+      if (nList!=null) {
+        for (Node node : nList) {
+          graph.getRealizer(node).setFillColor(Color.RED);
+          graph.getRealizer(node).setSelected(true);
+        }
       } else {
         log.info("Could not get a Node for " + integer);
       }
@@ -81,12 +86,12 @@ public class TranslatorTools {
    * Return a map from Entrez GeneID to corresponding {@link Node} for the given
    * translated pathway.
    * @param graph
-   * @return
+   * @return map from geneID to List of nodes.
    */
   @SuppressWarnings("unchecked")
-  public Map<Integer, Node> getGeneID2NodeMap() {
+  public Map<Integer, List<Node>> getGeneID2NodeMap() {
     // Build a map from GeneID 2 Node
-    Map<Integer, Node> id2node = new HashMap<Integer, Node>();
+    Map<Integer, List<Node>> id2node = new HashMap<Integer, List<Node>>();
     
     // Get the NodeMap from entrez 2 node.
     GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
@@ -107,7 +112,15 @@ public class TranslatorTools {
         String[] ids = entrezIds.toString().split(",");
         for (String id: ids) {
           try {
-            id2node.put(Integer.parseInt(id), n);
+            // Get Node collection for gene ID
+            Integer intId = Integer.parseInt(id);
+            List<Node> list = id2node.get(intId);
+            if (list==null) {
+              list = new LinkedList<Node>();
+              id2node.put(intId, list);
+            }
+            // Add node to list.
+            list.add(n);
           } catch (NumberFormatException e) {
             log.log(Level.WARNING, "Could not get geneID for node.", e);
           }
