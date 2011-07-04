@@ -61,6 +61,7 @@ import de.zbit.gui.JTabbedLogoPane;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.ext.RestrictedEditMode;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
@@ -101,6 +102,12 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
      * {@link Action} for downloading KGMLs.
      */
 		DOWNLOAD_KGML,
+		/**
+		 * This is coming from {@link RestrictedEditMode#OPEN_PATHWAY} and must be
+		 * renamed accordingly. The source is a kegg pathway id that should be opened
+		 * as new tab, when this action is fired.
+		 */
+		OPEN_PATHWAY,
 		/**
 		 * Invisible {@link Action} that should be performed, whenever an
 		 * translation is done.
@@ -385,6 +392,14 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
         break;
       case NEW_PROGRESSBAR:
         getStatusBar().showProgress((AbstractProgressBar)e.getSource());
+        break;
+      case OPEN_PATHWAY:
+        try {
+          tabbedPane.addTab(e.getSource().toString(), new TranslatorPanel(e.getSource().toString(),Format.GraphML,this));
+          tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
+        } catch (Exception e1) {
+          GUITools.showErrorMessage(this, e1);
+        }
         break;
       default:
         System.out.println(action);

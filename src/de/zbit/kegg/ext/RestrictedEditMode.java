@@ -33,6 +33,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -42,10 +44,12 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.ToolTipManager;
 import javax.swing.table.DefaultTableModel;
 
 import org.sbml.jsbml.util.StringTools;
@@ -61,11 +65,15 @@ import y.view.Graph2D;
 import y.view.Graph2DSelectionEvent;
 import y.view.Graph2DSelectionListener;
 import y.view.Graph2DView;
+import y.view.HitInfo;
 import y.view.NavigationComponent;
 import y.view.Overview;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
+import de.zbit.kegg.TranslatorTools;
+import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
+import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.StringUtil;
 
@@ -90,13 +98,43 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    */
   JTable propTable=null;
   
+  /**
+   * A panel for the {@link #propTable}.
+   */
   JPanel eastPanel=null;
+  
+  /**
+   * This is used to fire openPathway events on double clicks on
+   * pathway reference nodes.
+   */
+  ActionListener aListener = null;
+  
+  /**
+   * This is the ActionCommand for actionlisteners to open a new pathway tab.
+   * TODO
+   */
+  public final static String OPEN_PATHWAY = "OPEN_PATHWAY";
   
   public RestrictedEditMode() {
     super();
     //setEditNodeMode(null);
     setCreateEdgeMode(null);
+    /*
+     * The Tooltips of nodes, provding descriptions must be shown
+     * longer than the system default. Let's show them 15 seconds!
+     */
+    ToolTipManager.sharedInstance().setDismissDelay(15000);
   }
+  
+  /**
+   * @param listener this is used to fire TODO
+   */
+  public RestrictedEditMode(ActionListener listener) {
+    this();
+    this.aListener = listener;
+  }
+  
+  
   
   @Override
   protected Node createNode(Graph2D graph, double x, double y) {
@@ -127,10 +165,84 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
   /* (non-Javadoc)
    * @see y.view.EditMode#getNodeTip(y.base.Node)
    */
+  @SuppressWarnings("unchecked")
   @Override
-  protected String getNodeTip(Node arg0) {
-    // TODO Auto-generated method stub
-    return super.getNodeTip(arg0);
+  protected String getNodeTip(Node n) {
+    // Show a nice ToolTipText for every node.
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) n.getGraph().getDataProvider(KEGG2yGraph.mapDescription);
+    if (mapDescriptionMap==null) return super.getNodeTip(n);
+    
+    // Get nodeLabel, description and eventually an image for the ToolTipText
+    String nodeLabel = null;
+    String description = null;
+    String image = "";
+    NodeMap[] nm = n.getGraph().getRegisteredNodeMaps();
+    if (nm!=null) {
+      for (int i=0; i<nm.length;i++) {
+        Object c = nm[i].get(n);
+        if (c==null || c.toString().length()<1) continue;
+        String mapDescription = mapDescriptionMap.getV(nm[i]);
+        if (mapDescription.equals("nodeLabel")) {
+          nodeLabel = "<b>"+c.toString().replace(",", ",<br/>")+"</b><br/>";
+        } else if (mapDescription.equals("description")) {
+          description = "<i>"+c.toString().replace(",", ",<br/>")+"</i><br/>";
+        } else if (mapDescription.equals("keggIds")) {
+          for (String s: c.toString().split(",")) {
+            s=s.toUpperCase().trim();
+            if (s.startsWith("PATH:")) {
+              image+=KEGG2jSBML.getPathwayPreviewPicture(s);
+            } else if (s.startsWith("CPD:")) {
+              // KEGG provides picture for compounds (e.g., "C00118").
+              image+=KEGG2jSBML.getCompoundPreviewPicture(s);
+            }
+          }
+        }
+      }
+    }
+    
+    // Merge the three strings to a single tooltip
+    StringBuffer tooltip = new StringBuffer();
+    if (nodeLabel!=null) {
+      tooltip.append(StringUtil.insertLineBreaks(nodeLabel, GUITools.TOOLTIP_LINE_LENGTH, "<br/>"));
+    }
+    if (description!=null) {
+      tooltip.append(StringUtil.insertLineBreaks(description, GUITools.TOOLTIP_LINE_LENGTH, "<br/>"));
+    }
+    if (image!=null && image.length()>0) {
+      tooltip.append("<div align=\"center\">"+image+"</div>");
+    }
+    
+    // Append html and return toString.
+    return "<html><body>"+tooltip.toString()+"</body></html>";
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.EditMode#mouseClicked(double, double)
+   */
+  @Override
+  public void mouseClicked(double x, double y) {
+    MouseEvent ev = lastClickEvent;
+    if (ev.getClickCount() == 2 && aListener!=null) {
+      // Get double clicked node
+      HitInfo allHitObjects = getGraph2D().getHitInfo(x, y, false);
+      Node n = allHitObjects.getHitNode();
+      
+      // Ask user if he wants to open the pathway and fire an event.
+      String kgId = TranslatorTools.getKeggIDs(n);
+      if (kgId.toLowerCase().startsWith("path:")) {
+        int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
+          KEGGtranslator.APPLICATION_NAME, new String[]{"Yes", "No"});
+        if (ret==0) {
+          ActionEvent e = new ActionEvent(kgId.trim().substring(5).toLowerCase(), JOptionPane.OK_OPTION, OPEN_PATHWAY);
+          aListener.actionPerformed(e);
+        }
+      }
+      
+
+    } else {
+      // let EditMode handle the click event
+      super.mouseClicked(x,y);
+    }
   }
   
   /**

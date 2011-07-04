@@ -140,12 +140,11 @@ public class TranslatorPanel extends JPanel {
   
   /**
    * Initiates a download and translation of the given pathway.
-   * @param organism Organism kegg abbreviation (e.g., "mmu")
    * @param pathwayID pathway identifier (e.g., "mmu00010")
    * @param outputFormat
    * @param translationResult
    */
-  public TranslatorPanel(final String organism, final String pathwayID, 
+  public TranslatorPanel(final String pathwayID, 
     final Format outputFormat, ActionListener translationResult) {
     super();
     setLayout(new BorderLayout());
@@ -155,11 +154,11 @@ public class TranslatorPanel extends JPanel {
     this.translationListener = translationResult;
     
     // Execute download and translation in new thread
-    showTemporaryLoadingPanel(pathwayID, organism);
+    showTemporaryLoadingPanel(pathwayID, null);
     final SwingWorker<String, Void> downloadWorker = new SwingWorker<String, Void>() {
       @Override
       protected String doInBackground() throws Exception {
-        return KGMLSelectAndDownload.downloadPathway(organism, pathwayID, false);
+        return KGMLSelectAndDownload.downloadPathway(pathwayID, false);
       }
       protected void done() {
         String localFile=null;
@@ -256,7 +255,7 @@ public class TranslatorPanel extends JPanel {
     removeAll();
     setLayout(new BorderLayout()); // LayoutHelper creates a GridBaglayout, reset it to default.
     final AbstractProgressBar pb = generateLoadingPanel(this, "Downloading '" + pwName + "' " +
-        "for '"+organism+"'...");
+      (organism!=null&&organism.length()>0? "for '"+organism+"'...":""));
     FileDownload.ProgressBar = pb;
     repaint();
   }
@@ -345,7 +344,7 @@ public class TranslatorPanel extends JPanel {
           pane.setSize(getSize());
           //ViewMode mode = new NavigationMode();
           //pane.addViewMode(mode);
-          EditMode editMode = new RestrictedEditMode();
+          EditMode editMode = new RestrictedEditMode(translationListener);
           editMode.showNodeTips(true);
           pane.addViewMode(editMode);
           

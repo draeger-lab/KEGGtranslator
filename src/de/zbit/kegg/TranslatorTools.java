@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import y.base.DataMap;
+import y.base.Graph;
 import y.base.Node;
 import y.base.NodeMap;
 import y.view.Graph2D;
@@ -104,6 +105,10 @@ public class TranslatorTools {
         break;
       }
     }
+    if (entrez==null) {
+      log.severe("Could not find Node2EntrezID mapping.");
+      return null;
+    }
     
     // build the resulting map
     for (Node n : graph.getNodeArray()) {
@@ -129,6 +134,45 @@ public class TranslatorTools {
     }
     
     return id2node;
+  }
+  
+  /**
+   * @param n a node
+   * @param descriptor e.g., "keggIds" or "entrezIds". See {@link KEGG2yGraph} for a complete list.
+   * @return the string associated with this node.
+   */
+  @SuppressWarnings("unchecked")
+  public static String getNodeInfoIDs(Node n, String descriptor) {
+    Graph graph = n.getGraph();
+    
+    // Get the NodeMap from kegg 2 node.
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
+    NodeMap nodeMap = null;
+    if (mapDescriptionMap==null) return null;
+    for (int i=0; i<graph.getRegisteredNodeMaps().length; i++) {
+      NodeMap nm = graph.getRegisteredNodeMaps()[i];
+      if (mapDescriptionMap.getV(nm).equals(descriptor)) {
+        nodeMap = nm;
+        break;
+      }
+    }
+    if (nodeMap==null) {
+      log.severe("Could not find Node2" + descriptor==null?"null":descriptor + " mapping.");
+      return null;
+    }
+    
+    // return kegg id(s)
+    Object id = nodeMap.get(n);
+    return id!=null?id.toString():null;
+    
+  }
+
+  /**
+   * @param n
+   * @return kegg ids, separated by a "," for the given node.
+   */
+  public static String getKeggIDs(Node n) {
+    return getNodeInfoIDs(n, "keggIds");
   }
   
 }

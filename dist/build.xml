@@ -89,6 +89,7 @@
 <!-- Uncomment for SysBio classes instead of compiled jar. -->
            <fileset dir="${SysBioPath}/bin">
               <exclude name="de/zbit/resources/liftover/*"/>
+           	  <exclude name="de/zbit/mapper/*"/>
             	<exclude name="**/package.html"/>
            </fileset>
 <!-- Achtung, im ersten SysBio release befinden sich bugs in KeggInfos.java ! -->
@@ -103,7 +104,6 @@
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/Java5/saaj.jar"/>-->
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/WSDbfetch.jar"/>-->
             <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-cli-1.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/argparser.jar"/>
             
             <fileset dir="${JSBMLPath}/bin">
               <exclude name="log4j.properties"/> <!-- log4j.properties is in SBML2Latex and jSBML -->

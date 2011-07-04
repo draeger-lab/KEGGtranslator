@@ -33,13 +33,14 @@ public interface KEGGtranslator {
   
   /**
    * The name of the application.
+   * Removed the final attribute, such that referencing applications can still change this.
    */
-  public final static String APPLICATION_NAME = "KEGGtranslator";
+  public static String APPLICATION_NAME = "KEGGtranslator";
   
   /**
    * Version number of this translator
    */
-  public static final String VERSION_NUMBER = "1.1.0";
+  public static final String VERSION_NUMBER = "1.2.0";
   
   /**
    * Filename of the KEGG cache file (implemented just

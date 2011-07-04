@@ -30,10 +30,11 @@ import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.CVTerm;
+import org.sbml.jsbml.CVTerm.Qualifier;
+import org.sbml.jsbml.CVTerm.Type;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.History;
-import org.sbml.jsbml.JSBML;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
@@ -42,8 +43,6 @@ import org.sbml.jsbml.SBaseChangedEvent;
 import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
-import org.sbml.jsbml.CVTerm.Qualifier;
-import org.sbml.jsbml.CVTerm.Type;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
@@ -702,8 +701,18 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
           notes.append(String.format("<p><b>All given names:</b><br/>%s</p>\n",EscapeChars.forHTML(infos.getNames().replace(";", ""))));
         if (infos.getCas() != null)
           notes.append(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
-        if (infos.getFormula() != null)
+        if (infos.getFormula() != null) {
           notes.append(String.format("<p><b>Formula:</b> %s</p>\n", EscapeChars.forHTML(infos.getFormula())));
+          String ko_id_uc_t = ko_id.toUpperCase().trim();
+          if (ko_id_uc_t.startsWith("CPD:")) {
+            // KEGG provides picture for compounds (e.g., "C00118").
+            notes.append(getCompoundPreviewPicture(ko_id_uc_t));
+          }
+        }
+        if (entry.getType().equals(EntryType.map)) {
+          // KEGG provides picture for referenced pathways (e.g., "path:hsa00620" => "map00620.gif").
+          notes.append(getPathwayPreviewPicture(ko_id));
+        }
         if (infos.getMass() != null)
           notes.append(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
         notes.append(notesEndString);
@@ -767,6 +776,24 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
   }
   
   
+  /**
+   * @param ko_id starting with "cpd:"
+   * @return an html image tag, containing a preview picture for the given compound.
+   */
+  public static String getCompoundPreviewPicture(String ko_id) {
+    return String.format("<img src=\"http://www.kegg.jp/Fig/compound/%s.gif\"/><br/>\n", ko_id.trim().substring(4).toUpperCase() );
+  }
+
+  /** 
+   * @param ko_id starting with "path:"
+   * @return an html image tag, containing a preview picture for the given referenced pathway.
+   */
+  public static String getPathwayPreviewPicture(String ko_id) {
+    // KEGG provides picture for referenced pathways (e.g., "path:hsa00620" => "map00620.gif").
+    String mapNumber = Utils.getNumberFromStringRevAsString(ko_id.length(), ko_id);
+    return String.format("<img src=\"http://www.kegg.jp/kegg/misc/thumbnail/map%s.gif\"/><br/>\n", mapNumber );
+  }
+
   /**
    * Translates the given entry to jSBML.
    * 
