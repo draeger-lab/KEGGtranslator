@@ -70,10 +70,10 @@ import y.view.NavigationComponent;
 import y.view.Overview;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
+import de.zbit.kegg.Translator;
 import de.zbit.kegg.TranslatorTools;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
-import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.StringUtil;
 
@@ -231,7 +231,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       String kgId = TranslatorTools.getKeggIDs(n);
       if (kgId.toLowerCase().startsWith("path:")) {
         int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
-          KEGGtranslator.APPLICATION_NAME, new String[]{"Yes", "No"});
+          Translator.APPLICATION_NAME, new String[]{"Yes", "No"});
         if (ret==0) {
           ActionEvent e = new ActionEvent(kgId.trim().substring(5).toLowerCase(), JOptionPane.OK_OPTION, OPEN_PATHWAY);
           aListener.actionPerformed(e);

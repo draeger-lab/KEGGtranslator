@@ -31,6 +31,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.zbit.kegg.Translator;
+
 /**
  * This class creates an {@link OutputStream} that can be used with
  * the yFiles Java library. It ensures that KEGGtranslator name 
@@ -72,8 +74,8 @@ public class YFilesWriter extends OutputStream implements Closeable {
      * </ul>
      * such that no notes of yFiles are being written to the file.
 		 */
-		toReplace.put("yFiles", KEGGtranslator.APPLICATION_NAME);
-		toReplace.put(y.util.YVersion.currentVersionString(), KEGGtranslator.VERSION_NUMBER);
+		toReplace.put("yFiles", Translator.APPLICATION_NAME);
+		toReplace.put(y.util.YVersion.currentVersionString(), Translator.VERSION_NUMBER);
 		
 		realOut = out;
 		

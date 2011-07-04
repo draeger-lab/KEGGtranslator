@@ -62,7 +62,6 @@ import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.RestrictedEditMode;
-import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.AbstractProgressBar;
@@ -105,7 +104,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		/**
 		 * This is coming from {@link RestrictedEditMode#OPEN_PATHWAY} and must be
 		 * renamed accordingly. The source is a kegg pathway id that should be opened
-		 * as new tab, when this action is fired.
+		 * as new tab, when this action is fired. This is an invisible action.
 		 */
 		OPEN_PATHWAY,
 		/**
@@ -325,7 +324,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  if (inFile!=null) {
 		    message = '\'' + inFile.getName() + "' is no valid input file.";
 		  }
-			JOptionPane.showMessageDialog(this, message, KEGGtranslator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this, message, Translator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
 		} else {
 			Format f = null;
 			try {
@@ -333,7 +332,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			} catch (Throwable exc) {
 			  exc.printStackTrace();
 				JOptionPane.showMessageDialog(this, '\'' + format + "' is no valid output format.",
-						KEGGtranslator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
+						Translator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
 			}
 			if (f != null) {
 				// Tanslate and add tab.
@@ -476,7 +475,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
     if ( askOutputFormat || (format == null) || (format.length() < 1)) {
       JLabeledComponent outputFormat = (JLabeledComponent) PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, null);
       outputFormat.setTitle("Please select the output format");
-      JOptionPane.showMessageDialog(this, outputFormat, KEGGtranslator.APPLICATION_NAME, JOptionPane.QUESTION_MESSAGE);
+      JOptionPane.showMessageDialog(this, outputFormat, Translator.APPLICATION_NAME, JOptionPane.QUESTION_MESSAGE);
       format =  outputFormat.getSelectedItem().toString();
     }
 
@@ -718,7 +717,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#getApplicationName()
 	 */
 	public String getApplicationName() {
-		return KEGGtranslator.APPLICATION_NAME;
+		return Translator.APPLICATION_NAME;
 	}
 
 	/*
@@ -727,7 +726,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#getDottedVersionNumber()
 	 */
 	public String getDottedVersionNumber() {
-		return KEGGtranslator.VERSION_NUMBER;
+		return Translator.VERSION_NUMBER;
 	}
 
 	/*

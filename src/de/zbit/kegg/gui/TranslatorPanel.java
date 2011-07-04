@@ -72,7 +72,6 @@ import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
-import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.AbstractProgressBar;
@@ -431,7 +430,7 @@ public class TranslatorPanel extends JPanel {
     } else {
       // Display the panel in an jFrame
       JDialog f = new JDialog();
-      f.setTitle(KEGGtranslator.APPLICATION_NAME);
+      f.setTitle(Translator.APPLICATION_NAME);
       f.setSize(panel.getPreferredSize());
       f.setContentPane(panel);
       f.setPreferredSize(panel.getPreferredSize());
@@ -604,7 +603,7 @@ public class TranslatorPanel extends JPanel {
   public void writeLaTeXReport(File targetFile) {
     if (document==null) return;
     if (!isSBML()) {
-      GUITools.showMessage("This option is only available for SBML documents.", KEGGtranslator.APPLICATION_NAME);
+      GUITools.showMessage("This option is only available for SBML documents.", Translator.APPLICATION_NAME);
       return;
     }
     

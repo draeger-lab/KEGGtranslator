@@ -69,9 +69,10 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
-import de.zbit.kegg.KEGGtranslatorOptions;
+import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
@@ -1202,9 +1203,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    */
   public static void main(String[] args) throws IOException {
     KeggInfoManagement manager;
-    if (new File(KEGGtranslator.cacheFileName).exists()
-        && new File(KEGGtranslator.cacheFileName).length() > 0) {
-      manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
+    if (new File(Translator.cacheFileName).exists()
+        && new File(Translator.cacheFileName).length() > 0) {
+      manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(Translator.cacheFileName);
     } else {
       manager = new KeggInfoManagement();
     }
@@ -1236,7 +1237,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       
       // Remember already queried objects (save cache)
       if (k2g.getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, k2g.getKeggInfoManager());
+        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, k2g.getKeggInfoManager());
       }
       
       return;
@@ -1253,7 +1254,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       
       // Remember already queried objects
       if (k2g.getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, k2g.getKeggInfoManager());
+        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, k2g.getKeggInfoManager());
       }
       
     } catch (Exception e) {

@@ -31,29 +31,6 @@ import de.zbit.kegg.parser.pathway.Pathway;
  */
 public interface KEGGtranslator {
   
-  /**
-   * The name of the application.
-   * Removed the final attribute, such that referencing applications can still change this.
-   */
-  public static String APPLICATION_NAME = "KEGGtranslator";
-  
-  /**
-   * Version number of this translator
-   */
-  public static final String VERSION_NUMBER = "1.2.0";
-  
-  /**
-   * Filename of the KEGG cache file (implemented just
-   * like the browser cache). Must be loaded upon start
-   * and saved upon exit.
-   */
-  public static String cacheFileName = "keggdb.dat";
-  /**
-   * Filename of the KEGG function cache file (implemented just
-   * like the browser cache). Must be loaded upon start
-   * and saved upon exit.
-   */  
-  public static String cacheFunctionFileName = "keggfc.dat";
   
 	/**
 	 * Translate a given KEGG Pathway and write it in the new format to outfile.

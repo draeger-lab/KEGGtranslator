@@ -56,11 +56,39 @@ import de.zbit.util.prefs.SBProperties;
  * @version $Rev$
  */
 public class Translator {
+  
+  /**
+   * Filename of the KEGG cache file (implemented just
+   * like the browser cache). Must be loaded upon start
+   * and saved upon exit.
+   */
+  public final static String cacheFileName = "keggdb.dat";
+  
+  /**
+   * Filename of the KEGG function cache file (implemented just
+   * like the browser cache). Must be loaded upon start
+   * and saved upon exit.
+   */  
+  public final static String cacheFunctionFileName = "keggfc.dat";
+  
+  /**
+   * The name of the application.
+   * Removed the final attribute, such that referencing applications can still change this.
+   */
+  public static String APPLICATION_NAME = "KEGGtranslator";
+  
+  /**
+   * Version number of this translator
+   */
+  public static final String VERSION_NUMBER = "1.2.0";
+  
+  
   /**
    * The cache to be used by all KEGG interacting classes.
    * Access via {@link #getManager()}.
    */
   private static KeggInfoManagement manager=null;
+  
   /**
    * The cache to be used by all KEGG-Functions interacting classes.
    * Access via {@link #getFunctionManager()}.
@@ -201,14 +229,14 @@ public class Translator {
 	public synchronized static KeggInfoManagement getManager() {
 	  
 	  // Try to load from cache file
-		if (manager==null && new File(KEGGtranslator.cacheFileName).exists() && new File(KEGGtranslator.cacheFileName).length() > 0) {
+		if (manager==null && new File(Translator.cacheFileName).exists() && new File(Translator.cacheFileName).length() > 0) {
 			try {
-				manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(KEGGtranslator.cacheFileName);
+				manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(Translator.cacheFileName);
 			} catch (Throwable e) { // IOException or class cast, if class is moved.
 			  e.printStackTrace();
 			  // Delete invalid cache file
 			  try {
-			    File f = new File(KEGGtranslator.cacheFileName);
+			    File f = new File(Translator.cacheFileName);
 			    if (f.exists() && f.canRead()) {
 			      System.out.println("Deleting invalid cache file " + f.getName());
 			      f.delete();
@@ -229,15 +257,15 @@ public class Translator {
 	 public synchronized static KeggFunctionManagement getFunctionManager() {
 	    
 	    // Try to load from cache file
-	    if (managerFunction==null && new File(KEGGtranslator.cacheFunctionFileName).exists() && new File(KEGGtranslator.cacheFunctionFileName).length() > 0) {
+	    if (managerFunction==null && new File(Translator.cacheFunctionFileName).exists() && new File(Translator.cacheFunctionFileName).length() > 0) {
 	      try {
-	        managerFunction = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem(KEGGtranslator.cacheFunctionFileName);
+	        managerFunction = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem(Translator.cacheFunctionFileName);
 	      } catch (Throwable e) { // IOException or class cast, if class is moved.
 	        e.printStackTrace();
 	        
 	        // Delete invalid cache file
 	        try {
-	          File f = new File(KEGGtranslator.cacheFunctionFileName);
+	          File f = new File(Translator.cacheFunctionFileName);
 	          if (f.exists() && f.canRead()) {
 	            System.out.println("Deleting invalid cache file " + f.getName());
 	            f.delete();
@@ -259,10 +287,10 @@ public class Translator {
 	 */
 	public synchronized static void saveCache() {
     if (manager!=null && manager.hasChanged()) {
-      KeggInfoManagement.saveToFilesystem(KEGGtranslator.cacheFileName, manager);
+      KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, manager);
     }
     if (managerFunction!=null && managerFunction.isCacheChangedSinceLastLoading()) {
-      KeggFunctionManagement.saveToFilesystem(KEGGtranslator.cacheFunctionFileName, managerFunction);
+      KeggFunctionManagement.saveToFilesystem(Translator.cacheFunctionFileName, managerFunction);
     }
 	}
 	

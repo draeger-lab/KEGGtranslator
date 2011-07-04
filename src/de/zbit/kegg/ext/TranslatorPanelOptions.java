@@ -20,8 +20,8 @@
  */
 package de.zbit.kegg.ext;
 
+import de.zbit.kegg.Translator;
 import de.zbit.kegg.gui.TranslatorPanel;
-import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.OptionGroup;
@@ -39,7 +39,7 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
    * as background image.
    */
   public static final Option<Boolean> SHOW_LOGO_IN_GRAPH_BACKGROUND = new Option<Boolean>("SHOW_LOGO_IN_GRAPH_BACKGROUND",Boolean.class,
-      "If true, shows the " + KEGGtranslator.APPLICATION_NAME + " logo in the background of each graph.", false);
+      "If true, shows the " + Translator.APPLICATION_NAME + " logo in the background of each graph.", false);
 
   /**
    * Shows an overview and navigation panel in every graph frame.
