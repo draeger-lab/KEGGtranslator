@@ -45,6 +45,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
@@ -58,6 +59,7 @@ import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
 import de.zbit.gui.BaseFrame.BaseAction;
+import de.zbit.gui.BaseFrameTab;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.LayoutHelper;
@@ -95,7 +97,7 @@ import de.zbit.util.prefs.SBProperties;
  * @since 1.0
  * @version $Rev$
  */
-public class TranslatorPanel extends JPanel {
+public class TranslatorPanel extends JPanel implements BaseFrameTab {
   private static final long serialVersionUID = 6030311193210321410L;
   public static final transient Logger log = Logger.getLogger(TranslatorPanel.class.getName());
   File inputFile;
@@ -179,11 +181,21 @@ public class TranslatorPanel extends JPanel {
    * @param translationResult
    */
   public TranslatorPanel(ActionListener translationResult) {
+    this(null, translationResult);
+  }
+  
+  /**
+   * Shows a download pathway dialog with a predefined output format.
+   * @see TranslatorPanel#TranslatorPanel(ActionListener)
+   * @param outputFormat predefined output format of downloaded pathway.
+   * @param translationResult
+   */
+  public TranslatorPanel(final Format outputFormat, ActionListener translationResult) {
     super();
     setLayout(new BorderLayout());
     setOpaque(false);
     this.inputFile = null;
-    this.outputFormat = null;
+    this.outputFormat = outputFormat;
     this.translationListener = translationResult;
     
     showDownloadPanel(new LayoutHelper(this));
@@ -212,6 +224,9 @@ public class TranslatorPanel extends JPanel {
       final Container thiss = lh.getContainer();
       okButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
+          firePropertyChange("PATHWAY_NAME", null, selector.getSelectedPathway());
+          firePropertyChange("ORGANISM_NAME", null, selector.getOrganismSelector().getSelectedOrganism());
+          
           showTemporaryLoadingPanel(selector.getSelectedPathway(),
             selector.getOrganismSelector().getSelectedOrganism());
           
@@ -229,8 +244,11 @@ public class TranslatorPanel extends JPanel {
                 e.printStackTrace();
                 GUITools.showErrorMessage(thiss, e);
               }
-              pathwayDownloadComplete(localFile,
-                Format.valueOf(Reflect.invokeIfContains(oFormatFinal, "getSelectedItem").toString()));
+              Format outFormat = outputFormat;
+              if (oFormatFinal!=null) {
+                outFormat = Format.valueOf(Reflect.invokeIfContains(oFormatFinal, "getSelectedItem").toString());
+              }
+              pathwayDownloadComplete(localFile, outFormat);
             }
           };
           downloadWorker.execute();
@@ -489,6 +507,9 @@ public class TranslatorPanel extends JPanel {
       ff.add(SBFileFilter.createGIFFileFilter());
       ff.add(SBFileFilter.createYGFFileFilter());
       ff.add(SBFileFilter.createTGFFileFilter());
+      if (KEGG2yGraph.isSVGextensionInstalled()) {
+        ff.add(SBFileFilter.createSVGFileFilter());
+      }
       for (int i=0; i<ff.size(); i++) {
         if (((SBFileFilter)ff.get(i)).getExtension().toLowerCase().startsWith(this.outputFormat.toString().toLowerCase())) {
           ff.addFirst(ff.remove(i));
@@ -595,6 +616,14 @@ public class TranslatorPanel extends JPanel {
         GUITools.setEnabled(true, menuBar, BaseAction.FILE_CLOSE);
       }
     }
+  }
+  
+  /**
+   * @see #updateButtons(JMenuBar)
+   */
+  public void updateButtons(JMenuBar menuBar, JToolBar toolbar) {
+    updateButtons(menuBar);
+    // Toolbar must not be changed!
   }
   
   /**

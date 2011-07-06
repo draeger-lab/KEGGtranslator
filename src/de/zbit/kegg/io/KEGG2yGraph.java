@@ -26,6 +26,7 @@
 package de.zbit.kegg.io;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.io.BufferedOutputStream;
@@ -36,6 +37,9 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import y.base.DataMap;
 import y.base.Edge;
@@ -67,6 +71,7 @@ import y.view.LineType;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import y.view.View;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.kegg.KEGGtranslatorOptions;
@@ -81,8 +86,12 @@ import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.GraphicsType;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.kegg.parser.pathway.Reaction;
+import de.zbit.kegg.parser.pathway.ReactionComponent;
+import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.util.SortedArrayList;
 import de.zbit.util.Utils;
 
 /**
@@ -125,6 +134,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * or not.
    */
   private boolean createEdgeLabels=false;
+  /**
+   * Draws grey arrows for reactions. This is not recommended since reactions
+   * are mostly formally duplicates of the processed relations.
+   */
+  private boolean drawArrowsForReactions=false;
   /**
    * Important: This determines the output format. E.g. a GraphMLIOHandler
    * will write a graphML file, a GMLIOHandler will write a GML file.
@@ -255,6 +269,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   private void loadPreferences() {
   	groupNodesWithSameEdges = KEGGtranslatorOptions.MERGE_NODES_WITH_SAME_EDGES.getValue(prefs);
   	createEdgeLabels = KEGGtranslatorOptions.CREATE_EDGE_LABELS.getValue(prefs);
+  	drawArrowsForReactions = KEGGtranslatorOptions.DRAW_ARROWS_FOR_REACTIONS.getValue(prefs);
   }
 
   
@@ -287,17 +302,54 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   /**
    * Configures the view that is used as rendering environment for some output
    * formats.
-   * @param view - Graph2DView
+   * @param view any Graph2DView of a graph to save
+   * @param outputIsAPixelImage is the output a pixel based (jpeg, gif,...) image?
    */
-  private static void configureView(Graph2DView view) {
+  private static void configureView(Graph2DView view, boolean outputIsAPixelImage) {
     Graph2D graph = view.getGraph2D();
     Rectangle box = graph.getBoundingBox();
-    // Dimension dim = //inBox.getSize();
-    // view.setPreferredSize(dim);
-    // view.setSize(dim);
-    view.zoomToArea(box.getX() - 10, box.getY() - 10, box.getWidth() + 20, box.getHeight() + 20);
-    view.fitContent();
-    view.setPaintDetailThreshold(0.0); // never switch to less detail mode
+    if (outputIsAPixelImage) {
+      Dimension dim = getOutputSize(box);
+      view.setSize(dim);
+    }
+    view.zoomToArea(box.getX() - 5, box.getY() - 5, box.getWidth() + 10, box.getHeight() + 10);
+    view.setPaintDetailThreshold(0.0); // paint all details
+    
+    // Set the view as active view, such that io handlers take it.
+    graph.setCurrentView(view);
+  }
+  
+  /**
+   * Ensures a minimum graph size of 1600x1200.
+   * @param inBox input bounding box of graph.
+   * @return
+   */
+  private static Dimension getOutputSize(Rectangle inBox) {
+    /*if (outputWidth > 0 && outputHeight > 0) {
+      //output completely specified. use it
+      return new Dimension((int) outputWidth, (int) outputHeight);
+    } else if (outputWidth > 0) {
+      //output width specified. determine output height
+      return new Dimension(outputWidth,
+          (int) (outputWidth * (inBox.getHeight() / inBox.getWidth())));
+    } else if (outputHeight > 0) {
+      //output height specified. determine output width
+      return new Dimension((int) (outputHeight * (inBox.getWidth() / inBox.getHeight())), outputHeight);
+    } else { //no output size specified*/
+      //no output size specified. use input size, but only if smaller than 1024
+      double width = inBox.getWidth();
+      double height = inBox.getHeight();
+      //scale down if necessary, keeping aspect ratio
+      if (width < 1600) {
+        height *= 1600 / width;
+        width = 1600;
+      }
+      if (height < 1200) {
+        width *= 1200 / height;
+        height = 1200;
+      }
+      return new Dimension((int) width, (int) height);
+    //}
   }
   
   /**
@@ -489,6 +541,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Initialize a progress bar.
     initProgressBar(p,showProgressForRelations,false);
+    
+    // Save all reaction modifiers in a map. String = reaction id.
+    Map<String, Node> reactionModifiers = new HashMap<String, Node>();
     
     // Add nodes for all Entries
     for (int i=0; i<p.getEntries().size(); i++) {
@@ -729,6 +784,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       if (e.getLink()!=null && e.getLink().length()!=0) nodeURLs.set(n, e.getLink());
       
       if (isPathwayReference) PWReferenceNodeTexts.add(graph.getRealizer(n).getLabelText());
+      if (e.hasReaction()) {
+        reactionModifiers.put(e.getReaction().toLowerCase().trim(), n);
+      }
     }
     
     
@@ -863,7 +921,22 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
 
     // Give a warning if we have no relations.
     if (p.getRelations().size()<1) {
-      System.err.println("Warning: File does not contain any relations. Graph will look quite boring...");
+      log.warning("File does not contain any relations. Graph will look quite boring...");
+    }
+    
+    
+    // Eventually draw arrows for reactions. These are mostly functional duplicates of the
+    // already drawn relations, thus it is not recommended.
+    if (drawArrowsForReactions) {
+      // I noticed, that some reations occur multiple times in one KGML document,
+      // (maybe its intended? e.g. R00014 in hsa00010.xml)
+      List<String> processedReactions = new SortedArrayList<String>();
+      for (Reaction r : p.getReactions()) {
+        if (!processedReactions.contains(r.getName())) {
+          addKGMLReaction(r,p,graph,reactionModifiers);
+          processedReactions.add(r.getName());
+        }
+      }
     }
     
     
@@ -1018,6 +1091,54 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   }
   
   
+  /**
+   * @param r
+   * @param p
+   * @param graph
+   * @param reactionModifiers
+   */
+  private void addKGMLReaction(Reaction r, Pathway p, Graph2D graph, Map<String, Node> reactionModifiers) {
+    if (!reactionHasAtLeastOneReactantAndProduct(r, p)) return;
+    
+    EdgeRealizer er = new GenericEdgeRealizer();
+    er.setTargetArrow(Arrow.STANDARD);
+    er.setLineColor(Color.LIGHT_GRAY);
+    if (r.getType().equals(ReactionType.reversible)) {
+      er.setSourceArrow(Arrow.STANDARD);
+    }
+    
+    
+    // yFiles only provides 1:1 relations => Create edge for every combination.
+    for (ReactionComponent sub:r.getSubstrates()) {
+      Entry one;
+      if (sub.hasId()) one = p.getEntryForId(sub.getId());
+      else one = p.getEntryForName(sub.getName());;
+      for (ReactionComponent prod:r.getProducts()) {
+        Entry two;
+        if (prod.hasId()) two = p.getEntryForId(prod.getId());
+        else two = p.getEntryForName(prod.getName());;        
+        
+        // Get nodes, corresponding to entries
+        Node nOne = (Node) one.getCustom();
+        Node nTwo = (Node) two.getCustom();
+        
+        // Create edge, if not existent.
+        if (nOne.getEdgeTo(nTwo)==null) {
+          graph.createEdge(nOne, nTwo, er);
+        }
+        
+        // Consider reaction modifiers
+        Node modifier = reactionModifiers.get(r.getName().toLowerCase().trim());
+        if (modifier!=null && modifier.getEdgeTo(nTwo)==null) {
+          er.setSourceArrow(Arrow.NONE);
+          er.setTargetArrow(Arrow.TRANSPARENT_CIRCLE);
+          graph.createEdge(modifier, nTwo, er);
+        }
+      }
+    }
+    
+    
+  }
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.AbstractKEGGtranslator#writeToFile(java.lang.Object, java.lang.String)
    */
@@ -1061,11 +1182,16 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     // ----------------
     
     // Zoom by default to fit content in graphML
+    boolean isGraphOutput=false;
     if (outputHandler instanceof GraphMLIOHandler ||
         outputHandler instanceof GMLIOHandler ||
         outputHandler instanceof YGFIOHandler) {
-      configureView(new Graph2DView(graph));
+      isGraphOutput = true;
     }
+    
+    // Configure view and rememeber old one to restore after saving.
+    View old_v = graph.getCurrentView();
+    configureView(new Graph2DView(graph), !isGraphOutput);
     
     // => Moved to a global setting.
     //if (outputHandler instanceof JPGIOHandler) {
@@ -1082,7 +1208,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       	// y-Files-is-the-man--poser-strings.
         OutputStream out = null;
         if (outputHandler instanceof GraphMLIOHandler ||
-            outputHandler instanceof GMLIOHandler) {
+            outputHandler instanceof GMLIOHandler ||
+            outputHandler.getClass().getSimpleName().equals("SVGIOHandler")) {
         	out = new YFilesWriter(new BufferedOutputStream(new FileOutputStream(outFile)));
         }
         
@@ -1101,6 +1228,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           iex.printStackTrace();
           break;
         }
+      } finally {
+        graph.setCurrentView(old_v);
       }
     }
     return false;
@@ -1158,6 +1287,39 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   }
   
   /**
+   * Convenient method to create a new KEGG2SVG translator.
+   * <p>Requires the yFiles SVG extension libraries on the projects
+   * build path!
+   * @param manager - KeggInfoManagement to use for retrieving
+   * annotations.
+   * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
+   */
+  public static KEGG2yGraph createKEGG2SVG(KeggInfoManagement manager) {
+    IOHandler ioh = createSVGIOHandler();
+    if (ioh!=null) {      
+      return new KEGG2yGraph(ioh, manager);
+    } else {
+      return null;
+    }
+  }
+  
+  /**
+   * Requires the yFiles SVG extension libraries on the projects
+   * build path!
+   * @return new SVGIOHandler()
+   */
+  @SuppressWarnings("unchecked")
+  private static IOHandler createSVGIOHandler() {
+    try {
+      Class<? extends IOHandler> svg = (Class<? extends IOHandler>) Class.forName("yext.svg.io.SVGIOHandler");    
+      if (svg!=null) return svg.newInstance();
+    } catch (Throwable e) {
+      // Extension not installed
+    }
+    return null;
+  }
+  
+  /**
    * Convenient method to create a new KEGG2JPG translator.
    * @param manager - KeggInfoManagement to use for retrieving
    * annotations.
@@ -1204,7 +1366,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   public static void main(String[] args) throws IOException {
     KeggInfoManagement manager;
     if (new File(Translator.cacheFileName).exists()
-        && new File(Translator.cacheFileName).length() > 0) {
+        && new File(Translator.cacheFileName).length() > 1) {
       manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(Translator.cacheFileName);
     } else {
       manager = new KeggInfoManagement();
@@ -1320,11 +1482,23 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       io = new TGFIOHandler();
     } else if (format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg")) {
       io = new JPGIOHandler();
+    } else if (format.equalsIgnoreCase("svg")) {
+      io = createSVGIOHandler();
+      if (io==null) {
+        throw new Exception("Unknown output format (SVG extension not installed).");
+      }
     } else {
       throw new Exception("Unknown output format.");
     }
     setOutputHandler(io);
     writeToFile(graph, outFile);
+  }
+  
+  /**
+   * @return
+   */
+  public static boolean isSVGextensionInstalled() {
+    return createSVGIOHandler()!=null;
   }
   
 }

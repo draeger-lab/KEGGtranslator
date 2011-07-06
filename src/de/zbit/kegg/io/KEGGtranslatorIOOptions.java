@@ -43,6 +43,7 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 	 * Possible output file formats.
 	 * 
 	 * @author Andreas Dr&auml;ger
+	 * @author Clemens Wrzodek
 	 * @date 2011-01-07
 	 */
 	public static enum Format {

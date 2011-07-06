@@ -229,7 +229,7 @@ public class Translator {
 	public synchronized static KeggInfoManagement getManager() {
 	  
 	  // Try to load from cache file
-		if (manager==null && new File(Translator.cacheFileName).exists() && new File(Translator.cacheFileName).length() > 0) {
+		if (manager==null && new File(Translator.cacheFileName).exists() && new File(Translator.cacheFileName).length() > 1) {
 			try {
 				manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(Translator.cacheFileName);
 			} catch (Throwable e) { // IOException or class cast, if class is moved.
@@ -257,7 +257,7 @@ public class Translator {
 	 public synchronized static KeggFunctionManagement getFunctionManager() {
 	    
 	    // Try to load from cache file
-	    if (managerFunction==null && new File(Translator.cacheFunctionFileName).exists() && new File(Translator.cacheFunctionFileName).length() > 0) {
+	    if (managerFunction==null && new File(Translator.cacheFunctionFileName).exists() && new File(Translator.cacheFunctionFileName).length() > 1) {
 	      try {
 	        managerFunction = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem(Translator.cacheFunctionFileName);
 	      } catch (Throwable e) { // IOException or class cast, if class is moved.

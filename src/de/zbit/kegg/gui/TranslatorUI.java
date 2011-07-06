@@ -227,21 +227,16 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	protected JToolBar createJToolBar() {
 		initPreferences();
 		// final JPanel r = new JPanel(new VerticalLayout());
-		final JToolBar r = new JToolBar("Translate new file",
-				JToolBar.HORIZONTAL);
+		final JToolBar r = new JToolBar("Translate new file", JToolBar.HORIZONTAL);
 
 		JComponent jc = PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.INPUT, prefsIO, this);
 		// Allow a change of Focus (important!)
 		if (jc instanceof FileSelector) ((FileSelector)jc).removeInputVerifier();
 		r.add(jc);
-		
-		// r.add(new JSeparator(JSeparator.VERTICAL));
-		r.add(PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT,
-				prefsIO, this));
+		r.add(PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, this));
 
 		// Button and action
-		JButton ok = new JButton("Translate now!", UIManager
-				.getIcon("ICON_GEAR_16"));
+		JButton ok = new JButton("Translate now!", UIManager.getIcon("ICON_GEAR_16"));
 		ok.setToolTipText(StringUtil.toHTML(
 								"Starts the conversion of the input file to the selected output format and displays the result on this workbench.",
 								GUITools.TOOLTIP_LINE_LENGTH));

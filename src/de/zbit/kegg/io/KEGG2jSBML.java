@@ -503,24 +503,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
    */
   private org.sbml.jsbml.Reaction addKGMLReaction(Reaction r, Pathway p, Model model, Compartment compartment,
     SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers) {
-    // Skip reaction if it has either no reactants or no products.
-    boolean hasAtLeastOneReactantAndProduct = false;
-    for (ReactionComponent rc : r.getSubstrates()) {
-      Entry spec = p.getEntryForName(rc.getName());
-      if (spec == null || spec.getCustom() == null) continue;
-      hasAtLeastOneReactantAndProduct = true;
-      break;
-    }
-    if (!hasAtLeastOneReactantAndProduct) return null;//continue;
-    hasAtLeastOneReactantAndProduct = false;
-    for (ReactionComponent rc : r.getProducts()) {
-      Entry spec = p.getEntryForName(rc.getName());
-      if (spec == null || spec.getCustom() == null) continue;
-      hasAtLeastOneReactantAndProduct = true;
-      break;
-    }
-    
-    if (!hasAtLeastOneReactantAndProduct) return null;//continue;
+    if (!reactionHasAtLeastOneReactantAndProduct(r, p)) return null;
     
     org.sbml.jsbml.Reaction sbReaction = model.createReaction();
     sbReaction.initDefaults();
@@ -909,7 +892,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     spec.setNotes(notes.toString());
     
     // Set SBO Term
-    if (treatEntrysWithReactionDifferent && entry.getReaction() != null && entry.getReaction().trim().length() != 0) {
+    if (treatEntrysWithReactionDifferent && entry.hasReaction()) {
       // Q: Ist es richtig, sowohl dem Modifier als auch der species eine neue id zu geben? A: Nein, ist nicht richtig.
       // spec.setSBOTerm(ET_SpecialReactionCase2SBO);
       ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
@@ -1179,7 +1162,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     // load and heavily reduces computation time.
     AbstractKEGGtranslator<SBMLDocument> k2s;
     if (new File(Translator.cacheFileName).exists()
-        && new File(Translator.cacheFileName).length() > 0) {
+        && new File(Translator.cacheFileName).length() > 1) {
       KeggInfoManagement manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(Translator.cacheFileName);
       k2s = new KEGG2jSBML(manager);
     } else {

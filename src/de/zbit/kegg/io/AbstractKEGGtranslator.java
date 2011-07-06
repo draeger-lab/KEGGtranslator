@@ -32,6 +32,8 @@ import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.kegg.parser.pathway.Reaction;
+import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.ProgressBar;
 import de.zbit.util.prefs.SBPreferences;
@@ -381,8 +383,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
 				return doc;
 			}
 		}
-		throw new IOException(String.format("Cannot translate input file %s.", f
-				.getAbsolutePath()));
+		throw new IOException(String.format("Cannot translate input file %s.", f.getAbsolutePath()));
 	}
   
   /**
@@ -408,6 +409,34 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       progress.setNumberOfTotalCalls(totalCalls + 1);
     }
     progress.DisplayBar();
+  }
+  
+  /**
+   * Checks wether a given reaction has at least one product and substrate.
+   * @param reaction
+   * @param parentPathway
+   * @return
+   */
+  public static boolean reactionHasAtLeastOneReactantAndProduct(Reaction reaction, Pathway parentPathway) {
+    // Skip reaction if it has either no reactants or no products.
+    boolean hasAtLeastOneReactantAndProduct = false;
+    for (ReactionComponent rc : reaction.getSubstrates()) {
+      Entry spec = parentPathway.getEntryForName(rc.getName());
+      if (spec == null || spec.getCustom() == null) continue;
+      hasAtLeastOneReactantAndProduct = true;
+      break;
+    }
+    if (!hasAtLeastOneReactantAndProduct) return false;
+    hasAtLeastOneReactantAndProduct = false;
+    for (ReactionComponent rc : reaction.getProducts()) {
+      Entry spec = parentPathway.getEntryForName(rc.getName());
+      if (spec == null || spec.getCustom() == null) continue;
+      hasAtLeastOneReactantAndProduct = true;
+      break;
+    }
+    
+    if (!hasAtLeastOneReactantAndProduct) return false;
+    return true;
   }
   
   /**

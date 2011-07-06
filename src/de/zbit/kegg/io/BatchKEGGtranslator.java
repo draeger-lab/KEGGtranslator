@@ -237,6 +237,9 @@ public class BatchKEGGtranslator {
 		case GIF:
 			translator = KEGG2yGraph.createKEGG2GIF(manager);
 			break;
+//    case SVG:
+//      translator = KEGG2yGraph.createKEGG2SVG(manager);
+//      break;
 		case YGF:
 			translator = KEGG2yGraph.createKEGG2YGF(manager);
 			break;
