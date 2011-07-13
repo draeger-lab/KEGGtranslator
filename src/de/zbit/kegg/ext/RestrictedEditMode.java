@@ -231,7 +231,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       String kgId = TranslatorTools.getKeggIDs(n);
       if (kgId.toLowerCase().startsWith("path:")) {
         int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
-          Translator.APPLICATION_NAME, new String[]{"Yes", "No"});
+          Translator.APPLICATION_NAME, new Object[]{"Yes", "No"});
         if (ret==0) {
           ActionEvent e = new ActionEvent(kgId.trim().substring(5).toLowerCase(), JOptionPane.OK_OPTION, OPEN_PATHWAY);
           aListener.actionPerformed(e);

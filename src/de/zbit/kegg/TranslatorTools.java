@@ -33,6 +33,7 @@ import y.base.Graph;
 import y.base.Node;
 import y.base.NodeMap;
 import y.view.Graph2D;
+import y.view.LineType;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.gui.TranslatorPanel;
 import de.zbit.kegg.io.KEGG2yGraph;
@@ -81,6 +82,27 @@ public class TranslatorTools {
       }
     }
     
+  }
+  
+  /**
+   * Draws the frame and caption of all nodes, containing the given
+   * string in the nodeLabel tag red. Blackens all other frames and
+   * labels.
+   * @param containedString
+   */
+  public void searchGenes(String containedString) {
+    containedString = containedString.toLowerCase();
+    for (Node n: graph.getNodeArray()) {
+      Color color = Color.BLACK;
+      LineType lt = LineType.LINE_1;
+      if (getNodeInfoIDs(n, "nodeLabel").toLowerCase().contains(containedString)) {
+        color = Color.RED;
+        lt = LineType.LINE_2;
+      }
+      graph.getRealizer(n).setLineColor(color);
+      graph.getRealizer(n).setLineType(lt);
+      graph.getRealizer(n).getLabel().setTextColor(color);
+    }
   }
 
   /**
@@ -165,6 +187,23 @@ public class TranslatorTools {
     Object id = nodeMap.get(n);
     return id!=null?id.toString():null;
     
+  }
+  
+  /**
+   * Returns the organism kegg abbreviation from a graph.
+   * @param graph
+   * @return e.g. "ko" or "hsa",...
+   */
+  public static String getOrganismKeggAbbrFromGraph(Graph2D graph) {
+    
+    for (Node n: graph.getNodeArray()) {
+      String id = getKeggIDs(n).toLowerCase().trim();
+      if (id.contains(":")) {
+        return id.substring(0, id.indexOf(':'));
+      }
+    }
+    
+    return null;
   }
 
   /**
