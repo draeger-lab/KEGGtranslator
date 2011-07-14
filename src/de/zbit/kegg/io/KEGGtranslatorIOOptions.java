@@ -83,7 +83,16 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 		/**
 		 * 
 		 */
-		YGF;
+		YGF,
+		/**
+		 * This required the corresponding ySVG extension from yFiles. It's free
+		 * but large and thus, by default not included. But the functionality is
+		 * fully included. Thus, if you want SVG, include the libraries and simply
+		 * uncomment the next item and the SVG part in 
+		 * {@link BatchKEGGtranslator#getTranslator(Format, KeggInfoManagement)}
+		 */
+		//SVG
+		;
 	}
 	
 	/*

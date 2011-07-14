@@ -29,6 +29,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -40,6 +41,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -67,6 +70,8 @@ import y.view.Graph2DSelectionListener;
 import y.view.Graph2DView;
 import y.view.HitInfo;
 import y.view.NavigationComponent;
+import y.view.NodeLabel;
+import y.view.NodeRealizer;
 import y.view.Overview;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.SystemBrowser;
@@ -501,6 +506,59 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     tm.addColumn("", content.toArray());
     propTable.setModel(tm);
 
+  }
+  
+  /**
+   * Automatically adjust node size to fit the node label.
+   * @param realizer
+   * @param view
+   */
+  public static void adjustNodeSize(NodeRealizer realizer, Graph2DView view) {
+    NodeLabel label = realizer.getLabel();
+    int INDENTATION = 5;
+    
+    if (view.getGraphics()==null) {
+      System.err.println("Cannot adjust node size on unknown graphics object.");
+      return;
+    }
+    
+    FontMetrics fm;
+    if (label.getFont()!=null) {
+      fm = view.getGraphics().getFontMetrics(label.getFont());
+    } else {
+      fm = view.getGraphics().getFontMetrics();
+    }
+    
+    String labelText = label.getText();
+
+    //find max needed width
+    Pattern pat = Pattern.compile("(.*)", Pattern.MULTILINE);
+    Matcher matcher = pat.matcher(labelText);
+    int maxWidth = 0;
+    while (matcher.find()) {
+      String currentLine = matcher.group();
+      int currentWidth = fm.stringWidth(currentLine);
+      if (currentWidth > maxWidth) {
+        maxWidth = currentWidth;
+      }
+    }
+    if (maxWidth > 0) {
+      realizer.setWidth(maxWidth + 2 * INDENTATION);
+    } else {//fallback width if no label is set
+      realizer.setWidth(view.getGraph2D().getDefaultNodeRealizer().getWidth());
+    }
+
+    //find max needed height
+    int lineCount = 1;
+    for (Matcher m = Pattern.compile("\n").matcher(labelText); m.find();) {
+      lineCount++;
+    }
+    int lineHeight = fm.getHeight();
+    if (labelText.length() > 0) {
+      realizer.setHeight(lineHeight * lineCount + 2 * INDENTATION);
+    } else {//fallback height if no label is set
+      realizer.setHeight(view.getGraph2D().getDefaultNodeRealizer().getHeight());
+    }
   }
 
   /**

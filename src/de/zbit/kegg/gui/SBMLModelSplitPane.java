@@ -38,8 +38,8 @@ import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
-import org.sbml.jsbml.SBaseChangedEvent;
-import org.sbml.jsbml.SBaseChangedListener;
+import org.sbml.jsbml.util.SBaseChangedEvent;
+import org.sbml.jsbml.util.SBaseChangedListener;
 
 import de.zbit.gui.GUITools;
 

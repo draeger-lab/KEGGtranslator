@@ -1465,7 +1465,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   /**
    * @param document
    * @param path
-   * @param format
+   * @param format output file extension, e.g., "gif", "graphml", "gml", "jpg",...
    * @throws Exception 
    */
   public void writeToFile(Graph2D graph, String outFile, String format) throws Exception {

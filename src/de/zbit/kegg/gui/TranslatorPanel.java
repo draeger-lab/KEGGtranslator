@@ -34,6 +34,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -501,15 +502,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
       ff.add(SBFileFilter.createTeXFileFilter());
       ff.add(SBFileFilter.createPDFFileFilter());
     } else if (isGraphML()){
-      ff.add(SBFileFilter.createGraphMLFileFilter());
-      ff.add(SBFileFilter.createGMLFileFilter());
-      ff.add(SBFileFilter.createJPEGFileFilter());        
-      ff.add(SBFileFilter.createGIFFileFilter());
-      ff.add(SBFileFilter.createYGFFileFilter());
-      ff.add(SBFileFilter.createTGFFileFilter());
-      if (KEGG2yGraph.isSVGextensionInstalled()) {
-        ff.add(SBFileFilter.createSVGFileFilter());
-      }
+      ff.addAll(getGraphMLfilefilter());
       for (int i=0; i<ff.size(); i++) {
         if (((SBFileFilter)ff.get(i)).getExtension().toLowerCase().startsWith(this.outputFormat.toString().toLowerCase())) {
           ff.addFirst(ff.remove(i));
@@ -554,6 +547,23 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
 		}
 		return null;
   }
+
+  /**
+   * @return all available output file formats for GraphML files.
+   */
+  public static List<SBFileFilter> getGraphMLfilefilter() {
+    LinkedList<SBFileFilter> ff = new LinkedList<SBFileFilter>();
+    ff.add(SBFileFilter.createGraphMLFileFilter());
+    ff.add(SBFileFilter.createGMLFileFilter());
+    ff.add(SBFileFilter.createJPEGFileFilter());        
+    ff.add(SBFileFilter.createGIFFileFilter());
+    ff.add(SBFileFilter.createYGFFileFilter());
+    ff.add(SBFileFilter.createTGFFileFilter());
+    if (KEGG2yGraph.isSVGextensionInstalled()) {
+      ff.add(SBFileFilter.createSVGFileFilter());
+    }
+    return ff;
+  }
   
   /**
    * This does the real saving work, without checking write acces,
@@ -577,7 +587,6 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
         try {
           ((KEGG2yGraph)translator).writeToFile((Graph2D) document, file.getPath(), format);
         } catch (Exception e) {
-          e.printStackTrace();
           GUITools.showErrorMessage(this, e);
         }
       } else if (translator instanceof KEGG2jSBML){

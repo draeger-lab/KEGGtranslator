@@ -39,10 +39,10 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
-import org.sbml.jsbml.SBaseChangedEvent;
-import org.sbml.jsbml.SBaseChangedListener;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.util.SBaseChangedEvent;
+import org.sbml.jsbml.util.SBaseChangedListener;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KEGGtranslatorOptions;

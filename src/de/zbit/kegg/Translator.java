@@ -34,6 +34,7 @@ import javax.swing.SwingUtilities;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.kegg.gui.TranslatorUI;
+import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
@@ -221,6 +222,34 @@ public class Translator {
 		
 		return true;
 	}
+	
+	/**
+	 * Wrapper methods for applications including KEGGtranslator as library:
+	 * this method translates a given KGML document and returns the resulting
+	 * data structure (currently SBMLDocument or Graph2D).
+	 * @param format
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
+	public static Object translate(Format format, File in) throws IOException {
+  
+  // Check and build input
+  if (in==null || !in.canRead() || in.isDirectory()) {
+    System.err.println("Invalid or not-readable input file.");
+    return null;
+  }
+  
+  // Initiate the manager
+  KeggInfoManagement manager = getManager();
+  
+  // Check and build format
+  AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator.getTranslator(format, manager);
+  if (translator == null) return false; // Error message already issued.
+  
+  // Translate.
+  return translator.translate(in);
+}
 	
 	/**
 	 * 

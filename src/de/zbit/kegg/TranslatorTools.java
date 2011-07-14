@@ -69,19 +69,40 @@ public class TranslatorTools {
    * @param ncbiGeneIDs geneIDs to color in Red.
    */
   public void highlightGenes(Iterable<Integer> ncbiGeneIDs) {
+    highlightGenes(ncbiGeneIDs, Color.RED, Color.LIGHT_GRAY, true);
+  }
+  
+  public void highlightGenes(Iterable<Integer> ncbiGeneIDs, Color highlightColor, Color forAllOthers, boolean changeSelection) {
+    if (forAllOthers!=null) {
+      setColorOfAllNodesExceptPathwayReferences(forAllOthers);
+    }
+    if (changeSelection) graph.unselectAll();
     Map<Integer, List<Node>> id2node = getGeneID2NodeMap();
     for (Integer integer : ncbiGeneIDs) {
       List<Node> nList = id2node.get(integer);
       if (nList!=null) {
         for (Node node : nList) {
-          graph.getRealizer(node).setFillColor(Color.RED);
-          graph.getRealizer(node).setSelected(true);
+          graph.getRealizer(node).setFillColor(highlightColor);
+          if (changeSelection) {
+            graph.getRealizer(node).setSelected(true);
+          }
         }
       } else {
         log.info("Could not get a Node for " + integer);
       }
     }
-    
+  }
+  
+  /**
+   * Set a unique {@link Color} to all nodes, that are no pathway references.
+   * @param colorForUnaffectedNodes
+   */
+  public void setColorOfAllNodesExceptPathwayReferences(Color colorForUnaffectedNodes) {
+    // Set unaffected color for all other nodes but reference nodes.
+    for (Node n: graph.getNodeArray()) {
+      if (TranslatorTools.getKeggIDs(n).toLowerCase().trim().startsWith("path:")) continue;
+      graph.getRealizer(n).setFillColor(colorForUnaffectedNodes);
+    }
   }
   
   /**
@@ -212,6 +233,26 @@ public class TranslatorTools {
    */
   public static String getKeggIDs(Node n) {
     return getNodeInfoIDs(n, "keggIds");
+  }
+
+  /**
+   * Returns the node, referring to a certain pathway in the graph.
+   * Can be used to get the title node, by simply submitted the 
+   * pathwayID of the current graph as argument.
+   * @param graph
+   * @param pathwayID
+   * @return
+   */
+  public static Node getTitleNode(Graph2D graph, String pathwayID) {
+    pathwayID = pathwayID.toLowerCase().trim();
+    for (Node n: graph.getNodeArray()) {
+      String id = getKeggIDs(n).toLowerCase().trim();
+      if (id.startsWith("path:") && id.contains(pathwayID)) {
+        return n;
+      }
+    }
+    
+    return null;
   }
   
 }
