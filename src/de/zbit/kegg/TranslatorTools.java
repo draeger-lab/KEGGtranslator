@@ -157,8 +157,9 @@ public class TranslatorTools {
     for (Node n : graph.getNodeArray()) {
       Object entrezIds = entrez.get(n);
       if (entrezIds!=null && entrezIds.toString().length()>0) {
-        String[] ids = entrezIds.toString().split(",");
+        String[] ids = entrezIds.toString().split(",|\\s"); // comma or space separated.
         for (String id: ids) {
+          if (id==null || id.trim().length()<1) continue;
           try {
             // Get Node collection for gene ID
             Integer intId = Integer.parseInt(id);
