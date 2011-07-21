@@ -1151,13 +1151,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
   /**
    * Provides some direct access to KEGG2JSBML functionalities.
    * @param args
-   * @throws IOException
+   * @throws Exception 
    * @throws IllegalAccessException
    * @throws InstantiationException
    * @throws XMLStreamException
    * @throws ClassNotFoundException
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws Exception {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network
     // load and heavily reduces computation time.
     AbstractKEGGtranslator<SBMLDocument> k2s;

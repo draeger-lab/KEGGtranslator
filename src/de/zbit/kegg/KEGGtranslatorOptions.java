@@ -42,7 +42,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    * If true, remove all nodes that have no edges, before translating the pathway.
    */
   public static final Option<Boolean> REMOVE_ORPHANS = new Option<Boolean>("REMOVE_ORPHANS",Boolean.class,
-      "If true, remove all nodes that have no edges, before translating the pathway.", (short) 2, "-ro", true);
+      "If true, remove all nodes that have no edges, before translating the pathway.", (short) 2, "-ro", false);
 
   /**
    * If true, shows only short names of all KEGG entries.
@@ -54,7 +54,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    * If true, removes all gene-nodes in the KEGG document, which are white.
    */
   public static final Option<Boolean> REMOVE_WHITE_GENE_NODES = new Option<Boolean>("REMOVE_WHITE_GENE_NODES",Boolean.class,
-      "If true, removes all gene-nodes in the KEGG document, which are white.", true);
+      "If true, removes all gene-nodes in the KEGG document, which are white.", false);
 
   /**
    * If true, automatically looks for missing reactants and enzymes of reactions and adds them to the document. 

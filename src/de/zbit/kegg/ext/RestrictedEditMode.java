@@ -187,6 +187,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
         Object c = nm[i].get(n);
         if (c==null || c.toString().length()<1) continue;
         String mapDescription = mapDescriptionMap.getV(nm[i]);
+        if (mapDescription==null) continue;
         if (mapDescription.equals("nodeLabel")) {
           nodeLabel = "<b>"+c.toString().replace(",", ",<br/>")+"</b><br/>";
         } else if (mapDescription.equals("description")) {
@@ -234,7 +235,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       
       // Ask user if he wants to open the pathway and fire an event.
       String kgId = TranslatorTools.getKeggIDs(n);
-      if (kgId.toLowerCase().startsWith("path:")) {
+      if (kgId!=null && kgId.toLowerCase().startsWith("path:")) {
         int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
           Translator.APPLICATION_NAME, new Object[]{"Yes", "No"});
         if (ret==0) {
@@ -478,7 +479,12 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
           //tm.setValueAt(nm[i].get(node), (index++), 1);
           Object c = nm[i].get(node);
           if (c!=null && c.toString().length()>0) {
-            headers.add(getNiceCaption(mapDescriptionMap.getV(nm[i])));
+            String head = getNiceCaption(mapDescriptionMap.getV(nm[i]));
+            if (head==null) {
+              System.err.println("Please de-register NodeMap " + nm[i]);
+              continue;
+            }
+            headers.add(head);
             content.add(c.toString().replace(";", "; "));
           }
         }
@@ -567,7 +573,9 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    */
   private static String getNiceCaption(String v) {
     // description, type, description are being first-uppercased.
-    if (v.equals("nodeLabel")) {
+    if (v==null) {
+      return null;
+    } else if (v.equals("nodeLabel")) {
       return "All names"; // Synonyms
     } else if (v.equals("entrezIds")) {
       return "Entrez id(s)";

@@ -1361,9 +1361,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   /**
    * @param args
-   * @throws IOException 
+   * @throws Exception 
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws Exception {
     KeggInfoManagement manager;
     if (new File(Translator.cacheFileName).exists()
         && new File(Translator.cacheFileName).length() > 1) {

@@ -26,9 +26,14 @@
 package de.zbit.kegg.ext;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import y.base.DataMap;
+import y.base.EdgeMap;
+import y.base.Graph;
+import y.base.NodeMap;
 
 /**
  * yFiles extension to remember the name of a Map, such that
@@ -107,6 +112,48 @@ public class GenericDataMap<K, V> implements DataMap {
     this.mapName = mapName;
   }
   
+  /**
+   * @return creates a reversed copy of the current map and returns the map.
+   */
+  public Map<V, K> createReverseMap() {
+    return reverseCopy().kv;
+  }
+  
+  /**
+   * @return creates a reversed copy of this map.
+   */
+  public GenericDataMap<V, K> reverseCopy() {
+    GenericDataMap<V, K> ret = new GenericDataMap<V, K>(this.mapName);
+    for (Entry<K, V> e : kv.entrySet()) {
+      ret.set(e.getValue(), e.getKey());
+    }
+    return ret;
+  }
+  
+  /**
+   * Remove all {@link DataMap}s with a value that equals the
+   * given <code>value</code>.
+   * @param value
+   * @return true if at least ony map has been removed.
+   */
+  public boolean removeMap(String value, Graph graph) {
+    boolean removed = false; // at least one removed entry.
+    Iterator<Entry<K, V>> it = kv.entrySet().iterator();
+    while (it.hasNext()) {
+      Entry<K, V> e = it.next();
+      if (e.getValue().equals(value)) {
+        it.remove();
+        // inform graph about changes / de-register maps.
+        if (e.getKey() instanceof NodeMap) {
+          graph.disposeNodeMap((NodeMap) e.getKey());
+        } else if (e.getKey() instanceof EdgeMap) {
+          graph.disposeEdgeMap((EdgeMap) e.getKey());
+        }
+        removed=true;
+      }
+    }
+    return removed;
+  }
   
   
   

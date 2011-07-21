@@ -29,6 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import y.base.DataMap;
+import y.base.Edge;
+import y.base.EdgeMap;
 import y.base.Graph;
 import y.base.Node;
 import y.base.NodeMap;
@@ -50,7 +52,14 @@ public class TranslatorTools {
   /**
    * A graph on which operations are performed.
    */
-  Graph2D graph;
+  private Graph2D graph;
+  
+  /**
+   * A reverse map of {@link Graph#getDataProvider(Object)} where Object is
+   * {@link KEGG2yGraph#mapDescription}.
+   * <p>In other words, returns directly the map for, e.g. "entrezIds"
+   */
+  private Map<String, DataMap> descriptor2Map=null;
   
   public TranslatorTools(TranslatorPanel tp){
     this(tp.isGraphML()?(Graph2D) tp.getDocument():null);
@@ -60,6 +69,13 @@ public class TranslatorTools {
     super();
     this.graph=graph;
     if (this.graph==null) log.warning("Graph is null!");
+    init();
+  }
+  
+  @SuppressWarnings("unchecked")
+  private void init() {
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
+    descriptor2Map = mapDescriptionMap.createReverseMap();
   }
   
   
@@ -125,6 +141,14 @@ public class TranslatorTools {
       graph.getRealizer(n).getLabel().setTextColor(color);
     }
   }
+  
+  /**
+   * @param descriptor e.g., "keggIds" or "entrezIds". See {@link KEGG2yGraph} for a complete list.
+   * @return map for the descriptor.
+   */
+  public DataMap getMap(String descriptor) {
+    return descriptor2Map.get(descriptor);
+  }
 
   /**
    * Return a map from Entrez GeneID to corresponding {@link Node} for the given
@@ -132,22 +156,21 @@ public class TranslatorTools {
    * @param graph
    * @return map from geneID to List of nodes.
    */
-  @SuppressWarnings("unchecked")
   public Map<Integer, List<Node>> getGeneID2NodeMap() {
     // Build a map from GeneID 2 Node
     Map<Integer, List<Node>> id2node = new HashMap<Integer, List<Node>>();
     
     // Get the NodeMap from entrez 2 node.
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
-    NodeMap entrez = null;
-    if (mapDescriptionMap==null) return null;
-    for (int i=0; i<graph.getRegisteredNodeMaps().length; i++) {
-      NodeMap nm = graph.getRegisteredNodeMaps()[i];
-      if (mapDescriptionMap.getV(nm).equals("entrezIds")) {
-        entrez = nm;
-        break;
-      }
-    }
+//    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
+    NodeMap entrez = (NodeMap) descriptor2Map.get("entrezIds"); //null;
+//    if (mapDescriptionMap==null) return null;
+//    for (int i=0; i<graph.getRegisteredNodeMaps().length; i++) {
+//      NodeMap nm = graph.getRegisteredNodeMaps()[i];
+//      if (mapDescriptionMap.getV(nm).equals("entrezIds")) {
+//        entrez = nm;
+//        break;
+//      }
+//    }
     if (entrez==null) {
       log.severe("Could not find Node2EntrezID mapping.");
       return null;
@@ -208,8 +231,46 @@ public class TranslatorTools {
     // return kegg id(s)
     Object id = nodeMap.get(n);
     return id!=null?id.toString():null;
-    
   }
+  
+  /**
+   * Actually, a faster and more generic version of {@link #getNodeInfoIDs(Node, String)}.
+   * @param node_or_edge and {@link Node} or {@link Edge}
+   * @param descriptor a descriptor for a {@link NodeMap} or {@link EdgeMap} in the current
+   * {@link #graph}.
+   * @return the requested information or null, if not available.
+   */
+  public String getInfo(Object node_or_edge, String descriptor) {
+    // Get the NodeMap from kegg 2 node.
+    DataMap nodeMap = descriptor2Map.get(descriptor);
+    if (nodeMap==null) {
+      log.severe("Could not find Node2" + descriptor==null?"null":descriptor + " mapping.");
+      return null;
+    }
+    
+    // return kegg id(s)
+    Object id = nodeMap.get(node_or_edge);
+    return id!=null?id.toString():null;
+  }
+  
+  /**
+   * Set information to a map, contained in the current {@link #graph}.
+   * @param node_or_edge any node or edge
+   * @param descriptor descriptor of the map (e.g. "entrezIds")
+   * @param value value to set.
+   */
+  public void setInfo(Object node_or_edge, String descriptor, Object value) {
+    // Get the NodeMap from kegg 2 node.
+    DataMap nodeMap = descriptor2Map.get(descriptor);
+    if (nodeMap==null) {
+      log.severe("Could not find Node2" + (descriptor==null?"null":descriptor) + " mapping.");
+      return;
+    }
+    
+    // return kegg id(s)
+    nodeMap.set(node_or_edge, value);
+  }
+  
   
   /**
    * Returns the organism kegg abbreviation from a graph.

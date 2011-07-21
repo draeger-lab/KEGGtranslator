@@ -376,7 +376,12 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
 	public OutputFormat translate(File f) throws IOException {
 		if (f.exists() && f.isFile() && f.canRead()) {
-			List<Pathway> l = KeggParser.parse(f.getAbsolutePath());
+			List<Pathway> l;
+      try {
+        l = KeggParser.parse(f.getAbsolutePath());
+      } catch (Exception e) {
+        throw new IOException(String.format("Cannot translate input file %s.", f.getAbsolutePath()), e);
+      }
 			if (l.size() > 0) {
 				Pathway p = l.get(0);
 				OutputFormat doc = translate(p);
