@@ -592,10 +592,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         NodeLabel nl = new NodeLabel(name);
         
         // one of "rectangle, circle, roundrectangle, line, other"
-        boolean addThisNodeToGorupNodeList=false;
+        boolean addThisNodeToGroupNodeList=false;
         if (isGroupNode(e)) {
           groupNodeChildren.add(e.getComponents());
-          addThisNodeToGorupNodeList = true;
+          addThisNodeToGroupNodeList = true;
           
           
           // New Text
@@ -671,7 +671,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         
         
         n = graph.createNode(nr);
-        if (addThisNodeToGorupNodeList) {
+        if (addThisNodeToGroupNodeList) {
           hm.convertToGroupNode(n);
           parentGroupNodes.add(n);
         }
@@ -816,10 +816,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
         graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
         
-        // Set hirarchie
+        // Set hierarchy
         hm.setParentNode(nl, parentGroupNodes.get(i));
         
-        // Reposition group node to fit content (2nd time is neccessary. Maybe yFiles bug...)
+        // Reposition group node to fit content (2nd time is necessary. Maybe yFiles bug...)
         graph.setLocation(parentGroupNodes.get(i), x-offset, y-offset-14);
         graph.setSize(parentGroupNodes.get(i), width-x+2*offset, height-y+2*offset+11);
       }
@@ -1251,7 +1251,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       String t = g.getLabelText(n);
       // Convert "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
       if (removeSpeciesTitles && t.contains("-")) {
-        t = t.substring(0, t.indexOf("-")-1);
+        t = t.substring(0, t.lastIndexOf("-")-1);
         g.setLabelText(n, t);
         if (nodeName!=null) nodeName.set(n, t);
       }

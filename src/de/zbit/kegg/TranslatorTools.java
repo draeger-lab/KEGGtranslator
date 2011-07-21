@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import y.base.DataMap;
 import y.base.Edge;
@@ -60,6 +61,13 @@ public class TranslatorTools {
    * <p>In other words, returns directly the map for, e.g. "entrezIds"
    */
   private Map<String, DataMap> descriptor2Map=null;
+  
+  /**
+   * Static String for the <code>type</code> {@link NodeMap} of the {@link #graph}
+   * to be used for, e.g. microRNAs.
+   */
+  public final static String RNA_TYPE = "RNA";
+  
   
   public TranslatorTools(TranslatorPanel tp){
     this(tp.isGraphML()?(Graph2D) tp.getDocument():null);
@@ -149,6 +157,58 @@ public class TranslatorTools {
   public DataMap getMap(String descriptor) {
     return descriptor2Map.get(descriptor);
   }
+  
+  /**
+   * @return a map from nodeLabel (microRNA_name Uppercased and trimmed) to the actual node.
+   */
+  public Map<String, Node> getRNA2NodeMap() {
+
+    // Build a map from GeneID 2 Node
+    Map<String, Node> mi2node = new HashMap<String, Node>();
+
+    NodeMap typeMap = (NodeMap) getMap("type");
+    NodeMap labelMap = (NodeMap) getMap("nodeLabel");
+    if (typeMap==null || labelMap==null) {
+      log.severe(String.format("Could not find %s %s mapping.", typeMap==null?"type":"", labelMap==null?"label":""));
+      return mi2node; // return an empty map.
+    }
+    
+    // build the resulting map
+    for (Node n : graph.getNodeArray()) {
+      Object type = typeMap.get(n);
+      if (type!=null && type.equals(RNA_TYPE)) {
+        Object label = labelMap.get(n);
+        if (label==null) continue;
+        mi2node.put(label.toString().toUpperCase().trim(), n);
+      }
+    }
+    
+    return mi2node;
+  }
+  
+  /**
+   * @return true if and only if the underlying graph contains any nodes
+   * of type {@link #RNA_TYPE}.
+   */
+  public boolean containsRNAnodes() {
+
+    // Get Type map
+    NodeMap typeMap = (NodeMap) getMap("type");
+    if (typeMap==null) {
+      log.severe(String.format("Could not find %s mapping.", typeMap==null?"type":""));
+      return false;
+    }
+    
+    // Check all nodes
+    for (Node n : graph.getNodeArray()) {
+      Object type = typeMap.get(n);
+      if (type!=null && type.equals(RNA_TYPE)) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
 
   /**
    * Return a map from Entrez GeneID to corresponding {@link Node} for the given
@@ -210,6 +270,7 @@ public class TranslatorTools {
    */
   @SuppressWarnings("unchecked")
   public static String getNodeInfoIDs(Node n, String descriptor) {
+    if (n==null || n.getGraph()==null) return null;
     Graph graph = n.getGraph();
     
     // Get the NodeMap from kegg 2 node.
@@ -315,6 +376,37 @@ public class TranslatorTools {
     }
     
     return null;
+  }
+
+  /**
+   * @return the currently underlying {@link Graph2D} of this tools instance.
+   */
+  public Graph2D getGraph() {
+    return graph;
+  }
+
+  /**
+   * Resets the layout to the information stored in the nodes. Usually
+   * this is the layout as given directly by kegg. Only affects X and Y
+   * positions, NOT width and height of nodes.
+   * @param graph2
+   */
+  public void resetLayout() {
+    DataMap nodeMap = descriptor2Map.get("nodePosition");
+    if (nodeMap==null) {
+      log.severe("Could not find original node positions.");
+      return;
+    }
+    
+    String splitBy = Pattern.quote("|");
+    for (Node n: graph.getNodeArray()) {
+      Object pos = nodeMap.get(n);
+      if (pos==null) continue;
+      // pos is always X|Y
+      String[] XY = pos.toString().split(splitBy);
+      graph.getRealizer(n).setX(Integer.parseInt(XY[0]));
+      graph.getRealizer(n).setY(Integer.parseInt(XY[1]));
+    }
   }
   
 }

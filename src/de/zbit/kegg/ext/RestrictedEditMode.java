@@ -55,8 +55,6 @@ import javax.swing.JViewport;
 import javax.swing.ToolTipManager;
 import javax.swing.table.DefaultTableModel;
 
-import org.sbml.jsbml.util.StringTools;
-
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.EdgeMap;
@@ -83,7 +81,7 @@ import de.zbit.util.EscapeChars;
 import de.zbit.util.StringUtil;
 
 /**
- * An edit mode for y Files, that allow no creating of new Nodes or edges.
+ * An edit mode for yFiles, that allows no creation of new nodes or edges.
  * 
  * <p><i>Note:<br/>
  * Due to yFiles license requirements, we have to obfuscate this class
@@ -115,8 +113,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
   ActionListener aListener = null;
   
   /**
-   * This is the ActionCommand for actionlisteners to open a new pathway tab.
-   * TODO
+   * This is the ActionCommand for {@link ActionListener}s to open a new pathway tab.
    */
   public final static String OPEN_PATHWAY = "OPEN_PATHWAY";
   
@@ -132,7 +129,8 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
   }
   
   /**
-   * @param listener this is used to fire TODO
+   * @param listener this is used to fire an action with command {@link #OPEN_PATHWAY}
+   * if the user double clicked a pathway reference node.
    */
   public RestrictedEditMode(ActionListener listener) {
     this();
@@ -597,6 +595,6 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       return "Interaction type";
       
     } else
-      return StringTools.firstLetterUpperCase(v);
+      return StringUtil.firstLetterUpperCase(v);
   }
 }

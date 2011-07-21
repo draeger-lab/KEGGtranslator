@@ -471,7 +471,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     for (String name2: names) {
       // E.g. 308800 has name "Tyr, C" and "C" is not that helpful
       // => At least 2 digits in name and shortest one.
-      if (name2.length()>1 && name2.length()<name.length()) {
+      if (name2!=null && name2.trim().length()>1 && name2.length()<name.length()) {
         name = name2;
       }
     }

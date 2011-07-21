@@ -55,6 +55,7 @@ import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 import org.sbml.tolatex.io.LaTeXOptionsIO;
 
+import y.view.DefaultGraph2DRenderer;
 import y.view.EditMode;
 import y.view.Graph2D;
 import y.view.Graph2DView;
@@ -160,7 +161,13 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
     final SwingWorker<String, Void> downloadWorker = new SwingWorker<String, Void>() {
       @Override
       protected String doInBackground() throws Exception {
-        return KGMLSelectAndDownload.downloadPathway(pathwayID, false);
+        try {
+          return KGMLSelectAndDownload.downloadPathway(pathwayID, false);
+        } catch (Exception e) {
+          // Mostly 1) pathway does not exists for organism or 2) no connection to server
+          GUITools.showErrorMessage(null, e);
+          return null;
+        }
       }
       protected void done() {
         String localFile=null;
@@ -235,7 +242,13 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
           final SwingWorker<String, Void> downloadWorker = new SwingWorker<String, Void>() {
             @Override
             protected String doInBackground() throws Exception {
-              return KGMLSelectAndDownload.evaluateOKButton(selector);
+              try {
+                return KGMLSelectAndDownload.evaluateOKButton(selector);
+              } catch (Exception e) {
+                // Mostly 1) pathway does not exists for organism or 2) no connection to server
+                GUITools.showErrorMessage(null, e);
+                return null;
+              }
             }
             protected void done() {
               String localFile=null;
@@ -342,6 +355,12 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
           // Create a new visualization of the model.
           Graph2DView pane = new Graph2DView((Graph2D) document);
           add(pane);
+          
+          // Important to draw nodes last, edges should be BELOW nodes.
+          if (pane.getGraph2DRenderer() instanceof DefaultGraph2DRenderer ){
+            ((DefaultGraph2DRenderer) pane.getGraph2DRenderer()).setDrawEdgesFirst(true);
+          }
+          
           
           /*
            * Get settings to control visualization behaviour
