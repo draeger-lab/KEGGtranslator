@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -35,8 +36,12 @@ import y.base.EdgeMap;
 import y.base.Graph;
 import y.base.Node;
 import y.base.NodeMap;
+import y.layout.organic.SmartOrganicLayouter;
 import y.view.Graph2D;
+import y.view.Graph2DLayoutExecutor;
 import y.view.LineType;
+import y.view.NodeRealizer;
+import y.view.Selections;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.gui.TranslatorPanel;
 import de.zbit.kegg.io.KEGG2yGraph;
@@ -82,6 +87,10 @@ public class TranslatorTools {
   
   @SuppressWarnings("unchecked")
   private void init() {
+    if (graph==null) {
+      descriptor2Map=null;
+      return;
+    }
     GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
     descriptor2Map = mapDescriptionMap.createReverseMap();
   }
@@ -161,10 +170,10 @@ public class TranslatorTools {
   /**
    * @return a map from nodeLabel (microRNA_name Uppercased and trimmed) to the actual node.
    */
-  public Map<String, Node> getRNA2NodeMap() {
+  public Map<String, List<Node>> getRNA2NodeMap() {
 
     // Build a map from GeneID 2 Node
-    Map<String, Node> mi2node = new HashMap<String, Node>();
+    Map<String, List<Node>> mi2node = new HashMap<String, List<Node>>();
 
     NodeMap typeMap = (NodeMap) getMap("type");
     NodeMap labelMap = (NodeMap) getMap("nodeLabel");
@@ -179,7 +188,18 @@ public class TranslatorTools {
       if (type!=null && type.equals(RNA_TYPE)) {
         Object label = labelMap.get(n);
         if (label==null) continue;
-        mi2node.put(label.toString().toUpperCase().trim(), n);
+        String key = label.toString().toUpperCase().trim();
+        
+        // Get list, associated with node label
+        List<Node> list = mi2node.get(key);
+        if (list==null) {
+          list = new LinkedList<Node>();
+          mi2node.put(key, list);
+        }
+        
+        // Add node to list.
+        list.add(n);
+        
       }
     }
     
@@ -385,6 +405,64 @@ public class TranslatorTools {
     return graph;
   }
 
+
+  /**
+   * Layout the freshly added nodes.
+   * @param newNodes nodes to layout
+   */
+  public void layoutNodeSubset(Set<Node> newNodes) {
+    layoutNodeSubset(newNodes, false);
+  }
+  public void layoutNodeSubset(Set<Node> newNodes, boolean strict) {
+    if (newNodes==null || newNodes.size()<1) return;
+    
+    // Create a selection map that contains all new nodes.
+    NodeMap dp = Selections.createSelectionNodeMap(graph);
+    for (Node n : graph.getNodeArray()) {
+      dp.setBool(n, newNodes.contains(n));
+    }
+    graph.addDataProvider(SmartOrganicLayouter.NODE_SUBSET_DATA, dp);
+    
+    // Remember group node sizes and insets
+//    GroupLayoutConfigurator glc = new GroupLayoutConfigurator(graph);
+//    glc.prepareAll();
+    
+    // Create layouter and perform layout
+    SmartOrganicLayouter layouter = new SmartOrganicLayouter();
+    layouter.setScope(SmartOrganicLayouter.SCOPE_SUBSET);
+    // If SmartComponentLayoutEnabled is true, all new nodes will
+    // simply be put one above the other. If false, they are lyouted
+    // nicely, BUT orphans are being moved, too :-(
+//    layouter.setSmartComponentLayoutEnabled(true);
+    layouter.setSmartComponentLayoutEnabled(strict);
+    layouter.setNodeOverlapsAllowed(newNodes.size()>30);
+    layouter.setConsiderNodeLabelsEnabled(true);
+    
+//    OrganicLayouter layouter = new OrganicLayouter();
+//    layouter.setSphereOfAction(OrganicLayouter.ONLY_SELECTION);
+    
+    Graph2DLayoutExecutor l = new Graph2DLayoutExecutor();
+    l.doLayout(graph, layouter);
+    
+    // Write initial position to node annotations
+    for (Node n:newNodes) {
+      NodeRealizer nr = graph.getRealizer(n);
+      this.setInfo(n, "nodePosition", (int) nr.getX() + "|" + (int) nr.getY());
+      
+      // Paint above other nodes.
+      graph.moveToLast(n);
+    }
+    
+    // Restore group node sizes and insets
+//    glc.restoreAll();
+    
+    // remove selection map after layouting.
+    graph.removeDataProvider(SmartOrganicLayouter.NODE_SUBSET_DATA);
+    
+    // Reset layout, because subset scope doesn't work correctly.
+    new TranslatorTools(graph).resetLayout();
+  }
+  
   /**
    * Resets the layout to the information stored in the nodes. Usually
    * this is the layout as given directly by kegg. Only affects X and Y

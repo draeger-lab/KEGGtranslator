@@ -473,7 +473,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @param nl
    * @param changeCaption - null if you don't want to change the caption.
    */
-  private static NodeRealizer setupGroupNode(NodeLabel nl, String changeCaption) {
+  public static NodeRealizer setupGroupNode(NodeLabel nl, String changeCaption) {
     GroupNodeRealizer nr = new GroupNodeRealizer();
     ((GroupNodeRealizer)nr).setGroupClosed(false);
     nr.setTransparent(true);
@@ -1062,6 +1062,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Shorten name
     if (showShortNames) {
+      // XXX: Name is currently only assigned based on xml-graphics name. 
+      // - Enhance node label by include nodeLabel map and split this
+      // - Infere node type and remove organism from MAP.
       graph = modifyNodeLabels(graph,nodeName,false,true);
     }
     
@@ -1249,6 +1252,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   public static Graph2D modifyNodeLabels(Graph2D g, NodeMap nodeName, boolean removeSpeciesTitles, boolean removeMultipleNodeNames) {
     for (y.base.Node n:g.getNodeArray()) {
       String t = g.getLabelText(n);
+      
       // Convert "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
       if (removeSpeciesTitles && t.contains("-")) {
         t = t.substring(0, t.lastIndexOf("-")-1);

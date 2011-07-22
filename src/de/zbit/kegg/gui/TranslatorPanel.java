@@ -431,6 +431,12 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
     }
   }
   
+  /**
+   * @return the input file of this panel.
+   */
+  public File getInputFile() {
+    return inputFile;
+  }
   
   /**
    * Create and display a temporary loading panel with the given message and a
@@ -696,6 +702,13 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
    */
   public Object getDocument() {
     return document;
+  }
+  
+  /**
+   * @return true if and only if a translated pathway is stored in this class.
+   */
+  public boolean isReady() {
+    return document!=null;
   }
 
   /**
