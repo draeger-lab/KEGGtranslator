@@ -22,9 +22,11 @@ package de.zbit.kegg;
 
 import java.awt.Color;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +45,7 @@ import y.view.LineType;
 import y.view.NodeRealizer;
 import y.view.Selections;
 import de.zbit.kegg.ext.GenericDataMap;
+import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.gui.TranslatorPanel;
 import de.zbit.kegg.io.KEGG2yGraph;
 
@@ -145,11 +148,18 @@ public class TranslatorTools {
    * @param containedString
    */
   public void searchGenes(String containedString) {
+    // TODO: instead of globally resetting Border color and thickness,
+    // remember highlighted nodes in graph and remove highlighting
+    // prior to a new search.
+    // Also try to somehow remember old color and thickness and restore
+    // bzw. set thickness to math.max([2], currentThickness).
     containedString = containedString.toLowerCase();
     for (Node n: graph.getNodeArray()) {
       Color color = Color.BLACK;
       LineType lt = LineType.LINE_1;
-      if (getNodeInfoIDs(n, "nodeLabel").toLowerCase().contains(containedString)) {
+      // Check actual label and "all names" (label map).
+      if (graph.getLabelText(n).toLowerCase().contains(containedString) ||
+          getNodeInfoIDs(n, GraphMLmaps.NODE_LABEL).toLowerCase().contains(containedString)) {
         color = Color.RED;
         lt = LineType.LINE_2;
       }
@@ -160,7 +170,8 @@ public class TranslatorTools {
   }
   
   /**
-   * @param descriptor e.g., "keggIds" or "entrezIds". See {@link KEGG2yGraph} for a complete list.
+   * @param descriptor e.g., "keggIds" or "entrezIds".
+   * <p>See {@link GraphMLmaps} for a complete list.
    * @return map for the descriptor.
    */
   public DataMap getMap(String descriptor) {
@@ -168,17 +179,45 @@ public class TranslatorTools {
   }
   
   /**
+   * Get a reverse map for the <code>descriptor</code>. This means,
+   * descriptor object to List of nodes with this descriptor.
+   * <p>Key is an Object, Value is a <pre>List<Node></pre>
+   * @param descriptor
+   * @return
+   */
+  public Map<Object, List<Node>> getReverseMap(String descriptor) {
+    DataMap dm = getMap(descriptor);
+    if (dm==null) return null;
+    
+    Map<Object, List<Node>> revMap = new HashMap<Object, List<Node>>();
+    Node[] arr = graph.getNodeArray();
+    for (Node n: arr) {
+      Object o = dm.get(n);
+      if (o==null) continue;
+      List<Node> list = revMap.get(o);
+      if (list==null) {
+        list = new LinkedList<Node>();
+        revMap.put(o, list);
+      }
+      list.add(n);
+    }
+    
+    return revMap;
+  }
+  
+  /**
    * @return a map from nodeLabel (microRNA_name Uppercased and trimmed) to the actual node.
    */
+  @Deprecated
   public Map<String, List<Node>> getRNA2NodeMap() {
 
     // Build a map from GeneID 2 Node
     Map<String, List<Node>> mi2node = new HashMap<String, List<Node>>();
 
-    NodeMap typeMap = (NodeMap) getMap("type");
-    NodeMap labelMap = (NodeMap) getMap("nodeLabel");
+    NodeMap typeMap = (NodeMap) getMap(GraphMLmaps.NODE_TYPE);
+    NodeMap labelMap = (NodeMap) getMap(GraphMLmaps.NODE_LABEL);
     if (typeMap==null || labelMap==null) {
-      log.severe(String.format("Could not find %s %s mapping.", typeMap==null?"type":"", labelMap==null?"label":""));
+      log.severe(String.format("Could not find %s %s mapping.", (typeMap==null?"type":""), (labelMap==null?"label":"")));
       return mi2node; // return an empty map.
     }
     
@@ -213,9 +252,9 @@ public class TranslatorTools {
   public boolean containsRNAnodes() {
 
     // Get Type map
-    NodeMap typeMap = (NodeMap) getMap("type");
+    NodeMap typeMap = (NodeMap) getMap(GraphMLmaps.NODE_TYPE);
     if (typeMap==null) {
-      log.severe(String.format("Could not find %s mapping.", typeMap==null?"type":""));
+      log.severe(String.format("Could not find %s mapping.", (typeMap==null?"type":"")));
       return false;
     }
     
@@ -242,11 +281,11 @@ public class TranslatorTools {
     
     // Get the NodeMap from entrez 2 node.
 //    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
-    NodeMap entrez = (NodeMap) descriptor2Map.get("entrezIds"); //null;
+    NodeMap entrez = (NodeMap) descriptor2Map.get(GraphMLmaps.NODE_GENE_ID); //null;
 //    if (mapDescriptionMap==null) return null;
 //    for (int i=0; i<graph.getRegisteredNodeMaps().length; i++) {
 //      NodeMap nm = graph.getRegisteredNodeMaps()[i];
-//      if (mapDescriptionMap.getV(nm).equals("entrezIds")) {
+//      if (mapDescriptionMap.getV(nm).equals(GraphMLmaps.NODE_GENE_ID)) {
 //        entrez = nm;
 //        break;
 //      }
@@ -285,7 +324,7 @@ public class TranslatorTools {
   
   /**
    * @param n a node
-   * @param descriptor e.g., "keggIds" or "entrezIds". See {@link KEGG2yGraph} for a complete list.
+   * @param descriptor e.g., "keggIds" or "entrezIds". See {@link GraphMLmaps} for a complete list.
    * @return the string associated with this node.
    */
   @SuppressWarnings("unchecked")
@@ -305,7 +344,7 @@ public class TranslatorTools {
       }
     }
     if (nodeMap==null) {
-      log.severe("Could not find Node2" + descriptor==null?"null":descriptor + " mapping.");
+      log.severe(String.format("Could not find Node to %s mapping.", (descriptor==null?"null":descriptor)));
       return null;
     }
     
@@ -321,38 +360,89 @@ public class TranslatorTools {
    * {@link #graph}.
    * @return the requested information or null, if not available.
    */
-  public String getInfo(Object node_or_edge, String descriptor) {
+  public Object getInfo(Object node_or_edge, String descriptor) {
     // Get the NodeMap from kegg 2 node.
     DataMap nodeMap = descriptor2Map.get(descriptor);
     if (nodeMap==null) {
-      log.severe("Could not find Node2" + descriptor==null?"null":descriptor + " mapping.");
+      // This method is used without checking if the map has ever been set
+      // before. So this warning is really more for debugging purposes.
+      log.fine(String.format("Could not find Node to %s mapping.", (descriptor==null?"null":descriptor)));
       return null;
     }
     
     // return kegg id(s)
     Object id = nodeMap.get(node_or_edge);
-    return id!=null?id.toString():null;
+    return id!=null?id:null;
   }
   
   /**
-   * Set information to a map, contained in the current {@link #graph}.
+   * Set information to a map, contained in the current {@link #graph}. If the map given by
+   * <code>descriptor</code> does not exist, it will be created.
    * @param node_or_edge any node or edge
-   * @param descriptor descriptor of the map (e.g. "entrezIds")
+   * @param descriptor descriptor of the map (e.g. "entrezIds", see {@link GraphMLmaps})
    * @param value value to set.
    */
   public void setInfo(Object node_or_edge, String descriptor, Object value) {
-    // Get the NodeMap from kegg 2 node.
-    DataMap nodeMap = descriptor2Map.get(descriptor);
+    // Get the NodeMap for the descriptor.
+    DataMap nodeMap = getMap(descriptor);
+    if (nodeMap==null && value==null) return; // all ok. Unset in a non-existing map.
+    
     if (nodeMap==null) {
-      log.severe("Could not find Node2" + (descriptor==null?"null":descriptor) + " mapping.");
-      return;
+      // Create non-existing map automatically
+      nodeMap = createMap(descriptor, (node_or_edge instanceof Node) );
+      log.fine(String.format("Created not existing Node to %s mapping.", (descriptor==null?"null":descriptor)));
     }
     
-    // return kegg id(s)
+    // set / unset Value
     nodeMap.set(node_or_edge, value);
   }
   
+  /**
+   * Ensures that a specific map exists in this graph. Simply returns
+   * the map, if it already existed, else, the map will be created as
+   * an empty map.
+   * @param descriptor
+   * @param isNodeMap false, if and only if this should be an
+   * {@link EdgeMap}. If true, a {@link NodeMap} will be created.
+   * @return the map.
+   */
+  public DataMap ensureMapExists(String descriptor, boolean isNodeMap) {
+    // Get the NodeMap for the descriptor.
+    DataMap nodeMap = getMap(descriptor);
+    
+    if (nodeMap==null) {
+      // Create non-existing map automatically
+      nodeMap = createMap(descriptor, isNodeMap );
+      log.fine(String.format("Created not existing Node to %s mapping.", (descriptor==null?"null":descriptor)));
+    }
+    return nodeMap;
+  }
   
+  
+  /**
+   * Create a new Node- or EdgeMap in the {@link #graph}.
+   * @param descriptor descriptor for the map.
+   * @param nodeMap if true, a {@link NodeMap} will be created. Else,
+   * a {@link EdgeMap} will be created.
+   * @return the created map.
+   */
+  @SuppressWarnings("unchecked")
+  private DataMap createMap(String descriptor, boolean nodeMap) {
+    DataMap map;
+    if (nodeMap) {
+      map = graph.createNodeMap();
+    } else {
+      map = graph.createEdgeMap();
+    }
+    
+    // Add info about map also to descriptors.
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
+    mapDescriptionMap.set(map, descriptor);
+    descriptor2Map.put(descriptor, map);
+    
+    return map;
+  }
+
   /**
    * Returns the organism kegg abbreviation from a graph.
    * @param graph
@@ -375,7 +465,7 @@ public class TranslatorTools {
    * @return kegg ids, separated by a "," for the given node.
    */
   public static String getKeggIDs(Node n) {
-    return getNodeInfoIDs(n, "keggIds");
+    return getNodeInfoIDs(n, GraphMLmaps.NODE_KEGG_ID);
   }
 
   /**
@@ -447,7 +537,7 @@ public class TranslatorTools {
     // Write initial position to node annotations
     for (Node n:newNodes) {
       NodeRealizer nr = graph.getRealizer(n);
-      this.setInfo(n, "nodePosition", (int) nr.getX() + "|" + (int) nr.getY());
+      this.setInfo(n, GraphMLmaps.NODE_POSITION, (int) nr.getX() + "|" + (int) nr.getY());
       
       // Paint above other nodes.
       graph.moveToLast(n);
@@ -470,7 +560,7 @@ public class TranslatorTools {
    * @param graph2
    */
   public void resetLayout() {
-    DataMap nodeMap = descriptor2Map.get("nodePosition");
+    DataMap nodeMap = descriptor2Map.get(GraphMLmaps.NODE_POSITION);
     if (nodeMap==null) {
       log.severe("Could not find original node positions.");
       return;
@@ -485,6 +575,120 @@ public class TranslatorTools {
       graph.getRealizer(n).setX(Integer.parseInt(XY[0]));
       graph.getRealizer(n).setY(Integer.parseInt(XY[1]));
     }
+  }
+
+  /**
+   * Reset the color and label of the node to the parameters
+   * stored in the map during translation of the pathway.
+   * @param n
+   */
+  public void resetColorAndLabel(Node n) {
+    
+    // Reset Color
+    Object HTMLcolor = getInfo(n, GraphMLmaps.NODE_COLOR);
+    if (HTMLcolor!=null) {
+      try {
+        Color c = KEGG2yGraph.ColorFromHTML(HTMLcolor.toString());
+        graph.getRealizer(n).setFillColor(c);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+    // Reset name
+    Object name = getInfo(n, GraphMLmaps.NODE_NAME);
+    if (name!=null) {
+      graph.getRealizer(n).setLabelText(name.toString());
+    }
+    
+  }
+
+  /**
+   * Resets the node width and height to the values given
+   * in the original KGML.
+   * @param node
+   */
+  public void resetWidthAndHeight(Node node) {
+    // TODO: Also reset shape
+    DataMap nodeMap = descriptor2Map.get(GraphMLmaps.NODE_SIZE);
+    if (nodeMap==null) {
+      log.severe("Could not find original node sizes.");
+      return;
+    }
+    
+    String splitBy = Pattern.quote("|");
+    //for (Node node: graph.getNodeArray()) {
+    Object pos = nodeMap.get(node);
+    if (pos==null) return;//continue;
+    // pos is always Width|Height
+    String[] WH = pos.toString().split(splitBy);
+    graph.getRealizer(node).setWidth(Integer.parseInt(WH[0]));
+    graph.getRealizer(node).setHeight(Integer.parseInt(WH[1]));
+    //}
+  }
+  
+  /**
+   * Removes a data provider from the graph.
+   * @param map
+   */
+  @SuppressWarnings("unchecked")
+  public void removeMap(DataMap map) {
+    
+    // Also remove from my internal map.
+    Iterator<Entry<String, DataMap>> it = descriptor2Map.entrySet().iterator();
+    while (it.hasNext()) {
+      if (it.next().getValue().equals(map)) {
+        it.remove();
+        break;
+      }
+    }
+    
+    // Remove from description map
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
+    mapDescriptionMap.removeMapByKey(map, graph);
+    
+    // Remove from graph
+    try {
+      if (map instanceof NodeMap) {
+        graph.disposeNodeMap((NodeMap) map);
+      } else if (map instanceof EdgeMap) {
+        graph.disposeEdgeMap((EdgeMap) map);
+      }
+    } catch (IllegalStateException e) {
+      //  Map has been already disposed !
+      log.log(Level.FINE, "Could not dispose map.", e);
+    }
+    
+  }
+  
+  /**
+   * Removes a data provider from the graph.
+   * @param identifier
+   */
+  @SuppressWarnings("unchecked")
+  public void removeMap(String identifier) {
+    
+    // Also remove from my internal map.
+    DataMap item = descriptor2Map.remove(identifier);
+    
+    // Remove from description map
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
+    mapDescriptionMap.removeMap(identifier, graph);
+    
+    // Remove from graph
+    if (item!=null) {
+      try {
+        if (item instanceof NodeMap) {
+          graph.disposeNodeMap((NodeMap) item);
+        } else if (item instanceof EdgeMap) {
+          graph.disposeEdgeMap((EdgeMap) item);
+        }
+      } catch (IllegalStateException e) {
+        //  Map has been already disposed !
+        log.log(Level.FINE, "Could not dispose map.", e);
+      }
+    }
+    
   }
   
 }

@@ -79,6 +79,7 @@ import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.GenericDataMap;
+import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -518,6 +519,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     NodeMap nodeName = graph.createNodeMap();
     NodeMap nodeColor = graph.createNodeMap();
     NodeMap nodePosition = graph.createNodeMap();
+    NodeMap nodeSize = graph.createNodeMap();
     //NodeMap bindsToChemicals = graph.createNodeMap();
     
     EdgeMap edgeDescription = graph.createEdgeMap(); // = Relation.type
@@ -778,7 +780,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         nodeColor.set(n, ColorToHTML(nr.getFillColor()) );
         nodeName.set(n, nr.getLabelText());
         nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
-        
+        nodeSize.set(n, (int) nr.getWidth() + "|" + (int) nr.getHeight());
       }
       keggOntIds.set(n, e.getName().replace(" ", ","));
       if (e.getLink()!=null && e.getLink().length()!=0) nodeURLs.set(n, e.getLink());
@@ -1076,19 +1078,21 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     GenericDataMap<DataMap, String> mapDescriptionMap = new GenericDataMap<DataMap, String>(mapDescription);
     graph.addDataProvider(mapDescription, mapDescriptionMap);
     
-    mapDescriptionMap.set(nodeLabel, "nodeLabel");
-    mapDescriptionMap.set(entrezIds, "entrezIds"); // String "entrezIds" is also hardcoded in TranslatorTools.java!
-    mapDescriptionMap.set(entityType, "type");
-    mapDescriptionMap.set(nodeDescription, "description");
-    mapDescriptionMap.set(keggOntIds, "keggIds");
-    mapDescriptionMap.set(uniprotIds, "uniprotIds");
-    mapDescriptionMap.set(ensemblIds, "ensemblIds");
-    mapDescriptionMap.set(nodeURLs, "url");
-    mapDescriptionMap.set(nodeColor, "nodeColor");
-    mapDescriptionMap.set(nodeName, "nodeName");
-    mapDescriptionMap.set(nodePosition, "nodePosition");
-    mapDescriptionMap.set(edgeDescription, "description");
-    mapDescriptionMap.set(interactionDescription, "interactionType");
+    mapDescriptionMap.set(nodeLabel, GraphMLmaps.NODE_LABEL);
+    mapDescriptionMap.set(entrezIds, GraphMLmaps.NODE_GENE_ID);
+    mapDescriptionMap.set(entityType, GraphMLmaps.NODE_TYPE);
+    mapDescriptionMap.set(nodeDescription, GraphMLmaps.NODE_DESCRIPTION);
+    mapDescriptionMap.set(keggOntIds, GraphMLmaps.NODE_KEGG_ID);
+    mapDescriptionMap.set(uniprotIds, GraphMLmaps.NODE_UNIPROT_ID);
+    mapDescriptionMap.set(ensemblIds, GraphMLmaps.NODE_ENSEMBL_ID);
+    mapDescriptionMap.set(nodeURLs, GraphMLmaps.NODE_URL);
+    mapDescriptionMap.set(nodeColor, GraphMLmaps.NODE_COLOR);
+    mapDescriptionMap.set(nodeName, GraphMLmaps.NODE_NAME);
+    mapDescriptionMap.set(nodePosition, GraphMLmaps.NODE_POSITION);
+    mapDescriptionMap.set(nodeSize, GraphMLmaps.NODE_SIZE);
+    
+    mapDescriptionMap.set(edgeDescription, GraphMLmaps.EDGE_DESCRIPTION);
+    mapDescriptionMap.set(interactionDescription, GraphMLmaps.EDGE_TYPE);
     
     return graph;
   }

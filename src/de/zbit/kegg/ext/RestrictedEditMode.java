@@ -186,11 +186,11 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
         if (c==null || c.toString().length()<1) continue;
         String mapDescription = mapDescriptionMap.getV(nm[i]);
         if (mapDescription==null) continue;
-        if (mapDescription.equals("nodeLabel")) {
+        if (mapDescription.equals(GraphMLmaps.NODE_LABEL)) {
           nodeLabel = "<b>"+c.toString().replace(",", ",<br/>")+"</b><br/>";
-        } else if (mapDescription.equals("description")) {
+        } else if (mapDescription.equals(GraphMLmaps.NODE_DESCRIPTION)) {
           description = "<i>"+c.toString().replace(",", ",<br/>")+"</i><br/>";
-        } else if (mapDescription.equals("keggIds")) {
+        } else if (mapDescription.equals(GraphMLmaps.NODE_KEGG_ID)) {
           for (String s: c.toString().split(",")) {
             s=s.toUpperCase().trim();
             if (s.startsWith("PATH:")) {
@@ -477,7 +477,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
           //tm.setValueAt(nm[i].get(node), (index++), 1);
           Object c = nm[i].get(node);
           if (c!=null && c.toString().length()>0) {
-            String head = getNiceCaption(mapDescriptionMap.getV(nm[i]));
+            String mapName = mapDescriptionMap.getV(nm[i]);
+//            if (mapName==null || mapName.startsWith("_")) {
+//              // Maps starting with a "_" are marked invisible.
+//              continue;
+//            }
+            
+            String head = getNiceCaption(mapName);
             if (head==null) {
               System.err.println("Please de-register NodeMap " + nm[i]);
               continue;
@@ -497,7 +503,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
           //tm.setValueAt(eg[i].get(edge), (index++), 1);
           Object c = eg[i].get(edge);
           if (c!=null && c.toString().length()>0) {
-            headers.add(getNiceCaption(mapDescriptionMap.getV(eg[i])));
+            String mapName = mapDescriptionMap.getV(eg[i]);
+            if (mapName==null || mapName.startsWith("_")) {
+              // Maps starting with a "_" are marked invisible.
+              continue;
+            }
+            
+            headers.add(getNiceCaption(mapName));
             content.add(c.toString().replace(";", "; "));
           }
         }
@@ -573,25 +585,25 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     // description, type, description are being first-uppercased.
     if (v==null) {
       return null;
-    } else if (v.equals("nodeLabel")) {
+    } else if (v.equals(GraphMLmaps.NODE_LABEL)) {
       return "All names"; // Synonyms
-    } else if (v.equals("entrezIds")) {
+    } else if (v.equals(GraphMLmaps.NODE_GENE_ID)) {
       return "Entrez id(s)";
-    } else if (v.equals("keggIds")) {
+    } else if (v.equals(GraphMLmaps.NODE_KEGG_ID)) {
       return "Kegg id(s)";
-    } else if (v.equals("uniprotIds")) {
+    } else if (v.equals(GraphMLmaps.NODE_UNIPROT_ID)) {
       return "Uniprot id(s)";
-    } else if (v.equals("ensemblIds")) {
+    } else if (v.equals(GraphMLmaps.NODE_ENSEMBL_ID)) {
       return "Ensembl id(s)";
-    } else if (v.equals("url")) {
+    } else if (v.equals(GraphMLmaps.NODE_URL)) {
       return "URL";
-    } else if (v.equals("nodeColor")) {
+    } else if (v.equals(GraphMLmaps.NODE_COLOR)) {
       return "Node color";
-    } else if (v.equals("nodeName")) {
+    } else if (v.equals(GraphMLmaps.NODE_NAME)) {
       return "Node name";
-    } else if (v.equals("nodePosition")) {
+    } else if (v.equals(GraphMLmaps.NODE_POSITION)) {
       return "Node position";
-    } else if (v.equals("interactionType")) {
+    } else if (v.equals(GraphMLmaps.EDGE_TYPE)) {
       return "Interaction type";
       
     } else

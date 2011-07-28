@@ -33,8 +33,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -123,7 +125,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
   /**
    * Allows the programmer to store any additional data along with this panel.
    */
-  Object object=null;
+  Map<String, Object> additionalData=null;
   
   /**
    * Create a new translator-panel and initiates the translation.
@@ -713,20 +715,45 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
 
   /**
    * @see #setData(Object)
-   * @return the object, stored with {@link #setData(Object)}
+   * @param key key under which the object has been stored
+   * @return the object, stored with {@link #setData(String, Object)}, using
+   * the given <code>key</code>.
    */
-  public Object getData() {
-    return object;
+  public Object getData(String key) {
+    if (additionalData==null) return null;
+    return additionalData.get(key);
   }
+  
+  // TODO: REMOVE THE NEXT TWO METHODS!
+  public Object getData() {
+    return getData("DEFAULT_KEY");
+  }
+  public void setData(Object object) {
+    setData("DEFAULT_KEY", object);
+  }
+  //------------
 
   /**
    * Allows the programmer to store any additional data along with this panel.
+   * @param key a key for the object to store
    * @param object the object to set
    */
-  public void setData(Object object) {
-    this.object = object;
+  public void setData(String key, Object object) {
+    if (additionalData==null) additionalData = new HashMap<String, Object>();
+    additionalData.put(key, object);
   }
   
+  /* (non-Javadoc)
+   * @see java.awt.Component#repaint()
+   */
+  @Override
+  public void repaint() {
+    super.repaint();
+    // Update graph
+    if (isGraphML()) {
+      ((Graph2D)document).updateViews();
+    }
+  }
   
   
 }

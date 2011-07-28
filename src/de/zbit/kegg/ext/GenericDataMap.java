@@ -134,9 +134,9 @@ public class GenericDataMap<K, V> implements DataMap {
    * Remove all {@link DataMap}s with a value that equals the
    * given <code>value</code>.
    * @param value
-   * @return true if at least ony map has been removed.
+   * @return true if at least one map has been removed.
    */
-  public boolean removeMap(String value, Graph graph) {
+  public boolean removeMap(V value, Graph graph) {
     boolean removed = false; // at least one removed entry.
     Iterator<Entry<K, V>> it = kv.entrySet().iterator();
     while (it.hasNext()) {
@@ -144,15 +144,36 @@ public class GenericDataMap<K, V> implements DataMap {
       if (e.getValue().equals(value)) {
         it.remove();
         // inform graph about changes / de-register maps.
-        if (e.getKey() instanceof NodeMap) {
-          graph.disposeNodeMap((NodeMap) e.getKey());
-        } else if (e.getKey() instanceof EdgeMap) {
-          graph.disposeEdgeMap((EdgeMap) e.getKey());
+        try {
+          if (e.getKey() instanceof NodeMap) {
+            graph.disposeNodeMap((NodeMap) e.getKey());
+          } else if (e.getKey() instanceof EdgeMap) {
+            graph.disposeEdgeMap((EdgeMap) e.getKey());
+          }
+        } catch (IllegalStateException ex) {
+          //  Map has been already disposed !
+          //log.log(Level.FINE, "Could not dispose map.", e);
         }
+        
         removed=true;
       }
     }
     return removed;
+  }
+  
+  public void removeMapByKey(K key, Graph graph) {
+    kv.remove(key);
+    
+    try {
+      if (key instanceof NodeMap) {
+        graph.disposeNodeMap((NodeMap) key);
+      } else if (key instanceof EdgeMap) {
+        graph.disposeEdgeMap((EdgeMap) key);
+      }
+    } catch (IllegalStateException ex) {
+      //  Map has been already disposed !
+      //log.log(Level.FINE, "Could not dispose map.", e);
+    }
   }
   
   
