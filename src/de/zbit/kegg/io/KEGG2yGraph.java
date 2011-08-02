@@ -706,7 +706,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
             String exName = infos.getNames();            
             if (exName!=null && exName.length()!=0) {
               
-              if (!showShortNames) {
+              if (showFormulaForCompounds && infos.getFormula()!=null && infos.getFormula().length()>0) {
+                exName = infos.getFormula();
+
+              } else if (!showShortNames) {
                 // Take last name (mostly very descriptive)
                 int pos = exName.lastIndexOf(";");
                 if (pos>0 && pos<(exName.length()-1)) exName = exName.substring(pos+1, exName.length()).replace("\n", "").trim();
@@ -1066,8 +1069,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     if (showShortNames) {
       // XXX: Name is currently only assigned based on xml-graphics name. 
       // - Enhance node label by include nodeLabel map and split this
-      // - Infere node type and remove organism from MAP.
-      graph = modifyNodeLabels(graph,nodeName,false,true);
+      graph = modifyNodeLabels(graph,nodeName,true,true, keggOntIds);
     }
     
     
@@ -1253,15 +1255,18 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
    * @return Graph2D g
    */
-  public static Graph2D modifyNodeLabels(Graph2D g, NodeMap nodeName, boolean removeSpeciesTitles, boolean removeMultipleNodeNames) {
+  public static Graph2D modifyNodeLabels(Graph2D g, NodeMap nodeName, boolean removeSpeciesTitles, boolean removeMultipleNodeNames, NodeMap keggIDMap) {
     for (y.base.Node n:g.getNodeArray()) {
       String t = g.getLabelText(n);
       
       // Convert "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
-      if (removeSpeciesTitles && t.contains("-")) {
-        t = t.substring(0, t.lastIndexOf("-")-1);
-        g.setLabelText(n, t);
-        if (nodeName!=null) nodeName.set(n, t);
+      if (removeSpeciesTitles && keggIDMap!=null) {
+        Object kgID = keggIDMap.get(n);
+        if (kgID!=null && kgID.toString().startsWith("path:")) {
+          t = t.substring(0, t.lastIndexOf("-")-1);
+          g.setLabelText(n, t);
+          if (nodeName!=null) nodeName.set(n, t);
+        }
       }
       
       // Convert "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"

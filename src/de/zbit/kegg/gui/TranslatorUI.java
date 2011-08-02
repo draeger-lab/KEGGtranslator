@@ -83,7 +83,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		KeyListener, ItemListener {
 
 	/**
-	 * 
+	 * @author Clemens Wrzodek
 	 * @author Andreas Dr&auml;ger
 	 * @date 2010-11-12
 	 */
@@ -305,6 +305,25 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		}
 		return inFile;
 	}
+	
+	/**
+	 * A method to set the value of a currently displayed {@link FileSelector}
+	 * corresponding to the <code>KEGGtranslatorIOOptions.INPUT</code> option.
+	 * @param r the JComponent on which the component for the mentioned
+	 * optioned is placed.
+	 * @param file the file to set
+	 */
+	 private void setInputFile(JComponent r, File file) {
+	    for (Component c : r.getComponents()) {
+	      if (c.getName() == null) {
+	        continue;
+	      } else if (c.getName().equals(
+	        KEGGtranslatorIOOptions.INPUT.getOptionName())
+	        && (FileSelector.class.isAssignableFrom(c.getClass()))) {
+	        ((FileSelector) c).setSelectedFile(file);
+	      }
+	    }
+	 }
 
 	/**
 	 * Translate and create a new tab.
@@ -354,13 +373,15 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			switch (action) {
 			case TRANSLATION_DONE:
 				TranslatorPanel source = (TranslatorPanel) e.getSource();
-				if (e.getID() != JOptionPane.OK_OPTION) {
-					// If translation failed, remove the tab. The error
-					// message has already been issued by the translator.
-					tabbedPane.removeTabAt(tabbedPane.indexOfComponent(source));
-				} else {
-					tabbedPane.setTitleAt(tabbedPane.indexOfComponent(source),
-							source.getTitle());
+				int index = tabbedPane.indexOfComponent(source);
+				if (index>=0) {// ELSE: User closed the tab before completion
+				  if (e.getID() != JOptionPane.OK_OPTION) {
+				    // If translation failed, remove the tab. The error
+				    // message has already been issued by the translator.
+				    tabbedPane.removeTabAt(index);
+				  } else {
+				    tabbedPane.setTitleAt(index, source.getTitle());
+				  }
 				}
 				updateButtons();
 				break;
@@ -463,6 +484,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		}
 		if ((files == null) || (files.length < 1)) {
 			return files;
+		} else {
+		  // Set value to box if it does not yet contain a valid value
+		  if (getInputFile(toolBar)==null) {
+		    setInputFile(toolBar, files[0]);
+		  }
 		}
 		
     // Ask output format
@@ -638,19 +664,27 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  Translator.saveCache();
 		  
 		  SBProperties props = new SBProperties();
-		  File f = getInputFile(toolBar);
-		  if (f != null && KEGGtranslatorIOOptions.INPUT.getRange().isInRange(f)) {
-		    props.put(KEGGtranslatorIOOptions.INPUT, f);
+		  { // Save KEGGtranslatorIOOptions
+		    File f = getInputFile(toolBar);
+		    if (f != null && KEGGtranslatorIOOptions.INPUT.getRange().isInRange(f)) {
+		      props.put(KEGGtranslatorIOOptions.INPUT, f);
+		    }
+		    props.put(KEGGtranslatorIOOptions.FORMAT, getOutputFileFormat(toolBar));
+		    SBPreferences.saveProperties(KEGGtranslatorIOOptions.class, props);
 		  }
-		  props.put(KEGGtranslatorIOOptions.FORMAT, getOutputFileFormat(toolBar));
-		  SBPreferences.saveProperties(KEGGtranslatorIOOptions.class, props);
-		  
 			props.clear();
-			props.put(GUIOptions.OPEN_DIR, openDir);
-			if (saveDir != null && saveDir.length() > 1) {
-				props.put(GUIOptions.SAVE_DIR, saveDir);
+			
+			{ // Save GUIOptions
+			  if (openDir != null && openDir.length() > 1) {
+			    props.put(GUIOptions.OPEN_DIR, openDir); 
+			  }
+			  if (saveDir != null && saveDir.length() > 1) {
+			    props.put(GUIOptions.SAVE_DIR, saveDir);
+			  }
+			  if (props.size()>0) {
+			    SBPreferences.saveProperties(GUIOptions.class, props);
+			  }
 			}
-		  SBPreferences.saveProperties(GUIOptions.class, props);
 		  
 		} catch (BackingStoreException exc) {
 		  exc.printStackTrace();

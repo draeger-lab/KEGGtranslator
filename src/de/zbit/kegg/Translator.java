@@ -27,12 +27,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.SwingUtilities;
 
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
+import de.zbit.kegg.ext.TranslatorPanelOptions;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
@@ -104,10 +106,14 @@ public class Translator {
 	 */
 	public static void main(String[] args) throws IOException,
 		BackingStoreException, URISyntaxException {
-	  LogUtil.initializeLogging((String[])null);
+	  LogUtil.initializeLogging(Level.FINE);
 		// --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
 	  //Locale.setDefault(Locale.US);
 	  GUIOptions.GUI.setDefaultValue(Boolean.FALSE);
+	  
+	  // Just for dependency demonstration.
+	  TranslatorPanelOptions.SHOW_PROPERTIES_TABLE.addDependency(TranslatorPanelOptions.SHOW_NAVIGATION_AND_OVERVIEW_PANELS, Boolean.TRUE);
+	  
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
 		

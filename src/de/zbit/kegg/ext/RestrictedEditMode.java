@@ -121,6 +121,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     super();
     //setEditNodeMode(null);
     setCreateEdgeMode(null);
+    
+    // Disallow a few operations
+    allowLabelSelection(false);
+    allowEdgeCreation(false);
+    allowNodeCreation(false);
+    
+    
     /*
      * The Tooltips of nodes, provding descriptions must be shown
      * longer than the system default. Let's show them 15 seconds!
@@ -435,7 +442,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    */
   public void onGraph2DSelectionEvent(Graph2DSelectionEvent e) {
     //Update the properties table
-    if (propTable==null) return;
+    if (propTable==null) {
+      if (eastPanel!=null && eastPanel.isVisible()) {
+        eastPanel.setVisible(false);
+      }
+      return;
+    }
+    
     if (e.getSubject() instanceof Node) {
       Node node = (Node) e.getSubject();
       if(getGraph2D().isSelected(node)) {
@@ -453,6 +466,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       eastPanel.setVisible(false);
     }
   }
+  
 
   /**
    * @param node

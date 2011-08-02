@@ -49,6 +49,12 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    */
   public static final Option<Boolean> SHORT_NAMES = new Option<Boolean>("SHORT_NAMES",Boolean.class,
       "If true, shows only short names of all KEGG entries.", true);
+
+  /**
+   * If true, shows the chemical formula for all compounds, instead of the name.
+   */
+  public static final Option<Boolean> SHOW_FORMULA_FOR_COMPOUNDS = new Option<Boolean>("SHOW_FORMULA_FOR_COMPOUNDS",Boolean.class,
+      "If true, shows the chemical formula for all compounds, instead of the name.", false);
   
   /**
    * If true, removes all gene-nodes in the KEGG document, which are white.
@@ -76,7 +82,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   public static final OptionGroup<Boolean> GENERIC_OPTIONS = new OptionGroup<Boolean>(
       "Generic translation options",
       "Define various options that are used in all translations.",
-      REMOVE_ORPHANS, SHORT_NAMES, REMOVE_WHITE_GENE_NODES, AUTOCOMPLETE_REACTIONS, OFFLINE_MODE);
+      REMOVE_ORPHANS, SHORT_NAMES, SHOW_FORMULA_FOR_COMPOUNDS, REMOVE_WHITE_GENE_NODES, AUTOCOMPLETE_REACTIONS, OFFLINE_MODE);
 
   /*
    * Graphical, yFiles based translations

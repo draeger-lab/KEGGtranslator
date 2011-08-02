@@ -105,8 +105,8 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 	public static final Option<File> INPUT = new Option<File>("INPUT",
 			File.class,
 			"Path and name of the source, KGML formatted, XML-file.",
-			new Range<File>(File.class, new FileFilterKGML()), (short) 2, "-i",
-			new File(System.getProperty("user.dir")));
+			new Range<File>(File.class, new FileFilterKGML()), (short) 2, "-i" );
+			//new File(System.getProperty("user.dir")));
 
 	/**
 	 * Path and name, where the translated file should be put.
@@ -114,7 +114,7 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 	public static final Option<File> OUTPUT = new Option<File>("OUTPUT",
 			File.class,
 			"Path and name, where the translated file should be put.",
-			(short) 2, "-o", new File(System.getProperty("user.dir")));
+			(short) 2, "-o" );//, new File(System.getProperty("user.dir")));
 
 	/**
 	 * Target file format for the translation.

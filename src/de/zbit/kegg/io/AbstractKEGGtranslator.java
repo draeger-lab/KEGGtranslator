@@ -107,6 +107,12 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected boolean showShortNames = true;
   
   /**
+   * If true, show the chemical Formula (e.g. "C6H12OH") instead of
+   * the actual name for all compounds.
+   */
+  protected boolean showFormulaForCompounds = false;
+  
+  /**
    * This manager uses a cache and retrieved informations from the KeggDB. By
    * using the cache, it is very fast in retrieving informations.
    */
@@ -280,6 +286,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   	removeWhiteNodes = KEGGtranslatorOptions.REMOVE_WHITE_GENE_NODES.getValue(prefs);
   	autocompleteReactions = KEGGtranslatorOptions.AUTOCOMPLETE_REACTIONS.getValue(prefs);
   	showShortNames = KEGGtranslatorOptions.SHORT_NAMES.getValue(prefs);
+  	showFormulaForCompounds = KEGGtranslatorOptions.SHOW_FORMULA_FOR_COMPOUNDS.getValue(prefs);
   }
   
   

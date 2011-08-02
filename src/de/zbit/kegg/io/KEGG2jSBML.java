@@ -21,7 +21,6 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -847,20 +846,24 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     if (!hasMultipleIDs) {
       // Be careful: very slow, uses Cache - so doesn't matter to query the same id one or more times.
       KeggInfos infos = new KeggInfos(entry.getName().trim(), manager);
-      if (infos.queryWasSuccessfull() && showShortNames && (infos.getNames() != null)) {
-        name = infos.getNames();
-        // Choose the shortest name.
-        String[] multiNames = name.split(";");
-        for(String cname:multiNames) {
-          cname = cname.replace("\n", "").trim();
-          if (cname.length()>0 && cname.length()<name.length()) {
-            name = cname;
+      if (infos.queryWasSuccessfull() && (infos.getNames() != null)) {
+        if (showFormulaForCompounds && infos.getFormula()!=null && infos.getFormula().length()>0) {
+          name = infos.getFormula();
+          
+        } else if (showShortNames) {
+          name = infos.getNames();
+          // Choose the shortest name.
+          String[] multiNames = name.split(";");
+          for(String cname:multiNames) {
+            cname = cname.replace("\n", "").trim();
+            if (cname.length()>0 && cname.length()<name.length()) {
+              name = cname;
+            }
           }
+          
+        } else {
+          name = infos.getName();
         }
-        
-        // ! showShortNames
-      } else if (infos.queryWasSuccessfull() && (infos.getName() != null)) {
-        name = infos.getName();
       }
     }
     
