@@ -34,7 +34,6 @@ import javax.swing.SwingUtilities;
 
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
-import de.zbit.kegg.ext.TranslatorPanelOptions;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
@@ -112,7 +111,7 @@ public class Translator {
 	  GUIOptions.GUI.setDefaultValue(Boolean.FALSE);
 	  
 	  // Just for dependency demonstration.
-	  TranslatorPanelOptions.SHOW_PROPERTIES_TABLE.addDependency(TranslatorPanelOptions.SHOW_NAVIGATION_AND_OVERVIEW_PANELS, Boolean.TRUE);
+	  //TranslatorPanelOptions.SHOW_PROPERTIES_TABLE.addDependency(TranslatorPanelOptions.SHOW_NAVIGATION_AND_OVERVIEW_PANELS, Boolean.TRUE);
 	  
 		SBProperties props = SBPreferences.analyzeCommandLineArguments(
 				getCommandLineOptions(), args);
