@@ -21,6 +21,7 @@
 package de.zbit.kegg;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -176,6 +177,24 @@ public class TranslatorTools {
    */
   public DataMap getMap(String descriptor) {
     return descriptor2Map.get(descriptor);
+  }
+  
+  /**
+   * Get all maps registered in the graph.
+   * @param descriptor
+   * @return
+   */
+  public Collection<DataMap> getMaps() {
+    return descriptor2Map.values();
+  }
+  
+  /**
+   * Get all descriptors of all maps registered
+   * in the graph.
+   * @return
+   */
+  public Set<String> getMapDescriptors() {
+    return descriptor2Map.keySet();
   }
   
   /**
@@ -426,7 +445,6 @@ public class TranslatorTools {
    * a {@link EdgeMap} will be created.
    * @return the created map.
    */
-  @SuppressWarnings("unchecked")
   private DataMap createMap(String descriptor, boolean nodeMap) {
     DataMap map;
     if (nodeMap) {
@@ -435,12 +453,24 @@ public class TranslatorTools {
       map = graph.createEdgeMap();
     }
     
+    addMap(descriptor, map);
+    
+    return map;
+  }
+
+  /**
+   * Registers a map WITHIN THESE TOOLS and linked to the {@link GenericDataMap}
+   * <code>mapDescriptionMap</code>. Does not touch the graph itself!
+   * 
+   * @param descriptor
+   * @param map
+   */
+  @SuppressWarnings("unchecked")
+  public void addMap(String descriptor, DataMap map) {
     // Add info about map also to descriptors.
     GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
     mapDescriptionMap.set(map, descriptor);
     descriptor2Map.put(descriptor, map);
-    
-    return map;
   }
 
   /**
@@ -689,6 +719,27 @@ public class TranslatorTools {
       }
     }
     
+  }
+
+  /**
+   * Gets information from a map and returns true if it is not null
+   * (i.e. it is set) and if the content equals {@link Boolean#TRUE}.
+   * @param node_or_edge and {@link Node} or {@link Edge}
+   * @param descriptor a descriptor for a {@link NodeMap} or {@link EdgeMap} in the current
+   * {@link #graph}.
+   * @return true if {@link #getInfo(Object, String)} !=null and
+   * equals <code>TRUE</code>.
+   */
+  public boolean getBoolInfo(Object node_or_edge, String descriptor) {
+    Object o = getInfo(node_or_edge, descriptor);
+    
+    if (o!=null) {
+      if (o instanceof Boolean) return (Boolean)o;
+      try {
+         return Boolean.valueOf(o.toString());
+      } catch (Throwable t) {}
+    }
+    return false;
   }
   
 }
