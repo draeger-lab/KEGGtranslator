@@ -26,6 +26,7 @@
 package de.zbit.kegg.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -83,6 +84,7 @@ import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileDownload;
 import de.zbit.util.Reflect;
+import de.zbit.util.ValuePairUncomparable;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
@@ -293,6 +295,49 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
     repaint();
   }
   
+  /**
+   * Create, display and return a temporary statusLabel ({@link JLabel})
+   * and a {@link JProgressBar} at the bottom of this panel. Does not
+   * touch existing content.
+   * 
+   * <p>Do not forget to call {@link #hideTemporaryLoadingBar()} afterwards.
+   * 
+   * @param initialStatusText
+   * @return ValuePairUncomparable<JLabel, JProgressBar>()
+   */
+  public ValuePairUncomparable<JLabel, JProgressBar> showTemporaryLoadingBar(String initialStatusText) {
+    JPanel statusBar = new JPanel();
+    
+    JLabel statusLabel = new JLabel(initialStatusText);
+    final Dimension minimumSize = statusLabel.getMinimumSize();
+    statusLabel.setMinimumSize(new Dimension(Math.max(200, minimumSize.width), minimumSize.height));
+    statusBar.add(statusLabel, BorderLayout.LINE_START);
+    
+    JProgressBar jp = new JProgressBar();
+    jp.setIndeterminate(true);
+    statusBar.add(jp, BorderLayout.CENTER);
+    
+    add(statusBar, BorderLayout.SOUTH);
+    //invalidate();
+    //super.repaint(); // No need to repaint graph.
+    return new ValuePairUncomparable<JLabel, JProgressBar>(statusLabel, jp);
+  }
+  
+  /**
+   * Hide the temporary loading status bar, created with
+   * {@link #showTemporaryLoadingBar()}
+   */
+  public void hideTemporaryLoadingBar() {
+    if (!(getLayout() instanceof BorderLayout)) return;
+    Component c = ((BorderLayout)getLayout()).getLayoutComponent(BorderLayout.SOUTH);
+    if (c==null) return;
+    remove(c);
+  }
+  
+  
+  
+  
+  
   private void pathwayDownloadComplete(String localFile, Format outputFormat) {
     //String localFile=null;
 
@@ -363,6 +408,9 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
             ((DefaultGraph2DRenderer) pane.getGraph2DRenderer()).setDrawEdgesFirst(true);
           }
           
+          // Make group nodes collapsible.
+          // Unfortunately work-in-progress.
+          //pane.addViewMode(new CollapseGroupNodesViewMode((Graph2D) document));
           
           /*
            * Get settings to control visualization behaviour
