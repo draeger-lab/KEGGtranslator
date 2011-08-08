@@ -33,14 +33,13 @@ import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,16 +50,17 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ToolTipManager;
-import javax.swing.table.DefaultTableModel;
 
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.EdgeMap;
 import y.base.Node;
 import y.base.NodeMap;
+import y.option.Editor;
+import y.option.OptionHandler;
+import y.option.TableEditorFactory;
 import y.view.DefaultBackgroundRenderer;
 import y.view.EditMode;
 import y.view.Graph2D;
@@ -73,17 +73,18 @@ import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.Overview;
 import de.zbit.gui.GUITools;
-import de.zbit.gui.SystemBrowser;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.TranslatorTools;
-import de.zbit.kegg.gui.TranslatorPanel;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
-import de.zbit.util.EscapeChars;
 import de.zbit.util.StringUtil;
 
 /**
  * An edit mode for yFiles, that allows no creation of new nodes or edges.
+ * 
+ * <p><b>This class is a work-in-progress draft that uses the {@link OptionHandler}s
+ * of yFiles that allow a much more improved displaying of node
+ * properties!</b>
  * 
  * <p><i>Note:<br/>
  * Due to yFiles license requirements, we have to obfuscate this class
@@ -96,12 +97,13 @@ import de.zbit.util.StringUtil;
  * @since 1.0
  * @version $Rev$
  */
-public class RestrictedEditMode extends EditMode implements Graph2DSelectionListener {
+public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionListener {
  
   /**
-   * A properties table that might be initialized.
+   * The scroll pane on which the informations about the
+   * current selection are displayed.
    */
-  JTable propTable=null;
+  JScrollPane scrollPane=null;
   
   /**
    * A panel for the {@link #propTable}.
@@ -119,14 +121,8 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    */
   public final static String OPEN_PATHWAY = "OPEN_PATHWAY";
   
-  /**
-   * The panel on which the graph is displayed.
-   */
-  private JComponent parent = null;
-  
-  public RestrictedEditMode() {
+  public RestrictedEditModeV2() {
     super();
-    
     //setEditNodeMode(null);
     setCreateEdgeMode(null);
     
@@ -146,12 +142,10 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
   /**
    * @param listener this is used to fire an action with command {@link #OPEN_PATHWAY}
    * if the user double clicked a pathway reference node.
-   * @param parent any panel on which the graph is displayed.
    */
-  public RestrictedEditMode(ActionListener listener, JComponent parent) {
+  public RestrictedEditModeV2(ActionListener listener) {
     this();
     this.aListener = listener;
-    this.parent = parent;
   }
   
   
@@ -318,10 +312,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     }
     Box rightPanel = new Box(BoxLayout.Y_AXIS);
     
-    if (propTable==null) {
-      propTable = createPropertiesTable();
-    }
-    JScrollPane scrollPane = new JScrollPane(propTable);
+    scrollPane = new JScrollPane();
     scrollPane.setPreferredSize(new Dimension(250, 180));
     rightPanel.add(GUITools.createTitledPanel(scrollPane,"Properties"));
     scrollPane.setColumnHeaderView(null);
@@ -344,56 +335,26 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     glassPane.add(eastPanel, BorderLayout.EAST);
   }
   
-  /**
-   * Creates a JTable based properties view that displays the details of a selected model element.
-   */
-  private JTable createPropertiesTable() {
-    if (propTable==null) {
-      propTable = new JTable() {
-        private static final long serialVersionUID = -542498752356126673L;
-        // Make cells not editable.
-        public boolean isCellEditable(int row, int column) {
-          return false;
-        }
-      };
-      // Make cell values to appear as ToolTip
-      propTable.addMouseMotionListener(new MouseMotionAdapter(){
-        public void mouseMoved(MouseEvent e){
-          int row = -1, column=-1;
-          try {
-            Point p = e.getPoint(); 
-            row = propTable.rowAtPoint(p);
-            column = propTable.columnAtPoint(p);
-          } catch (Throwable t) {return;}
-          if (row>=0 && column>=0) {
-            propTable.setToolTipText(
-              StringUtil.toHTML( EscapeChars.forHTML(String.valueOf(propTable.getValueAt(row,column))) , 120)
-            );
-          }
-        }
-      });
-      propTable.addMouseListener(new MouseAdapter() {
-        // Open browser on link double-click
-        public void mouseClicked(MouseEvent e) {
-          super.mouseClicked(e);
-          if (e.getClickCount() == 2) {
-            Point p = e.getPoint(); 
-            int row = propTable.rowAtPoint(p);
-            int column = propTable.columnAtPoint(p);
-            String text = String.valueOf(propTable.getValueAt(row,column));
-            if (text.toLowerCase().startsWith("http")) {
-              SystemBrowser.openURL(text);
-            }
-          }
-        }
-      });
-      propTable.setOpaque(false);
-      propTable.setTableHeader(null);
-    }
-    
-    return propTable;
-  }
   
+  /**
+   * Creates the GUI.
+   */
+  private JComponent createComponentForOptionHandler( final OptionHandler handler ) {
+//    DefaultEditorFactory defaultFactory = new DefaultEditorFactory();
+//    Editor editor1 = defaultFactory.createEditor( handler );
+    /*
+     * TODO: Decide for a view. Default or tabular?
+     * - Make uneditable
+     * - generate correct elements (addColor, addDouble, etc. instead of addString).
+     * - Group items
+     * - resonable default width.
+     * 
+     */
+    TableEditorFactory tableFactory = new TableEditorFactory();
+    Editor editor = tableFactory.createEditor(handler);
+    
+    return editor.getComponent();
+  }
   
   private static Overview createOverview(Graph2DView view) {
     Overview ov = new Overview(view);
@@ -456,11 +417,8 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    * @see y.view.Graph2DSelectionListener#onGraph2DSelectionEvent(y.view.Graph2DSelectionEvent)
    */
   public void onGraph2DSelectionEvent(Graph2DSelectionEvent e) {
-    // NOTE: This is not necessarily a user-action! Also in setSelection() calls,
-    // this listener is fired.
-    
     //Update the properties table
-    if (propTable==null || (parent!=null && !parent.isEnabled()) ) {
+    if (scrollPane==null) {
       if (eastPanel!=null && eastPanel.isVisible()) {
         eastPanel.setVisible(false);
       }
@@ -472,14 +430,18 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       if(getGraph2D().isSelected(node)) {
         updatePropertiesTable(node);
       }
-      eastPanel.setVisible((propTable.getModel().getRowCount()>0));
+//      eastPanel.setVisible((propTable.getModel().getRowCount()>0));
+      // TODO: isEmpty?
+      eastPanel.setVisible(true);
     } else if (e.getSubject() instanceof Edge) {
       Edge edge = (Edge) e.getSubject();
       if(getGraph2D().isSelected(edge)) {
         updatePropertiesTable(edge);
       }
       
-      eastPanel.setVisible((propTable.getModel().getRowCount()>0));
+//      eastPanel.setVisible((propTable.getModel().getRowCount()>0));
+      // TODO: isEmpty?
+      eastPanel.setVisible(true);
     } else {
       eastPanel.setVisible(false);
     }
@@ -498,8 +460,8 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     
     
     // Generate table headings and content
-    ArrayList<String> headers = new ArrayList<String>();
-    ArrayList<Object> content = new ArrayList<Object>();
+    List<String> headers = new ArrayList<String>();
+    List<Object> content = new ArrayList<Object>();
     if (nodeOrEdge instanceof Node) {
       Node node = (Node) nodeOrEdge;
       
@@ -549,10 +511,17 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     }
     
     // Apply the new table content
-    DefaultTableModel tm = new DefaultTableModel();
-    tm.addColumn("", headers.toArray());
-    tm.addColumn("", content.toArray());
-    propTable.setModel(tm);
+//    DefaultTableModel tm = new DefaultTableModel();
+//    tm.addColumn("", headers.toArray());
+//    tm.addColumn("", content.toArray());
+//    propTable.setModel(tm);
+    
+    final OptionHandler propTable = new OptionHandler("Grid");
+    propTable.useSection("Misc");
+    for (int i=0; i<content.size(); i++) {
+      propTable.addString(headers.get(i), content.get(i).toString());
+    }
+    scrollPane.setViewportView(createComponentForOptionHandler(propTable));
 
   }
   

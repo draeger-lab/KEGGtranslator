@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -1148,6 +1149,27 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     
   }
+  
+  /**
+   * Check if {@link GraphMLmaps} contains a map with the
+   * given descriptor.
+   * @param descriptor
+   * @return true if and only the the given descriptor corresponds
+   * to a registered map.
+   */
+  public static boolean GraphMLmapsContainsMap(String descriptor) {
+    try {
+      for (Field f: GraphMLmaps.class.getFields()) {
+        // Get field value (for static fields, object is null) and
+        // compare with given descriptor.
+        if (f.get(null).equals(descriptor)) {
+          return true;
+        }
+      }
+    } catch (Exception e) {}
+    return false;
+  }
+  
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.AbstractKEGGtranslator#writeToFile(java.lang.Object, java.lang.String)
    */
@@ -1169,16 +1191,27 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       Graph2DGraphMLHandler ioh = ((GraphMLIOHandler) outputHandler).getGraphMLHandler() ;
       
       try {
+        // Add known maps from GraphMLMapsExtended.
         GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(mapDescription);
         
         EdgeMap[] eg = graph.getRegisteredEdgeMaps();
-        if (eg!=null)
-          for (int i=0; i<eg.length;i++)
-            addDataMap(eg[i], ioh, mapDescriptionMap.getV(eg[i]));
+        if (eg!=null) {
+          for (int i=0; i<eg.length;i++) {
+            String desc = mapDescriptionMap.getV(eg[i]);
+            if (desc!=null && GraphMLmapsContainsMap( desc )) {
+              addDataMap(eg[i], ioh, mapDescriptionMap.getV(eg[i]));
+            }
+          }
+        }
         NodeMap[] nm = graph.getRegisteredNodeMaps();
-        if (nm!=null)
-          for (int i=0; i<nm.length;i++)
-            addDataMap(nm[i], ioh, mapDescriptionMap.getV(nm[i]));
+        if (nm!=null) {
+          for (int i=0; i<nm.length;i++) {
+            String desc = mapDescriptionMap.getV(nm[i]);
+            if (desc!=null && GraphMLmapsContainsMap( desc )) {            
+              addDataMap(nm[i], ioh, mapDescriptionMap.getV(nm[i]));
+            }
+          }
+        }
         
       } catch(Throwable e) {
         System.err.println("Cannot write annotations to graph file.");

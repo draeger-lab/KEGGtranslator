@@ -306,6 +306,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
    * @return ValuePairUncomparable<JLabel, JProgressBar>()
    */
   public ValuePairUncomparable<JLabel, JProgressBar> showTemporaryLoadingBar(String initialStatusText) {
+    setEnabled(false);
     JPanel statusBar = new JPanel();
     
     JLabel statusLabel = new JLabel(initialStatusText);
@@ -328,6 +329,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
    * {@link #showTemporaryLoadingBar()}
    */
   public void hideTemporaryLoadingBar() {
+    setEnabled(true);
     if (!(getLayout() instanceof BorderLayout)) return;
     Component c = ((BorderLayout)getLayout()).getLayoutComponent(BorderLayout.SOUTH);
     if (c==null) return;
@@ -431,7 +433,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
           pane.setSize(getSize());
           //ViewMode mode = new NavigationMode();
           //pane.addViewMode(mode);
-          EditMode editMode = new RestrictedEditMode(translationListener);
+          EditMode editMode = new RestrictedEditMode(translationListener, thiss);
           editMode.showNodeTips(true);
           pane.addViewMode(editMode);
           

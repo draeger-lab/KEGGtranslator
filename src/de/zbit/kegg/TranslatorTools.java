@@ -23,6 +23,7 @@ package de.zbit.kegg;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +39,7 @@ import y.base.Edge;
 import y.base.EdgeMap;
 import y.base.Graph;
 import y.base.Node;
+import y.base.NodeCursor;
 import y.base.NodeMap;
 import y.layout.organic.SmartOrganicLayouter;
 import y.view.Graph2D;
@@ -45,6 +47,7 @@ import y.view.Graph2DLayoutExecutor;
 import y.view.LineType;
 import y.view.NodeRealizer;
 import y.view.Selections;
+import y.view.hierarchy.HierarchyManager;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.gui.TranslatorPanel;
@@ -535,6 +538,7 @@ public class TranslatorTools {
   }
   public void layoutNodeSubset(Set<Node> newNodes, boolean strict) {
     if (newNodes==null || newNodes.size()<1) return;
+    graph.unselectAll();
     
     // Create a selection map that contains all new nodes.
     NodeMap dp = Selections.createSelectionNodeMap(graph);
@@ -557,6 +561,7 @@ public class TranslatorTools {
     layouter.setSmartComponentLayoutEnabled(strict);
     layouter.setNodeOverlapsAllowed(newNodes.size()>30);
     layouter.setConsiderNodeLabelsEnabled(true);
+    layouter.setCompactness(1.0d);
     
 //    OrganicLayouter layouter = new OrganicLayouter();
 //    layouter.setSphereOfAction(OrganicLayouter.ONLY_SELECTION);
@@ -580,8 +585,90 @@ public class TranslatorTools {
     graph.removeDataProvider(SmartOrganicLayouter.NODE_SUBSET_DATA);
     
     // Reset layout, because subset scope doesn't work correctly.
-    new TranslatorTools(graph).resetLayout();
+    //resetLayout();
   }
+  
+  public void layoutGroupNode(Node group) {
+    if (group==null) return;
+    
+    //NodeRealizer gr = graph.getRealizer(group);
+    //setStackingChildNodePosition(graph.getRealizer(nc.node()), gr, i);
+    //layoutNodeSubset(childs, true);
+    
+    // Get size of all children
+    Set<Node> childs = getChildren(group);
+    double maxWidth=0;
+    double maxHeight = 0;
+    double minX = Double.MAX_VALUE;
+    double minY = Double.MAX_VALUE;
+    for (Node n : childs) {
+      NodeRealizer nr = graph.getRealizer(n);
+      maxWidth = Math.max(nr.getWidth(), maxWidth);
+      maxHeight = Math.max(nr.getHeight(), maxHeight);
+      minX = Math.min(nr.getX(), minX);
+      minY = Math.min(nr.getY(), minY);
+    }
+    
+    // Apply to all childs
+    int i=0;
+    for (Node n : childs) {
+      setStackingChildNodePosition(graph.getRealizer(n),maxWidth, maxHeight, minX, minY, (++i));
+    }
+
+  }
+  
+  /**
+   * @param group must be a group node
+   * @return all children of the given group node.
+   */
+  public static Set<Node> getChildren(Node group) {
+    Set<Node> childs = new HashSet<Node>();
+    NodeCursor nc = graph.getHierarchyManager().getChildren(group);
+    for (int i=1; i<=nc.size(); i++) {
+      childs.add(nc.node());
+      nc.next();
+    }
+    return childs;
+  }
+  
+  public void layoutChildsAndGroupNodes(Collection<Node> nodes) {
+    if (nodes==null) return;
+
+    HierarchyManager hm = graph.getHierarchyManager();
+    Set<Node> alreadyLayouted = new HashSet<Node>();
+    Set<Node> groupsToLayout = new HashSet<Node>();
+    for (Node n: nodes) {
+      Node p = hm.getParentNode(n);
+      boolean isGroupNode = hm.isGroupNode(n);
+      boolean hasParent = p!=null;
+      
+      // Layout internals of n
+      if (isGroupNode) {
+        if (!alreadyLayouted.contains(n)) {
+          layoutGroupNode(n);
+          alreadyLayouted.add(n);
+        }
+      } 
+      
+      // Layout all super-groups, too
+      if (hasParent) {
+        while (p!=null) {
+          if (!alreadyLayouted.contains(p)) {
+            layoutGroupNode(p);
+            alreadyLayouted.add(p);
+          }
+          p = hm.getParentNode(p);
+        }
+      } else {
+        p=n;
+      }
+      groupsToLayout.add(p);
+    }
+    
+    // Dimension of groups may have changed. layout them.
+    //layoutNodeSubset(groupsToLayout, true);
+  }
+  
   
   /**
    * Resets the layout to the information stored in the nodes. Usually
@@ -715,7 +802,7 @@ public class TranslatorTools {
         }
       } catch (IllegalStateException e) {
         //  Map has been already disposed !
-        log.log(Level.FINE, "Could not dispose map.", e);
+        log.log(Level.FINE, String.format("Could not dispose map '%s'.",identifier), e);
       }
     }
     
@@ -741,5 +828,47 @@ public class TranslatorTools {
     }
     return false;
   }
+
+  /**
+   * Calculates a simple stacked layout with 2 columns.
+   * @param cr realizer of the node
+   * @param gr realizer of the parent group node
+   * @param nodesInGroup index of node in stacking group, starting with 1
+   */
+  public static void setStackingChildNodePosition(NodeRealizer cr, NodeRealizer gr, int nodesInGroup) {
+    double inset=5.0;
+    // consider node with and label width to determine x layout.
+    double w = Math.max(cr.getWidth(), cr.getLabel().getWidth()-inset);
+//    double x = ((nodesInGroup-1) %cols); // column
+//    x = (x*(w+inset)) + gr.getX(); // + cr.getX()
+//    double y = ((nodesInGroup-1) /cols); // row
+//    y = (y*(cr.getHeight()+inset)) + gr.getY();  // + cr.getY()
+//    cr.setX(x);
+//    cr.setY(y);
+    setStackingChildNodePosition(cr, w, cr.getHeight(), gr.getX(), gr.getY(), nodesInGroup);
+  }
+  
+  /**
+   * Calculates a simple stacked layout with 2 columns.
+   * @param cr realizer of the node
+   * @param nodeWidth
+   * @param nodeHeight
+   * @param firstX
+   * @param firstY
+   * @param nodeIndex index of node in stacking group, starting with 1
+   */
+  public static void setStackingChildNodePosition(NodeRealizer cr, double nodeWidth, double nodeHeight, double firstX, double firstY, int nodeIndex) {
+    int cols = 2;
+    double inset=5.0;
+    
+    double x = ((nodeIndex-1) %cols); // column
+    x = (x*(nodeWidth+inset)) + firstX;
+    double y = ((nodeIndex-1) /cols); // row
+    y = (y*(nodeHeight+inset)) + firstY;
+    
+    cr.setX(x);
+    cr.setY(y);
+  }
+  
   
 }
