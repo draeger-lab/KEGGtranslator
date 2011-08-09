@@ -23,7 +23,7 @@
  * <http://www.yworks.com/en/products_yfiles_sla.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.kegg.ext;
+package de.zbit.graph;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -74,13 +74,26 @@ import y.view.NodeRealizer;
 import y.view.Overview;
 import de.zbit.gui.GUITools;
 import de.zbit.kegg.Translator;
-import de.zbit.kegg.TranslatorTools;
+import de.zbit.kegg.ext.GenericDataMap;
+import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.util.StringUtil;
+import de.zbit.util.TranslatorTools;
 
 /**
+ * <b>TODO: WORK IN PROGRESS, does not work yet.</b><p>
+ * <p><b> Aim of this EditMode is to modify {@link RestrictedEditMode} to
+ * display the values not in a simple JTable, but in a yFiles generated
+ * {@link OptionHandler} TableFactory. </b><p>
+ * 
  * An edit mode for yFiles, that allows no creation of new nodes or edges.
+ * <p>Furthermore, a table is displayed on click of a node or edge, that
+ * shows various properties of the selected item.
+ * <p>A navigation and overview panel is also displayed on the
+ * implementing panel.
+ * <p>An {@link ActionListener} can be registered, that is fired on
+ * double click of a pathway-reference node.  
  * 
  * <p><b>This class is a work-in-progress draft that uses the {@link OptionHandler}s
  * of yFiles that allow a much more improved displaying of node
@@ -527,6 +540,8 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
   
   /**
    * Automatically adjust node size to fit the node label.
+   * TODO: This is currently unsed. Furthermore, a very easy
+   * implementation method would be {@link NodeRealizer#getLabel()#getWidth()}!
    * @param realizer
    * @param view
    */

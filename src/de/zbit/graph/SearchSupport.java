@@ -18,7 +18,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.kegg.ext;
+package de.zbit.graph;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -50,10 +50,13 @@ import y.view.Graph2DView;
 import y.view.NodeRealizer;
 
 /**
+ * <b>TODO: WORK IN PROGRESS, does not work yet.</b><p>
  * 
- * TODO: This is a stump and currently unused. A demo class taken
+ * <b>This is a stump and currently unused. A demo class taken
  * from yFiles examples to search nodes. Node highlighting is performed
- * by the {@link Marker}.
+ * by the {@link Marker}.</b><p>
+ * Intended is, to provide a search method that helps locating certain
+ * genes in a pathway.
  * 
  * <p>
  * Utility class that provides methods for searching for nodes that match

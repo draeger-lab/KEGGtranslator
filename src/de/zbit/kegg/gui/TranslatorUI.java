@@ -52,6 +52,7 @@ import javax.swing.event.ChangeListener;
 
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 
+import de.zbit.graph.RestrictedEditMode;
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
@@ -61,7 +62,6 @@ import de.zbit.gui.JTabbedLogoPane;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.kegg.Translator;
-import de.zbit.kegg.ext.RestrictedEditMode;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.AbstractProgressBar;

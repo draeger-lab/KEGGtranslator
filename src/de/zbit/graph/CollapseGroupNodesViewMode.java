@@ -17,7 +17,7 @@
  * available online as <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.kegg.ext;
+package de.zbit.graph;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -42,8 +42,9 @@ import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 
 /**
- * View mode that allows to collapse or expand folder / group nodes.
- * <p><b>TODO: WORK IN PROGRESS, does not work yet.</b><br/>
+ * <b>TODO: WORK IN PROGRESS, does not work yet.</b><p>
+ * View mode that allows to collapse or expand folder / group nodes.<br/>
+ * 
  * <i>See yFiles_Demo_Sources\src\demo\view\hierarchy\HierarchyDemo.java
  * for a template implementation.</i>
  * 

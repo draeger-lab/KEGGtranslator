@@ -63,6 +63,7 @@ import y.view.EditMode;
 import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
+import de.zbit.graph.RestrictedEditMode;
 import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.gui.BaseFrameTab;
 import de.zbit.gui.GUITools;
@@ -73,7 +74,6 @@ import de.zbit.gui.VerticalLayout;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
-import de.zbit.kegg.ext.RestrictedEditMode;
 import de.zbit.kegg.ext.TranslatorPanelOptions;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
@@ -84,6 +84,7 @@ import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.FileDownload;
 import de.zbit.util.Reflect;
+import de.zbit.util.TranslatorTools;
 import de.zbit.util.ValuePairUncomparable;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
@@ -307,6 +308,9 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
    */
   public ValuePairUncomparable<JLabel, JProgressBar> showTemporaryLoadingBar(String initialStatusText) {
     setEnabled(false);
+    try {
+      TranslatorTools.enableViews(((Graph2D)document),false);
+    } catch (Throwable e) {}
     JPanel statusBar = new JPanel();
     
     JLabel statusLabel = new JLabel(initialStatusText);
@@ -330,11 +334,15 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
    */
   public void hideTemporaryLoadingBar() {
     setEnabled(true);
+    try {
+      TranslatorTools.enableViews(((Graph2D)document),true);
+    } catch (Throwable e) {}
     if (!(getLayout() instanceof BorderLayout)) return;
     Component c = ((BorderLayout)getLayout()).getLayoutComponent(BorderLayout.SOUTH);
     if (c==null) return;
     remove(c);
   }
+  
   
   
   

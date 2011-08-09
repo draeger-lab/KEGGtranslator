@@ -18,9 +18,10 @@
  * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
  * ---------------------------------------------------------------------
  */
-package de.zbit.kegg;
+package de.zbit.util;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,13 +42,19 @@ import y.base.Graph;
 import y.base.Node;
 import y.base.NodeCursor;
 import y.base.NodeMap;
+import y.base.YCursor;
 import y.layout.organic.SmartOrganicLayouter;
 import y.view.Graph2D;
 import y.view.Graph2DLayoutExecutor;
+import y.view.Graph2DView;
 import y.view.LineType;
 import y.view.NodeRealizer;
 import y.view.Selections;
+import y.view.View;
+import y.view.hierarchy.GroupLayoutConfigurator;
+import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
+import de.zbit.graph.StackingNodeLayout;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.gui.TranslatorPanel;
@@ -542,14 +549,26 @@ public class TranslatorTools {
     
     // Create a selection map that contains all new nodes.
     NodeMap dp = Selections.createSelectionNodeMap(graph);
+    NodeMap dp2 = graph.createNodeMap();
+    HierarchyManager hm = graph.getHierarchyManager();
+    Set<Node> resetLayout = new HashSet<Node>();
     for (Node n : graph.getNodeArray()) {
       dp.setBool(n, newNodes.contains(n));
+      // Do never layout contents of any group node.
+      if (hm.isGroupNode(n)) {
+        ((GroupNodeRealizer)graph.getRealizer(n)).updateAutoSizeBounds();
+        dp2.set(n, SmartOrganicLayouter.GROUP_NODE_MODE_FIX_CONTENTS);
+      }
+      if (!newNodes.contains(n) && hm.getParentNode(n)==null) {
+        resetLayout.add(n);
+      }
     }
     graph.addDataProvider(SmartOrganicLayouter.NODE_SUBSET_DATA, dp);
+    graph.addDataProvider(SmartOrganicLayouter.GROUP_NODE_MODE_DATA, dp2);
     
     // Remember group node sizes and insets
-//    GroupLayoutConfigurator glc = new GroupLayoutConfigurator(graph);
-//    glc.prepareAll();
+    GroupLayoutConfigurator glc = new GroupLayoutConfigurator(graph);
+    glc.prepareAll();
     
     // Create layouter and perform layout
     SmartOrganicLayouter layouter = new SmartOrganicLayouter();
@@ -561,7 +580,9 @@ public class TranslatorTools {
     layouter.setSmartComponentLayoutEnabled(strict);
     layouter.setNodeOverlapsAllowed(newNodes.size()>30);
     layouter.setConsiderNodeLabelsEnabled(true);
-    layouter.setCompactness(1.0d);
+    layouter.setCompactness(0.7d);
+    layouter.setNodeSizeAware(true);
+    
     
 //    OrganicLayouter layouter = new OrganicLayouter();
 //    layouter.setSphereOfAction(OrganicLayouter.ONLY_SELECTION);
@@ -569,9 +590,11 @@ public class TranslatorTools {
     Graph2DLayoutExecutor l = new Graph2DLayoutExecutor();
     l.doLayout(graph, layouter);
     
+    
     // Write initial position to node annotations
     for (Node n:newNodes) {
-      NodeRealizer nr = graph.getRealizer(n);
+      NodeRealizer nr = n!=null?graph.getRealizer(n):null;
+      if (nr==null) continue;
       this.setInfo(n, GraphMLmaps.NODE_POSITION, (int) nr.getX() + "|" + (int) nr.getY());
       
       // Paint above other nodes.
@@ -579,49 +602,26 @@ public class TranslatorTools {
     }
     
     // Restore group node sizes and insets
-//    glc.restoreAll();
+    glc.restoreAll();
     
     // remove selection map after layouting.
     graph.removeDataProvider(SmartOrganicLayouter.NODE_SUBSET_DATA);
+    graph.removeDataProvider(SmartOrganicLayouter.GROUP_NODE_MODE_DATA);
     
     // Reset layout, because subset scope doesn't work correctly.
-    //resetLayout();
+    resetLayout(resetLayout);
   }
   
   public void layoutGroupNode(Node group) {
     if (group==null) return;
-    
-    //NodeRealizer gr = graph.getRealizer(group);
-    //setStackingChildNodePosition(graph.getRealizer(nc.node()), gr, i);
-    //layoutNodeSubset(childs, true);
-    
-    // Get size of all children
-    Set<Node> childs = getChildren(group);
-    double maxWidth=0;
-    double maxHeight = 0;
-    double minX = Double.MAX_VALUE;
-    double minY = Double.MAX_VALUE;
-    for (Node n : childs) {
-      NodeRealizer nr = graph.getRealizer(n);
-      maxWidth = Math.max(nr.getWidth(), maxWidth);
-      maxHeight = Math.max(nr.getHeight(), maxHeight);
-      minX = Math.min(nr.getX(), minX);
-      minY = Math.min(nr.getY(), minY);
-    }
-    
-    // Apply to all childs
-    int i=0;
-    for (Node n : childs) {
-      setStackingChildNodePosition(graph.getRealizer(n),maxWidth, maxHeight, minX, minY, (++i));
-    }
-
+    StackingNodeLayout.doRecursiveLayout(graph, group);
   }
   
   /**
    * @param group must be a group node
    * @return all children of the given group node.
    */
-  public static Set<Node> getChildren(Node group) {
+  public Set<Node> getChildren(Node group) {
     Set<Node> childs = new HashSet<Node>();
     NodeCursor nc = graph.getHierarchyManager().getChildren(group);
     for (int i=1; i<=nc.size(); i++) {
@@ -634,39 +634,30 @@ public class TranslatorTools {
   public void layoutChildsAndGroupNodes(Collection<Node> nodes) {
     if (nodes==null) return;
 
+    // Layout all group nodes.
     HierarchyManager hm = graph.getHierarchyManager();
     Set<Node> alreadyLayouted = new HashSet<Node>();
-    Set<Node> groupsToLayout = new HashSet<Node>();
     for (Node n: nodes) {
       Node p = hm.getParentNode(n);
-      boolean isGroupNode = hm.isGroupNode(n);
-      boolean hasParent = p!=null;
-      
-      // Layout internals of n
-      if (isGroupNode) {
-        if (!alreadyLayouted.contains(n)) {
-          layoutGroupNode(n);
-          alreadyLayouted.add(n);
-        }
-      } 
-      
-      // Layout all super-groups, too
-      if (hasParent) {
-        while (p!=null) {
-          if (!alreadyLayouted.contains(p)) {
-            layoutGroupNode(p);
-            alreadyLayouted.add(p);
-          }
-          p = hm.getParentNode(p);
-        }
-      } else {
-        p=n;
+      if (!hm.isGroupNode(n) && p==null) {
+        alreadyLayouted.add(n); // Layout them, too
+        continue; 
       }
-      groupsToLayout.add(p);
+      
+      // Get root node
+      while ((p = hm.getParentNode(n)) !=null) {
+        n=p;
+      }
+      
+      // Layout recursive and add to set
+      if (!alreadyLayouted.contains(n)) {
+        StackingNodeLayout.doRecursiveLayout(graph, n);
+        alreadyLayouted.add(n);
+      }
     }
     
     // Dimension of groups may have changed. layout them.
-    //layoutNodeSubset(groupsToLayout, true);
+    layoutNodeSubset(alreadyLayouted, false);
   }
   
   
@@ -674,9 +665,18 @@ public class TranslatorTools {
    * Resets the layout to the information stored in the nodes. Usually
    * this is the layout as given directly by kegg. Only affects X and Y
    * positions, NOT width and height of nodes.
-   * @param graph2
    */
   public void resetLayout() {
+    resetLayout(Arrays.asList(graph.getNodeArray()));
+  }
+  
+  /**
+   * Resets the layout to the information stored in the nodes. Usually
+   * this is the layout as given directly by kegg. Only affects X and Y
+   * positions, NOT width and height of nodes.
+   * @param nodesToReset only reset these nodes.
+   */
+  public void resetLayout(Iterable<Node> nodesToReset) {
     DataMap nodeMap = descriptor2Map.get(GraphMLmaps.NODE_POSITION);
     if (nodeMap==null) {
       log.severe("Could not find original node positions.");
@@ -684,7 +684,7 @@ public class TranslatorTools {
     }
     
     String splitBy = Pattern.quote("|");
-    for (Node n: graph.getNodeArray()) {
+    for (Node n: nodesToReset) {
       Object pos = nodeMap.get(n);
       if (pos==null) continue;
       // pos is always X|Y
@@ -836,38 +836,38 @@ public class TranslatorTools {
    * @param nodesInGroup index of node in stacking group, starting with 1
    */
   public static void setStackingChildNodePosition(NodeRealizer cr, NodeRealizer gr, int nodesInGroup) {
-    double inset=5.0;
-    // consider node with and label width to determine x layout.
-    double w = Math.max(cr.getWidth(), cr.getLabel().getWidth()-inset);
-//    double x = ((nodesInGroup-1) %cols); // column
-//    x = (x*(w+inset)) + gr.getX(); // + cr.getX()
-//    double y = ((nodesInGroup-1) /cols); // row
-//    y = (y*(cr.getHeight()+inset)) + gr.getY();  // + cr.getY()
-//    cr.setX(x);
-//    cr.setY(y);
-    setStackingChildNodePosition(cr, w, cr.getHeight(), gr.getX(), gr.getY(), nodesInGroup);
-  }
-  
-  /**
-   * Calculates a simple stacked layout with 2 columns.
-   * @param cr realizer of the node
-   * @param nodeWidth
-   * @param nodeHeight
-   * @param firstX
-   * @param firstY
-   * @param nodeIndex index of node in stacking group, starting with 1
-   */
-  public static void setStackingChildNodePosition(NodeRealizer cr, double nodeWidth, double nodeHeight, double firstX, double firstY, int nodeIndex) {
     int cols = 2;
     double inset=5.0;
     
-    double x = ((nodeIndex-1) %cols); // column
-    x = (x*(nodeWidth+inset)) + firstX;
-    double y = ((nodeIndex-1) /cols); // row
-    y = (y*(nodeHeight+inset)) + firstY;
+    // consider node with and label width to determine x layout.
+    double w = Math.max(cr.getWidth(), cr.getLabel().getWidth()-inset);
+    
+    double x = ((nodesInGroup-1) %cols); // column
+    x = (x*(w+inset)) + gr.getX(); // + cr.getX()
+    double y = ((nodesInGroup-1) /cols); // row
+    y = (y*(cr.getHeight()+inset)) + gr.getY();  // + cr.getY()
     
     cr.setX(x);
     cr.setY(y);
+  }
+
+  /**
+   * Update the enabled state of all registered views
+   * to the given value.
+   * @param graph
+   * @param state
+   * @throws Throwable
+   */
+  public static void enableViews(Graph2D graph, boolean state) throws Throwable {
+    YCursor yc = graph.getViews();
+    while (yc.ok()) {
+      if (yc.current() instanceof Graph2DView) {
+        ((Graph2DView)yc.current()).setEnabled(state);
+      } else if (yc.current() instanceof View) { 
+        ((View)yc.current()).getComponent().setEnabled(state);
+      }
+      yc.next();
+    }
   }
   
   
