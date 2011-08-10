@@ -735,7 +735,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
             
             
             String text = infos.getNames();
-            if (text!=null && text.length()!=0) name2+=(name2.length()!=0?",":"")+text.replace(",", "");
+            if (text!=null && text.length()!=0) name2+=(name2.length()!=0?", ":"")+text.replace(",", "");
             
             if (e.getType().equals(EntryType.map)) { // => Link zu anderem Pathway oder Title-Node des aktuellem PW.
               text = infos.getDescription();
@@ -1068,9 +1068,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Shorten name
     if (showShortNames) {
-      // XXX: Name is currently only assigned based on xml-graphics name. 
-      // - Enhance node label by include nodeLabel map and split this
-      graph = modifyNodeLabels(graph,nodeName,true,true, keggOntIds);
+      graph = modifyNodeLabels(graph,nodeName,true,true, keggOntIds, nodeLabel);
     }
     
     
@@ -1279,16 +1277,19 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   /**
    * Modifies all labels of all nodes in the given graph.
-   * @param g - the graph to modiy
-   * @param nodeName - a list to store the node names separately
-   * @param removeSpeciesTitles -
-   * convert e.g. "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
+   * @param g the graph to modiy
+   * @param nodeName a list to store the node names separately
+   * @param removeSpeciesTitles convert e.g. "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
    * BE CAREFUL WITH THAT: "HNF-4" is also converted to "HNF"!
-   * @param removeMultipleNodeNames -
-   * convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
+   * @param removeMultipleNodeNames convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
+   * @param keggIDMap required only if <code>removeSpeciesTitles</code> is true.
+   * A mapping from node to kegg identifier(s).
+   * @param nodeLabel optional mapping from node to further synonyms for
+   * the corresponding gene. Only if <code>removeMultipleNodeNames</code> is true.
    * @return Graph2D g
    */
-  public static Graph2D modifyNodeLabels(Graph2D g, NodeMap nodeName, boolean removeSpeciesTitles, boolean removeMultipleNodeNames, NodeMap keggIDMap) {
+  public static Graph2D modifyNodeLabels(Graph2D g, NodeMap nodeName, boolean removeSpeciesTitles, 
+    boolean removeMultipleNodeNames, NodeMap keggIDMap, NodeMap nodeLabel) {
     for (y.base.Node n:g.getNodeArray()) {
       String t = g.getLabelText(n);
       
@@ -1296,14 +1297,30 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       if (removeSpeciesTitles && keggIDMap!=null) {
         Object kgID = keggIDMap.get(n);
         if (kgID!=null && kgID.toString().startsWith("path:")) {
-          t = t.substring(0, t.lastIndexOf("-")-1);
-          g.setLabelText(n, t);
-          if (nodeName!=null) nodeName.set(n, t);
+          int pos = t.lastIndexOf("-");
+          if (pos>0) {
+            t = t.substring(0, pos-1);
+            g.setLabelText(n, t);
+            if (nodeName!=null) nodeName.set(n, t);
+          }
         }
       }
       
       // Convert "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
       if (removeMultipleNodeNames) {
+        if (nodeLabel!=null) {
+          // Append further names to choose one from
+          // Note: Compounds are divided with ";", genes with "," and " "
+          // and compounds and reference nodes may contain " " in single names.
+          Object synonyms = nodeLabel.get(n);
+          if (synonyms!=null) {
+            // => append with ", " and replace all identifier
+            // divider by ", ". Unfortunately, replacing the somtetimes
+            // dividing space leads often to incorrect names...
+            t = t + ", " + synonyms.toString().replace("; ", ", ");
+            //.replaceAll(",\\S", ", ");
+          }
+        }
         t = shortenName(t);
         g.setLabelText(n, t);
         if (nodeName!=null) nodeName.set(n, t);

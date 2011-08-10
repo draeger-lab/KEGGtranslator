@@ -245,19 +245,42 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
   @Override
   public void mouseClicked(double x, double y) {
     MouseEvent ev = lastClickEvent;
-    if (ev.getClickCount() == 2 && aListener!=null) {
+    if (ev.getClickCount() == 2) {
       // Get double clicked node
       HitInfo allHitObjects = getGraph2D().getHitInfo(x, y, false);
       Node n = allHitObjects.getHitNode();
       
-      // Ask user if he wants to open the pathway and fire an event.
+      // Open URL on double click on a simple node OR
+      // ask user if he wants to open the pathway by click on
+      // Pathway node and fire an event.
+      Object url = (TranslatorTools.getNodeInfoIDs(n, GraphMLmaps.NODE_URL));
       String kgId = TranslatorTools.getKeggIDs(n);
+      // Clicked on a pathway node?
       if (kgId!=null && kgId.toLowerCase().startsWith("path:")) {
-        int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
-          Translator.APPLICATION_NAME, new Object[]{"Yes", "No"});
-        if (ret==0) {
-          ActionEvent e = new ActionEvent(kgId.trim().substring(5).toLowerCase(), JOptionPane.OK_OPTION, OPEN_PATHWAY);
-          aListener.actionPerformed(e);
+        // Dirty check if it is the title node via green color of title nodes.
+        Object color = (TranslatorTools.getNodeInfoIDs(n, GraphMLmaps.NODE_COLOR));
+        if (((color!=null && color.equals("#00FF00")) || aListener==null) && 
+            url!=null && url.toString().toLowerCase().startsWith("http")) {
+          SystemBrowser.openURL(url.toString());
+          ev.consume();
+          return;
+        }
+          
+        // Open clicked pathway in a new tab
+        if (aListener!=null) {
+          int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
+            Translator.APPLICATION_NAME, new Object[]{"Yes", "No"});
+          if (ret==0) {
+            ActionEvent e = new ActionEvent(kgId.trim().substring(5).toLowerCase(), JOptionPane.OK_OPTION, OPEN_PATHWAY);
+            aListener.actionPerformed(e);
+            ev.consume();
+          }
+        }
+      } else {
+        // All non-pathway reference nodes
+        if (url!=null && url.toString().toLowerCase().startsWith("http")) {
+          SystemBrowser.openURL(url.toString());
+          ev.consume();
         }
       }
       
