@@ -43,11 +43,13 @@ import y.base.Node;
 import y.base.NodeCursor;
 import y.base.NodeMap;
 import y.base.YCursor;
+import y.layout.labeling.SALabeling;
 import y.layout.organic.SmartOrganicLayouter;
 import y.view.Graph2D;
 import y.view.Graph2DLayoutExecutor;
 import y.view.Graph2DView;
 import y.view.LineType;
+import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.Selections;
 import y.view.View;
@@ -867,6 +869,40 @@ public class TranslatorTools {
         ((View)yc.current()).getComponent().setEnabled(state);
       }
       yc.next();
+    }
+  }
+  
+  /**
+   * This method automatically places all node labels.
+   */
+  public void layoutLabels() {
+    // Code for automatic node-label placement!
+    SALabeling labeling = new SALabeling();
+    labeling.setPlaceNodeLabels(true);
+    labeling.setPlaceEdgeLabels(false);
+    labeling.label( graph );
+    //g.updateViews();
+  }
+
+  /**
+   * Calculate the number of labels for a node.
+   * @param n {@link Node}
+   * @param model any value smaller than 0, to count all.
+   * Else: allows to filter the labels to count for a
+   * certain model property (e.g., {@link NodeLabel#SIDES}).
+   * @return number of labels.
+   */
+  public int getNumberOfLabels(Node n, byte model) {
+    NodeRealizer nr = graph.getRealizer(n);
+    if (model<0) return nr.labelCount();
+    else {
+      int count = 0;
+      for (int i=0; i<nr.labelCount(); i++) {
+        if (nr.getLabel(i).getModel()==model) {
+          count++;
+        }
+      }
+      return count;
     }
   }
   

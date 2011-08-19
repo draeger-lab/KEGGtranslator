@@ -198,6 +198,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     String nodeLabel = null;
     String description = null;
     String image = "";
+    StringBuffer additional = new StringBuffer();
     NodeMap[] nm = n.getGraph().getRegisteredNodeMaps();
     if (nm!=null) {
       for (int i=0; i<nm.length;i++) {
@@ -219,8 +220,17 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
               image+=KEGG2jSBML.getCompoundPreviewPicture(s);
             }
           }
+          
+        } else if (mapDescription.startsWith("[")) {
+          // I know, it is a dirty solution, but it allows other applications
+          // that use KEGGtranslator to include something into the tooltip.
+          if (additional.length()>0) additional.append("<br/>");
+          additional.append(String.format(
+            "<p><b>%s:</b><br/>%s</p>",
+            mapDescription, c.toString().replace("\n", "<br/>")));
         }
-      }
+          
+        }
     }
     
     // Merge the three strings to a single tooltip
@@ -233,6 +243,10 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     }
     if (image!=null && image.length()>0) {
       tooltip.append("<div align=\"center\">"+image+"</div>");
+    }
+    if (additional!=null && additional.length()>0) {
+      tooltip.append("<p>&nbsp;</p>");
+      tooltip.append(StringUtil.insertLineBreaks(additional.toString(), GUITools.TOOLTIP_LINE_LENGTH, "<br/>"));
     }
     
     // Append html and return toString.

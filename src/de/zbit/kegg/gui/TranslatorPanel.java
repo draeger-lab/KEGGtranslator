@@ -423,7 +423,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
           //pane.addViewMode(new CollapseGroupNodesViewMode((Graph2D) document));
           
           /*
-           * Get settings to control visualization behaviour
+           * Get settings to control visualization behavior
            */
           SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
           
@@ -460,7 +460,6 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
         fireActionEvent(new ActionEvent(thiss,JOptionPane.OK_OPTION,TranslatorUI.Action.TRANSLATION_DONE.toString()));
         return;
       }
-
     };
     
     // Run the worker
