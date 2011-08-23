@@ -136,6 +136,7 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     allowLabelSelection(false);
     allowEdgeCreation(false);
     allowNodeCreation(false);
+    allowMoveLabels(false);
     
     
     /*

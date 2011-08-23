@@ -21,6 +21,7 @@
 package de.zbit.util;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -397,7 +398,7 @@ public class TranslatorTools {
     if (nodeMap==null) {
       // This method is used without checking if the map has ever been set
       // before. So this warning is really more for debugging purposes.
-      log.fine(String.format("Could not find Node to %s mapping.", (descriptor==null?"null":descriptor)));
+      log.finest(String.format("Could not find Node to %s mapping.", (descriptor==null?"null":descriptor)));
       return null;
     }
     
@@ -553,7 +554,7 @@ public class TranslatorTools {
     NodeMap dp = Selections.createSelectionNodeMap(graph);
     NodeMap dp2 = graph.createNodeMap();
     HierarchyManager hm = graph.getHierarchyManager();
-    Set<Node> resetLayout = new HashSet<Node>();
+    List<Node> resetLayout = new ArrayList<Node>();
     for (Node n : graph.getNodeArray()) {
       dp.setBool(n, newNodes.contains(n));
       // Do never layout contents of any group node.
@@ -561,9 +562,11 @@ public class TranslatorTools {
         ((GroupNodeRealizer)graph.getRealizer(n)).updateAutoSizeBounds();
         dp2.set(n, SmartOrganicLayouter.GROUP_NODE_MODE_FIX_CONTENTS);
       }
-      if (!newNodes.contains(n) && hm.getParentNode(n)==null) {
+      
+      if (!newNodes.contains(n)){// && hm.getParentNode(n)==null && !hm.isGroupNode(n)) {
         resetLayout.add(n);
       }
+      
     }
     graph.addDataProvider(SmartOrganicLayouter.NODE_SUBSET_DATA, dp);
     graph.addDataProvider(SmartOrganicLayouter.GROUP_NODE_MODE_DATA, dp2);
@@ -684,6 +687,7 @@ public class TranslatorTools {
       log.severe("Could not find original node positions.");
       return;
     }
+    log.fine("Resetting layout for certain nodes.");
     
     String splitBy = Pattern.quote("|");
     for (Node n: nodesToReset) {
@@ -691,8 +695,10 @@ public class TranslatorTools {
       if (pos==null) continue;
       // pos is always X|Y
       String[] XY = pos.toString().split(splitBy);
-      graph.getRealizer(n).setX(Integer.parseInt(XY[0]));
-      graph.getRealizer(n).setY(Integer.parseInt(XY[1]));
+      NodeRealizer nr = graph.getRealizer(n);
+      //log.finer(String.format("Resetting layout for %s from %s|%s to %s.", n, nr.getX(), nr.getY(), pos.toString()));
+      nr.setX(Integer.parseInt(XY[0]));
+      nr.setY(Integer.parseInt(XY[1]));
     }
   }
 
@@ -849,6 +855,7 @@ public class TranslatorTools {
     double y = ((nodesInGroup-1) /cols); // row
     y = (y*(cr.getHeight()+inset)) + gr.getY();  // + cr.getY()
     
+    log.fine("Set stacking coords of " + cr.getNode() + " to " + x + "|" + y);
     cr.setX(x);
     cr.setY(y);
   }

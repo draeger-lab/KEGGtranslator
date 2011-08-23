@@ -603,7 +603,8 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
       //JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
     JFileChooser fc = GUITools.createJFileChooser(TranslatorUI.saveDir, false,
       false, JFileChooser.FILES_ONLY, ff.toArray(new FileFilter[0]));
-    fc.setSelectedFile(inputFile.getPath().contains(".")?new File(inputFile.getPath().substring(0, inputFile.getPath().lastIndexOf('.'))):new File(inputFile.getPath()+'.'+defaultFF.getExtension()) );
+    fc.setSelectedFile(inputFile.getPath().contains(".")?new File(inputFile.getPath().substring(0, inputFile.getPath().lastIndexOf('.'))):
+      new File(inputFile.getPath()+'.'+defaultFF.getExtension()) );
     if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return null;
     
     // Check file

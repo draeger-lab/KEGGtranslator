@@ -22,6 +22,7 @@ package de.zbit.graph;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import y.base.Node;
 import y.base.NodeCursor;
@@ -43,6 +44,8 @@ import de.zbit.util.Utils;
  * @version $Rev$
  */
 public class StackingNodeLayout {
+  public static final transient Logger log = Logger.getLogger(StackingNodeLayout.class.getName());
+  
   /**
    * Number of columns in this group Node that
    * are available to stack the children
@@ -101,6 +104,7 @@ public class StackingNodeLayout {
     this.recursive = recursive;
     prepareVariables(group);
     layoutGroupNode(group);
+    log.fine("Performing stacking layout on " + group);
   }
   
   /**

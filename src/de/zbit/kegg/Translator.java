@@ -82,7 +82,7 @@ public class Translator {
   /**
    * Version number of this translator
    */
-  public static final String VERSION_NUMBER = "1.2.0";
+  public static String VERSION_NUMBER = "1.2.0";
   
   
   /**
