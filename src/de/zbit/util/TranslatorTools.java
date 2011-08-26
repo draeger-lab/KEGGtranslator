@@ -492,11 +492,15 @@ public class TranslatorTools {
    * @return e.g. "ko" or "hsa",...
    */
   public static String getOrganismKeggAbbrFromGraph(Graph2D graph) {
+    if (graph==null) return null;
     
     for (Node n: graph.getNodeArray()) {
       String id = getKeggIDs(n).toLowerCase().trim();
       if (id.contains(":")) {
-        return id.substring(0, id.indexOf(':'));
+        String kga = id.substring(0, id.indexOf(':'));
+        if (!(kga.equals("cpd") || kga.equals("map") || kga.equals("path"))) {
+          return kga;
+        }
       }
     }
     

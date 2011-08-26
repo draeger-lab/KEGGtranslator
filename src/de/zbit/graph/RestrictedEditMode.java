@@ -550,10 +550,10 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
           Object c = nm[i].get(node);
           if (c!=null && c.toString().length()>0) {
             String mapName = mapDescriptionMap.getV(nm[i]);
-//            if (mapName==null || mapName.startsWith("_")) {
-//              // Maps starting with a "_" are marked invisible.
-//              continue;
-//            }
+            if (mapName==null || mapName.startsWith("_")) {
+              // Maps starting with a "_" are marked invisible.
+              continue;
+            }
             
             String head = getNiceCaption(mapName);
             if (head==null) {
