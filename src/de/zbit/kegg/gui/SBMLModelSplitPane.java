@@ -38,8 +38,6 @@ import org.sbml.jsbml.ASTNode;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.SBase;
-import org.sbml.jsbml.util.SBaseChangedEvent;
-import org.sbml.jsbml.util.SBaseChangedListener;
 
 import de.zbit.gui.GUITools;
 
@@ -54,7 +52,7 @@ import de.zbit.gui.GUITools;
  * @version $Rev$
  */
 public class SBMLModelSplitPane extends JSplitPane implements
-		TreeSelectionListener, SBaseChangedListener {
+		TreeSelectionListener {
 	
 	/**
 	 * Generated serial version id.
@@ -79,7 +77,7 @@ public class SBMLModelSplitPane extends JSplitPane implements
 		IOException {
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		actionListeners = new HashSet<ActionListener>();
-		document.addChangeListener(this);
+		//document.addChangeListener(this);
 		init(document, false);
 	}
 	
@@ -160,41 +158,6 @@ public class SBMLModelSplitPane extends JSplitPane implements
 			setDividerLocation(proportionalLocation);
 		}
 		validate();
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.sbml.squeezer.io.SBaseChangedListener#sbaseAdded(org.sbml.jlibsbml
-	 * .SBase)
-	 */
-	public void sbaseAdded(SBase sb) {
-		// TreePath path = tree.getSelectionPath();
-		// init(sb.getModel(), true);
-		// tree.setSelectionPath(path);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.sbml.squeezer.io.SBaseChangedListener#sbaseRemoved(org.sbml.jlibsbml
-	 * .SBase)
-	 */
-	public void sbaseRemoved(SBase sb) {
-		// TreePath path = tree.getSelectionPath();
-		// init(sb.getModel(), true);
-		// tree.setSelectionPath(path);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.sbml.jsbml.SBaseChangedListener#stateChanged(org.sbml.jsbml.SBaseChangedEvent)
-	 */
-	public void stateChanged(SBaseChangedEvent ev) {
-		// TreePath path = tree.getSelectionPath();
-		// init(sb.getModel(), true);
-		// tree.setSelectionPath(path);
 	}
 	
 	/*
