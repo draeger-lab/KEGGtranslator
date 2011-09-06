@@ -37,11 +37,8 @@ import org.sbml.jsbml.History;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
-import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
-import org.sbml.jsbml.util.SBaseChangedEvent;
-import org.sbml.jsbml.util.SBaseChangedListener;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
@@ -69,7 +66,11 @@ import de.zbit.util.Utils;
  * @since 1.0
  * @version $Rev$
  */
-public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements SBaseChangedListener {
+public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
+/* implements SBaseChangedListener REMOVES,
+ * this is unused and thus, not necessary here!
+ *  
+ */
   /*
    * General Notes:
    * XXX: Important to know: subtype.setValue contains replacement of &gt; to > !!!
@@ -336,7 +337,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     int level = 2;
     int version = 4;
     SBMLDocument doc = new SBMLDocument(level, version);
-    doc.addChangeListener(this);
+    //doc.addChangeListener(this);
     
     // Reset lists and buffers.
     SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
@@ -1224,27 +1225,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument> implements 
     
     
     System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
-  }
-  
-  /* (non-Javadoc)
-   * @see org.sbml.jsbml.SBaseChangedListener#sbaseAdded(org.sbml.jsbml.SBase)
-   */
-  public void sbaseAdded(SBase sb) {
-    //System.out.println("[ADD] " + sb.toString());
-  }
-  
-  /* (non-Javadoc)
-   * @see org.sbml.jsbml.SBaseChangedListener#sbaseRemoved(org.sbml.jsbml.SBase)
-   */
-  public void sbaseRemoved(SBase sb) {
-    //System.out.println("[RMV] " + sb.toString());
-  }
-  
-  /* (non-Javadoc)
-   * @see org.sbml.jsbml.SBaseChangedListener#stateChanged(org.sbml.jsbml.SBaseChangedEvent)
-   */
-  public void stateChanged(SBaseChangedEvent ev) {
-    //System.out.println("[CHG] " + ev.toString());
   }
   
 }
