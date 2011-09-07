@@ -1530,8 +1530,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @param path
    * @param format output file extension, e.g., "gif", "graphml", "gml", "jpg",...
    * @throws Exception 
+   * @return true if everything went fine.
    */
-  public void writeToFile(Graph2D graph, String outFile, String format) throws Exception {
+  public boolean writeToFile(Graph2D graph, String outFile, String format) throws Exception {
     IOHandler io;
     if (format.equalsIgnoreCase("gif")) {
       io = new GIFIOHandler();
@@ -1554,7 +1555,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       throw new Exception("Unknown output format.");
     }
     setOutputHandler(io);
-    writeToFile(graph, outFile);
+    return writeToFile(graph, outFile);
   }
   
   /**

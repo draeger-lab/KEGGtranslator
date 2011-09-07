@@ -663,23 +663,34 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
     if (!file.getName().toLowerCase().endsWith(format)) {
       file = new File(file.getPath() + '.' + format);
     }*/
-      
+
+    boolean success = false;
     if (file != null) {
       TranslatorUI.saveDir = file.getParent();
       if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file) || format.equals("tex") || format.equals("pdf")) {
         writeLaTeXReport(file);
+        success=true; // Void result... can't check.
       } else if (translator instanceof KEGG2yGraph){
         try {
-          ((KEGG2yGraph)translator).writeToFile((Graph2D) document, file.getPath(), format);
+          success = ((KEGG2yGraph)translator).writeToFile((Graph2D) document, file.getPath(), format);
         } catch (Exception e) {
           GUITools.showErrorMessage(this, e);
+          success=false;
         }
       } else if (translator instanceof KEGG2jSBML){
-        ((KEGG2jSBML)translator).writeToFile((SBMLDocument) document, file.getPath());
+        success = ((KEGG2jSBML)translator).writeToFile((SBMLDocument) document, file.getPath());
       }
     }
+    success&=(file.exists()&& (file.length()>0));
     
-    documentHasBeenSaved = true;
+    // Report success or failure.
+    if (success) {
+      documentHasBeenSaved = true;
+      log.info("Pathway has been saved successfully to '" + file.getName() + "'.");
+    } else {
+      log.warning("Saving pathway to disk failed.");
+    }
+    
     return file;
   }
   
