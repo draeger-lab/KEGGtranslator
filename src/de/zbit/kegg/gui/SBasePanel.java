@@ -74,7 +74,6 @@ import org.sbml.jsbml.Unit;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.compilers.HTMLFormula;
 import org.sbml.jsbml.util.compilers.LaTeXCompiler;
-import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.io.SBOTermFormatter;
 
 import de.zbit.gui.LayoutHelper;
@@ -322,7 +321,7 @@ public class SBasePanel extends JPanel {
 					"E-mail", "Organization" };
 			String rowData[][] = new String[hist.getNumCreators()][4];
 			int i = 0;
-			for (Creator mc : hist.getListCreators()) {
+			for (Creator mc : hist.getListOfCreators()) {
 				rowData[i][0] = mc.getGivenName();
 				rowData[i][1] = mc.getFamilyName();
 				rowData[i][2] = mc.getEmail();
@@ -558,16 +557,16 @@ public class SBasePanel extends JPanel {
 					String uri = cvt.getResourceURI(k);
 					if (!replacedURIs.contains(uri)) {
 					  replacedURIs.add(uri);
-					  String loc[];
-					  try {
-					    loc = SBML2LaTeX.getMIRIAMparser().getLocations(uri);
-					  } catch (Exception e) {
-					    throw new IOException(e.getMessage());
-					  }
-					  if (loc.length > 0) {
+				    String url = null;
+				    if (!uri.startsWith("urn")) {
+				      url = uri;
+				    } else {
+				      url = "http://identifiers.org/" + uri.substring(11).replace(':', '/');
+				    }
+					  if (url != null) {
 					    // The old code here was wrong!
 					    cvtString = cvtString.replace(uri,
-					      "<a href=\""+loc[0]+"\">"+uri+"</a>\n");
+					      "<a href=\""+url+"\">"+uri+"</a>\n");
 					  }
 					}
 				}

@@ -27,15 +27,13 @@ import java.awt.event.MouseListener;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.JDialog;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.sbml.jsbml.ASTNode;
-import org.sbml.jsbml.MathContainer;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
@@ -58,26 +56,62 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 	private static final long serialVersionUID = -3081533906479036522L;
 	
 	/**
-     * 
-     */
+	 * 
+	 */
 	private SBase currSBase;
 	
 	/**
-     * 
-     */
+	 * 
+	 */
 	private JPopupMenu popup;
 	
 	/**
-     * 
-     */
+	 * 
+	 */
 	private Set<ActionListener> setOfActionListeners;
 	
 	/**
-	 * @param node
+	 * @param sbase
 	 */
-	public SBMLTree(TreeNode node) {
-		super(node);
+	public SBMLTree(SBase sbase) {
+		super(createNodes(sbase));
 		init();
+	}
+	
+	/**
+	 * @param sbase
+	 * @return
+	 */
+	private static MutableTreeNode createNodes(TreeNode sbase) {
+		SBMLNode node = null;
+		if ((sbase instanceof SBase)) {
+			node = new SBMLNode((SBase) sbase);
+			MutableTreeNode child;
+			for (int i = 0; i < sbase.getChildCount(); i++) {
+				child = createNodes(sbase.getChildAt(i));
+				if (child != null) {
+					node.add(child);
+				}
+			}
+		} 
+		return node;
+	}
+	
+	/**
+	 * 
+	 * @author Andreas Dr&auml;ger
+	 */
+	public static class SBMLNode extends DefaultMutableTreeNode {
+
+		/**
+		 * Generated serial version identifier.
+		 */
+		private static final long serialVersionUID = 9057010975355065921L;
+		
+		
+		public SBMLNode(SBase sbase) {
+			super(sbase);
+		}
 	}
 	
 	/*
@@ -147,20 +181,20 @@ public class SBMLTree extends JTree implements MouseListener, ActionListener {
 						popup.setVisible(true);
 					}
 				}
-				if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
-					MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
-							.getUserObject();
-					JDialog dialog = new JDialog();
-					JScrollPane scroll = new JScrollPane(new SBMLTree(mc.getMath()),
-						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-					dialog.getContentPane().add(scroll);
-					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-					dialog.pack();
-					dialog.setModal(true);
-					dialog.setLocationRelativeTo(null);
-					dialog.setVisible(true);
-				}
+//				if (((DefaultMutableTreeNode) clickedOn).getUserObject() instanceof MathContainer) {
+//					MathContainer mc = (MathContainer) ((DefaultMutableTreeNode) clickedOn)
+//							.getUserObject();
+//					JDialog dialog = new JDialog();
+//					JScrollPane scroll = new JScrollPane(new SBMLTree(mc.getMath()),
+//						JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+//						JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//					dialog.getContentPane().add(scroll);
+//					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//					dialog.pack();
+//					dialog.setModal(true);
+//					dialog.setLocationRelativeTo(null);
+//					dialog.setVisible(true);
+//				}
 			}
 		}
 	}
