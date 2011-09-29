@@ -95,7 +95,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
       "If true, merges all nodes that have exactly the same relations (sources, targets and types).", (short) 2, "--merge", false);
   public static final Option<Boolean> CREATE_EDGE_LABELS = new Option<Boolean>("CREATE_EDGE_LABELS",Boolean.class,
       "If true, creates describing labels for each edge in the graph.", (short) 2, "--cel", false);
-  public static final Option<Boolean> DRAW_ARROWS_FOR_REACTIONS = new Option<Boolean>("DRAW_ARROWS_FOR_REACTIONS",Boolean.class,
+  public static final Option<Boolean> DRAW_GREY_ARROWS_FOR_REACTIONS = new Option<Boolean>("DRAW_GREY_ARROWS_FOR_REACTIONS",Boolean.class,
       "If true, creates grey arrows for reactions and arrows with transparent circles as heads for reaction modifiers. This does only " +
       "affect reactions defined by KEGG, not the relations.", (short) 2, "--dar", false);
   
@@ -106,7 +106,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   public static final OptionGroup<Boolean> GRAPH_OPTIONS = new OptionGroup<Boolean>(
       "Translation options for graphical outputs",
       "Define various options that are used in yFiles based translations.",
-      MERGE_NODES_WITH_SAME_EDGES, CREATE_EDGE_LABELS, DRAW_ARROWS_FOR_REACTIONS);
+      MERGE_NODES_WITH_SAME_EDGES, CREATE_EDGE_LABELS, DRAW_GREY_ARROWS_FOR_REACTIONS);
   
   /*
    * Funcional, SBML based translations

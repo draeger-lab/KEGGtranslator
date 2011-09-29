@@ -271,7 +271,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   private void loadPreferences() {
   	groupNodesWithSameEdges = KEGGtranslatorOptions.MERGE_NODES_WITH_SAME_EDGES.getValue(prefs);
   	createEdgeLabels = KEGGtranslatorOptions.CREATE_EDGE_LABELS.getValue(prefs);
-  	drawArrowsForReactions = KEGGtranslatorOptions.DRAW_ARROWS_FOR_REACTIONS.getValue(prefs);
+  	drawArrowsForReactions = KEGGtranslatorOptions.DRAW_GREY_ARROWS_FOR_REACTIONS.getValue(prefs);
   }
 
   

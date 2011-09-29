@@ -558,6 +558,8 @@ public class SBasePanel extends JPanel {
 					if (!replacedURIs.contains(uri)) {
 					  replacedURIs.add(uri);
 				    String url = null;
+				    // XXX: NOTE: startsWith is CASE-Sensitive! => "URN*" will lead
+				    // to wrong urls.
 				    if (!uri.startsWith("urn")) {
 				      url = uri;
 				    } else {

@@ -107,9 +107,31 @@ import de.zbit.util.prefs.SBProperties;
 public class TranslatorPanel extends JPanel implements BaseFrameTab {
   private static final long serialVersionUID = 6030311193210321410L;
   public static final transient Logger log = Logger.getLogger(TranslatorPanel.class.getName());
+  
+  /**
+   * This is the path where the background-logo will be loaded from. This must be
+   * relative to the current path!
+   */
+  public static String logoResourcePath = "img/Logo2.png";
+  
+  /**
+   * KGML formatted input file
+   */
   File inputFile;
+  
+  /**
+   * Desired output file format
+   */
   Format outputFormat;
+  
+  /**
+   * Boolean flag to remember weather the contained {@link #document}
+   * has been saved successfully at least once.
+   */
   boolean documentHasBeenSaved=false;
+  
+  
+  
   
   /**
    * Result of translating {@link #inputFile} to {@link #outputFormat}.
@@ -429,7 +451,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
           
           // Set KEGGtranslator logo as background
           if (TranslatorPanelOptions.SHOW_LOGO_IN_GRAPH_BACKGROUND.getValue(prefs)) {
-            RestrictedEditMode.addBackgroundImage(getClass().getResource("img/Logo2.png"), pane);
+            RestrictedEditMode.addBackgroundImage(getClass().getResource(logoResourcePath), pane);
           }
           //--
           // Show Navigation and Overview
