@@ -140,7 +140,7 @@ public class Relation2Reaction {
       int lastPos = 0;
       while (lastPos>=0) {
         String reactant = eq.substring(lastPos, curPos>=0?curPos:eq.length()).trim();
-        boolean isSubstrate = (lastPos<dividerPos);
+        boolean isSubstrate = (lastPos < dividerPos);
         if (reactant.contains(" ")) { // e.g. "2 C00103"
           reactant = reactant.substring(reactant.indexOf(" ")+1);
         }

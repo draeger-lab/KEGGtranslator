@@ -54,6 +54,7 @@ import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.tolatex.LaTeXOptions;
 import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 import org.sbml.tolatex.io.LaTeXOptionsIO;
@@ -423,7 +424,9 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
           
           // Create a new visualization of the model.
           try {
-            add(new SBMLModelSplitPane(doc));
+						add(new SBMLModelSplitPane(doc, SBPreferences.getPreferencesFor(
+							LaTeXOptions.class).getBoolean(
+							LaTeXOptions.PRINT_NAMES_IF_AVAILABLE)));
           } catch (Exception e) {
             e.printStackTrace();
             GUITools.showErrorMessage(null, e);
