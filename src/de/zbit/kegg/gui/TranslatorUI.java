@@ -61,6 +61,7 @@ import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.JTabbedLogoPane;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
+import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
@@ -478,7 +479,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		// Ask input file
 		if ((files == null) || (files.length < 1)) {
 			files = GUITools.openFileDialog(this, openDir, false, true,
-				JFileChooser.FILES_ONLY, new FileFilterKGML());
+				JFileChooser.FILES_ONLY, SBFileFilter.createKGMLFileFilter());
 			
 			askOutputFormat=true;
 		}

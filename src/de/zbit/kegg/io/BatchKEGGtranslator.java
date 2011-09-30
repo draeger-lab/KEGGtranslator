@@ -23,9 +23,9 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.util.List;
 
+import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.Translator;
-import de.zbit.kegg.gui.FileFilterKGML;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.DirectoryParser;
@@ -165,7 +165,7 @@ public class BatchKEGGtranslator {
       if (inFile.isDirectory()) {
         parseDirAndSubDir(dir + fn);
         
-      } else if (FileFilterKGML.isKGML(inFile)) {
+      } else if (SBFileFilter.isKGML(inFile)) {
         // Test if outFile already exists. Assumes: 1 Pathway per file. (should be true for all files... not crucial if assumption is wrong)
         String myDir = getAndCreateOutDir(dir);
         String outFileTemp = myDir + fn.trim().substring(0, fn.trim().length()-4) + fileExtension;

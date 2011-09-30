@@ -22,7 +22,7 @@ package de.zbit.kegg.io;
 
 import java.io.File;
 
-import de.zbit.kegg.gui.FileFilterKGML;
+import de.zbit.io.SBFileFilter;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.OptionGroup;
@@ -105,7 +105,7 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 	public static final Option<File> INPUT = new Option<File>("INPUT",
 			File.class,
 			"Path and name of the source, KGML formatted, XML-file.",
-			new Range<File>(File.class, new FileFilterKGML()), (short) 2, "-i" );
+			new Range<File>(File.class, SBFileFilter.createKGMLFileFilter()), (short) 2, "-i" );
 			//new File(System.getProperty("user.dir")));
 
 	/**
