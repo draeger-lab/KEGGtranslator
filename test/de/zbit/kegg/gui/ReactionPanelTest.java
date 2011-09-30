@@ -37,6 +37,8 @@ import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
+import de.zbit.sbml.gui.ReactionPanel;
+
 /**
  * @author Andreas Dr&auml;ger
  * @since 1.0
@@ -57,7 +59,7 @@ public class ReactionPanelTest {
 		writer.setIndentationChar(' ');
 		System.out.println(writer.writeSBMLToString(doc));
 		JFrame f = new JFrame("Reaction test");
-		JPanel panel = new ReactionPanel(doc.getModel().getReaction(0));
+		JPanel panel = new ReactionPanel(doc.getModel().getReaction(0), false);
 		panel.setBackground(Color.WHITE);
 		f.getContentPane().add(panel);
 		f.setBackground(Color.WHITE);
