@@ -37,7 +37,7 @@ public class TranslatorPanelOptionPanel extends PreferencesPanelForKeyProvider {
    * @throws IOException
    */
   public TranslatorPanelOptionPanel() throws IOException {
-    super(TranslatorPanelOptions.class);
+    super("Graph options", TranslatorPanelOptions.class);
   }
   
 }

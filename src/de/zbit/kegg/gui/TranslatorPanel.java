@@ -258,7 +258,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
       okButton.setEnabled(GUITools.isEnabled(lh.getContainer()));
       
       // Action
-      final Container thiss = lh.getContainer();
+//      final Container thiss = lh.getContainer();
       okButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           firePropertyChange("PATHWAY_NAME", null, selector.getSelectedPathway());
@@ -285,7 +285,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
                 localFile = get();
               } catch (Exception e) {
                 e.printStackTrace();
-                GUITools.showErrorMessage(thiss, e);
+                GUITools.showErrorMessage(null, e);
               }
               Format outFormat = outputFormat;
               if (oFormatFinal!=null) {
@@ -389,6 +389,7 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
       log.warning("Pathway download failed.");
       // Remove the tab
       this.getParent().remove(this);
+      
     }
   }
   
@@ -818,15 +819,6 @@ public class TranslatorPanel extends JPanel implements BaseFrameTab {
     if (additionalData==null) return null;
     return additionalData.get(key);
   }
-  
-  // TODO: REMOVE THE NEXT TWO METHODS!
-  public Object getData() {
-    return getData("DEFAULT_KEY");
-  }
-  public void setData(Object object) {
-    setData("DEFAULT_KEY", object);
-  }
-  //------------
 
   /**
    * Allows the programmer to store any additional data along with this panel.
