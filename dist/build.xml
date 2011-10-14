@@ -117,10 +117,6 @@
             
             <fileset dir="${SBML2LaTeXPath}/bin"/>
             <zipfileset excludes="META-INF/*.SF" src="${SBML2LaTeXPath}/lib/html2latex.jar"/>
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${SBML2LaTeXPath}/lib/jaxen-core.jar"/> -->
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${SBML2LaTeXPath}/lib/jaxen-jdom.jar"/> -->
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${SBML2LaTeXPath}/lib/jdom.jar"/> -->
-            <zipfileset excludes="META-INF/*.SF" src="${SBML2LaTeXPath}/lib/saxpath.jar"/>
       
     </jar>
   </target>
