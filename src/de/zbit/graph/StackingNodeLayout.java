@@ -40,6 +40,13 @@ import de.zbit.util.Utils;
  * [...])<br/>
  * Use this for group nodes only.
  * 
+ * <p><i>Note:<br/>
+ * Due to yFiles license requirements, we have to obfuscate this class
+ * in the JAR release of this application. Thus, this class
+ * can not be found by using the class name.<br/> If you can provide us
+ * with a proof of possessing a yFiles license yourself, we can send you
+ * an unobfuscated release of KEGGtranslator.</i></p>
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */

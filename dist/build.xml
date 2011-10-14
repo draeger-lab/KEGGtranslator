@@ -78,9 +78,6 @@
             </fileset>	
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/y.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/HotEqn.jar"/> -->
-            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jaxen-core.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jaxen-jdom.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/jdom.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/keggapi.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/stax-api-1.0.1.jar"/> -->
     	
@@ -173,11 +170,20 @@
 
                 <!-- Obfuscate all classes that make use of y.jar -->
                 <exclude name="de.zbit.kegg.gui.TranslatorPanel"/>
-                <exclude name="de.zbit.kegg.ext.RestrictedEditMode"/>
+
                 <exclude name="de.zbit.kegg.ext.GenericDataMap"/>
+              	
+              	<exclude name="de.zbit.util.TranslatorTools"/>
+              	
                 <exclude name="de.zbit.kegg.io.KEGG2yGraph"/>
                 <exclude name="de.zbit.kegg.io.YFilesWriter"/>
-               
+              	
+              	<exclude name="de.zbit.graph.CollapseGroupNodesViewMode"/>
+                <exclude name="de.zbit.graph.RestrictedEditMode"/>
+                <exclude name="de.zbit.graph.RestrictedEditModeV2"/>
+              	<exclude name="de.zbit.graph.SearchSupport"/>
+              	<exclude name="de.zbit.graph.StackingNodeLayout"/>
+              	
                <!-- Obfuscate the included y.jar -->
                <exclude name="y.**.*"/>
               </patternset>

@@ -62,6 +62,13 @@ import y.view.NodeRealizer;
  * Utility class that provides methods for searching for nodes that match
  * a given search criterion and for displaying search results.
  * 
+ * <p><i>Note:<br/>
+ * Due to yFiles license requirements, we have to obfuscate this class
+ * in the JAR release of this application. Thus, this class
+ * can not be found by using the class name.<br/> If you can provide us
+ * with a proof of possessing a yFiles license yourself, we can send you
+ * an unobfuscated release of KEGGtranslator.</i></p>
+ * 
  * @author Clemens Wrzodek
  * @author yFiles GmbH
  * @version $Rev$
