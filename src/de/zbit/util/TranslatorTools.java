@@ -98,8 +98,8 @@ public class TranslatorTools {
   public final static String RNA_TYPE = "RNA";
   
   
-  public TranslatorTools(TranslatorPanel tp){
-    this(tp.isGraphML()?(Graph2D) tp.getDocument():null);
+  public TranslatorTools(TranslatorPanel<Graph2D> tp){
+    this(tp.getDocument());
   }
   
   public TranslatorTools(Graph2D graph){

@@ -73,6 +73,7 @@ import y.view.NodeRealizer;
  * @author yFiles GmbH
  * @version $Rev$
  */
+@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 public class SearchSupport {
   private static final Object NEXT_ACTION_ID = "SearchSupport.Next";
   private static final Object CLEAR_ACTION_ID = "SearchSupport.Clear";

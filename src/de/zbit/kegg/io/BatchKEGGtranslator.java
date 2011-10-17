@@ -50,7 +50,7 @@ public class BatchKEGGtranslator {
    */
   private String orgOutdir = "";
   /**
-   * Possible: SBML & GraphML. Default to graphML
+   * Possible: SBML & GraphML. Default to GraphML
    */
   private Format outFormat = Format.GraphML;
   

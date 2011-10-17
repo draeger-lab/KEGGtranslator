@@ -353,14 +353,38 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				// Tanslate and add tab.
 				try {
 					openDir = inFile.getParent();
-					tabbedPane.addTab(inFile.getName(), new TranslatorPanel(inFile, f, this));
-					tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+					addTranslatorTab(TranslatorPanel.createPanel(inFile, f, this));
 				} catch (Exception e1) {
 					GUITools.showErrorMessage(this, e1);
 				}
 			}
 		}
 	}
+	
+	/**
+	 * Adds a new {@link TranslatorPanel} to this {@link #tabbedPane}
+	 * and changes the selection to this new panel.
+	 * @param tp
+	 */
+	public void addTranslatorTab(TranslatorPanel<?> tp) {
+    addTranslatorTab(null, tp);
+	}
+	
+	/**
+	 * Adds a new {@link TranslatorPanel} to this {@link #tabbedPane}
+	 * and changes the selection to this new panel.
+	 * @param tabName name for the tab
+	 * @param tp
+	 */
+	public void addTranslatorTab(String tabName, TranslatorPanel<?> tp) {
+    try {
+      if (tabName==null) tabName = tp.getTitle();
+      tabbedPane.addTab(tabName, tp);
+      tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+    } catch (Exception e1) {
+      GUITools.showErrorMessage(this, e1);
+    }
+  }
 
 	/*
 	 * (non-Javadoc)
@@ -373,7 +397,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			Action action = Action.valueOf(e.getActionCommand());
 			switch (action) {
 			case TRANSLATION_DONE:
-				TranslatorPanel source = (TranslatorPanel) e.getSource();
+				TranslatorPanel<?> source = (TranslatorPanel<?>) e.getSource();
 				int index = tabbedPane.indexOfComponent(source);
 				if (index>=0) {// ELSE: User closed the tab before completion
 				  if (e.getID() != JOptionPane.OK_OPTION) {
@@ -381,7 +405,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				    // message has already been issued by the translator.
 				    tabbedPane.removeTabAt(index);
 				  } else {
-				    tabbedPane.setTitleAt(index, source.getTitle());
+				    // Do not change title here. Initial title is mostly
+				    // better than this one ;-)
+				    //tabbedPane.setTitleAt(index, source.getTitle());
 				  }
 				}
 				updateButtons();
@@ -399,20 +425,20 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 //				writeLaTeXReport();
 //				break;
       case DOWNLOAD_KGML:
-        try {
-          tabbedPane.addTab(action.getName(), new TranslatorPanel(this));
-          tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
-        } catch (Exception e1) {
-          GUITools.showErrorMessage(this, e1);
-        }
+        TranslatePathwayDialog.showAndEvaluateDialog(tabbedPane, this, null);
+//        try {
+//          tabbedPane.addTab(action.getName(), new TranslatorPanel(this));
+//          tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
+//        } catch (Exception e1) {
+//          GUITools.showErrorMessage(this, e1);
+//        }
         break;
       case NEW_PROGRESSBAR:
         getStatusBar().showProgress((AbstractProgressBar)e.getSource());
         break;
       case OPEN_PATHWAY:
         try {
-          tabbedPane.addTab(e.getSource().toString(), new TranslatorPanel(e.getSource().toString(),Format.GraphML,this));
-          tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
+          addTranslatorTab(e.getSource().toString(), TranslatorPanel.createPanel(e.getSource().toString(),Format.GraphML,this));
         } catch (Exception e1) {
           GUITools.showErrorMessage(this, e1);
         }
@@ -453,7 +479,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 
 		// Check if document already has been saved
 		if ((comp instanceof TranslatorPanel)
-				&& !((TranslatorPanel) comp).isSaved()) {
+				&& !((TranslatorPanel<?>) comp).isSaved()) {
 			if ((JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this,
 					StringUtil.toHTML(String.format(
 							"Do you really want to close %s without saving?",
@@ -517,7 +543,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		GUITools.setEnabled(false, getJMenuBar(), BaseAction.FILE_SAVE,
 				//Action.TO_LATEX,
 				BaseAction.FILE_CLOSE);
-		TranslatorPanel o = getCurrentlySelectedPanel();
+		TranslatorPanel<?> o = getCurrentlySelectedPanel();
 		if (o != null) {
 			o.updateButtons(getJMenuBar());
 		}
@@ -528,15 +554,15 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 *         {@link #tabbedPane}, or null if either no or no valid selection
 	 *         exists.
 	 */
-	private TranslatorPanel getCurrentlySelectedPanel() {
+	private TranslatorPanel<?> getCurrentlySelectedPanel() {
 		if ((tabbedPane == null) || (tabbedPane.getSelectedIndex() < 0)) {
 			return null;
 		}
 		Object o = ((JTabbedPane) tabbedPane).getSelectedComponent();
-		if ((o == null) || !(o instanceof TranslatorPanel)) {
+		if ((o == null) || !(o instanceof TranslatorPanel<?>)) {
 			return null;
 		}
-		return ((TranslatorPanel) o);
+		return ((TranslatorPanel<?>) o);
 	}
 
 	/*
@@ -545,7 +571,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @see de.zbit.gui.BaseFrame#saveFile()
 	 */
 	public void saveFile() {
-		TranslatorPanel o = getCurrentlySelectedPanel();
+		TranslatorPanel<?> o = getCurrentlySelectedPanel();
 		if (o != null) {
 			o.saveToFile();
 		}
