@@ -143,7 +143,9 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
      * The Tooltips of nodes, provding descriptions must be shown
      * longer than the system default. Let's show them 15 seconds!
      */
-    ToolTipManager.sharedInstance().setDismissDelay(15000);
+    if (ToolTipManager.sharedInstance().getDismissDelay()<15000) {
+      ToolTipManager.sharedInstance().setDismissDelay(15000);
+    }
   }
   
   /**
@@ -200,7 +202,13 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     String description = null;
     String image = "";
     StringBuffer additional = new StringBuffer();
-    NodeMap[] nm = n.getGraph().getRegisteredNodeMaps();
+    NodeMap[] nm;
+    try {
+      nm = n.getGraph().getRegisteredNodeMaps();
+    } catch  (Exception e) {
+      e.printStackTrace();
+      return super.getNodeTip(n);
+    }
     if (nm!=null) {
       for (int i=0; i<nm.length;i++) {
         Object c = nm[i].get(n);

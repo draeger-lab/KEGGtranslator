@@ -149,7 +149,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			case DOWNLOAD_KGML:
         return "Downloads KGML-formatted XML pathways from KEGG server.";
 			default:
-				return "Unknown";
+				return "";
 			}
 		}
 	}

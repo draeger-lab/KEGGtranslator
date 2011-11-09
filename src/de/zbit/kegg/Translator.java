@@ -162,9 +162,9 @@ public class Translator {
 	
 	/**
 	 * 
-	 * @param format - currently one of {SBML,LaTeX,GraphML,GML,JPG,GIF,TGF,YGF}.
-	 * @param input - input file
-	 * @param output - output file
+	 * @param format One of all valid output {@link Format}s.
+	 * @param input input file
+	 * @param output output file
 	 * @return
 	 * @throws IOException
 	 */
@@ -282,7 +282,7 @@ public class Translator {
 		
 		// Create new, if loading failed
 		if (manager==null) {
-			manager = new KeggInfoManagement(5000);
+			manager = new KeggInfoManagement(10000);
 		}
 		
 		return manager;

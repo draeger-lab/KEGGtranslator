@@ -39,6 +39,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +76,7 @@ import y.view.ShapeNodeRealizer;
 import y.view.View;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
+import de.zbit.graph.LineNodeRealizer;
 import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
@@ -136,6 +138,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * or not.
    */
   private boolean createEdgeLabels=false;
+  /**
+   * If true, hides labels for all compounds (=small molecules).
+   */
+  private boolean hideLabelsForCompounds=false;
   /**
    * Draws grey arrows for reactions. This is not recommended since reactions
    * are mostly formally duplicates of the processed relations.
@@ -272,6 +278,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   	groupNodesWithSameEdges = KEGGtranslatorOptions.MERGE_NODES_WITH_SAME_EDGES.getValue(prefs);
   	createEdgeLabels = KEGGtranslatorOptions.CREATE_EDGE_LABELS.getValue(prefs);
   	drawArrowsForReactions = KEGGtranslatorOptions.DRAW_GREY_ARROWS_FOR_REACTIONS.getValue(prefs);
+  	hideLabelsForCompounds = KEGGtranslatorOptions.HIDE_LABELS_FOR_COMPOUNDS.getValue(prefs);
   }
 
   
@@ -538,7 +545,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       }
     }
     ArrayList<Node> parentGroupNodes = new ArrayList<Node>();
-    ArrayList<ArrayList<Integer>> groupNodeChildren = new ArrayList<ArrayList<Integer>>();
+    ArrayList<List<Integer>> groupNodeChildren = new ArrayList<List<Integer>>();
     HierarchyManager hm = graph.getHierarchyManager();
     if (hm==null) hm = new HierarchyManager(graph);
     
@@ -555,10 +562,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       if (skipCompounds && e.getType().equals(EntryType.compound)) continue;
       
       Node n = null;
+      Object nodeLink = null;
       boolean isPathwayReference=false;
       String name = e.getName().trim();
       if (name.toLowerCase().startsWith("path:") || e.getType().equals(EntryType.map)) isPathwayReference=true;
-      
       
       // Get the graphics object, create a default one or skip this entry.
       Graphics g = null;
@@ -580,16 +587,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         
         // Get name, description and other annotations via api (organism specific) possible!!
         //Graphics g = e.getGraphics();
-        if (g.getName().length()!=0)
-          name = g.getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
+        if (g.getName().length()!=0) {
+          name = g.getName();
+        }
         /*if (g.getWidth()>0 && g.getHeight()>0) {
           n = graph.createNode(g.getX(), g.getY(), g.getWidth(), g.getHeight(), name);
         } else {
           n = graph.createNode(g.getX(), g.getY(), name);
         }*/
-        
-        
-        
         
         NodeRealizer nr;
         NodeLabel nl = new NodeLabel(name);
@@ -604,42 +609,16 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           // New Text
           String newText = null;
           if (nl.getText().length()==0 || nl.getText().equals("undefined")) {
-            /*String newText = "Group of: " + "\n";
-            char sep = ',';
-            for (Integer i2: e.getComponents()) {
-              Entry e2 = p.getEntryForId(i2);
-              if (e2==null) {
-                newText+=i2+sep;
-              } else if (e2.hasGraphics() && !e2.getGraphics().getName().isEmpty()) {
-                newText+=e2.getGraphics().getName()+sep;
-              } else {
-                newText+=e2.getName()+sep;
-              }
-            }*/
             newText = "Group";
           }
           nr = setupGroupNode(nl, newText);
-        } else if (g.getType().equals(GraphicsType.rectangle)) {
-          nr = new ShapeNodeRealizer(ShapeNodeRealizer.RECT);
-        } else if (g.getType().equals(GraphicsType.circle)) {
-          nr = new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE);
-          nl.setFontSize(10); // looks better on small ellipses
-        } else if (g.getType().equals(GraphicsType.roundrectangle)) {
-          nr = new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT);
-          //} else if (g.getType().toString().equals("line")) { // Vielleicht in neuerer yFiles version line verfuegbar?
-          //nr = new ShapeNodeRealizer(ShapeNodeRealizer.TRAPEZOID);
-        } else
-          nr = new GenericNodeRealizer();
+        } else {
+          // set depdent on graphics object in setupGraphics()
+          nr = null;
+        }
         
-        try {
-          if (g.isBGcolorSet())
-            nr.setFillColor(ColorFromHTML(g.getBgcolor()));
-        } catch (Throwable t) {t.printStackTrace();}
-        
-        try {
-          if (g.isBGcolorSet())
-            nl.setTextColor(ColorFromHTML(g.getFgcolor()));
-        } catch (Throwable t) {t.printStackTrace();}
+        // Parse and set information from the graphics object
+        nr = setupGraphics(nr, nl, g);
         
         nr.setLabel(nl);
         if (isPathwayReference && name.toUpperCase().startsWith("TITLE:")) {
@@ -659,27 +638,41 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           try {
             // Convert to URL, because type is infered of the submitted object
             // and URL is better than STRING.
-            nl.setUserData(new URL(link));
+            nodeLink = new URL(link);
           } catch (MalformedURLException e1) {
-            nl.setUserData(link);
+            nodeLink = link;
           }
+          nl.setUserData(nodeLink);
         }
-        
-        nr.setX(g.getX());
-        nr.setY(g.getY());
-        if (g.getWidth()>0 || g.getHeight()>0) {
-          nr.setWidth(g.getWidth());
-          nr.setHeight(g.getHeight());
-        }
-        
         
         n = graph.createNode(nr);
         if (addThisNodeToGroupNodeList) {
           hm.convertToGroupNode(n);
           parentGroupNodes.add(n);
         }
-        
       }
+      
+      // Multiple graphics objects are actually only observed when
+      // KEGG tries to create shapes with (multiple) lines.
+      if (e.hasMultipleGraphics()) {
+        for (Graphics g2: e.getMoreGraphics()) {          
+          NodeRealizer nr = null;
+          NodeLabel nl = new NodeLabel(g2.getName());
+          
+          // Parse and set information from the graphics object
+          nr = setupGraphics(nr, nl, g2);
+          nr.setLabel(nl);
+          
+          // Store hyperlinks in the node-label (and later on in the node itself).
+          if (nodeLink!=null) {
+            nl.setUserData(nodeLink);
+          }
+          
+          // Create a node, but don't set the reference
+          graph.createNode(nr);
+        }
+      }
+      
       
       
       // Node was created. Postprocessing options.
@@ -689,53 +682,26 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         
         
         // KeggAdaptor.
-        boolean hasMultipleIDs = false;
-        if (e.getName().trim().contains(" ")) hasMultipleIDs = true;
+        //boolean hasMultipleIDs = false;
+        //if (e.getName().trim().contains(" ")) hasMultipleIDs = true;
         
+        List<KeggInfos> keggInfos = new LinkedList<KeggInfos>();
         String name2="",definition="",entrezIds2="",uniprotIds2="",eType="",ensemblIds2="";
         for (String ko_id:e.getName().split(" ")) {
           //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zusaetzlich: in sortedArrayList merken.
           if (ko_id.trim().equalsIgnoreCase("undefined") || e.hasComponents()) continue;
           
-          KeggInfos infos = new KeggInfos(ko_id, manager);
+          KeggInfos infos = KeggInfos.get(ko_id, manager);
+          keggInfos.add(infos);
           
           // "NCBI-GeneID:","UniProt:", "Ensembl:", ... aus dem GET rausparsen
           if (infos.queryWasSuccessfull()) {
-            String oldText=graph.getRealizer(n).getLabelText();
-            
-            // KEGG always provides multiple names for an entry.
-            String exName = infos.getNames();            
-            if (exName!=null && exName.length()!=0) {
-              
-              if (showFormulaForCompounds && infos.getFormula()!=null && infos.getFormula().length()>0) {
-                exName = infos.getFormula();
-
-              } else if (!showShortNames) {
-                // Take last name (mostly very descriptive)
-                int pos = exName.lastIndexOf(";");
-                if (pos>0 && pos<(exName.length()-1)) exName = exName.substring(pos+1, exName.length()).replace("\n", "").trim();
-              } else {
-                // Choose the shortest name.
-                String[] multiNames = exName.split(";");
-                for(String cname:multiNames) {
-                  cname = cname.replace("\n", "").trim();
-                  if (cname.length()>0 && cname.length()<exName.length()) {
-                    exName = cname;
-                  }
-                }
-              }
-              
-              // Eventually assign new name.
-              if (!hasMultipleIDs) // Knotennamen nur anpassen, falls nicht mehrere IDs.
-                graph.getRealizer(n).setLabelText(exName);
-              else if (oldText.length()==0) // ... oder wenn er bisher leer ist.
-                graph.getRealizer(n).setLabelText(exName);
-            }
-            
-            
             
             String text = infos.getNames();
-            if (text!=null && text.length()!=0) name2+=(name2.length()!=0?", ":"")+text.replace(",", "");
+            if (text!=null && text.length()!=0) name2+=(name2.length()>0?", ":"")+text.replace(", ", " ").replace(';', ' ').replace("\n", "");
+            // Append formula for compounds. ONLY WITH SPACE, because compounds synonyms are space divided
+            text = infos.getFormula();
+            if (text!=null && text.length()!=0) name2+=(name2.length()>0?" ":"")+text;
             
             if (e.getType().equals(EntryType.map)) { // => Link zu anderem Pathway oder Title-Node des aktuellem PW.
               text = infos.getDescription();
@@ -769,6 +735,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
             // Außerdem: "bindsToChemicals" nicht gesetzt.
           }
         }
+        
+        // Assign new name based on API and user selection
+        name = getNameForEntry(e, keggInfos.toArray(new KeggInfos[0]));
+        graph.getRealizer(n).setLabelText(name);
+        if (hideLabelsForCompounds && e.getType().equals(EntryType.compound)) {
+          graph.getRealizer(n).removeLabel(graph.getRealizer(n).getLabel());
+        }
+
         if (isPathwayReference) {
           eType = "pathway";
         }
@@ -791,7 +765,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       
       if (isPathwayReference) PWReferenceNodeTexts.add(graph.getRealizer(n).getLabelText());
       if (e.hasReaction()) {
-        reactionModifiers.put(e.getReaction().toLowerCase().trim(), n);
+        for (String reaction : e.getReactions()) {
+          reactionModifiers.put(reaction.toLowerCase().trim(), n);
+        }
       }
     }
     
@@ -1066,12 +1042,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     // Disables: leads to very low resultions on JPG files.
     //configureView(new Graph2DView(graph));
     
-    // Shorten name
-    if (showShortNames) {
-      graph = modifyNodeLabels(graph,nodeName,true,true, keggOntIds, nodeLabel);
-    }
-    
-    
     /*
      * Create a data provider that stores the names of all
      * data providers (Maps).
@@ -1100,13 +1070,73 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   
   /**
+   * Set parameters from the graphics object on the
+   * {@link NodeRealizer} / {@link NodeLabel}.
+   * @param nr
+   * @param nl
+   * @param g
+   */
+  private NodeRealizer setupGraphics(NodeRealizer nr, NodeLabel nl, Graphics g) {
+    if (nr==null) {
+      if (g.getType().equals(GraphicsType.rectangle)) {
+        nr = new ShapeNodeRealizer(ShapeNodeRealizer.RECT);
+      } else if (g.getType().equals(GraphicsType.circle)) {
+        nr = new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE);
+        nl.setFontSize(10); // looks better on small ellipses
+      } else if (g.getType().equals(GraphicsType.roundrectangle)) {
+        nr = new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT);
+      } else if (g.getType().equals(GraphicsType.line) && g.isSetCoords()) {
+        nr = new LineNodeRealizer();
+      } else {
+        nr = new GenericNodeRealizer();
+      }
+    }
+    
+    // Colors
+    try {
+      if (g.isBGcolorSet())
+        nr.setFillColor(ColorFromHTML(g.getBgcolor()));
+    } catch (Throwable t) {t.printStackTrace();}
+    
+    try {
+      if (g.isFGcolorSet()) {
+        Color color = ColorFromHTML(g.getFgcolor());
+        nl.setTextColor(color);
+        if (nr instanceof LineNodeRealizer) {
+          nr.setFillColor(color);
+        }
+      } 
+    } catch (Throwable t) {t.printStackTrace();}
+    
+    // Coordinates
+    if (g.isSetCoords() && (nr instanceof LineNodeRealizer)) {
+      // Is it a line/spline
+      Integer[] coords = g.getCoords();
+      for (int j=0; j<(coords.length-1); j+=2) {
+        ((LineNodeRealizer)nr).addSplineCoords(coords[j], coords[j+1]);
+      }
+      
+    } else {
+      // ... or a (simple) node
+      if (g.getWidth()>0 || g.getHeight()>0) {
+        nr.setWidth(g.getWidth());
+        nr.setHeight(g.getHeight());
+      }
+      nr.setCenter(g.getX(), g.getY());
+    }
+    
+    return nr;
+  }
+  
+  
+  /**
    * @param r
    * @param p
    * @param graph
    * @param reactionModifiers
    */
   private void addKGMLReaction(Reaction r, Pathway p, Graph2D graph, Map<String, Node> reactionModifiers) {
-    if (!reactionHasAtLeastOneReactantAndProduct(r, p)) return;
+    if (!reactionHasAtLeastOneSubstrateAndProduct(r, p)) return;
     
     EdgeRealizer er = new GenericEdgeRealizer();
     er.setTargetArrow(Arrow.STANDARD);
@@ -1118,13 +1148,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // yFiles only provides 1:1 relations => Create edge for every combination.
     for (ReactionComponent sub:r.getSubstrates()) {
-      Entry one;
-      if (sub.hasId()) one = p.getEntryForId(sub.getId());
-      else one = p.getEntryForName(sub.getName());;
+      Entry one = p.getEntryForReactionComponent(sub);
       for (ReactionComponent prod:r.getProducts()) {
-        Entry two;
-        if (prod.hasId()) two = p.getEntryForId(prod.getId());
-        else two = p.getEntryForName(prod.getName());;        
+        Entry two = p.getEntryForReactionComponent(prod);
+        if (one==null || two==null) continue;        
         
         // Get nodes, corresponding to entries
         Node nOne = (Node) one.getCustom();
@@ -1273,60 +1300,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       }
     }
     return false;
-  }
-  
-  /**
-   * Modifies all labels of all nodes in the given graph.
-   * @param g the graph to modiy
-   * @param nodeName a list to store the node names separately
-   * @param removeSpeciesTitles convert e.g. "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
-   * BE CAREFUL WITH THAT: "HNF-4" is also converted to "HNF"!
-   * @param removeMultipleNodeNames convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
-   * @param keggIDMap required only if <code>removeSpeciesTitles</code> is true.
-   * A mapping from node to kegg identifier(s).
-   * @param nodeLabel optional mapping from node to further synonyms for
-   * the corresponding gene. Only if <code>removeMultipleNodeNames</code> is true.
-   * @return Graph2D g
-   */
-  public static Graph2D modifyNodeLabels(Graph2D g, NodeMap nodeName, boolean removeSpeciesTitles, 
-    boolean removeMultipleNodeNames, NodeMap keggIDMap, NodeMap nodeLabel) {
-    for (y.base.Node n:g.getNodeArray()) {
-      String t = g.getLabelText(n);
-      
-      // Convert "Citrate cycle (TCA cycle) - Homo sapiens (human)" => "Citrate cycle (TCA cycle)"
-      if (removeSpeciesTitles && keggIDMap!=null) {
-        Object kgID = keggIDMap.get(n);
-        if (kgID!=null && kgID.toString().startsWith("path:")) {
-          int pos = t.lastIndexOf("-");
-          if (pos>0) {
-            t = t.substring(0, pos-1);
-            g.setLabelText(n, t);
-            if (nodeName!=null) nodeName.set(n, t);
-          }
-        }
-      }
-      
-      // Convert "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..." => "PCK1"
-      if (removeMultipleNodeNames) {
-        if (nodeLabel!=null) {
-          // Append further names to choose one from
-          // Note: Compounds are divided with ";", genes with "," and " "
-          // and compounds and reference nodes may contain " " in single names.
-          Object synonyms = nodeLabel.get(n);
-          if (synonyms!=null) {
-            // => append with ", " and replace all identifier
-            // divider by ", ". Unfortunately, replacing the somtetimes
-            // dividing space leads often to incorrect names...
-            t = t + ", " + synonyms.toString().replace("; ", ", ");
-            //.replaceAll(",\\S", ", ");
-          }
-        }
-        t = shortenName(t);
-        g.setLabelText(n, t);
-        if (nodeName!=null) nodeName.set(n, t);
-      }
-    }
-    return g;
   }
   
   /**

@@ -149,7 +149,9 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
      * The Tooltips of nodes, provding descriptions must be shown
      * longer than the system default. Let's show them 15 seconds!
      */
-    ToolTipManager.sharedInstance().setDismissDelay(15000);
+    if (ToolTipManager.sharedInstance().getDismissDelay()<15000) {
+      ToolTipManager.sharedInstance().setDismissDelay(15000);
+    }
   }
   
   /**

@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 
 import y.base.DataMap;
 import y.base.Edge;
+import y.base.EdgeCursor;
 import y.base.EdgeMap;
 import y.base.Graph;
 import y.base.Node;
@@ -603,8 +604,32 @@ public class TranslatorTools {
 //    OrganicLayouter layouter = new OrganicLayouter();
 //    layouter.setSphereOfAction(OrganicLayouter.ONLY_SELECTION);
     
-    Graph2DLayoutExecutor l = new Graph2DLayoutExecutor();
-    l.doLayout(graph, layouter);
+    try {
+      Graph2DLayoutExecutor l = new Graph2DLayoutExecutor();
+      l.doLayout(graph, layouter);
+    }catch (Exception e) {
+      log.fine("Layout fallback on manual simple layout.");
+      /* With LineNodeRealizer it is possible to get
+       * java.lang.IllegalArgumentException: Graph contains nodes with zero width/height.
+       * Please enlarge those nodes manually or by using LayoutStage y.layout.MinNodeSizeStage.
+       */
+      // Since we only have miRNAs here, place on top of first target
+      try {
+        for (Node n:newNodes) {
+          NodeRealizer nr = n!=null?graph.getRealizer(n):null;
+          if (nr==null) continue;
+          EdgeCursor cursor = n.edges();
+          if (cursor.ok()) {
+            //cursor.toLast();
+            Node target = cursor.edge().opposite(n);
+            NodeRealizer targetRealizer = graph.getRealizer(target);
+            nr.setCenter(targetRealizer.getCenterX(), targetRealizer.getCenterY()-nr.getHeight()*1.5);
+          }
+        }
+      }catch (Exception e2) {
+        e2.printStackTrace();
+      }
+    }
     
     
     // Write initial position to node annotations

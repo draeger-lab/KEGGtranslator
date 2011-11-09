@@ -22,11 +22,15 @@ package de.zbit.kegg.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggInfoManagement;
+import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.KeggTools;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -35,7 +39,9 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.util.AbstractProgressBar;
+import de.zbit.util.ArrayUtils;
 import de.zbit.util.ProgressBar;
+import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
 
 
@@ -98,13 +104,13 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected boolean autocompleteReactions=true;
   
   /**
-   * If set to true, all names will be shortened to one synonym.
-   * Else: all synonyms will be shown e.g. only "DLAT" instead of
-   * "DLAT, DLTA, PDC-E2, PDCE2"
+   * Selector that allows to change the way how translated entries
+   * should be labeled.
    * XXX: Implementing classes must implement this functionality!
-   * You may use the {@link #shortenName(String)} function for that.
+   * You may use the {@link #getNameForEntry(Entry)}
+   * function for that.
    */
-  protected boolean showShortNames = true;
+  protected KEGGtranslatorOptions.NODE_NAMING nameToAssign = KEGGtranslatorOptions.NODE_NAMING.INTELLIGENT;
   
   /**
    * If true, show the chemical Formula (e.g. "C6H12OH") instead of
@@ -125,7 +131,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected boolean lastFileWasOverwritten = false;
   
   /**
-   * ProgressBar for Kegg2x translation
+   * ProgressBar for KEGG translation
    */
   protected AbstractProgressBar progress=null;
   
@@ -204,19 +210,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   }
   
   /**
-   * See {@link #showShortNames}
-   * @return
+   * See {@link #nameToAssign}
+   * @param node_naming how to label translated entries.
    */
-  public boolean isShowShortNames() {
-    return showShortNames;
-  }
-  
-  /**
-   * See {@link #showShortNames}
-   * @param showShortNames
-   */
-  public void setShowShortNames(boolean showShortNames) {
-    this.showShortNames = showShortNames;
+  public void setNameToAssign(KEGGtranslatorOptions.NODE_NAMING node_naming) {
+    this.nameToAssign = node_naming;
   }
   
   /**
@@ -285,7 +283,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   	retrieveKeggAnnots = !KEGGtranslatorOptions.OFFLINE_MODE.getValue(prefs);
   	removeWhiteNodes = KEGGtranslatorOptions.REMOVE_WHITE_GENE_NODES.getValue(prefs);
   	autocompleteReactions = KEGGtranslatorOptions.AUTOCOMPLETE_REACTIONS.getValue(prefs);
-  	showShortNames = KEGGtranslatorOptions.SHORT_NAMES.getValue(prefs);
+  	nameToAssign = KEGGtranslatorOptions.GENE_NAMES.getValue(prefs);
   	showFormulaForCompounds = KEGGtranslatorOptions.SHOW_FORMULA_FOR_COMPOUNDS.getValue(prefs);
   }
   
@@ -304,16 +302,18 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       KeggInfoManagement.offlineMode = false;
       
       // Prefetch kegg information (enormas speed improvement).
-      //System.out.print("Fetching information from KEGG online resources... ");
       log.info("Fetching information from KEGG online resources... ");
       KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false);
-      log.info("Information fetched. Translating pathway... ");
-      //System.out.println("done.");
       
       // Auto-complete the reaction by adding all substrates, products and enzymes.
       if (autocompleteReactions && functionalOutput) {
-        KeggTools.autocompleteReactions(p, manager);
+        KeggTools.autocompleteReactions(p, manager, true);
       }
+      
+      // Auto-completion requires API-infos and also adds new entries
+      // => preFetch twice.
+      KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false);
+      log.info("Information fetched. Translating pathway... ");
     }
     
     // Preprocess pathway
@@ -402,10 +402,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * Initializes the given, or a new progressBar with the number of
    * entries. Optionally, the number of relations or reactions can
    * be added.
-   * @param p - The KEGG Pathway to translate
-   * @param addRelations - if true, also adds the number of relations
+   * @param p The KEGG Pathway to translate
+   * @param addRelations if true, also adds the number of relations
    * to the number of total calls.
-   * @param addReactions - if true, also adds the number of reactions
+   * @param addReactions if true, also adds the number of reactions
    * to the number of total calls. 
    */
   protected void initProgressBar(Pathway p, boolean addRelations, boolean addReactions) {
@@ -416,6 +416,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     // if (!retrieveKeggAnnots) aufrufeGesamt+=p.getRelations().size();
     if (progress==null) {
       progress = new ProgressBar(totalCalls + 1);
+      ((ProgressBar)progress).setPrintInOneLine(true);
     } else {
       progress.reset();
       progress.setNumberOfTotalCalls(totalCalls + 1);
@@ -424,24 +425,25 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   }
   
   /**
-   * Checks wether a given reaction has at least one product and substrate.
+   * Checks whether a given reaction has at least one product and substrate.
    * @param reaction
    * @param parentPathway
    * @return
    */
-  public static boolean reactionHasAtLeastOneReactantAndProduct(Reaction reaction, Pathway parentPathway) {
+  public static boolean reactionHasAtLeastOneSubstrateAndProduct(Reaction reaction, Pathway parentPathway) {
     // Skip reaction if it has either no reactants or no products.
     boolean hasAtLeastOneReactantAndProduct = false;
     for (ReactionComponent rc : reaction.getSubstrates()) {
-      Entry spec = parentPathway.getEntryForName(rc.getName());
+      Entry spec = parentPathway.getEntryForReactionComponent(rc);
       if (spec == null || spec.getCustom() == null) continue;
       hasAtLeastOneReactantAndProduct = true;
       break;
     }
     if (!hasAtLeastOneReactantAndProduct) return false;
+    
     hasAtLeastOneReactantAndProduct = false;
     for (ReactionComponent rc : reaction.getProducts()) {
-      Entry spec = parentPathway.getEntryForName(rc.getName());
+      Entry spec = parentPathway.getEntryForReactionComponent(rc);
       if (spec == null || spec.getCustom() == null) continue;
       hasAtLeastOneReactantAndProduct = true;
       break;
@@ -462,6 +464,187 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   }
   
   /**
+   * @param entry
+   * @return {@link String} to use as label for the {@link Entry}.
+   * @see #getNameForEntry(Entry, KeggInfos...)
+   */
+  protected String getNameForEntry(Entry entry) {
+    return getNameForEntry(entry, (KeggInfos)null);
+  }
+  
+  /**
+   * Convenient method to be called by extending classes that
+   * returns the name to assign for an entry, based on the
+   * current user selection ({@link #nameToAssign}).
+   * @param entry
+   * @param infos already queried {@link KeggInfos}
+   * @return {@link String} to use as label for the {@link Entry}.
+   */
+  protected String getNameForEntry(Entry entry, KeggInfos... infos) {
+    
+    // Query API
+    if (infos==null || infos.length==0 ||
+        (infos.length==1 && infos[0]==null)) {
+      List<KeggInfos> list = new LinkedList<KeggInfos>();
+      for (String ko_id:entry.getName().split(" ")) {
+        // Do not consider group nodes
+        if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents()) continue;
+        
+        list.add(KeggInfos.get(ko_id, manager));
+      }
+      infos = list.toArray(new KeggInfos[0]);
+    }
+    
+    // Concatenate names and check for compound option
+    StringBuilder name = new StringBuilder();
+    for (int i=0; i<infos.length; i++) {
+      if (infos[i]==null || !infos[i].queryWasSuccessfull()) continue;
+      if (name.length()>0 && name.charAt(name.length()-1)!=';') {
+        name.append(';'); // Add gene separator
+      }
+    
+      if (showFormulaForCompounds && infos[i].getFormula()!=null && infos[i].getFormula().length()>0) {
+        name.append(infos[i].getFormula());
+      } else if (infos[i].getKegg_ID().startsWith("br:")){
+        name.append(infos[i].getDefinition().replace(";\n", ", ").replace(";", ","));
+      } else if (infos[i].getNames()!=null){
+        name.append(infos[i].getNames().replace(";\n", ", ").replace(";", ","));
+      }
+    }
+    
+    return getNameForEntry(entry, name.toString());
+  }
+
+    
+  /**
+   * Convenient method to be called by extending classes that
+   * returns the name to assign for an entry, based on the
+   * current user selection ({@link #nameToAssign}).
+   * <p>Note: please use preferred method
+   * {@link #getNameForEntry(Entry, KeggInfos...)}.
+   * @param entry
+   * @param names already API-queried names. Synonyms for same
+   * gene are ", " separated and different genes contained in
+   * same entry are ";" separated. Furthermore, requires to
+   * check and react to the {@link #showFormulaForCompounds}
+   * option in advance!
+   * @return {@link String} to use as label for the {@link Entry}.
+   * @see #getNameForEntry(Entry, KeggInfos...)
+   */
+  protected String getNameForEntry(Entry entry, String names) {
+    // Please note further: kegg splits compound-synonyms by ";", not ",". 
+    
+    if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.FIRST_NAME_FROM_KGML)) {
+      String name = entry.getName();
+      if (entry.hasGraphics() && entry.getGraphics().getName()!=null &&
+          entry.getGraphics().getName().length()>1) {
+        name = entry.getGraphics().getName();
+      }
+      
+      // SPECIAL CASES FOR MAPS AND BRITE
+      if (entry.getType().equals(EntryType.map)) {
+        // Pathway references are to be treated separately
+        return trimSpeciesSuffix(name);
+      } else if (entry.getName().startsWith("br:")) {
+        // Kegg brite groups contain species suffixes
+        names = trimSpeciesSuffix(names);
+      }
+      //--------
+      return firstName(name);
+      
+    } else if (names!=null && names.length()>0) {
+      
+      // Pathway references are to be treated separately
+      // SPECIAL CASES FOR MAPS AND BRITE
+      if (entry.getType().equals(EntryType.map)) {
+        return trimSpeciesSuffix(names);
+      } else if (entry.getName().startsWith("br:")) {
+        // Kegg brite groups contain species suffixes
+        names = trimSpeciesSuffix(names);
+      }
+      //--------
+      
+      if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.FIRST_NAME)) {
+        return firstName(names);
+      }
+      
+      // We need to split all genes for further naming options
+      String[] multiNames = names.split(";"); // components are not trimmed!
+      
+      if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.SHORTEST_NAME)) {
+        return shortenName(ArrayUtils.implode(multiNames, ", "));
+        
+      } else if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.ALL_FIRST_NAMES)) {
+        Set<String> firstNames = new HashSet<String>();
+        for (String name: multiNames) {
+          firstNames.add(firstName(name));
+        }
+        
+        // return separated by ';' to indicate different genes!
+        return ArrayUtils.implode(firstNames, "; ");
+        
+      } else if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.INTELLIGENT)) {
+        // Shortest for compounds
+        if (entry.getType().equals(EntryType.compound)) {
+          return shortenName(ArrayUtils.implode(multiNames, ", "));
+        }
+        
+        // Try to detect gene families
+        Set<String> firstNames = new HashSet<String>();
+        String veryFirst = null;
+        for (String name: multiNames) {
+          String first = firstName(name);
+          if (veryFirst==null || veryFirst.length()<1) veryFirst = first;
+          firstNames.add(first);
+        }
+        if (firstNames.size()>1) {
+          String LCP = StringUtil.getLongestCommonPrefix(firstNames.toArray(new String[0]),true);
+          if (LCP!=null && LCP.length()>2) {
+            // Require at least 3 chars for family identifiers
+            return LCP;
+          }
+        } 
+        
+        // First for single genes or in doubt.
+        if (veryFirst!=null && veryFirst.length()>0) {
+          return firstNames.iterator().next();
+        }
+        
+      }
+    }
+      
+    // In doubt, return first nicest...
+    if (names!=null&&names.length()>0) {
+      // From API
+      return names;
+    } else { 
+      // From KGML
+      String name = entry.getName();
+      if (entry.hasGraphics() && entry.getGraphics().getName()!=null &&
+          entry.getGraphics().getName().length()>1) {
+        name = entry.getGraphics().getName();
+      }
+      return firstName(name);
+    }
+  }
+
+
+  /**
+   * @param name
+   * @return
+   */
+  private static String trimSpeciesSuffix(String name) {
+    //name is e.g. "Glycine, serine and threonine metabolism - Enterococcus faecalis"
+    // => remove species and don't split at comma.
+    int pos = name.lastIndexOf(" - ");
+    if (pos>0) {
+      name = name.substring(0, pos).trim();
+    }
+    return name;
+  }
+
+
+  /**
    * Shorten a given Entry full-name.
    * <p>Convert e.g. "PCK1, MGC22652, PEPCK-C, PEPCK1, PEPCKC..."
    * to "PCK1". Splits at ", " not at "," to preserve entries
@@ -476,14 +659,35 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     }*/
     String[] names = name.split(", ");
     for (String name2: names) {
+      name2 = name2==null?null:name2.trim();
       // E.g. 308800 has name "Tyr, C" and "C" is not that helpful
       // => At least 2 digits in name and shortest one.
-      if (name2!=null && name2.trim().length()>1 && name2.length()<name.length()) {
+      if (name2!=null && name2.length()>1 && name2.length()<name.length()) {
         name = name2;
       }
     }
     
-    return name.trim();
+    return name;
+  }
+  
+  /**
+   * Returns the first gene symbol from a (KEGG) list
+   * of symbols.
+   * @param name
+   * @return first name
+   */
+  protected static String firstName(String name) {
+    // Extract very first given name.
+    name = name.trim();
+    char[] names = name.toCharArray();
+    int i=1;
+    for (; i<name.length(); i++) {
+      if (names[i]==';') break; // Multiple genes in one node
+      // Multiple names for same gene, don not break, e.g. "Ins(1,4,5)P3".
+      if (names[i]==',' && (i==(name.length()-1) || names[i+1]==' ')) break;
+    }
+    if (i>1) return name.substring(0, i);
+    else return name;
   }
 
   /**

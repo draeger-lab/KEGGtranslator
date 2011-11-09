@@ -133,7 +133,9 @@ public class TranslatorGraphPanel extends TranslatorPanel<Graph2D> {
     if (!isReady()) return;
     
     // Update graph
-    ((Graph2D)document).updateViews();
+    // updateViews() does not update, but clear the visualization
+    // strange thing...
+    //((Graph2D)document).updateViews();
   }
   
 

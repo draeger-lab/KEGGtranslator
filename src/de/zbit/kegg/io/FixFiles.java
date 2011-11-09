@@ -38,6 +38,7 @@ import de.zbit.util.DirectoryParser;
  * @since 1.0
  * @version $Rev$
  */
+@Deprecated
 public class FixFiles {
   
   /**

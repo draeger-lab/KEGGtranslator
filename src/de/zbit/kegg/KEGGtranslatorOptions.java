@@ -20,9 +20,12 @@
  */
 package de.zbit.kegg;
 
+import de.zbit.gui.ActionCommand;
+import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.OptionGroup;
+import de.zbit.util.prefs.Range;
 
 /**
  * This class contains user-specific general settings for translating
@@ -34,6 +37,71 @@ import de.zbit.util.prefs.OptionGroup;
  * @version $Rev$
  */
 public abstract interface KEGGtranslatorOptions extends KeyProvider {
+  
+  /**
+   * Enum to select how to name the nodes.
+   * @author Clemens Wrzodek
+   */
+  public static enum NODE_NAMING implements ActionCommand {
+    /**
+     * Simply first name with fewest chars
+     */
+    SHORTEST_NAME,
+    /**
+     * Name, mentioned in the KGML
+     */
+    FIRST_NAME_FROM_KGML,
+    /**
+     * Simply first Name the api returns
+     */
+    FIRST_NAME,
+    /**
+     * Complete (unrecommended) very long String of all names.
+     */
+    ALL_FIRST_NAMES,
+    /**
+     * 
+     */
+    INTELLIGENT;
+
+    /* (non-Javadoc)
+     * @see de.zbit.gui.ActionCommand#getName()
+     */
+    public String getName() {
+      switch (this) {
+      case FIRST_NAME_FROM_KGML:
+        return "First name from KGML";
+      case FIRST_NAME:
+        return "First given name (usually the HGNC symbol)";
+        
+      default:
+        return StringUtil.firstLetterUpperCase(toString().toLowerCase()
+            .replace('_', ' '));
+      }
+    }
+
+    /* (non-Javadoc)
+     * @see de.zbit.gui.ActionCommand#getToolTip()
+     */
+    public String getToolTip() {
+      switch (this) {
+        case SHORTEST_NAME:
+        return "Name genes according to the name with fewest characters (creates nice graphs).";
+        case FIRST_NAME_FROM_KGML:
+          return "Name genes according to name in KGML.";
+        case FIRST_NAME:
+          return "Name genes according to the first name, given by the KEGG API. This is usually the HGNC symbol.";
+        case INTELLIGENT:
+          return "Tries to assign: -HGNC (first name) to genes, -prefixes to families, -short names for compounds.";
+        case ALL_FIRST_NAMES:
+          return "Name genes according to the first names, given by the KEGG API. " +
+          		"This is will create multiple names if one KEGG entry consists of multiple genes and is thus NOT RECOMMENDED.";
+
+      default:
+        return "";
+      }
+    };
+  }
   
   /*
    * Generic translation options
@@ -47,8 +115,16 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   /**
    * If true, shows only short names of all KEGG entries.
    */
-  public static final Option<Boolean> SHORT_NAMES = new Option<Boolean>("SHORT_NAMES",Boolean.class,
-      "If true, shows only short names of all KEGG entries.", true);
+//  public static final Option<Boolean> SHORT_NAMES = new Option<Boolean>("SHORT_NAMES",Boolean.class,
+//      "If true, shows only short names of all KEGG entries.", true);
+  
+  /**
+   * How to label translated KEGG entries in the target node/species/etc.
+   */
+  public static final Option<NODE_NAMING> GENE_NAMES = new Option<NODE_NAMING>("GENE_NAMES",NODE_NAMING.class,
+      "For one KEGG object, multiple names are available. Choose how to assign one name to this object.",
+      new Range<NODE_NAMING>(NODE_NAMING.class, Range.toRangeString(NODE_NAMING.class)),
+      NODE_NAMING.INTELLIGENT, "Label genes by");
 
   /**
    * If true, shows the chemical formula for all compounds, instead of the name.
@@ -79,10 +155,10 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    * Define various options that are used in all translations.
    */
   @SuppressWarnings("unchecked")
-  public static final OptionGroup<Boolean> GENERIC_OPTIONS = new OptionGroup<Boolean>(
+  public static final OptionGroup<?> GENERIC_OPTIONS = new OptionGroup<Object>(
       "Generic translation options",
-      "Define various options that are used in all translations.",
-      REMOVE_ORPHANS, SHORT_NAMES, SHOW_FORMULA_FOR_COMPOUNDS, REMOVE_WHITE_GENE_NODES, AUTOCOMPLETE_REACTIONS, OFFLINE_MODE);
+      "Define various options that are used in all translations.", // SHORT_NAMES
+      REMOVE_ORPHANS, GENE_NAMES, SHOW_FORMULA_FOR_COMPOUNDS, REMOVE_WHITE_GENE_NODES, AUTOCOMPLETE_REACTIONS, OFFLINE_MODE);
 
   /*
    * Graphical, yFiles based translations
@@ -95,6 +171,8 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
       "If true, merges all nodes that have exactly the same relations (sources, targets and types).", (short) 2, "--merge", false);
   public static final Option<Boolean> CREATE_EDGE_LABELS = new Option<Boolean>("CREATE_EDGE_LABELS",Boolean.class,
       "If true, creates describing labels for each edge in the graph.", (short) 2, "--cel", false);
+  public static final Option<Boolean> HIDE_LABELS_FOR_COMPOUNDS = new Option<Boolean>("HIDE_LABELS_FOR_COMPOUNDS",Boolean.class,
+      "If true, hides labels for all compounds (=small molecules).", (short) 2, "--hc", false);
   public static final Option<Boolean> DRAW_GREY_ARROWS_FOR_REACTIONS = new Option<Boolean>("DRAW_GREY_ARROWS_FOR_REACTIONS",Boolean.class,
       "If true, creates grey arrows for reactions and arrows with transparent circles as heads for reaction modifiers. This does only " +
       "affect reactions defined by KEGG, not the relations.", (short) 2, "--dar", false);
@@ -106,7 +184,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   public static final OptionGroup<Boolean> GRAPH_OPTIONS = new OptionGroup<Boolean>(
       "Translation options for graphical outputs",
       "Define various options that are used in yFiles based translations.",
-      MERGE_NODES_WITH_SAME_EDGES, CREATE_EDGE_LABELS, DRAW_GREY_ARROWS_FOR_REACTIONS);
+      MERGE_NODES_WITH_SAME_EDGES, CREATE_EDGE_LABELS, HIDE_LABELS_FOR_COMPOUNDS, DRAW_GREY_ARROWS_FOR_REACTIONS);
   
   /*
    * Funcional, SBML based translations
