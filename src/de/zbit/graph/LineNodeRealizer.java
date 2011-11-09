@@ -82,7 +82,7 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
    */
   private void setCoordLists(Polygon other) {
     this.shape = new Polygon(); // clear
-    for (int i=0; i<other.xpoints.length; i++) {
+    for (int i=0; i<other.npoints; i++) {
       ((Polygon)shape).addPoint(other.xpoints[i], other.ypoints[i]);
     }
     
@@ -117,7 +117,9 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
    */
   @Override
   public double getX() {
-    return shape.getBounds().getX();
+    //return shape.getBounds().getX();
+    //return fake value to not hide the line
+    return getCenterX();
   }
   
   /* (non-Javadoc)
@@ -125,15 +127,9 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
    */
   @Override
   public double getY() {
-    return shape.getBounds().getY();
-  }
-  
-  /* (non-Javadoc)
-   * @see y.view.NodeRealizer#getWidth()
-   */
-  @Override
-  public double getWidth() {
-    return shape.getBounds().getWidth();
+    //return shape.getBounds().getY();
+    //return fake value to not hide the line
+    return getCenterY();
   }
   
   /* (non-Javadoc)
@@ -150,6 +146,14 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
   @Override
   public double getCenterY() {
     return shape.getBounds().getCenterY();
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.NodeRealizer#getWidth()
+   */
+  @Override
+  public double getWidth() {
+    return shape.getBounds().getWidth();
   }
   
   /* (non-Javadoc)
@@ -173,9 +177,11 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
     }
     Polygon p = (Polygon)shape;
     for (int i=1; i<p.npoints; i++) {
-      if (doNotConnectIndex==null || !doNotConnectIndex.contains(i)) {
-        gfx.drawLine(p.xpoints[i-1], p.ypoints[i-1], p.xpoints[i], p.ypoints[i]);
-      }
+      try {
+        if (doNotConnectIndex==null || !doNotConnectIndex.contains(i)) {
+          gfx.drawLine(p.xpoints[i-1], p.ypoints[i-1], p.xpoints[i], p.ypoints[i]);
+        }
+      } catch (Throwable e) {}
     }
     // do NOT connect line. That's why we don't paint the polygon directly!
     //gfx.drawLine(p.xpoints[p.npoints-1], p.ypoints[p.npoints-1], p.xpoints[0], p.ypoints[0]);
