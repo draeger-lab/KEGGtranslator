@@ -25,6 +25,8 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.HashSet;
 
 import y.view.LineType;
 import y.view.NodeRealizer;
@@ -45,6 +47,12 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
    * By default, create a line of width 3.
    */
   private final static LineType defaultStroke = LineType.LINE_3;
+  
+  /**
+   * Allows to say that line i=Integer and i+1
+   * should not get connected. Must be sorted incrementally!
+   */
+  Collection<Integer> doNotConnectIndex = null;
   
   public LineNodeRealizer() {
     super();
@@ -165,7 +173,9 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
     }
     Polygon p = (Polygon)shape;
     for (int i=1; i<p.npoints; i++) {
-      gfx.drawLine(p.xpoints[i-1], p.ypoints[i-1], p.xpoints[i], p.ypoints[i]);
+      if (doNotConnectIndex==null || !doNotConnectIndex.contains(i)) {
+        gfx.drawLine(p.xpoints[i-1], p.ypoints[i-1], p.xpoints[i], p.ypoints[i]);
+      }
     }
     // do NOT connect line. That's why we don't paint the polygon directly!
     //gfx.drawLine(p.xpoints[p.npoints-1], p.ypoints[p.npoints-1], p.xpoints[0], p.ypoints[0]);
@@ -189,6 +199,18 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
   public void calcUnionRect(Rectangle2D arg0) {
     super.calcUnionRect(arg0);
     // should be same as "shape.getBounds2D().createUnion(rect);"
+  }
+
+  /**
+   * Avoid connecting the last added coordinates and the next
+   * added ones.
+   */
+  public void startNewLine() {
+    Integer np = ((Polygon)shape).npoints;
+    if (np!=null && np>0) {
+      if (doNotConnectIndex==null) doNotConnectIndex = new HashSet<Integer>();
+      doNotConnectIndex.add(np);
+    }
   } 
   
 }

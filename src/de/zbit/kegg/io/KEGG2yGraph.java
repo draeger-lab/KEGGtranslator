@@ -575,7 +575,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         g = new Graphics(e);
       }
       
-      // If it should get drawed, then create this node.
+      // Handle the graphics first and then create this node.
+      LineNodeRealizer line = null;
       if (g!=null) {
         /* Example:
          *     <entry id="16" name="ko:K04467 ko:K07209 ko:K07210" type="ortholog">
@@ -619,6 +620,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         
         // Parse and set information from the graphics object
         nr = setupGraphics(nr, nl, g);
+        if (nr instanceof LineNodeRealizer) {
+          line = (LineNodeRealizer) nr;
+        }
         
         nr.setLabel(nl);
         if (isPathwayReference && name.toUpperCase().startsWith("TITLE:")) {
@@ -655,13 +659,26 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       // Multiple graphics objects are actually only observed when
       // KEGG tries to create shapes with (multiple) lines.
       if (e.hasMultipleGraphics()) {
-        for (Graphics g2: e.getMoreGraphics()) {          
+        for (Graphics g2: e.getMoreGraphics()) {
+          // Mostly, lines are multiple graphics => try to pack in same node.
+          if (g2.getType().equals(GraphicsType.line) && line!=null && g2.isSetCoords()) {
+            // Just add another line to the existing line node
+            line.startNewLine();
+            Integer[] coords = g2.getCoords();
+            for (int j=0; j<(coords.length-1); j+=2) {
+              line.addSplineCoords(coords[j], coords[j+1]);
+            }
+            continue;
+          }
           NodeRealizer nr = null;
           NodeLabel nl = new NodeLabel(g2.getName());
-          
+
           // Parse and set information from the graphics object
           nr = setupGraphics(nr, nl, g2);
           nr.setLabel(nl);
+          if (nr instanceof LineNodeRealizer) {
+            line = (LineNodeRealizer) nr;
+          }
           
           // Store hyperlinks in the node-label (and later on in the node itself).
           if (nodeLink!=null) {
