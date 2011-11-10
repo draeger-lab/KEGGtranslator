@@ -303,7 +303,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       
       // Prefetch kegg information (enormas speed improvement).
       log.info("Fetching information from KEGG online resources... ");
-      KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false);
+      KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false, progress);
       
       // Auto-complete the reaction by adding all substrates, products and enzymes.
       if (autocompleteReactions && functionalOutput) {
@@ -312,7 +312,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       
       // Auto-completion requires API-infos and also adds new entries
       // => preFetch twice.
-      KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false);
+      KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false, progress);
       log.info("Information fetched. Translating pathway... ");
     }
     

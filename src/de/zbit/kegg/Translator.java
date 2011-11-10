@@ -82,7 +82,7 @@ public class Translator {
   /**
    * Version number of this translator
    */
-  public static String VERSION_NUMBER = "1.2.0";
+  public static String VERSION_NUMBER = "2.0.0";
   
   
   /**
@@ -268,6 +268,7 @@ public class Translator {
 				manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(Translator.cacheFileName);
 			} catch (Throwable e) { // IOException or class cast, if class is moved.
 			  e.printStackTrace();
+			  manager=null;
 			  // Delete invalid cache file
 			  try {
 			    File f = new File(Translator.cacheFileName);
@@ -296,6 +297,7 @@ public class Translator {
 	        managerFunction = (KeggFunctionManagement) KeggFunctionManagement.loadFromFilesystem(Translator.cacheFunctionFileName);
 	      } catch (Throwable e) { // IOException or class cast, if class is moved.
 	        e.printStackTrace();
+	        managerFunction=null;
 	        
 	        // Delete invalid cache file
 	        try {

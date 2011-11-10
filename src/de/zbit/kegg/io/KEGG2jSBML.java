@@ -443,7 +443,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       Translator.APPLICATION_NAME, Translator.VERSION_NUMBER));
     
     // Save all reaction modifiers in a list. String = reaction id.
-    SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers = new SortedArrayList<Info<String, ModifierSpeciesReference>>();
+    List<Info<String, ModifierSpeciesReference>> reactionModifiers = new SortedArrayList<Info<String, ModifierSpeciesReference>>();
     
     // Create species
     ArrayList<Entry> entries = p.getEntries();
@@ -524,7 +524,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @param reactionModifiers - list of all reactionModifiers.
    */
   private org.sbml.jsbml.Reaction addKGMLReaction(Reaction r, Pathway p, Model model, Compartment compartment,
-    SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers) {
+    List<Info<String, ModifierSpeciesReference>> reactionModifiers) {
     if (!reactionHasAtLeastOneSubstrateAndProduct(r, p)) return null;
     
     org.sbml.jsbml.Reaction sbReaction = model.createReaction();
@@ -629,7 +629,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @return list of modifiers, or empty list.
    */
   private List<ModifierSpeciesReference> getAllModifier (
-    SortedArrayList<Info<String, ModifierSpeciesReference>> reactionModifiers, Reaction r) {
+    List<Info<String, ModifierSpeciesReference>> reactionModifiers, Reaction r) {
     List<ModifierSpeciesReference> modifier = new ArrayList<ModifierSpeciesReference>();
     String lName = r.getName().toLowerCase().trim();
     int modifierPos = reactionModifiers.indexOf(lName);
