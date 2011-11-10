@@ -25,6 +25,7 @@ import de.zbit.kegg.gui.TranslatorPanel;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.OptionGroup;
+import de.zbit.util.prefs.Range;
 
 /**
  * Contains options for the {@link TranslatorPanel}.
@@ -35,12 +36,36 @@ import de.zbit.util.prefs.OptionGroup;
 public abstract interface TranslatorPanelOptions extends KeyProvider{
   
   /**
+   * A range that just contains <code>FALSE</code>.
+   */
+  static Range<Boolean> FALSE_RANGE = new Range<Boolean>(Boolean.class, Boolean.FALSE);
+  
+  /**
+   * A range that just contains <code>TRUE</code>.
+   */
+  static Range<Boolean> TRUE_RANGE = new Range<Boolean>(Boolean.class, Boolean.TRUE);
+  
+  
+  
+  /**
    * If true, shows the KEGGtranslator picture in every graph frame
    * as background image.
    */
   public static final Option<Boolean> SHOW_LOGO_IN_GRAPH_BACKGROUND = new Option<Boolean>("SHOW_LOGO_IN_GRAPH_BACKGROUND",Boolean.class,
       "If true, shows the " + Translator.APPLICATION_NAME + " logo in the background of each graph.", false);
 
+  /**
+   * If true, shows the original KEGG picture in the background layer of a translated graph.
+   */
+  public static final Option<Boolean> SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND = new Option<Boolean>("SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND",Boolean.class,
+      "If true, shows the original KEGG picture in the background layer of a translated graph.", false, SHOW_LOGO_IN_GRAPH_BACKGROUND, FALSE_RANGE);
+  
+  /**
+   * Select percentage for brightening the KEGG background image.
+   */
+  public static final Option<Integer> BRIGHTEN_KEGG_BACKGROUND_IMAGE = new Option<Integer>("BRIGHTEN_KEGG_BACKGROUND_IMAGE",Integer.class,
+      "Select percentage for brightening the KEGG background image.", new Range<Integer>(Integer.class, "{[0,100]}"), 40, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, TRUE_RANGE);
+  
   /**
    * Shows an overview and navigation panel in every graph frame.
    */
@@ -55,10 +80,11 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
   
   
   @SuppressWarnings("unchecked")
-  public static final OptionGroup<Boolean> GRAPH_PANEL_OPTIONS = new OptionGroup<Boolean>(
+  public static final OptionGroup GRAPH_PANEL_OPTIONS = new OptionGroup(
       "Graph visualization options",
       "Define various options that control the look and feel of GraphML visualizing panels.",
-      SHOW_LOGO_IN_GRAPH_BACKGROUND, SHOW_NAVIGATION_AND_OVERVIEW_PANELS, SHOW_PROPERTIES_TABLE);
+      SHOW_LOGO_IN_GRAPH_BACKGROUND, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, BRIGHTEN_KEGG_BACKGROUND_IMAGE,
+      SHOW_NAVIGATION_AND_OVERVIEW_PANELS, SHOW_PROPERTIES_TABLE);
   
   
   

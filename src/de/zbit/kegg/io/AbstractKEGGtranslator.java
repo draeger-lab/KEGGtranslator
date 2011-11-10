@@ -136,6 +136,13 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected boolean lastFileWasOverwritten = false;
   
   /**
+   * Remembers the last pathway that has been translated. Just remembers
+   * the core {@link Pathway} object, no {@link Entry}s, Reactions,
+   * Relations, etc. included. 
+   */
+  protected Pathway lastTranslatedPathway = null;
+  
+  /**
    * ProgressBar for KEGG translation
    */
   protected AbstractProgressBar progress=null;
@@ -265,6 +272,16 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   public boolean isLastFileWasOverwritten() {
     return lastFileWasOverwritten;
+  }
+  
+  /**
+   * Returns the last pathway that has been translated. Just remembers
+   * the core {@link Pathway} object, no {@link Entry}s, Reactions,
+   * Relations, etc. included. 
+   * @return the lastTranslatedPathway
+   */
+  public Pathway getLastTranslatedPathway() {
+    return lastTranslatedPathway;
   }
   
   /**
@@ -400,8 +417,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       } catch (Exception e) {
         throw new IOException(String.format("Cannot translate input file %s.", f.getAbsolutePath()), e);
       }
+      
 			if (l.size() > 0) {
 				Pathway p = l.get(0);
+				// Remember just the pathway object with core information for later information
+				lastTranslatedPathway = new Pathway(p.getName(), p.getOrg(), p.getNumber(), p.getTitle(), p.getImage(), p.getLink());
 				OutputFormat doc = translate(p);
 				return doc;
 			}

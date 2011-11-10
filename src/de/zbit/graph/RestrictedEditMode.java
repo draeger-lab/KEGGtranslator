@@ -38,12 +38,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -68,6 +72,7 @@ import y.view.HitInfo;
 import y.view.NavigationComponent;
 import y.view.Overview;
 import de.zbit.gui.GUITools;
+import de.zbit.gui.ImageTools;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.GenericDataMap;
@@ -99,6 +104,8 @@ import de.zbit.util.TranslatorTools;
  * @version $Rev$
  */
 public class RestrictedEditMode extends EditMode implements Graph2DSelectionListener {
+  
+  public static final transient Logger log = Logger.getLogger(RestrictedEditMode.class.getName());
  
   /**
    * A properties table that might be initialized.
@@ -185,6 +192,33 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
     renderer.setMode(DefaultBackgroundRenderer.CENTERED);
     renderer.setColor(Color.white);
     pane.setBackgroundRenderer(renderer);
+  }
+  
+  /**
+   * Adds a dynamic background image to the given pane.
+   * @param imagePath URL of the image to display
+   * @param pane the content pane
+   * @param brighten percentage for brightening the image. Set to 0 to disable.
+   */
+  public static void addDynamicBackgroundImage(URL imagePath, Graph2DView pane, int brighten) {
+    try {
+      DefaultBackgroundRenderer renderer = new DefaultBackgroundRenderer(pane);
+      //renderer.setImageResource(imagePath);
+      BufferedImage image = ImageTools.image2BufferedImage(new ImageIcon(imagePath).getImage());
+      // First replace black by grey (can not be brightened else)
+      ImageTools.replaceColor(image, Color.BLACK, Color.GRAY);
+      // Brighten image by 50%
+      if (brighten>0) {
+        image = ImageTools.brightenImage(image, new Float(((double)brighten)/100).floatValue());
+      }
+      renderer.setImage(image);
+    
+      renderer.setMode(DefaultBackgroundRenderer.DYNAMIC);
+      renderer.setColor(Color.white);
+      pane.setBackgroundRenderer(renderer);
+    } catch (Exception e) {
+      log.log(Level.WARNING, "Could not setup KEGG background image.", e);
+    }
   }
   
   /* (non-Javadoc)

@@ -22,6 +22,7 @@ package de.zbit.kegg.gui;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -165,7 +166,17 @@ public class TranslatorGraphPanel extends TranslatorPanel<Graph2D> {
     // Set KEGGtranslator logo as background
     if (TranslatorPanelOptions.SHOW_LOGO_IN_GRAPH_BACKGROUND.getValue(prefs)) {
       RestrictedEditMode.addBackgroundImage(getClass().getResource(logoResourcePath), pane);
+    } else
+    if (TranslatorPanelOptions.SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND.getValue(prefs)) {
+      Integer brighten = (TranslatorPanelOptions.BRIGHTEN_KEGG_BACKGROUND_IMAGE.getValue(prefs));
+      if (brighten==null || brighten<0) brighten = 0;
+      
+      String image = translator.getLastTranslatedPathway().getImage();
+      if (image!=null) {
+        RestrictedEditMode.addDynamicBackgroundImage(new URL(image), pane, brighten);
+      }
     }
+    
     //--
     // Show Navigation and Overview
     if (TranslatorPanelOptions.SHOW_NAVIGATION_AND_OVERVIEW_PANELS.getValue(prefs)) {
