@@ -542,12 +542,14 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Add substrates/ products
     sbReaction.setReversible(r.getType().equals(ReactionType.reversible));
     for (ReactionComponent rc : r.getSubstrates()) {
+      int sbo = (r.getType().equals(ReactionType.irreversible))?15:10;
       SpeciesReference sr = sbReaction.createReactant();
-      configureReactionComponent(p, rc, sr, 15); // 15 =Substrate
+      configureReactionComponent(p, rc, sr, sbo); // 15=Substrate, 10=Reactant
     }
     for (ReactionComponent rc : r.getProducts()) {
+      int sbo = (r.getType().equals(ReactionType.irreversible))?11:10;
       SpeciesReference sr = sbReaction.createProduct();
-      configureReactionComponent(p, rc, sr, 11); // 11 =Product
+      configureReactionComponent(p, rc, sr, sbo); // 11=Product
     }
     
     // Eventually add modifier

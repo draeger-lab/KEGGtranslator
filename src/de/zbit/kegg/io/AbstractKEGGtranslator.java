@@ -104,6 +104,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected boolean autocompleteReactions=true;
   
   /**
+   * If true, removes all entries that are referring to other pathways.
+   */
+  protected boolean removePathwayReferences=false;
+  
+  /**
    * Selector that allows to change the way how translated entries
    * should be labeled.
    * XXX: Implementing classes must implement this functionality!
@@ -285,6 +290,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   	autocompleteReactions = KEGGtranslatorOptions.AUTOCOMPLETE_REACTIONS.getValue(prefs);
   	nameToAssign = KEGGtranslatorOptions.GENE_NAMES.getValue(prefs);
   	showFormulaForCompounds = KEGGtranslatorOptions.SHOW_FORMULA_FOR_COMPOUNDS.getValue(prefs);
+  	removePathwayReferences = KEGGtranslatorOptions.REMOVE_PATHWAY_REFERENCES.getValue(prefs);
   }
   
   
@@ -300,6 +306,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       KeggInfoManagement.offlineMode = true;
     } else {
       KeggInfoManagement.offlineMode = false;
+      
+      // Remove pathway references
+      if (removePathwayReferences) {
+        KeggTools.removePathwayEntries(p);
+      }
       
       // Prefetch kegg information (enormas speed improvement).
       log.info("Fetching information from KEGG online resources... ");

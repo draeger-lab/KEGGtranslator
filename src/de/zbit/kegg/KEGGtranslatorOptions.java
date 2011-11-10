@@ -143,6 +143,12 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    */
   public static final Option<Boolean> AUTOCOMPLETE_REACTIONS = new Option<Boolean>("AUTOCOMPLETE_REACTIONS",Boolean.class,
       "If true, automatically looks for missing reactants and enzymes of reactions and adds them to the document.", (short) 2, "-ar", true);
+
+  /**
+   * If true, removes all entries (nodes, species, etc.) referring to other pathways.
+   */
+  public static final Option<Boolean> REMOVE_PATHWAY_REFERENCES = new Option<Boolean>("REMOVE_PATHWAY_REFERENCES",Boolean.class,
+      "If true, removes all entries (nodes, species, etc.) referring to other pathways.", (short) 2, "-nopr", false);
   
   /**
    * If true, no additional information will be retrieved from the KEGG-Server.
@@ -158,7 +164,8 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   public static final OptionGroup<?> GENERIC_OPTIONS = new OptionGroup<Object>(
       "Generic translation options",
       "Define various options that are used in all translations.", // SHORT_NAMES
-      REMOVE_ORPHANS, GENE_NAMES, SHOW_FORMULA_FOR_COMPOUNDS, REMOVE_WHITE_GENE_NODES, AUTOCOMPLETE_REACTIONS, OFFLINE_MODE);
+      REMOVE_ORPHANS, GENE_NAMES, SHOW_FORMULA_FOR_COMPOUNDS, REMOVE_WHITE_GENE_NODES,
+      AUTOCOMPLETE_REACTIONS, REMOVE_PATHWAY_REFERENCES, OFFLINE_MODE);
 
   /*
    * Graphical, yFiles based translations

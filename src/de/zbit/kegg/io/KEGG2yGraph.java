@@ -834,7 +834,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       Entry two = p.getEntryForId(r.getEntry2());
       
       if (one==null || two==null) {
-        System.out.println("Relation with unknown entry!");
+        // This happens, e.g. when removing pathways nodes
+        // or in general when removing nodes... => below
+        // info, because mostly this is wanted by user.
+        log.fine("Relation with unknown entry!");
         continue;
       }
       
