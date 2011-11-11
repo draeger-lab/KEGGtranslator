@@ -58,13 +58,13 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
    * If true, shows the original KEGG picture in the background layer of a translated graph.
    */
   public static final Option<Boolean> SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND = new Option<Boolean>("SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND",Boolean.class,
-      "If true, shows the original KEGG picture in the background layer of a translated graph.", false, SHOW_LOGO_IN_GRAPH_BACKGROUND, FALSE_RANGE);
+      "If true, shows the original KEGG picture in the background layer of a translated graph.", true, SHOW_LOGO_IN_GRAPH_BACKGROUND, FALSE_RANGE);
   
   /**
    * Select percentage for brightening the KEGG background image.
    */
   public static final Option<Integer> BRIGHTEN_KEGG_BACKGROUND_IMAGE = new Option<Integer>("BRIGHTEN_KEGG_BACKGROUND_IMAGE",Integer.class,
-      "Select percentage for brightening the KEGG background image.", new Range<Integer>(Integer.class, "{[0,100]}"), 40, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, TRUE_RANGE);
+      "Select percentage for brightening the KEGG background image.", new Range<Integer>(Integer.class, "{[0,100]}"), 80, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, TRUE_RANGE);
   
   /**
    * Shows an overview and navigation panel in every graph frame.

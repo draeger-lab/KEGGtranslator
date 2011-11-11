@@ -209,7 +209,8 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       ImageTools.replaceColor(image, Color.BLACK, Color.GRAY);
       // Brighten image by 50%
       if (brighten>0) {
-        image = ImageTools.brightenImage(image, new Float(((double)brighten)/100).floatValue());
+        //image = ImageTools.brightenImage(image, new Float(((double)brighten)/100).floatValue());
+        ImageTools.brightenImageCustom(image, (double)brighten);
       }
       renderer.setImage(image);
     

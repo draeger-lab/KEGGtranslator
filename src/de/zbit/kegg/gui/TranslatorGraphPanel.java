@@ -22,6 +22,7 @@ package de.zbit.kegg.gui;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,7 @@ import y.view.Graph2DViewMouseWheelZoomListener;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.ext.TranslatorPanelOptions;
+import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.TranslatorTools;
@@ -164,18 +166,7 @@ public class TranslatorGraphPanel extends TranslatorPanel<Graph2D> {
     SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
     
     // Set KEGGtranslator logo as background
-    if (TranslatorPanelOptions.SHOW_LOGO_IN_GRAPH_BACKGROUND.getValue(prefs)) {
-      RestrictedEditMode.addBackgroundImage(getClass().getResource(logoResourcePath), pane);
-    } else
-    if (TranslatorPanelOptions.SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND.getValue(prefs)) {
-      Integer brighten = (TranslatorPanelOptions.BRIGHTEN_KEGG_BACKGROUND_IMAGE.getValue(prefs));
-      if (brighten==null || brighten<0) brighten = 0;
-      
-      String image = translator.getLastTranslatedPathway().getImage();
-      if (image!=null) {
-        RestrictedEditMode.addDynamicBackgroundImage(new URL(image), pane, brighten);
-      }
-    }
+    addBackgroundImage(pane, translator, prefs);
     
     //--
     // Show Navigation and Overview
@@ -198,6 +189,33 @@ public class TranslatorGraphPanel extends TranslatorPanel<Graph2D> {
     pane.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
     pane.fitContent(true);
     pane.setFitContentOnResize(true);
+  }
+
+
+  /**
+   * Setup the background image as set in the preferences
+   * @param pane the pane to add the background image
+   * @param translator the translator used for translation
+   * @param prefs might be null, else, prefs object for {@link TranslatorPanelOptions}
+   * @throws MalformedURLException
+   */
+  public static void addBackgroundImage(Graph2DView pane, AbstractKEGGtranslator<?> translator, SBPreferences prefs)
+    throws MalformedURLException {
+    if (prefs ==null) {
+      prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
+    }
+    if (TranslatorPanelOptions.SHOW_LOGO_IN_GRAPH_BACKGROUND.getValue(prefs)) {
+      RestrictedEditMode.addBackgroundImage(TranslatorGraphPanel.class.getResource(logoResourcePath), pane);
+    } else
+    if (TranslatorPanelOptions.SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND.getValue(prefs)) {
+      Integer brighten = (TranslatorPanelOptions.BRIGHTEN_KEGG_BACKGROUND_IMAGE.getValue(prefs));
+      if (brighten==null || brighten<0) brighten = 0;
+      
+      String image = translator.getLastTranslatedPathway().getImage();
+      if (image!=null) {
+        RestrictedEditMode.addDynamicBackgroundImage(new URL(image), pane, brighten);
+      }
+    }
   }
 
   

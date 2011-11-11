@@ -83,6 +83,7 @@ import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
+import de.zbit.kegg.gui.TranslatorGraphPanel;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -1227,7 +1228,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       outputHandler = new GraphMLIOHandler(); // new GMLIOHandler();
     }
     if (!outputHandler.canWrite()) {
-      System.err.println("Y OutputHandler can't write.");
+      log.warning("Can not write to given path!");
       return false;
     }
     
@@ -1259,7 +1260,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         }
         
       } catch(Throwable e) {
-        System.err.println("Cannot write annotations to graph file.");
+        log.warning("Can not write annotations to graph file.");
         e.printStackTrace();
       }
       
@@ -1278,7 +1279,13 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Configure view and rememeber old one to restore after saving.
     View old_v = graph.getCurrentView();
-    configureView(new Graph2DView(graph), !isGraphOutput);
+    Graph2DView view = new Graph2DView(graph);
+    configureView(view, !isGraphOutput);
+    try {
+      TranslatorGraphPanel.addBackgroundImage(view, this, null);
+    } catch (MalformedURLException e) {
+      log.warning("Could not setup background image for output file.");
+    }
     
     // => Moved to a global setting.
     //if (outputHandler instanceof JPGIOHandler) {
