@@ -222,6 +222,9 @@ public class BatchKEGGtranslator {
 		case SBML:
 			translator = new KEGG2jSBML(manager);
 			break;
+    case SBML_QUAL:
+      translator = new KEGG2SBMLqual(manager);
+      break;
 		case LaTeX:
 			translator = new KEGG2jSBML(manager);
 			break;

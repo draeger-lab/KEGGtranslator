@@ -52,6 +52,10 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 		 */
 		SBML,
 		/**
+     * 
+     */
+    SBML_QUAL,
+		/**
 		 * REMOVED, PLease only insert working items here.
 		 * As soon as SBGNML really works, we can include it here.
 		 */

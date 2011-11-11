@@ -43,6 +43,7 @@ import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.util.ValuePair;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
@@ -337,9 +338,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    */
   @Override
   protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
-    int level = 2;
-    int version = 4;
-    SBMLDocument doc = new SBMLDocument(level, version);
+    ValuePair<Integer,Integer> lv = getLevelAndVersion();
+    SBMLDocument doc = new SBMLDocument(lv.getL().intValue(), lv.getV().intValue());
     //doc.addChangeListener(this);
     
     // Reset lists and buffers.
@@ -513,6 +513,15 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     }
     
     return doc;
+  }
+  
+  /**
+   * 
+   * @return the level and version of the SBML core (2,4)
+   */
+  protected ValuePair<Integer, Integer> getLevelAndVersion() {
+    return new ValuePair<Integer, Integer>(Integer.valueOf(2),
+        Integer.valueOf(4));
   }
   
   /**
@@ -1121,7 +1130,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @param name
    * @return SId
    */
-  private String NameToSId(String name) {
+  protected String NameToSId(String name) {
     /*
      * letter ::= �a�..�z�,�A�..�Z� digit ::= �0�..�9� idChar ::= letter |
      * digit | �_� SId ::= ( letter | �_� ) idChar*
@@ -1340,6 +1349,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       
       return;
     }
+    
     
     
     // Just a few test cases here.
