@@ -200,26 +200,32 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    * @param pane the content pane
    * @param brighten percentage for brightening the image. Set to 0 to disable.
    */
-  public static void addDynamicBackgroundImage(URL imagePath, Graph2DView pane, int brighten) {
-    try {
-      DefaultBackgroundRenderer renderer = new DefaultBackgroundRenderer(pane);
-      //renderer.setImageResource(imagePath);
-      BufferedImage image = ImageTools.image2BufferedImage(new ImageIcon(imagePath).getImage());
-      // First replace black by grey (can not be brightened else)
-      ImageTools.replaceColor(image, Color.BLACK, Color.GRAY);
-      // Brighten image by 50%
-      if (brighten>0) {
-        //image = ImageTools.brightenImage(image, new Float(((double)brighten)/100).floatValue());
-        ImageTools.brightenImageCustom(image, (double)brighten);
+  public static void addDynamicBackgroundImage(final URL imagePath, final Graph2DView pane, final int brighten) {
+    Runnable run = new Runnable() {
+      public void run() {
+        try {
+          DefaultBackgroundRenderer renderer = new DefaultBackgroundRenderer(pane);
+          //renderer.setImageResource(imagePath);
+          BufferedImage image = ImageTools.image2BufferedImage(new ImageIcon(imagePath).getImage());
+          // First replace black by grey (can not be brightened else)
+          ImageTools.replaceColor(image, Color.BLACK, Color.GRAY);
+          // Brighten image by 50%
+          if (brighten>0) {
+            //image = ImageTools.brightenImage(image, new Float(((double)brighten)/100).floatValue());
+            ImageTools.brightenImageCustom(image, (double)brighten);
+          }
+          renderer.setImage(image);
+        
+          renderer.setMode(DefaultBackgroundRenderer.DYNAMIC);
+          renderer.setColor(Color.white);
+          pane.setBackgroundRenderer(renderer);
+          pane.repaint();
+        } catch (Exception e) {
+          log.log(Level.WARNING, "Could not setup KEGG background image.", e);
+        }
       }
-      renderer.setImage(image);
-    
-      renderer.setMode(DefaultBackgroundRenderer.DYNAMIC);
-      renderer.setColor(Color.white);
-      pane.setBackgroundRenderer(renderer);
-    } catch (Exception e) {
-      log.log(Level.WARNING, "Could not setup KEGG background image.", e);
-    }
+    };
+    new Thread(run).start();
   }
   
   /* (non-Javadoc)

@@ -63,6 +63,7 @@ import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.gui.TranslatorPanel;
 import de.zbit.kegg.io.KEGG2yGraph;
+import de.zbit.kegg.parser.pathway.EntryType;
 
 /**
  * This class is intended to provide various translator tools.
@@ -947,6 +948,49 @@ public class TranslatorTools {
       }
       return count;
     }
+  }
+
+  /**
+   * Create a map that maps from pathway ids (e.g. "path:mmu00910") to
+   * nodes referencing to this pathway (grey, pathway-reference nodes,
+   * used for cross-linking pathways).
+   * @return Map from pathway id (LOWERCASED! e.g. path:mmu00910) to node.
+   */
+  public Map<String, List<Node>> getPathwayReferenceNodeMap() {
+
+    // Build a map from PWID 2 Node
+    Map<String, List<Node>> pw2node = new HashMap<String, List<Node>>();
+
+    NodeMap typeMap = (NodeMap) getMap(GraphMLmaps.NODE_TYPE);
+    NodeMap labelMap = (NodeMap) getMap(GraphMLmaps.NODE_KEGG_ID);
+    if (typeMap==null || labelMap==null) {
+      log.severe(String.format("Could not find %s %s mapping.", (typeMap==null?"type":""), (labelMap==null?"label":"")));
+      return pw2node; // return an empty map.
+    }
+    
+    // build the resulting map
+    for (Node n : graph.getNodeArray()) {
+      Object type = typeMap.get(n);
+      if (type!=null && (type.toString().equals(EntryType.map.toString()) ||
+          type.toString().equalsIgnoreCase("pathway"))) {
+        Object label = labelMap.get(n);
+        if (label==null) continue;
+        String key = label.toString().toLowerCase().trim();
+        
+        // Get list, associated with node label
+        List<Node> list = pw2node.get(key);
+        if (list==null) {
+          list = new LinkedList<Node>();
+          pw2node.put(key, list);
+        }
+        
+        // Add node to list.
+        list.add(n);
+        
+      }
+    }
+    
+    return pw2node;
   }
   
   
