@@ -2,6 +2,7 @@ package de.zbit.kegg.io;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -27,6 +28,7 @@ import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
+import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.Utils;
 
 public class KEGG2SBMLqual extends KEGG2jSBML {
@@ -84,7 +86,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     // ... extend doc
     Model model = doc.getModel();
     qualModel = new QualitativeModel(model);
-    doc.addDeclaredNamespace(KEGG2SBMLqual.QUAL_NS, KEGG2SBMLqual.QUAL_NS_PREFIX);
+    //doc.addDeclaredNamespace(KEGG2SBMLqual.QUAL_NS, KEGG2SBMLqual.QUAL_NS_PREFIX);
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     
     // KEGG2jSBML always just creates one compartment
@@ -104,7 +106,9 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
 
 
   public Transition addKGMLRelation(Relation r, Pathway p, Compartment compartment) {
-    Transition t = null;
+    // create transition and add it to the model
+    Transition t = qualModel.createTransition(NameToSId("tr"));
+
     Species one = (Species) p.getEntryForId(r.getEntry1()).getCustom();
     Species two = (Species) p.getEntryForId(r.getEntry2()).getCustom();
 
@@ -117,12 +121,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     QualitativeSpecies qTwo = createQualitativeSpeciesFromSpecies(two);
    
     // Input
-    Input in = new Input(NameToSId("in"), qOne, InputTransitionEffect.none);
-    
-    //TODO: level und version, qualModel.getModel().getLevel(), qualModel.getModel().getVersion()); //TODO: is none correct?
+    Input in = t.createInput(NameToSId("in"), qOne, InputTransitionEffect.none);
 
     // Output
-    Output out = new Output(NameToSId("out"), qTwo, OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
+    t.createOutput(NameToSId("out"), qTwo, OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
     
     //TODO: function term?
 
@@ -168,50 +170,52 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     
     // Determine the sign variable
-    if (r.getSubtypes()!=null && r.getSubtypes().size()>0) {
-      ArrayList<String> subTypeNames = r.getSubtypesNames();
+    List<SubType> subTypes = r.getSubtypes();
+    if (subTypes != null && subTypes.size() > 0) {
+      List<String> subTypeNames = r.getSubtypesNames();
 
-      if (subTypeNames.contains("inhibition") && subTypeNames.contains("--|")) { //inhibition, repression SBO:0000169
-        in.setSBOTerm("SBO:0000169");
-        sign = Sign.dual;
-      } else if (subTypeNames.contains("activation")) { //activation SBO:0000170
+      if (subTypeNames.contains(SubType.INHIBITION)) {
+          in.setSBOTerm("SBO:0000169");
+          sign = Sign.dual;
+      } else if (subTypeNames.contains(SubType.ACTIVATION)) { //stimulation SBO:0000170
         sign = Sign.positive;
         in.setSBOTerm("SBO:0000170");
-      } else if(subTypeNames.contains("repression")) { //inhibition, repression SBO:0000169
+      } else if(subTypeNames.contains(SubType.REPRESSION)) { //inhibition, repression SBO:0000169
         sign = Sign.negative;
         in.setSBOTerm("SBO:0000169");
-      } else if(subTypeNames.contains("indirect effect")) { // indirect effect 
+      } else if(subTypeNames.contains(SubType.INDIRECT_EFFECT)) { // indirect effect 
         sign = Sign.unknown;
         
-      } else if(subTypeNames.contains("state change")) { //state change SBO:0000168        
+      } else if(subTypeNames.contains(SubType.STATE_CHANGE)) { //state change SBO:0000168        
         sign = Sign.unknown; //TODO: is unknown correct?
         in.setSBOTerm("SBO:0000168");
-      } 
+      } else {
+        // just for debugging
+        sign = null;
+      }
 
 
       if (sign!=null){          
-        if(subTypeNames.contains("dissociation")) { // dissociation SBO:0000177
-          in.setSBOTerm("SBO:0000177");  
-        } else if(subTypeNames.contains("binding/association")) { // binding/association SBO:0000177
-          in.setSBOTerm("SBO:0000177");   
-        } else if (subTypeNames.contains("phophorylation")) { // phophorylation SBO:0000216
-          in.setSBOTerm("SBO:0000216");
-        } else if (subTypeNames.contains("dephosphorylation")) { // dephosphorylation SBO:0000330
-          in.setSBOTerm("SBO:0000330");
-        } else if (subTypeNames.contains("glycosylation")) { // glycosylation SBO:0000217
-          in.setSBOTerm("SBO:0000217");
-        } else if (subTypeNames.contains("ubiquitination")) { // ubiquitination SBO:0000224
-          in.setSBOTerm("SBO:0000224");
-        } else if (subTypeNames.contains("methylation")) { // methylation SBO:0000214
-          in.setSBOTerm("SBO:0000214");
-        }
+        // TODO: put this in an annotation
+//        if(subTypeNames.contains("dissociation")) { // dissociation SBO:0000177
+//          in.setSBOTerm("SBO:0000177");  
+//        } else if(subTypeNames.contains("binding/association")) { // binding/association SBO:0000177
+//          in.setSBOTerm("SBO:0000177");   
+//        } else if (subTypeNames.contains("phosphorylation")) { // phosphorylation SBO:0000216
+//          in.setSBOTerm("SBO:0000216");
+//        } else if (subTypeNames.contains("dephosphorylation")) { // dephosphorylation SBO:0000330
+//          in.setSBOTerm("SBO:0000330");
+//        } else if (subTypeNames.contains("glycosylation")) { // glycosylation SBO:0000217
+//          in.setSBOTerm("SBO:0000217");
+//        } else if (subTypeNames.contains("ubiquitination")) { // ubiquitination SBO:0000224
+//          in.setSBOTerm("SBO:0000224");
+//        } else if (subTypeNames.contains("methylation")) { // methylation SBO:0000214
+//          in.setSBOTerm("SBO:0000214");
+//        }
         
         in.setSign(sign);
       }
     }
-    
-    // create transition and add it to the model
-    t = qualModel.createTransition(NameToSId("tr"), in, out);
 
     return t;
 
@@ -223,14 +227,9 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     if(qs != null){
       return qs;
     } else {
-      QualitativeSpecies qSpecies = new QualitativeSpecies();
-      qSpecies.setId(id);
+      QualitativeSpecies qSpecies = qualModel.createQualitativeSpecies(id, species.getBoundaryCondition(), species.getCompartment(), species.getConstant());
       qSpecies.setName(species.getName());
-      qSpecies.setBoundaryCondition(species.getBoundaryCondition());
-      qSpecies.setCompartment(species.getCompartment());
-      qSpecies.setConstant(species.getConstant());
-//      qSpecies.setSBOTerm(species.getSBOTerm()); //TODO: not possible, because, the level is wrong!
-      qualModel.addQualitativeSpecies(qSpecies);
+      qSpecies.setSBOTerm(species.getSBOTerm()); //TODO: not possible, because, the level is wrong!
       
       return qSpecies;  
     }
