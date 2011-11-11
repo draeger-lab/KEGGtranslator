@@ -117,7 +117,9 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     QualitativeSpecies qTwo = createQualitativeSpeciesFromSpecies(two);
    
     // Input
-    Input in = new Input(NameToSId("in"), qOne, InputTransitionEffect.none); //TODO: is none correct?    
+    Input in = new Input(NameToSId("in"), qOne, InputTransitionEffect.none);
+    
+    //TODO: level und version, qualModel.getModel().getLevel(), qualModel.getModel().getVersion()); //TODO: is none correct?
 
     // Output
     Output out = new Output(NameToSId("out"), qTwo, OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
@@ -170,15 +172,20 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       ArrayList<String> subTypeNames = r.getSubtypesNames();
 
       if (subTypeNames.contains("inhibition") && subTypeNames.contains("--|")) { //inhibition, repression SBO:0000169
+        in.setSBOTerm("SBO:0000169");
         sign = Sign.dual;
       } else if (subTypeNames.contains("activation")) { //activation SBO:0000170
         sign = Sign.positive;
+        in.setSBOTerm("SBO:0000170");
       } else if(subTypeNames.contains("repression")) { //inhibition, repression SBO:0000169
         sign = Sign.negative;
+        in.setSBOTerm("SBO:0000169");
       } else if(subTypeNames.contains("indirect effect")) { // indirect effect 
         sign = Sign.unknown;
+        
       } else if(subTypeNames.contains("state change")) { //state change SBO:0000168        
         sign = Sign.unknown; //TODO: is unknown correct?
+        in.setSBOTerm("SBO:0000168");
       } 
 
 
