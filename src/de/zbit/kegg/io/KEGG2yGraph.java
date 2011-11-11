@@ -623,6 +623,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         nr = setupGraphics(nr, nl, g);
         if (nr instanceof LineNodeRealizer) {
           line = (LineNodeRealizer) nr;
+        } else if (e.getType().equals(EntryType.compound)) {
+          // Show label below node
+          nl.setModel(NodeLabel.SIDES);
+          nl.setPosition(NodeLabel.S);
+          nl.setDistance(0);
         }
         
         nr.setLabel(nl);
