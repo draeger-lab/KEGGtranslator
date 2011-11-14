@@ -1,7 +1,6 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
@@ -12,7 +11,6 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.InputTransitionEffect;
-import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.OutputTransitionEffect;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.QualitativeSpecies;
@@ -128,47 +126,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     //TODO: function term?
 
-    
-    
     Sign sign = null;
-//    // Determine the sign variable
-//    if (r.getSubtypes()!=null && r.getSubtypes().size()>0) {
-//      ArrayList<String> subTypeNames = r.getSubtypesNames();
-//
-//      if (subTypeNames.contains("-->") && subTypeNames.contains("--|")) { //inhibition, repression SBO:0000169
-//        sign = Sign.dual;
-//      } else if (subTypeNames.contains("-->")) { //activation SBO:0000170
-//        sign = Sign.positive;
-//      } else if(subTypeNames.contains("--|")) { //inhibition, repression SBO:0000169
-//        sign = Sign.negative;
-//      } else if(subTypeNames.contains("..>")) { // indirect effect 
-//        sign = Sign.unknown;
-//      } else if(subTypeNames.contains("...")) { //state change SBO:0000168        
-//        sign = Sign.unknown; //TODO: is unknown correct?
-//      } 
-//
-//
-//      if (sign!=null){          
-//        if(subTypeNames.contains("-+-")) { // dissociation SBO:0000177
-//          in.setSBOTerm("SBO:0000177");  
-//        } else if(subTypeNames.contains("---")) { // binding/association SBO:0000177
-//          in.setSBOTerm("SBO:0000177");   
-//        } else if (subTypeNames.contains("+p")) { // phophorylation SBO:0000216
-//          in.setSBOTerm("SBO:0000216");
-//        } else if (subTypeNames.contains("-p")) { // dephosphorylation SBO:0000330
-//          in.setSBOTerm("SBO:0000330");
-//        } else if (subTypeNames.contains("+g")) { // glycosylation SBO:0000217
-//          in.setSBOTerm("SBO:0000217");
-//        } else if (subTypeNames.contains("+u")) { // ubiquitination SBO:0000224
-//          in.setSBOTerm("SBO:0000224");
-//        } else if (subTypeNames.contains("+m")) { // methylation SBO:0000214
-//          in.setSBOTerm("SBO:0000214");
-//        }
-//        
-//        in.setSign(sign);
-//      }
-    
-    
     // Determine the sign variable
     List<SubType> subTypes = r.getSubtypes();
     if (subTypes != null && subTypes.size() > 0) {
@@ -223,7 +181,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   
   private QualitativeSpecies createQualitativeSpeciesFromSpecies(Species species) {
     String id = "qual_" + species.getId();
-    QualitativeSpecies qs = qualModel.getQualitativeSpeciesWithID(id);
+    QualitativeSpecies qs = qualModel.getQualitativeSpecies(id);
     if(qs != null){
       return qs;
     } else {
