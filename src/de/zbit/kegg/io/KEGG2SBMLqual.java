@@ -1,10 +1,12 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
@@ -21,6 +23,7 @@ import org.sbml.jsbml.util.ValuePair;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.kegg.KeggInfoManagement;
+import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
@@ -84,7 +87,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     // ... extend doc
     Model model = doc.getModel();
     qualModel = new QualitativeModel(model);
-    //doc.addDeclaredNamespace(KEGG2SBMLqual.QUAL_NS, KEGG2SBMLqual.QUAL_NS_PREFIX);
+    doc.addDeclaredNamespace(KEGG2SBMLqual.QUAL_NS, KEGG2SBMLqual.QUAL_NS_PREFIX);
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     
     // KEGG2jSBML always just creates one compartment
@@ -119,57 +122,68 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     QualitativeSpecies qTwo = createQualitativeSpeciesFromSpecies(two);
    
     // Input
-    Input in = t.createInput(NameToSId("in"), qOne, InputTransitionEffect.none);
+    Input in = t.createInput(NameToSId("in"), qOne, InputTransitionEffect.none); //TODO: is this correct?
+    in.setMetaId("meta_" + in.getId());
 
     // Output
     t.createOutput(NameToSId("out"), qTwo, OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
     
-    //TODO: function term?
+    //TODO: function term
 
     Sign sign = null;
     // Determine the sign variable
     List<SubType> subTypes = r.getSubtypes();
     if (subTypes != null && subTypes.size() > 0) {
-      List<String> subTypeNames = r.getSubtypesNames();
+      Collection<String> subTypeNames = r.getSubtypesNames();
 
       if (subTypeNames.contains(SubType.INHIBITION)) {
-          in.setSBOTerm("SBO:0000169");
-          sign = Sign.dual;
+        in.setSBOTerm(169);
+        sign = Sign.dual;
       } else if (subTypeNames.contains(SubType.ACTIVATION)) { //stimulation SBO:0000170
         sign = Sign.positive;
-        in.setSBOTerm("SBO:0000170");
+        in.setSBOTerm(170);
       } else if(subTypeNames.contains(SubType.REPRESSION)) { //inhibition, repression SBO:0000169
         sign = Sign.negative;
-        in.setSBOTerm("SBO:0000169");
+        in.setSBOTerm(169);
       } else if(subTypeNames.contains(SubType.INDIRECT_EFFECT)) { // indirect effect 
-        sign = Sign.unknown;
-        
+        sign = Sign.unknown;        
       } else if(subTypeNames.contains(SubType.STATE_CHANGE)) { //state change SBO:0000168        
         sign = Sign.unknown; //TODO: is unknown correct?
-        in.setSBOTerm("SBO:0000168");
+        in.setSBOTerm(168);
       } else {
         // just for debugging
-        sign = null;
+        sign = Sign.unknown;
       }
 
 
+      CVTerm cv= new CVTerm(CVTerm.Qualifier.BQB_IS);
       if (sign!=null){          
-        // TODO: put this in an annotation
-//        if(subTypeNames.contains("dissociation")) { // dissociation SBO:0000177
-//          in.setSBOTerm("SBO:0000177");  
-//        } else if(subTypeNames.contains("binding/association")) { // binding/association SBO:0000177
-//          in.setSBOTerm("SBO:0000177");   
-//        } else if (subTypeNames.contains("phosphorylation")) { // phosphorylation SBO:0000216
-//          in.setSBOTerm("SBO:0000216");
-//        } else if (subTypeNames.contains("dephosphorylation")) { // dephosphorylation SBO:0000330
-//          in.setSBOTerm("SBO:0000330");
-//        } else if (subTypeNames.contains("glycosylation")) { // glycosylation SBO:0000217
-//          in.setSBOTerm("SBO:0000217");
-//        } else if (subTypeNames.contains("ubiquitination")) { // ubiquitination SBO:0000224
-//          in.setSBOTerm("SBO:0000224");
-//        } else if (subTypeNames.contains("methylation")) { // methylation SBO:0000214
-//          in.setSBOTerm("SBO:0000214");
-//        }
+        if(subTypeNames.contains("dissociation")) { // dissociation SBO:0000177
+          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(177));
+        } 
+        if(subTypeNames.contains("binding/association")) { // binding/association SBO:0000177
+          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(177));   
+        } 
+        if (subTypeNames.contains("phosphorylation")) { // phosphorylation SBO:0000216
+          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(216));
+        } 
+        if (subTypeNames.contains("dephosphorylation")) { // dephosphorylation SBO:0000330
+          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(330));
+        } 
+        if (subTypeNames.contains("glycosylation")) { // glycosylation SBO:0000217
+          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(217));
+        } 
+        if (subTypeNames.contains("ubiquitination")) { // ubiquitination SBO:0000224
+          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(224));
+        } 
+        if (subTypeNames.contains("methylation")) { // methylation SBO:0000214
+          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(214));
+        }
+        
+        if (cv.getNumResources()>0) {          
+          setBiologicalQualifierISorHAS_VERSION(cv);
+          in.addCVTerm(cv);
+        }
         
         in.setSign(sign);
       }
@@ -179,18 +193,30 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
 
   }
   
+  /**
+   * Formats an SBO term. E.g. "177" to "SBO%3A0000177".
+   * @param i
+   * @return
+   */
+  private String formatSBO(int i) {
+    StringBuilder b = new StringBuilder("SBO%3A");
+    String iString = Integer.toString(i);
+    b.append(Utils.replicateCharacter('0', 7-iString.length()));
+    b.append(iString);
+    return b.toString();
+  }
+
   private QualitativeSpecies createQualitativeSpeciesFromSpecies(Species species) {
     String id = "qual_" + species.getId();
     QualitativeSpecies qs = qualModel.getQualitativeSpecies(id);
-    if(qs != null){
-      return qs;
-    } else {
-      QualitativeSpecies qSpecies = qualModel.createQualitativeSpecies(id, species.getBoundaryCondition(), species.getCompartment(), species.getConstant());
-      qSpecies.setName(species.getName());
-      qSpecies.setSBOTerm(species.getSBOTerm()); //TODO: not possible, because, the level is wrong!
-      
-      return qSpecies;  
+    if(qs == null){
+      qs = qualModel.createQualitativeSpecies(id, species.getBoundaryCondition(), species.getCompartment(), species.getConstant());
+      qs.setName(species.getName());
+      qs.setSBOTerm(species.getSBOTerm()); 
+      qs.setMetaId("meta_" + id);
     }
+    
+    return qs;  
   }
   
   /**
@@ -255,8 +281,8 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       //k2s.translate("files/KGMLsamplefiles/hsa04010.xml", "files/KGMLsamplefiles/hsa04010.sbml.xml");
 //      k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
       
-      SBMLDocument doc = k2s.translate(new File("files/KGMLsamplefiles/hsa05212.xml"));
-      new SBMLWriter().write(doc, "files/KGMLsamplefiles/hsa05212.sbml.xml");
+      SBMLDocument doc = k2s.translate(new File("files/KGMLsamplefiles/hsa04210.xml"));
+      new SBMLWriter().write(doc, "files/KGMLsamplefiles/hsa04210.sbml.xml");
       new JSBMLvisualizer(doc); 
             
       // Remember already queried objects

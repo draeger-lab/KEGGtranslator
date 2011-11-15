@@ -883,7 +883,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * is assignes.
    * @param CVterm any CVTerm
    */
-  private void setBiologicalQualifierISorHAS_VERSION(CVTerm CVterm) {
+  protected void setBiologicalQualifierISorHAS_VERSION(CVTerm CVterm) {
     if (CVterm.getNumResources() > 1) {
       // Multiple proteins in one node
       CVterm.setBiologicalQualifierType(Qualifier.BQB_HAS_VERSION);
