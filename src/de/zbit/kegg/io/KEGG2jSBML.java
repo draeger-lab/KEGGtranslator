@@ -474,29 +474,29 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     if (addCellDesignerAnnots) cdu.addCellDesignerAnnotationToAllSpecies(p);
     
     // ------------------------------------------------------------------
-    
-    // I noticed, that some reations occur multiple times in one KGML document,
-    // (maybe its intended? e.g. R00014 in hsa00010.xml)
-    List<String> processedReactions = new SortedArrayList<String>();
-    
-    
-    // All species added. Parse reactions and relations.
-    for (Reaction r : p.getReactions()) {
-      if (!processedReactions.contains(r.getName())) {
-        org.sbml.jsbml.Reaction sbReaction = addKGMLReaction(r,p,model,compartment,reactionModifiers);
-        
-        if (addCellDesignerAnnots && sbReaction!=null)
-          cdu.addCellDesignerAnnotationToReaction(sbReaction, r);
-        processedReactions.add(r.getName());
+    if(considerReactions()){
+      // I noticed, that some reations occur multiple times in one KGML document,
+      // (maybe its intended? e.g. R00014 in hsa00010.xml)
+      List<String> processedReactions = new SortedArrayList<String>();
+      
+      
+      // All species added. Parse reactions and relations.
+      for (Reaction r : p.getReactions()) {
+        if (!processedReactions.contains(r.getName())) {
+          org.sbml.jsbml.Reaction sbReaction = addKGMLReaction(r,p,model,compartment,reactionModifiers);
+          
+          if (addCellDesignerAnnots && sbReaction!=null)
+            cdu.addCellDesignerAnnotationToReaction(sbReaction, r);
+          processedReactions.add(r.getName());
+        }
+      }
+      
+      // Give a warning if we have no reactions.
+      if (p.getReactions().size()<1 && !considerRelations()) {
+        System.err.println("Warning: File does not contain any reactions.");
+        //  Consider setting 'considerRelations' to true.
       }
     }
-    
-    // Give a warning if we have no reactions.
-    if (p.getReactions().size()<1 && !considerRelations) {
-      System.err.println("Warning: File does not contain any reactions.");
-      //  Consider setting 'considerRelations' to true.
-    }
-    
     // ------------------------------------------------------------------
     
     
@@ -1371,6 +1371,16 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     
     System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
+  }
+
+  @Override
+  protected boolean considerRelations() {
+    return false;
+  }
+
+  @Override
+  protected boolean considerReactions() {    
+    return true;
   }
   
 }

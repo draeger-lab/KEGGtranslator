@@ -59,6 +59,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    */
   public KEGG2SBMLqual(KeggInfoManagement manager) {
     super(manager);
+    // Important to manifest that we NEED the relations
     
     loadPreferences();
   }
@@ -100,6 +101,9 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       for (Relation r : p.getRelations()) {
         addKGMLRelation(r, p, compartment);
       }  
+    }
+    if(!considerReactions()) {
+      model.unsetListOfSpecies();
     }
     
     return doc;
@@ -296,5 +300,16 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     
     System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
+  }
+  
+  
+  @Override
+  protected boolean considerRelations() {
+    return true;
+  }
+
+  @Override
+  protected boolean considerReactions() {    
+    return false;
   }
 }

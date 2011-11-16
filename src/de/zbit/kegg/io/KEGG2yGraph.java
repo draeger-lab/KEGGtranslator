@@ -1570,4 +1570,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     return createSVGIOHandler()!=null;
   }
   
+  @Override
+  protected boolean considerRelations() {
+    return true; //TODO: is this correct or is there something missing?
+  }
+  
+  @Override
+  protected boolean considerReactions() {  
+    return true;//TODO: is this correct or is there something missing?
+  }
+  
 }

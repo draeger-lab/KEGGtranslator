@@ -72,16 +72,6 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * Defauls: Graphical representation: true, functional: false.
    */
   private boolean removeOrphans = false;
-
-  /**
-   * If false, all relations in the document will be skipped. Just like most
-   * of the other very-basic converters.
-   * NOTE: Only makes sense in KEGG2SBML (or non-graphic-based-converters).
-   * Kegg2yGraph by default only considers realtions.
-   * 
-   * REMARK: This is option is currently IGNORED!
-   */
-  protected boolean considerRelations = true;
   
   /**
    * If true, all nodes in white color (except for small molecules/ compounds)
@@ -148,6 +138,23 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected AbstractProgressBar progress=null;
   
   
+  
+  /*===========================
+   * Abstract methods
+   * ===========================*/
+  /**
+   * If false, all relations in the document will be skipped. Just like most
+   * of the other very-basic converters.
+   * NOTE: Only makes sense in KEGG2SBML (or non-graphic-based-converters).
+   * Kegg2yGraph by default only considers realtions.
+   */
+  abstract protected boolean considerRelations();
+  
+  /**
+   * If false, all reactions in the document will be skipped. 
+   * NOTE: Only makes sense in KEGG2SBMLqual.
+   */
+  abstract protected boolean considerReactions();
   /*===========================
    * CONSTRUCTORS
    * ===========================*/
@@ -194,19 +201,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   public void setRemoveOrphans(boolean removeOrphans) {
     this.removeOrphans = removeOrphans;
   }
-  /**
-   * See {@link #considerRelations}
-   * @return
-   */
-  public boolean isConsiderRelations() {
-    return considerRelations;
-  }
-  /**
-   * @param considerRelations - see {@link #considerRelations}.
-   */
-  public void setConsiderRelations(boolean considerRelations) {
-    this.considerRelations = considerRelations;
-  }
+
   /**
    * See {@link #removeWhiteNodes}
    * @return
@@ -346,7 +341,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     
     // Preprocess pathway
     if (removeOrphans) {
-      KeggTools.removeOrphans(p, functionalOutput?considerRelations:true,functionalOutput);
+      KeggTools.removeOrphans(p, functionalOutput?considerRelations():true,functionalOutput&&considerReactions());
     }
     
     // Skip it, if it's white
