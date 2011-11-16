@@ -152,10 +152,12 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   
   /**
    * If true, no additional information will be retrieved from the KEGG-Server.
+   * Unfortunately, is not considered by every method and translator => feature
+   * has been deactivated until it is required by somebody.
    */
   // =! retrieveKeggAnnots
   public static final Option<Boolean> OFFLINE_MODE = new Option<Boolean>("OFFLINE_MODE",Boolean.class,
-      "If true, no additional information will be retrieved from the KEGG-Server.", false);
+      "If true, no additional information will be retrieved from the KEGG-Server.", false, false);
 
   /**
    * Define various options that are used in all translations.

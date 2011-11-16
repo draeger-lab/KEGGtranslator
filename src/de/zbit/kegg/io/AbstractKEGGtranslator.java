@@ -281,10 +281,15 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   
   
   /**
-   * Preprocesses the given pathway:
-   * - precaches all Ids,
-   * - removes orphans, white nodes, etc. if the user wishes to do so
-   * @param p
+   * Preprocesses the given pathway, according to current settings/options.
+   * Eventually
+   * <ul><li>precaches all kegg ids</li>
+   * <li>autocomplete reactions</li>
+   * <li>remove orphans</li>
+   * <li>remove white nodes</li>
+   * <li>remove pathway-reference nodes</li>
+   * </ul>
+   * @param p {@link Pathway}
    */
   private void preProcessPathway(Pathway p) {
     boolean completeAndCacheReactions = considerReactions()&&autocompleteReactions;
@@ -298,29 +303,30 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
         KeggTools.removePathwayEntries(p);
       }
       
-      // Prefetch kegg information (enormas speed improvement).
+      // Prefetch kegg information (enormous speed improvement).
       log.info("Fetching information from KEGG online resources... ");
       KeggTools.preFetchInformation(p,manager,completeAndCacheReactions, progress);
       
       // Auto-complete the reaction by adding all substrates, products and enzymes.
       if (completeAndCacheReactions) {
         KeggTools.autocompleteReactions(p, manager, true);
+        
+        // Auto-completion requires API-infos and also adds new entries
+        // => preFetch twice.
+        KeggTools.preFetchInformation(p,manager,completeAndCacheReactions, progress);
       }
       
-      // Auto-completion requires API-infos and also adds new entries
-      // => preFetch twice.
-      KeggTools.preFetchInformation(p,manager,completeAndCacheReactions, progress);
       log.info("Information fetched. Translating pathway... ");
-    }
-    
-    // Preprocess pathway
-    if (removeOrphans) {
-      KeggTools.removeOrphans(p, considerRelations(),considerReactions());
     }
     
     // Skip it, if it's white
     if (removeWhiteNodes) {
       KeggTools.removeWhiteNodes(p);
+    }
+    
+    // Preprocess pathway (remove orphans after autocompletion and others)
+    if (removeOrphans) {
+      KeggTools.removeOrphans(p, considerRelations(),considerReactions());
     }
   }
 
