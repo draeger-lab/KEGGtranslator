@@ -88,9 +88,12 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     // ... extend doc
     Model model = doc.getModel();
     qualModel = new QualitativeModel(model);
-    doc.addDeclaredNamespace(KEGG2SBMLqual.QUAL_NS, KEGG2SBMLqual.QUAL_NS_PREFIX);
-    model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
+   
+    doc.addNamespace(KEGG2SBMLqual.QUAL_NS_PREFIX, "xmlns", KEGG2SBMLqual.QUAL_NS);
+    doc.getSBMLDocumentAttributes().put(QUAL_NS_PREFIX + ":required", "true");
     
+    
+    model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     // KEGG2jSBML always just creates one compartment
     Compartment compartment = model.getCompartment(0);
     

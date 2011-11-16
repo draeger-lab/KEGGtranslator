@@ -351,6 +351,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Create neccessary default compartment
     compartment.setSize(defaultCompartmentSize);
     compartment.setUnits(model.getUnitDefinition("volume"));
+    compartment.setConstant(true); //TODO: I'm not sure if this is OK
     // Be careful: compartment ID ant other compartment stuff are HARDCODED
     // in cellDesigner extension code generation!
     
