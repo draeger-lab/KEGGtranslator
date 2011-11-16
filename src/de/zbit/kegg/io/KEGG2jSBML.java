@@ -372,9 +372,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       cdu.initCellDesignerAnnotations(model, doc);
     }
     
-    model.getAnnotation().addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
-    model.getAnnotation().addRDFAnnotationNamespace("bqmodel", "", "http://biomodels.net/model-qualifiers/");
-    
     // Parse Kegg Pathway information
     CVTerm mtPwID = new CVTerm();
     mtPwID.setQualifierType(Type.MODEL_QUALIFIER);
@@ -607,9 +604,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           }
         }
       }
-    }
-    if ((reID.getNumResources() > 0) || (rePWs.getNumResources() > 0)) {
-      sbReaction.getAnnotation().addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
     }
     if (reID.getNumResources() > 0) sbReaction.addCVTerm(reID);
     if (rePWs.getNumResources() > 0) sbReaction.addCVTerm(rePWs);
@@ -1066,7 +1060,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       // is handled by cellDesigner functions.
     }
     
-    spec.getAnnotation().addRDFAnnotationNamespace("bqbiol", "", "http://biomodels.net/biology-qualifiers/");
     addMiriamURNs(entry, spec);
     
     // Finally, add the fully configured species.
