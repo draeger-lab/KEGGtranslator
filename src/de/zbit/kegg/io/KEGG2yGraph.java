@@ -245,13 +245,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     this.createEdgeLabels = createEdgeLabels;
   }
   
-  /* (non-Javadoc)
-   * @see de.zbit.kegg.io.AbstractKEGGtranslator#isOutputFunctional()
-   */
-  @Override
-  public boolean isOutputFunctional() {
-    return false;
-  }
   /**
    * The IOHandler determines the output format.
    * May be GraphMLIOHandler or GMLIOHandler,...
@@ -280,6 +273,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   	createEdgeLabels = KEGGtranslatorOptions.CREATE_EDGE_LABELS.getValue(prefs);
   	drawArrowsForReactions = KEGGtranslatorOptions.DRAW_GREY_ARROWS_FOR_REACTIONS.getValue(prefs);
   	hideLabelsForCompounds = KEGGtranslatorOptions.HIDE_LABELS_FOR_COMPOUNDS.getValue(prefs);
+  	
+  	// Wee need to set autocompleteReactions to false, because it does not make
+  	// sense in out context and considerReactions() is sometimes true.
+  	autocompleteReactions = false;
   }
 
   
@@ -1572,12 +1569,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   @Override
   protected boolean considerRelations() {
-    return true; //TODO: is this correct or is there something missing?
+    return true;
   }
   
   @Override
-  protected boolean considerReactions() {  
-    return true;//TODO: is this correct or is there something missing?
+  protected boolean considerReactions() {
+    // Actually false, but the user might want to draw some arrows here.
+    // Return value is important, e.g. for the "remove orphans" feature.
+    return drawArrowsForReactions;
   }
   
 }

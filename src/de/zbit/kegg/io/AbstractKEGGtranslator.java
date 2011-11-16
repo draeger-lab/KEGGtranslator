@@ -138,23 +138,6 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected AbstractProgressBar progress=null;
   
   
-  
-  /*===========================
-   * Abstract methods
-   * ===========================*/
-  /**
-   * If false, all relations in the document will be skipped. Just like most
-   * of the other very-basic converters.
-   * NOTE: Only makes sense in KEGG2SBML (or non-graphic-based-converters).
-   * Kegg2yGraph by default only considers realtions.
-   */
-  abstract protected boolean considerRelations();
-  
-  /**
-   * If false, all reactions in the document will be skipped. 
-   * NOTE: Only makes sense in KEGG2SBMLqual.
-   */
-  abstract protected boolean considerReactions();
   /*===========================
    * CONSTRUCTORS
    * ===========================*/
@@ -241,15 +224,6 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   }
 
   /**
-   * This function should return true, if the output should be used
-   * functionally. If false, only a graphical pahtway representation
-   * is created (e.g. reactions can be skipped).
-   * E.g. SBML is functional (returns true) and GraphML is graphical
-   * (returns false).
-   */
-  public abstract boolean isOutputFunctional();
-
-  /**
    * See {@link #manager}
    * @param manager
    */
@@ -313,7 +287,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @param p
    */
   private void preProcessPathway(Pathway p) {
-    boolean functionalOutput = isOutputFunctional();
+    boolean completeAndCacheReactions = considerReactions()&&autocompleteReactions;
     if (!retrieveKeggAnnots) {
       KeggInfoManagement.offlineMode = true;
     } else {
@@ -326,22 +300,22 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       
       // Prefetch kegg information (enormas speed improvement).
       log.info("Fetching information from KEGG online resources... ");
-      KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false, progress);
+      KeggTools.preFetchInformation(p,manager,completeAndCacheReactions, progress);
       
       // Auto-complete the reaction by adding all substrates, products and enzymes.
-      if (autocompleteReactions && functionalOutput) {
+      if (completeAndCacheReactions) {
         KeggTools.autocompleteReactions(p, manager, true);
       }
       
       // Auto-completion requires API-infos and also adds new entries
       // => preFetch twice.
-      KeggTools.preFetchInformation(p,manager,functionalOutput?autocompleteReactions:false, progress);
+      KeggTools.preFetchInformation(p,manager,completeAndCacheReactions, progress);
       log.info("Information fetched. Translating pathway... ");
     }
     
     // Preprocess pathway
     if (removeOrphans) {
-      KeggTools.removeOrphans(p, functionalOutput?considerRelations():true,functionalOutput&&considerReactions());
+      KeggTools.removeOrphans(p, considerRelations(),considerReactions());
     }
     
     // Skip it, if it's white
@@ -716,10 +690,25 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     else return name;
   }
 
+
+  /**
+   * If false, all relations in the document will be skipped. Just like most
+   * of the other very-basic converters.
+   * NOTE: Makes sense, e.g. in KEGG2SBML (or non-graphic-based-converters).
+   * Kegg2yGraph by default only considers relations.
+   */
+  abstract protected boolean considerRelations();
+  
+  /**
+   * If false, all reactions in the document will be skipped. 
+   * NOTE: Makes sense, e.g. in KEGG2SBMLqual.
+   */
+  abstract protected boolean considerReactions();
+  
   /**
    * Write the translated document to the given file.
-   * @param doc - the translated document
-   * @param outFile - the file to write
+   * @param doc the translated document
+   * @param outFile the file to write
    * @return true if and only if everything went fine.
    */
   public abstract boolean writeToFile(OutputFormat doc, String outFile);
@@ -729,7 +718,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * (precaching of ids, autocomplete reactions, remove orphans, etc.) has
    * already been performed.
    * 
-   * @param p - Pathway to translate
+   * @param p Pathway to translate
    * @return Translated pathway
    */
   protected abstract OutputFormat translateWithoutPreprocessing(Pathway p);
