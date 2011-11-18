@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -54,6 +55,7 @@ import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
+import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
@@ -1057,7 +1059,25 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Process graphics information
     if (entry.hasGraphics()) {
-      // is handled by cellDesigner functions.
+      if (false) {
+        List<String> output = new LinkedList<String>(); 
+        // is handled by cellDesigner functions.
+        // TODO: Remove this, this is only for the path2models project until layout extension is used.
+        Graphics g = entry.getGraphics();
+        output.add(((Species)entry.getCustom()).getId());
+        if (!g.isSetCoords()) {
+          output.add(g.getX()+"");
+          output.add(g.getY()+"");
+          output.add(g.getWidth()+"");
+          output.add(g.getHeight()+"");
+        } else {
+          output.add("coords");
+          for (int i=0; i<g.getCoords().length; i++) {
+            output.add(g.getCoords()[i]+"");
+          }
+        }
+        // TODO: write output as tab-separated row.
+      }
     }
     
     addMiriamURNs(entry, spec);
