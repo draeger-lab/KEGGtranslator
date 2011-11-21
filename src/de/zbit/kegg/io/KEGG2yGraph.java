@@ -1284,7 +1284,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     Graph2DView view = new Graph2DView(graph);
     configureView(view, !isGraphOutput);
     try {
-      TranslatorGraphPanel.addBackgroundImage(view, this, null);
+      TranslatorGraphPanel.addBackgroundImage(view, this, null, true);
     } catch (MalformedURLException e) {
       log.warning("Could not setup background image for output file.");
     }
@@ -1297,6 +1297,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     // Try to write the file.
     int retried=0;
     if (new File(outFile).exists()) lastFileWasOverwritten=true;
+    boolean success = false;
     while (retried<3) {
       try {
       	
@@ -1316,7 +1317,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       	  out.close();
         }
       	
-        return true; // Success => No more need to retry
+        success = true;
+        break;// Success => No more need to retry
       } catch (IOException iex) {
         retried++;
         if (retried>2) {
@@ -1328,7 +1330,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         graph.setCurrentView(old_v);
       }
     }
-    return false;
+    
+    return success;
   }
   
   /**

@@ -199,8 +199,9 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
    * @param imagePath URL of the image to display
    * @param pane the content pane
    * @param brighten percentage for brightening the image. Set to 0 to disable.
+   * @return thread that is executing the task.
    */
-  public static void addDynamicBackgroundImage(final URL imagePath, final Graph2DView pane, final int brighten) {
+  public static Thread addDynamicBackgroundImage(final URL imagePath, final Graph2DView pane, final int brighten) {
     Runnable run = new Runnable() {
       public void run() {
         try {
@@ -225,7 +226,9 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
         }
       }
     };
-    new Thread(run).start();
+    Thread t = new Thread(run);
+    t.start();
+    return t;
   }
   
   /* (non-Javadoc)

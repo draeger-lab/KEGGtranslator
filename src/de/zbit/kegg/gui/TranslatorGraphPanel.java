@@ -40,6 +40,7 @@ import de.zbit.kegg.ext.TranslatorPanelOptions;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
+import de.zbit.util.ThreadManager;
 import de.zbit.util.TranslatorTools;
 import de.zbit.util.prefs.SBPreferences;
 
@@ -200,6 +201,10 @@ public class TranslatorGraphPanel extends TranslatorPanel<Graph2D> {
    * @throws MalformedURLException
    */
   public static void addBackgroundImage(Graph2DView pane, AbstractKEGGtranslator<?> translator, SBPreferences prefs)
+  throws MalformedURLException {
+    addBackgroundImage(pane, translator, prefs, false);
+  }
+  public static void addBackgroundImage(Graph2DView pane, AbstractKEGGtranslator<?> translator, SBPreferences prefs, boolean waitUntilComplete)
     throws MalformedURLException {
     if (prefs ==null) {
       prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
@@ -213,7 +218,10 @@ public class TranslatorGraphPanel extends TranslatorPanel<Graph2D> {
       
       String image = translator.getLastTranslatedPathway().getImage();
       if (image!=null) {
-        RestrictedEditMode.addDynamicBackgroundImage(new URL(image), pane, brighten);
+        Thread t = RestrictedEditMode.addDynamicBackgroundImage(new URL(image), pane, brighten);
+        if (waitUntilComplete) {
+          ThreadManager.awaitTermination(t);
+        }
       }
     }
   }
