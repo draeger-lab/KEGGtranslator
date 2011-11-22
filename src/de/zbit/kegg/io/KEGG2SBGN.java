@@ -399,8 +399,6 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 		///////////////////////////////////
 		for(Reaction reaction : p.getReactions())
 		{
-			
-			System.out.println(reaction.getName());
 			// initiate
 			Arc a = new Arc();
 			Start start = new Start();
@@ -421,11 +419,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	
 		return sbgn;
 	}
-	@Override
-	public boolean isOutputFunctional() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	
 	@Override
 	public boolean writeToFile(Object doc, String outFile) {
 		// TODO Auto-generated method stub
@@ -453,5 +447,17 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 //			sbgn.translateWithoutPreprocessing(p);
 			sbgn.writeToFile(sbgn.translateWithoutPreprocessing(p), "sbgn.xml");
 		}
+	}
+
+	@Override
+	protected boolean considerRelations() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected boolean considerReactions() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
