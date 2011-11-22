@@ -1,6 +1,7 @@
 package de.zbit.kegg.io;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Arc.Start;
 import org.sbgn.bindings.Arc.End;
+import org.sbgn.bindings.Arc.Next;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Label;
@@ -138,14 +140,14 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	private final String GLYPH_TYPE_UNSPECIFIED_ENTITY 				= "unspecified entity"; // no direct biological relevance
 	private final String GLYPH_TYPE_SIMPLE_CHEMICAL					= "simple chemical"; // atoms, monoatomic ions, a salt, a radical, a solid metal, a crytsal, etc.
 	private final String GLYPH_TYPE_MACROMOLECULE					= "macromolecule"; // proteins, nucleic acids (RNA, DNA) and polysaccharides (glycogen, cellulose, starch, etc.)
-	private final String GLYPH_TYPE_NUCLEIC_ACID_FEATURE				= "nucleic acid feature"; // genes or transcripts
-	private final String GLYPH_TYPE_SIMPLE_CHEMICAL_MULTIMER			= "simple chemical multimer"; 		// a multimer is an aggregation of multiple identical 
+	private final String GLYPH_TYPE_NUCLEIC_ACID_FEATURE			= "nucleic acid feature"; // genes or transcripts
+	private final String GLYPH_TYPE_SIMPLE_CHEMICAL_MULTIMER		= "simple chemical multimer"; 		// a multimer is an aggregation of multiple identical 
 	private final String GLYPH_TYPE_MACROMOLECULE_MULTIMER			= "macromolecule multimer";			// or pseudo-identical entities held together by
 	private final String GLYPH_TYPE_NUCLEIC_ACID_FEATURE_MULTIMER 	= "nucleic acid feature multimer";	// non-covalent bonds
 	private final String GLYPH_TYPE_COMPLEX							= "complex"; // biochemical entity composed of other biochemical entities for example macromolecules, simple chemicals, multimers, etc.
-	private final String GLYPH_TYPE_COMPLEX_MULTIMER					= "complex multimer";
+	private final String GLYPH_TYPE_COMPLEX_MULTIMER				= "complex multimer";
 	private final String GLYPH_TYPE_SOURCE_AND_SINK					= "source and sink"; // creation of a entity or a state from an unspecified source
-	private final String GLYPH_TYPE_PERTURBING_AGENT					= "perturbing agent"; // external influces which affect biochemical networks
+	private final String GLYPH_TYPE_PERTURBING_AGENT				= "perturbing agent"; // external influces which affect biochemical networks
 	
 	/**
 	 * Process Node (PN) Types
@@ -154,7 +156,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	private final String GLYPH_TYPE_OMITTED_PROCESS					= "omitted process"; // existing processes which are omitted from the map
 	private final String GLYPH_TYPE_UNCERTAIN_PROCESS				= "uncertain process"; // processes that may not exist
 	private final String GLYPH_TYPE_ASSOCIATION						= "association"; // association betwee one or more EPNs (non-covalent binding)
-	private final String GLYPH_TYPE_DISSOCIATION						= "dissociation"; // dissociation of an EPN int one or more EPNs
+	private final String GLYPH_TYPE_DISSOCIATION					= "dissociation"; // dissociation of an EPN int one or more EPNs
 	private final String GLYPH_TYPE_PHENOTYPE						= "phenotype"; // generated phenotypes or affects by biological processes
 	
 	/**
@@ -214,12 +216,58 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	private final String ARC_TYPE_EQUIVALENCE						= "equivalence arc"; // all entities marked by a tag are equivalent
 	
 	/**
+	 * Mapping of the glyphs and arcs
+	 */
+	private HashMap<String, String> glyphType = new HashMap<String, String>();
+	private HashMap<String, String> arcType = new HashMap<String, String>();
+	private HashMap<String, String> arcSubtType = new HashMap<String, String>();
+	/**
 	 * Constructor
 	 * @param manager
 	 */
 	public KEGG2SBGN(KeggInfoManagement manager) {
 		super(manager);
 		// TODO Auto-generated constructor stub
+		
+		// generate the mapping for the glyphs
+		this.glyphType.put(KEGG_ENTRY_TYPE_COMPOUND, 				GLYPH_TYPE_SIMPLE_CHEMICAL_MULTIMER);
+		this.glyphType.put(KEGG_ENTRY_TYPE_ENZYME, 					GLYPH_TYPE_MACROMOLECULE);
+		this.glyphType.put(KEGG_ENTRY_TYPE_GENE, 					GLYPH_TYPE_NUCLEIC_ACID_FEATURE);
+		this.glyphType.put(KEGG_ENTRY_TYPE_GROUP, 					GLYPH_TYPE_NUCLEIC_ACID_FEATURE_MULTIMER);
+		this.glyphType.put(KEGG_ENTRY_TYPE_MAP, 					GLYPH_TYPE_TAG);
+		this.glyphType.put(KEGG_ENTRY_TYPE_ORTHOLOG, 				GLYPH_TYPE_SUBMAP);
+		this.glyphType.put(KEGG_ENTRY_TYPE_REACTION, 				GLYPH_TYPE_PROCESS);
+		this.glyphType.put(null, 									GLYPH_TYPE_UNSPECIFIED_ENTITY);
+		
+		String value = "";
+		
+		// generate the mapping for the arcs
+		// TODO: map real values
+		this.arcType.put(KEGG_REACTION_IRREVERSIBLE, 				value);
+		this.arcType.put(KEGG_REACTION_REVERSIBLE, 					value);
+		this.arcType.put(KEGG_RELATION_ECREL, 						value);
+		this.arcType.put(KEGG_RELATION_GEREL, 						value);
+		this.arcType.put(KEGG_RELATION_MAPLINK, 					value);
+		this.arcType.put(KEGG_RELATION_PCREL, 						value);
+		this.arcType.put(KEGG_RELATION_PPREL, 						value);
+		
+		this.arcType.put(KEGG_RELATION_SUBTYPE_ACTIVATION, 			value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_ASSOCIATION, 		value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_COMPOUND, 			value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_DEPHOSPHORYLATION, 	value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_DISSOCIATION, 		value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_EXPRESSION, 			value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_GLYCOSYLATION, 		value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_HIDDEN_COMPOUND, 	value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_INDIRECT_EFFECT, 	value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_INHIBITION, 			value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_METHYLATION, 		value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_MISSING_INTERACTION, value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_PHOSPHORYLATION, 	value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_REPRESSION, 			value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_STATE_CHANGE, 		value);
+		this.arcType.put(KEGG_RELATION_SUBTYPE_UBIQUITINATION, 		value);
+		this.arcType.put(null, 										value);
 	}
 	
 	/**
@@ -228,24 +276,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	 * @return SBGN glyph type
 	 */
 	protected String determineGlyphType(String glyphType){
-		String result = GLYPH_TYPE_UNSPECIFIED_ENTITY;
-		
-		if(glyphType.equalsIgnoreCase(KEGG_ENTRY_TYPE_COMPOUND))
-			result = GLYPH_TYPE_COMPLEX;
-		if(glyphType.equalsIgnoreCase(KEGG_ENTRY_TYPE_ENZYME))
-			result = GLYPH_TYPE_MACROMOLECULE;
-		if(glyphType.equalsIgnoreCase(KEGG_ENTRY_TYPE_GENE))
-			result = GLYPH_TYPE_NUCLEIC_ACID_FEATURE; // GLYP_TYPE_MACROMOLECULE
-		if(glyphType.equalsIgnoreCase(KEGG_ENTRY_TYPE_GROUP))
-			result = GLYPH_TYPE_NUCLEIC_ACID_FEATURE_MULTIMER;
-		if(glyphType.equalsIgnoreCase(KEGG_ENTRY_TYPE_MAP))
-			result = GLYPH_TYPE_TAG; // TODO: check this one
-		if(glyphType.equalsIgnoreCase(KEGG_ENTRY_TYPE_ORTHOLOG))
-			result = GLYPH_TYPE_SUBMAP;
-		if(glyphType.equalsIgnoreCase(KEGG_ENTRY_TYPE_REACTION))
-			result = GLYPH_TYPE_PROCESS;
-			
-		return result;
+		return this.glyphType.get(glyphType);
 	}
 	
 	/**
@@ -254,67 +285,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	 * @return SBGN arc type
 	 */
 	protected String determineArcType(String arcType){
-		String result = ARC_TYPE_CONSUMPTION;
-		
-		if(arcType.equalsIgnoreCase(KEGG_REACTION_IRREVERSIBLE))
-			result = "";
-		if(arcType.equalsIgnoreCase(KEGG_REACTION_REVERSIBLE))
-			result = "";
-		if(arcType.equalsIgnoreCase(KEGG_RELATION_ECREL))
-			result = "";
-		if(arcType.equalsIgnoreCase(KEGG_RELATION_GEREL))
-			result = "";
-		if(arcType.equalsIgnoreCase(KEGG_RELATION_MAPLINK))
-			result = "";
-		if(arcType.equalsIgnoreCase(KEGG_RELATION_PCREL))
-			result = "";
-		if(arcType.equalsIgnoreCase(KEGG_RELATION_PPREL))
-			result = "";
-		return result;
-	}
-	
-	/**
-	 * transform the KEGG relation subtype into a SBGN arc
-	 * @param arcSubtype String of a KEGG relation subtype
-	 * @return SBGN arc type
-	 */
-	protected String determineArcSubType(String arcSubtype){
-		String result = ARC_TYPE_CONSUMPTION;
-		
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_ACTIVATION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_ASSOCIATION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_COMPOUND))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_DEPHOSPHORYLATION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_DISSOCIATION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_EXPRESSION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_GLYCOSYLATION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_HIDDEN_COMPOUND))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_INDIRECT_EFFECT))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_INHIBITION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_METHYLATION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_MISSING_INTERACTION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_PHOSPHORYLATION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_REPRESSION))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_STATE_CHANGE))
-			result = "";
-		if(arcSubtype.equalsIgnoreCase(KEGG_RELATION_SUBTYPE_UBIQUITINATION))
-			result = "";
-		
-		return result;
+		return this.arcType.get(arcType);
 	}
 
 	@Override
@@ -403,15 +374,13 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 			Arc a = new Arc();
 			Start start = new Start();
 			End end = new End();
+			Next next = new Next();
 			
 			// set start and end points
-			// TODO: this
+			// TODO: create a path form start over next to end
 			
 			// set the reaction type
 			a.setClazz(reaction.getType().toString());
-			
-			// TODO: check other values and complete the arc part
-			// TODO: check for subtrates / products / reactants
 			
 			// put the arc into the map
 			sbgn.getMap().getArc().add(a);
