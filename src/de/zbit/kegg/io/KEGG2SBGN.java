@@ -220,7 +220,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	 */
 	private HashMap<String, String> glyphType = new HashMap<String, String>();
 	private HashMap<String, String> arcType = new HashMap<String, String>();
-	private HashMap<String, String> arcSubtType = new HashMap<String, String>();
+	
 	/**
 	 * Constructor
 	 * @param manager
