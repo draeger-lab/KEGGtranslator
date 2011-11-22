@@ -354,6 +354,9 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     // REMARK: This class is and must be called by all other translate functions.
     preProcessPathway(p);
     
+    // Remember just the pathway object with core information for later information
+    lastTranslatedPathway = new Pathway(p.getName(), p.getOrg(), p.getNumber(), p.getTitle(), p.getImage(), p.getLink());
+    
     OutputFormat doc = translateWithoutPreprocessing(p);
     
     // Remember already queried objects
@@ -395,8 +398,6 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       
 			if (l.size() > 0) {
 				Pathway p = l.get(0);
-				// Remember just the pathway object with core information for later information
-				lastTranslatedPathway = new Pathway(p.getName(), p.getOrg(), p.getNumber(), p.getTitle(), p.getImage(), p.getLink());
 				OutputFormat doc = translate(p);
 				return doc;
 			}
@@ -723,6 +724,9 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * Translate the pathway to the new format - assumes that all preprocessing
    * (precaching of ids, autocomplete reactions, remove orphans, etc.) has
    * already been performed.
+   * 
+   * <p>This method should not be called directly. Use any other translate method,
+   * e.g. {@link #translate(Pathway)}.
    * 
    * @param p Pathway to translate
    * @return Translated pathway
