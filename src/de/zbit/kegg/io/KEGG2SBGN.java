@@ -1,6 +1,27 @@
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of KEGGtranslator, a program to convert KGML files
+ * from the KEGG database into various other formats, e.g., SBML, GML,
+ * GraphML, and many more. Please visit the project homepage at
+ * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
+ * obtain the latest version of KEGGtranslator.
+ *
+ * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ *
+ * KEGGtranslator is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
+ */
+
 package de.zbit.kegg.io;
 
-import java.io.*;
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,86 +30,47 @@ import javax.xml.bind.JAXBException;
 
 import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Arc;
-import org.sbgn.bindings.Arc.Start;
 import org.sbgn.bindings.Arc.End;
 import org.sbgn.bindings.Arc.Next;
+import org.sbgn.bindings.Arc.Start;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Label;
 import org.sbgn.bindings.Map;
 import org.sbgn.bindings.Sbgn;
 
-import y.io.GMLIOHandler;
-import y.io.GraphMLIOHandler;
-import y.io.TGFIOHandler;
-import y.io.YGFIOHandler;
-import y.view.Graph2D;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
+import de.zbit.kegg.Translator;
+import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
+import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
-import de.zbit.kegg.parser.pathway.ReactionComponent;
+import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.kegg.parser.pathway.Relation;
-import de.zbit.kegg.parser.pathway.SubType;
-import de.zbit.kegg.Translator;
+import de.zbit.kegg.parser.pathway.RelationType;
 
-import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
-import de.zbit.kegg.parser.KeggParser;
-import de.zbit.util.Utils;
 
-///*
-// * $Id$
-// * $URL$
-// * ---------------------------------------------------------------------
-// * This file is part of KEGGtranslator, a program to convert KGML files
-// * from the KEGG database into various other formats, e.g., SBML, GML,
-// * GraphML, and many more. Please visit the project homepage at
-// * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
-// * obtain the latest version of KEGGtranslator.
-// *
-// * Copyright (C) 2011 by the University of Tuebingen, Germany.
-// *
-// * KEGGtranslator is free software; you can redistribute it and/or 
-// * modify it under the terms of the GNU Lesser General Public License
-// * as published by the Free Software Foundation. A copy of the license
-// * agreement is provided in the file named "LICENSE.txt" included with
-// * this software distribution and also available online as
-// * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
-// * ---------------------------------------------------------------------
-// */
-//package de.zbit.kegg.io;
-//
-//import java.io.File;
-//
-//import javax.xml.bind.JAXBException;
-//
-//import org.sbgn.SbgnUtil;
-//import org.sbgn.bindings.Bbox;
-//import org.sbgn.bindings.Glyph;
-//import org.sbgn.bindings.Label;
-//import org.sbgn.bindings.Map;
-//import org.sbgn.bindings.Sbgn;
-//
-//import de.zbit.kegg.KeggInfoManagement;
-//import de.zbit.kegg.parser.pathway.Pathway;
-//
-///**
-// * A (not yet fully implemented) implementation of KEGG2SBGN.
-// * 
-// * <p> Note:<br/>
-// * Martijn should be mentioned in 'Acknowledgments', in case of a publication
-// * of this method.</p>
-// * 
-// * @author Martijn van Iersel
-// * @author Andreas Dr&auml;ger
-// * @date 2011-04-22
-// * @version $Rev$
-// */
-public class KEGG2SBGN extends AbstractKEGGtranslator {
+/**
+ * A (not yet fully implemented) implementation of KEGG2SBGN.
+ * 
+ * <p> Note:<br/>
+ * Martijn and Manuel should be mentioned at least in 'Acknowledgments', in case of a publication
+ * of this method.</p>
+ * 
+ * @author Manuel Ruff
+ * @author Clemens Wrzodek
+ * @author Martijn van Iersel
+ * @author Andreas Dr&auml;ger
+ * @date 2011-04-22
+ * @version $Rev$
+ */
+public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	
 	/**
 	 * KEGG Entry Types
+	 * TODO: Replace with {@link EntryType}
 	 */
 	private final String KEGG_ENTRY_TYPE_ORTHOLOG					= "ortholog"; // the node is a KO (ortholog group)
 	private final String KEGG_ENTRY_TYPE_ENZYME						= "enzyme"; // the node is an enzyme
@@ -101,6 +83,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	
 	/**
 	 * KEGG Relation Types
+	 * TODO: Replace with {@link RelationType}
 	 */
 	private final String KEGG_RELATION_ECREL						= "ECrel"; // enzyme-enzyme relation, indicating two enzymes catalyzing successive reaction steps
 	private final String KEGG_RELATION_PPREL						= "PPrel"; // protein-protein interaction, such as binding and modification
@@ -130,6 +113,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	
 	/**
 	 * KEGG Reaction Types
+	 * TODO: Replace with {@link ReactionType}
 	 */
 	private final String KEGG_REACTION_REVERSIBLE					= "reversible"; // 	reversible reaction
 	private final String KEGG_REACTION_IRREVERSIBLE					= "irreversible"; // irreversible reaction
@@ -289,7 +273,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	}
 
 	@Override
-	protected Object translateWithoutPreprocessing(Pathway p) {
+	protected Sbgn translateWithoutPreprocessing(Pathway p) {
 		
 		Sbgn sbgn = new Sbgn();
 		Map map = new Map();
@@ -303,13 +287,27 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 		////////////////////////////////
 		for (Entry e : p.getEntries())
 		{	
+		  // TODO use Enum class EntryType here 
 			// initiate
 			Glyph g = new Glyph();
 			Bbox bb = new Bbox();
 			Label l = new Label();
 		
+			
+			
 			// call KeggInfos for the correct name and additional informations
-			KeggInfos infos = KeggInfos.get(e.getName(), manager);
+      List<KeggInfos> keggInfos = new LinkedList<KeggInfos>();
+      for (String ko_id:e.getName().split(" ")) {
+        if (ko_id.trim().equalsIgnoreCase("undefined") || e.hasComponents()) continue;
+        
+        KeggInfos infos = KeggInfos.get(ko_id, manager);
+        keggInfos.add(infos);
+      }
+        
+
+			
+			
+			String name = getNameForEntry(e, keggInfos.toArray(new KeggInfos[0]));
 			
 			// define the bounding box
 			bb.setX(e.getGraphics().getX());
@@ -318,7 +316,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 			bb.setH(e.getGraphics().getHeight());
 			
 			// set the label name according to the KeggInfos fetched
-			l.setText(infos.getName());
+			l.setText(name);
 			
 			// set the values for the glyph
 			// TODO: check whats happening if there are submaps etc.
@@ -329,6 +327,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 			g.setOrientation(GLYPH_ORIENTATION_HORIZONTAL);
 			
 			// put the glyph into the map
+			e.setCustom(g);
 			sbgn.getMap().getGlyph().add(g);
 		}
 		
@@ -337,14 +336,30 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 		///////////////////////////////////
 		for (Relation relation : p.getRelations())
 		{
+		  //TODO Use Enum class RelationType
+		  //TODO Iterate over relation.getSubtypes()
+      Entry one = p.getEntryForId(relation.getEntry1());
+      Entry two = p.getEntryForId(relation.getEntry2());
+      
+      if (one==null || two==null) {
+        // This happens, e.g. when removing pathways nodes
+        // or in general when removing nodes... => below
+        // info, because mostly this is wanted by user.
+        log.fine("Relation with unknown entry!");
+        continue;
+      }
+      
+      
 			// initiate
 			Arc a = new Arc();
 			Start start = new Start();
 			End end = new End();
 			
 			// grab the first and second entry
-			Glyph entry1 = map.getGlyph().get(relation.getEntry1());
-			Glyph entry2 = map.getGlyph().get(relation.getEntry2());
+//			Glyph entry1 = map.getGlyph().get(relation.getEntry1());
+//			Glyph entry2 = map.getGlyph().get(relation.getEntry2());
+			Glyph entry1 = (Glyph) one.getCustom();
+      Glyph entry2 = (Glyph) two.getCustom();
 			
 			// set start and end
 			// TODO: check for the direction
@@ -390,10 +405,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 	}
 	
 	@Override
-	public boolean writeToFile(Object doc, String outFile) {
+	public boolean writeToFile(Sbgn doc, String outFile) {
 		// TODO Auto-generated method stub
 		try {
-			SbgnUtil.writeToFile((Sbgn)doc, new File (outFile));
+			SbgnUtil.writeToFile(doc, new File (outFile));
 			return true;
 		} catch (JAXBException e) {
 			return false;
@@ -420,13 +435,11 @@ public class KEGG2SBGN extends AbstractKEGGtranslator {
 
 	@Override
 	protected boolean considerRelations() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	protected boolean considerReactions() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

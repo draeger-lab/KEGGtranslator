@@ -141,8 +141,9 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       case GraphML: case GML: case JPG: case GIF: case YGF: case TGF: /* case SVG:*/
         return new TranslatorGraphPanel(inputFile, outputFormat, translationResult);
         
-      // SBGN REMOVED, Please only insert working items here.
-      // case SBGNML:
+      // Please only insert working items here.
+      case SBGNML:
+        return new TranslatorSBGNPanel(inputFile, translationResult);
       default:
         GUITools.showErrorMessage(null, "Unknwon output Format: '" + outputFormat + "'.");
         return null;
@@ -157,7 +158,8 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
         return new TranslatorGraphPanel(pathwayID, outputFormat, translationResult);
         
       // SBGN REMOVED, Please only insert working items here.
-      // case SBGNML:
+      case SBGNML:
+        return new TranslatorSBGNPanel(pathwayID, translationResult);
       default:
         GUITools.showErrorMessage(null, "Unknwon output Format: '" + outputFormat + "'.");
         return null;

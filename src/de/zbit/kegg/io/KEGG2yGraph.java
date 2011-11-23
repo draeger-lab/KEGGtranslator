@@ -161,6 +161,15 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    */
   public final static String mapDescription="-MAP_DESCRIPTION-";
   
+  /**
+   * An enum of writeable output formats (identified by file extension).
+   * <p>All lowercased!
+   * @author Clemens Wrzodek
+   */
+  public static enum writeableFileExtensions {
+    gif,graphml,gml,ygf,tgf,jpg,jpeg,svg;
+  }
+  
   /*===========================
    * CONSTRUCTORS
    * ===========================*/
@@ -1529,7 +1538,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     ioh.addOutputDataProvider(desc, nm, scope, keytype);
     //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
   }
-  
+    
   /**
    * @param document
    * @param path
@@ -1539,19 +1548,20 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    */
   public boolean writeToFile(Graph2D graph, String outFile, String format) throws Exception {
     IOHandler io;
-    if (format.equalsIgnoreCase("gif")) {
+    writeableFileExtensions ext = writeableFileExtensions.valueOf(format.toLowerCase().trim());
+    if (ext.equals(writeableFileExtensions.gif)) {
       io = new GIFIOHandler();
-    } else if (format.equalsIgnoreCase("graphml")) {
+    } else if (ext.equals(writeableFileExtensions.graphml)) {
       io = new GraphMLIOHandler();
-    } else if (format.equalsIgnoreCase("gml")) {
+    } else if (ext.equals(writeableFileExtensions.gml)) {
       io = new GMLIOHandler();
-    } else if (format.equalsIgnoreCase("ygf")) {
+    } else if (ext.equals(writeableFileExtensions.ygf)) {
       io = new YGFIOHandler();
-    } else if (format.equalsIgnoreCase("tgf")) {
+    } else if (ext.equals(writeableFileExtensions.tgf)) {
       io = new TGFIOHandler();
-    } else if (format.equalsIgnoreCase("jpg") || format.equalsIgnoreCase("jpeg")) {
+    } else if (ext.equals(writeableFileExtensions.jpg) || ext.equals(writeableFileExtensions.jpeg)) {
       io = new JPGIOHandler();
-    } else if (format.equalsIgnoreCase("svg")) {
+    } else if (ext.equals(writeableFileExtensions.svg)) {
       io = createSVGIOHandler();
       if (io==null) {
         throw new Exception("Unknown output format (SVG extension not installed).");

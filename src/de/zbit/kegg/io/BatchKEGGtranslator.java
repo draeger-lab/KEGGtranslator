@@ -251,10 +251,10 @@ public class BatchKEGGtranslator {
 			break;
 	    /*
 	     * REMOVED, PLease only insert working items here.
-	     * As soon as SBGNML really works, we can include it here.
+	     * As soon as SBGNML really works, we can include it here.*/
 		case SBGNML:
 			translator  = new KEGG2SBGN(manager);
-			break;*/
+			break;
 		default:
 			System.err.println("Unknwon output Format: '" + outFormat + "'.");
 			translator = null;
