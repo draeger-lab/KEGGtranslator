@@ -250,8 +250,8 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @see de.zbit.kegg.gui.TranslatorPanel#getOutputFileFilter()
    */
   @Override
-  protected LinkedList<FileFilter> getOutputFileFilter() {
-    LinkedList<FileFilter> ff = getOutputFileFilterForRealDocument();
+  protected List<FileFilter> getOutputFileFilter() {
+    List<FileFilter> ff = getOutputFileFilterForRealDocument();
     if (ff==null) ff = new LinkedList<FileFilter>();
     if (isAllowedToSaveAsGraphFormats()) {
       ff.addAll(getGraphMLfilefilter());
@@ -273,7 +273,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * the default file filter.
    * @return
    */
-  protected abstract LinkedList<FileFilter> getOutputFileFilterForRealDocument();
+  protected abstract List<FileFilter> getOutputFileFilterForRealDocument();
 
   
   /* (non-Javadoc)

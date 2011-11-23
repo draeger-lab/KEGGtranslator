@@ -23,6 +23,7 @@ package de.zbit.kegg.gui;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
@@ -107,7 +108,7 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    * @see de.zbit.kegg.gui.TranslatorPanel#getOutputFileFilter()
    */
   @Override
-  protected LinkedList<FileFilter> getOutputFileFilter() {
+  protected List<FileFilter> getOutputFileFilter() {
     LinkedList<FileFilter> ff = new LinkedList<FileFilter>();
     ff.add(SBFileFilter.createSBMLFileFilter());
     ff.add(SBFileFilter.createTeXFileFilter());

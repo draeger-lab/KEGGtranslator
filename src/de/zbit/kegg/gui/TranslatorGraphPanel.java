@@ -22,27 +22,13 @@ package de.zbit.kegg.gui;
 
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.filechooser.FileFilter;
 
-import y.view.DefaultGraph2DRenderer;
-import y.view.EditMode;
 import y.view.Graph2D;
-import y.view.Graph2DView;
-import y.view.Graph2DViewMouseWheelZoomListener;
-import de.zbit.graph.RestrictedEditMode;
-import de.zbit.io.SBFileFilter;
-import de.zbit.kegg.ext.TranslatorPanelOptions;
-import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
-import de.zbit.util.ThreadManager;
-import de.zbit.util.TranslatorTools;
-import de.zbit.util.prefs.SBPreferences;
 
 /**
  * Extension of {@link TranslatorPanel} to visualize yFiles
@@ -51,28 +37,9 @@ import de.zbit.util.prefs.SBPreferences;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class TranslatorGraphPanel extends TranslatorPanel<Graph2D> {
+public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
   private static final long serialVersionUID = -1083637150034491451L;
 
-
-  /**
-   * @return all available output file formats for GraphML files.
-   */
-  public static List<SBFileFilter> getGraphMLfilefilter() {
-    LinkedList<SBFileFilter> ff = new LinkedList<SBFileFilter>();
-    ff.add(SBFileFilter.createGraphMLFileFilter());
-    ff.add(SBFileFilter.createGMLFileFilter());
-    ff.add(SBFileFilter.createJPEGFileFilter());        
-    ff.add(SBFileFilter.createGIFFileFilter());
-    ff.add(SBFileFilter.createYGFFileFilter());
-    ff.add(SBFileFilter.createTGFFileFilter());
-    if (KEGG2yGraph.isSVGextensionInstalled()) {
-      ff.add(SBFileFilter.createSVGFileFilter());
-    }
-    return ff;
-  }
-  
-  
   /**
    * Create a new translator-panel and initiates the translation.
    * @param inputFile
@@ -114,136 +81,31 @@ public class TranslatorGraphPanel extends TranslatorPanel<Graph2D> {
     this(pathwayID, Format.GraphML, translationResult);
   }
 
-
   /* (non-Javadoc)
-   * @see javax.swing.JComponent#setEnabled(boolean)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#createGraphFromDocument(java.lang.Object)
    */
   @Override
-  public void setEnabled(boolean enabled) {
-    super.setEnabled(enabled);
-    
-    // Also enable the yFiles views
-    try {
-      TranslatorTools.enableViews(document,enabled);
-    } catch (Throwable e) {}
+  protected Graph2D createGraphFromDocument(Graph2D document) {
+    return document;
   }
-  
-  /* (non-Javadoc)
-   * @see java.awt.Component#repaint()
-   */
-  @Override
-  public void repaint() {
-    super.repaint();
-    if (!isReady()) return;
-    
-    // Update graph
-    // updateViews() does not update, but clear the visualization
-    // strange thing...
-    //((Graph2D)document).updateViews();
-  }
-  
 
   /* (non-Javadoc)
-   * @see de.zbit.kegg.gui.TranslatorPanel#createTabContent()
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()
    */
   @Override
-  public void createTabContent() throws Exception {
- // Create a new visualization of the model.
-    Graph2DView pane = new Graph2DView((Graph2D) document);
-    add(pane);
-    
-    // Important to draw nodes last, edges should be BELOW nodes.
-    if (pane.getGraph2DRenderer() instanceof DefaultGraph2DRenderer ){
-      ((DefaultGraph2DRenderer) pane.getGraph2DRenderer()).setDrawEdgesFirst(true);
-    }
-    
-    // Make group nodes collapsible.
-    // Unfortunately work-in-progress.
-    //pane.addViewMode(new CollapseGroupNodesViewMode((Graph2D) document));
-    
-    /*
-     * Get settings to control visualization behavior
-     */
-    SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
-    
-    // Set KEGGtranslator logo as background
-    addBackgroundImage(pane, translator, prefs);
-    
-    //--
-    // Show Navigation and Overview
-    if (TranslatorPanelOptions.SHOW_NAVIGATION_AND_OVERVIEW_PANELS.getValue(prefs)) {
-      RestrictedEditMode.addOverviewAndNavigation(pane);
-    }
-    //--
-    
-    pane.setSize(getSize());
-    //ViewMode mode = new NavigationMode();
-    //pane.addViewMode(mode);
-    EditMode editMode = new RestrictedEditMode(translationListener, this);
-    editMode.showNodeTips(true);
-    pane.addViewMode(editMode);
-    
-    if (TranslatorPanelOptions.SHOW_PROPERTIES_TABLE.getValue(prefs)) {
-      ((RestrictedEditMode)editMode).addPropertiesTable(pane);
-    }
-    
-    pane.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
-    pane.fitContent(true);
-    pane.setFitContentOnResize(true);
+  protected List<FileFilter> getOutputFileFilterForRealDocument() {
+    return null; // Graph formats are included by default!
   }
-
-
-  /**
-   * Setup the background image as set in the preferences
-   * @param pane the pane to add the background image
-   * @param translator the translator used for translation
-   * @param prefs might be null, else, prefs object for {@link TranslatorPanelOptions}
-   * @throws MalformedURLException
-   */
-  public static void addBackgroundImage(Graph2DView pane, AbstractKEGGtranslator<?> translator, SBPreferences prefs)
-  throws MalformedURLException {
-    addBackgroundImage(pane, translator, prefs, false);
-  }
-  public static void addBackgroundImage(Graph2DView pane, AbstractKEGGtranslator<?> translator, SBPreferences prefs, boolean waitUntilComplete)
-    throws MalformedURLException {
-    if (prefs ==null) {
-      prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
-    }
-    if (TranslatorPanelOptions.SHOW_LOGO_IN_GRAPH_BACKGROUND.getValue(prefs)) {
-      RestrictedEditMode.addBackgroundImage(TranslatorGraphPanel.class.getResource(logoResourcePath), pane);
-    } else
-    if (TranslatorPanelOptions.SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND.getValue(prefs)) {
-      Integer brighten = (TranslatorPanelOptions.BRIGHTEN_KEGG_BACKGROUND_IMAGE.getValue(prefs));
-      if (brighten==null || brighten<0) brighten = 0;
-      
-      String image = translator.getLastTranslatedPathway().getImage();
-      if (image!=null) {
-        Thread t = RestrictedEditMode.addDynamicBackgroundImage(new URL(image), pane, brighten);
-        if (waitUntilComplete) {
-          ThreadManager.awaitTermination(t);
-        }
-      }
-    }
-  }
-
-  
-  /* (non-Javadoc)
-   * @see de.zbit.kegg.gui.TranslatorPanel#getOutputFileFilter()
-   */
-  @Override
-  protected LinkedList<FileFilter> getOutputFileFilter() {
-    LinkedList<FileFilter> ff = new LinkedList<FileFilter>();
-    ff.addAll(getGraphMLfilefilter());
-    return ff;
-  }
-
 
   /* (non-Javadoc)
-   * @see de.zbit.kegg.gui.TranslatorPanel#writeToFileUnchecked(java.io.File, java.lang.String)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#writeRealDocumentToFileUnchecked(java.io.File, java.lang.String)
    */
   @Override
-  protected boolean writeToFileUnchecked(File file, String format) throws Exception {
+  protected boolean writeRealDocumentToFileUnchecked(File file, String format)
+    throws Exception {
     return ((KEGG2yGraph)translator).writeToFile(document, file.getPath(), format);
   }
+
+
   
 }

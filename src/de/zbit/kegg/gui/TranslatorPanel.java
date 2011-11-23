@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -441,7 +442,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    * the default file filter.
    * @return
    */
-  protected abstract LinkedList<FileFilter> getOutputFileFilter();
+  protected abstract List<FileFilter> getOutputFileFilter();
   
   /**
    * 
@@ -451,7 +452,10 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     if (!isReady()) return null;
     
     // Create list of available output file filters
-    LinkedList<FileFilter> ff = getOutputFileFilter();
+    List<FileFilter> ff = getOutputFileFilter();
+    if (!(ff instanceof LinkedList<?>)) {
+      ff = new LinkedList<FileFilter>(ff);
+    }
     
     // Move the selected output format to the top of the list
     for (int i=0; i<ff.size(); i++) {
@@ -459,7 +463,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       if (extensions!=null) {
         for (String ext: extensions) {
           if (ext.equalsIgnoreCase((this.outputFormat.toString()))) {
-            ff.addFirst(ff.remove(i));
+            ((LinkedList<FileFilter>) ff).addFirst(ff.remove(i));
             break;
           }
         }

@@ -24,6 +24,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.filechooser.FileFilter;
@@ -36,6 +37,7 @@ import y.base.Edge;
 import y.base.Node;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
+import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.io.KEGG2SBGN;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 
@@ -114,7 +116,8 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
       Node source = map.get(a.getSource());
       Node target = map.get(a.getTarget());
       
-      Edge e = simpleGraph.createEdge(source, target);
+      //Edge e =
+      simpleGraph.createEdge(source, target);
       //EdgeRealizer nr = simpleGraph.getRealizer(e);
       // XXX: Set arrow heads and such...
     }
@@ -126,10 +129,10 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
    * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()
    */
   @Override
-  protected LinkedList<FileFilter> getOutputFileFilterForRealDocument() {
-    // TODO: SBGN FileFilters
-//    SBFileFilter.createSB
-    return null;
+  protected List<FileFilter> getOutputFileFilterForRealDocument() {
+    List<FileFilter> ff = new LinkedList<FileFilter>();
+    ff.add(SBFileFilter.createSBGNFileFilter());
+    return ff;
   }
 
 
