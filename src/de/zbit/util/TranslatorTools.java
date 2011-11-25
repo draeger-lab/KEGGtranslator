@@ -45,6 +45,7 @@ import y.base.Node;
 import y.base.NodeCursor;
 import y.base.NodeMap;
 import y.base.YCursor;
+import y.layout.CanonicMultiStageLayouter;
 import y.layout.labeling.SALabeling;
 import y.layout.organic.SmartOrganicLayouter;
 import y.view.Graph2D;
@@ -592,11 +593,11 @@ public class TranslatorTools {
     SmartOrganicLayouter layouter = new SmartOrganicLayouter();
     layouter.setScope(SmartOrganicLayouter.SCOPE_SUBSET);
     // If SmartComponentLayoutEnabled is true, all new nodes will
-    // simply be put one above the other. If false, they are lyouted
+    // simply be put one above the other. If false, they are layouted
     // nicely, BUT orphans are being moved, too :-(
 //    layouter.setSmartComponentLayoutEnabled(true);
     layouter.setSmartComponentLayoutEnabled(strict);
-    layouter.setNodeOverlapsAllowed(newNodes.size()>30);
+    layouter.setNodeOverlapsAllowed(newNodes.size()>75);
     layouter.setConsiderNodeLabelsEnabled(true);
     layouter.setCompactness(0.7d);
     layouter.setNodeSizeAware(true);
@@ -652,6 +653,49 @@ public class TranslatorTools {
     
     // Reset layout, because subset scope doesn't work correctly.
     resetLayout(resetLayout);
+  }
+  
+  /**
+   * Layout the graph with the given layout.
+   * @param layouterClass
+   */
+  public void layout(Class<? extends CanonicMultiStageLayouter> layouterClass) {
+    graph.unselectAll();
+    
+    // Remember group node sizes and insets
+    GroupLayoutConfigurator glc = new GroupLayoutConfigurator(graph);
+    glc.prepareAll();
+    
+    // Create layouter and perform layout
+    CanonicMultiStageLayouter layouter;
+    try {
+      layouter = layouterClass.newInstance();
+    } catch (Exception e) {
+      log.log(Level.WARNING, "Could not create graph layouter.", e);
+      return;
+    }
+
+    // Change a few properties to make the result nicer
+    if (layouter instanceof SmartOrganicLayouter) {
+      SmartOrganicLayouter la = ((SmartOrganicLayouter) layouter);
+      la.setMinimalNodeDistance(15);
+      la.setCompactness(0.7d);
+    }
+//    layouter.setSmartComponentLayoutEnabled(true);
+//    layouter.setNodeOverlapsAllowed(false);
+//    layouter.setConsiderNodeLabelsEnabled(true);
+//    layouter.setCompactness(0.7d);
+//    layouter.setNodeSizeAware(true);
+    
+    try {
+      Graph2DLayoutExecutor l = new Graph2DLayoutExecutor();
+      l.doLayout(graph, layouter);
+    } catch (Exception e) {
+      log.log(Level.WARNING, "Could not layout graph.", e);
+    }
+    
+    // Restore group node sizes and insets
+    glc.restoreAll();
   }
   
   public void layoutGroupNode(Node group) {

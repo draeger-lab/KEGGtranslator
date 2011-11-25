@@ -23,6 +23,9 @@ package de.zbit.graph;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import y.base.Edge;
+import y.base.EdgeCursor;
+import y.base.Graph;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 
@@ -35,7 +38,7 @@ import y.view.ShapeNodeRealizer;
 public class ReactionNodeRealizer extends ShapeNodeRealizer {
   
   public ReactionNodeRealizer() {
-    super();
+    super(ShapeNodeRealizer.RECT);
     setHeight(8);
     setWidth(16);
   }
@@ -52,7 +55,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
   public NodeRealizer createCopy(NodeRealizer nr) {
     return new ReactionNodeRealizer(nr);
   }
-    
+  
   /* (non-Javadoc)
    * @see y.view.NodeRealizer#paint(java.awt.Graphics2D)
    */
@@ -82,7 +85,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     // Draw the reaction node rectangle
     gfx.drawRect((int)offsetX+x, (int)offsetY+y, (int)min, (int)min);
     
-    boolean vertical = offsetY>offsetX; // TODO: <===
+    boolean vertical = offsetY>offsetX;
     if (!vertical) {
       int halfHeight = (int)(getHeight()/2.0);
       
@@ -104,24 +107,56 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     
   }
   
+  /**
+   * True if the node is painted in a horizontal layout.
+   * Use {@link #rotateNode()} to change the rotation.
+   */
+  public boolean isHorizontal() {
+    return getWidth()>=getHeight();
+  }
   
-//  /* (non-Javadoc)
-//   * @see y.view.NodeRealizer#getBoundingBox()
-//   */
-//  @Override
-//  public Rectangle2D.Double getBoundingBox() {
-//    Rectangle b = shape.getBounds();
-//    return new Rectangle2D.Double(b.getX(), b.getY(), b.getWidth(), b.getHeight());
-//  }
-//  
-//       
-//  /* (non-Javadoc)
-//   * @see y.view.ShapeNodeRealizer#calcUnionRect(java.awt.geom.Rectangle2D)
-//   */
-//  @Override
-//  public void calcUnionRect(Rectangle2D arg0) {
-//    super.calcUnionRect(arg0);
-//    // should be same as "shape.getBounds2D().createUnion(rect);"
-//  }
+  /**
+   * Rotates the node by 90°.
+   */
+  public void rotateNode() {
+    double width = getWidth();
+    double height = getHeight();
+    setWidth(height);
+    setWidth(width);
+  }
+  
+  /**
+   * 
+   */
+  private void fixLayout() {
+//    Graph g = getNode().getGraph();
+//    Node n = getNode();
+//    
+//    for (EdgeCursor nc = getNode().edges(); nc.ok(); nc.next()) {
+//      Edge v = nc.edge();
+//      v.t
+//    }
+    
+  }
+  
+  
+  //  /* (non-Javadoc)
+  //   * @see y.view.NodeRealizer#getBoundingBox()
+  //   */
+  //  @Override
+  //  public Rectangle2D.Double getBoundingBox() {
+  //    Rectangle b = shape.getBounds();
+  //    return new Rectangle2D.Double(b.getX(), b.getY(), b.getWidth(), b.getHeight());
+  //  }
+  //  
+  //       
+  //  /* (non-Javadoc)
+  //   * @see y.view.ShapeNodeRealizer#calcUnionRect(java.awt.geom.Rectangle2D)
+  //   */
+  //  @Override
+  //  public void calcUnionRect(Rectangle2D arg0) {
+  //    super.calcUnionRect(arg0);
+  //    // should be same as "shape.getBounds2D().createUnion(rect);"
+  //  }
   
 }
