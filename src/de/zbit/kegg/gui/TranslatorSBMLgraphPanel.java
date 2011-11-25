@@ -55,6 +55,8 @@ import y.base.DataMap;
 import y.base.Edge;
 import y.base.Node;
 import y.base.NodeMap;
+import y.layout.hierarchic.HierarchicLayouter;
+import y.layout.organic.SmartOrganicLayouter;
 import y.view.Arrow;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
@@ -204,6 +206,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     int COLUMNS = species.size()/5; // Show in 5 rows by default
     for (AbstractNamedSBase s : species) {
       boolean nodeHadLayoutInformation = false;
+      boolean nodeShouldBeACircle = false;
       Node n = simpleGraph.createNode();
       species2node.put(s.getId(), n);
       
@@ -213,7 +216,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         nr = simpleGraph.getRealizer(n);
       } else {
         nr = new ShapeNodeRealizer(ShapeNodeRealizer.PARALLELOGRAM);
-        simpleGraph.setRealizer(n, nr);        
+        simpleGraph.setRealizer(n, nr);
+        
       } 
       
       // Initialize default layout variables
@@ -255,6 +259,12 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       nr.setWidth(w);
       nr.setHeight(h);
       
+      if (nodeShouldBeACircle) {
+        double min = Math.min(nr.getWidth(), nr.getHeight());
+        nr.setWidth(min);
+        nr.setHeight(min);
+      }
+      
       if (!nodeHadLayoutInformation) {
         // Remember in defined hashmap
         nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
@@ -292,6 +302,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
           ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), species2node, simpleGraph);
           NodeRealizer nr = new ReactionNodeRealizer();
           Node rNode = simpleGraph.createNode(nr);
+          unlayoutedNodes.add(rNode); // TODO: really add them here?
           nr.setX(xy.getA());
           nr.setY(xy.getB());
           
@@ -302,7 +313,9 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
               Edge e = simpleGraph.createEdge(source, rNode);
               EdgeRealizer er = simpleGraph.getRealizer(e);
               if (r.isReversible()) {
-                er.setSourceArrow(Arrow.PLAIN);
+                er.setSourceArrow(Arrow.STANDARD);
+              } else {
+                er.setSourceArrow(Arrow.NONE);
               }
               er.setArrow(Arrow.NONE);
             }
@@ -313,7 +326,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             if (target!=null) {
               Edge e = simpleGraph.createEdge(rNode, target);
               EdgeRealizer er = simpleGraph.getRealizer(e);
-              er.setArrow(Arrow.PLAIN);
+              er.setArrow(Arrow.STANDARD);
+              er.setSourceArrow(Arrow.NONE);
             }
           }
           
@@ -322,7 +336,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             if (source!=null) {
               Edge e = simpleGraph.createEdge(source, rNode);
               EdgeRealizer er = simpleGraph.getRealizer(e);
-              er.setArrow(Arrow.PLAIN);
+              er.setArrow(Arrow.TRANSPARENT_CIRCLE);
+              er.setSourceArrow(Arrow.NONE);
             }
           }
           
@@ -331,17 +346,21 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       }
     }
     
+    // Fix layout
     if (nodesWithoutCoordinates>0) {
       TranslatorTools tools = new TranslatorTools(simpleGraph);
       if (useLayoutExtension) {
         // Only layout nodes, that had no coords in the layout extension
-        tools.layoutNodeSubset(unlayoutedNodes);
+        tools.layoutNodeSubset(unlayoutedNodes, true);
+      } else {
+        // Apply Hierarchic layout if no layoutExtension is available.
+        tools.layout(HierarchicLayouter.class);
       }
-      // TODO: Apply Hirarchic layout if no layoutExtension is available.
-      // Apply Smart Organic if only for some nodes the layout is not available.
-      
       simpleGraph.unselectAll();
     }
+        
+    // TODO: Fix ReactionNode edges
+
     
     return simpleGraph;
   }
