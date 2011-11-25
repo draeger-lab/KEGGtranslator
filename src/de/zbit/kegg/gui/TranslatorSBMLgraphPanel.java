@@ -46,6 +46,7 @@ import org.sbml.jsbml.ext.qual.Transition;
 import y.base.Node;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
+import y.view.ShapeNodeRealizer;
 import de.zbit.gui.GUITools;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.io.KEGG2SBMLLayoutExtension;
@@ -165,18 +166,28 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             layoutMap.put(sg.getSpecies(), sg.getBoundingBox());
           }
         }
+        useLayoutExtension = layoutMap.size()>0;
       } else {
         useLayoutExtension = false;
       }
     }
     
+    // Convert each species to a graph node
     Map<String, Node> species2node = new HashMap<String, Node>();
     int nodesWithoutCoordinates=0;
     int COLUMNS = species.size()/5; // Show in 5 rows by default
     for (AbstractNamedSBase s : species) {
       Node n = simpleGraph.createNode();
-      NodeRealizer nr = simpleGraph.getRealizer(n);
       species2node.put(s.getId(), n);
+      
+      // TODO: Set Node shape (and color?) based on SBO-terms
+      NodeRealizer nr;
+      if (!s.isSetSBOTerm()) {
+        nr = simpleGraph.getRealizer(n);
+      } else {
+        nr = new ShapeNodeRealizer(ShapeNodeRealizer.PARALLELOGRAM);
+        simpleGraph.setRealizer(n, nr);        
+      } 
       
       // Initialize default layout variables
       double x=Double.NaN;
@@ -214,8 +225,6 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       nr.setWidth(w);
       nr.setHeight(h);
       
-      // TODO: Set Node shape (and color?) based on SBO-terms
-      
       nr.setLabelText(s.getName());
     }
     
@@ -241,6 +250,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       // TODO: Reactions.
     }
     
+    // TODO: Apply Hirarchic layout if no layoutExtension is available. 
     
     return simpleGraph;
   }
