@@ -122,6 +122,19 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   public TranslatorGraphLayerPanel(String pathwayID, ActionListener translationResult) {
     this(pathwayID, Format.JPG, translationResult);
   }
+  
+  /**
+   * Use this constructor if the document has already been translated.
+   * This constructor does not call {@link #createTabContent()}.
+   * @param inputFile
+   * @param outputFormat
+   * @param translationResult
+   * @param translatedDocument
+   * @throws Exception 
+   */
+  protected TranslatorGraphLayerPanel(final File inputFile, final Format outputFormat, ActionListener translationResult, DocumentType translatedDocument) {
+    super (inputFile,outputFormat,translationResult, translatedDocument);
+  }
 
 
   /* (non-Javadoc)
@@ -178,7 +191,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
     
     // Set KEGGtranslator logo as background
-    addBackgroundImage(pane, translator, prefs);
+    addBackgroundImage(pane, getTranslator(), prefs);
     
     //--
     // Show Navigation and Overview
@@ -199,7 +212,9 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     }
     
     pane.getCanvasComponent().addMouseWheelListener(new Graph2DViewMouseWheelZoomListener());
-    pane.fitContent(true);
+    try {
+      pane.fitContent(true);
+    } catch (Throwable t) {} // Not really a problem
     pane.setFitContentOnResize(true);
   }
 
@@ -301,12 +316,12 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       }
       
       KEGGtranslator trans2;
-      if (translator instanceof KEGG2yGraph) {
-        trans2 = translator;
+      if (getTranslator() instanceof KEGG2yGraph) {
+        trans2 = getTranslator();
       } else if (f!=null) {
-        trans2 = BatchKEGGtranslator.getTranslator(Format.valueOf(format), translator.getKeggInfoManager());
+        trans2 = BatchKEGGtranslator.getTranslator(Format.valueOf(format), getTranslator().getKeggInfoManager());
       } else {
-        trans2 = KEGG2yGraph.createKEGG2JPG(translator.getKeggInfoManager());
+        trans2 = KEGG2yGraph.createKEGG2JPG(getTranslator().getKeggInfoManager());
       }
       return ((KEGG2yGraph)trans2).writeToFile(graphLayer, file.getPath(), format);
       

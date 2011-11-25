@@ -31,11 +31,11 @@ import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.sbml.jsbml.AbstractNamedSBase;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
+import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.InputTransitionEffect;
 import org.sbml.jsbml.ext.qual.OutputTransitionEffect;
@@ -71,14 +71,27 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   /**
    * Qual Namespace definition URL.
    */
-  private static final String QUAL_NS = "http://www.sbml.org/sbml/level3/version1/qual/version1";
+  public static final String QUAL_NS = "http://www.sbml.org/sbml/level3/version1/qual/version1";
   
   /**
    * Unique identifier to identify this Namespace/Extension.
    */
-  private static final String QUAL_NS_PREFIX = "qual";
-
+  public static final String QUAL_NS_NAME = "qual";
   
+  /**
+   * @param document
+   * @return true if the given document has at least one {@link QualitativeSpecies}.
+   */
+  public static boolean hasQualSpecies(SBMLDocument document) {
+    if (document==null || !document.isSetModel()) return false;
+    SBasePlugin qm = document.getModel().getExtension(KEGG2SBMLqual.QUAL_NS);
+    if (qm!=null && qm instanceof QualitativeModel) {
+      QualitativeModel q = (QualitativeModel) qm;
+      if (!q.isSetListOfQualitativeSpecies()) return false;
+      return q.getListOfQualitativeSpecies().size()>0;
+    }
+    return false;
+  }
   
   /*===========================
    * CONSTRUCTORS
@@ -129,15 +142,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     QualitativeModel qualModel = new QualitativeModel(model);
    
     // Add extension and namespace to model
-    doc.addNamespace(KEGG2SBMLqual.QUAL_NS_PREFIX, "xmlns", KEGG2SBMLqual.QUAL_NS);
-    doc.getSBMLDocumentAttributes().put(QUAL_NS_PREFIX + ":required", "true");
+    doc.addNamespace(KEGG2SBMLqual.QUAL_NS_NAME, "xmlns", KEGG2SBMLqual.QUAL_NS);
+    doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", "true");
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     
     //Should be set to false or removed after everything is fine with layout extension
-    if(true) {
-      System.out.println(p.getName());
+    if (false) {
       String file = "matchingSpeciesLayout_" + p.getName().replace(":", "") + ".txt";
-      System.out.println(file);
       try {        
         writeMatchingFile(file, p);
       } catch (IOException e) {

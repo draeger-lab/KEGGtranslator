@@ -33,7 +33,6 @@ import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Sbgn;
 
-import y.base.Edge;
 import y.base.Node;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
@@ -58,7 +57,7 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
    * @param translationResult
    */
   public TranslatorSBGNPanel(File inputFile, ActionListener translationResult) {
-    this(inputFile, Format.SBGNML, translationResult);
+    this(inputFile, Format.SBGN, translationResult);
   }
 
   /**
@@ -89,7 +88,7 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
    * @param translationResult
    */
   public TranslatorSBGNPanel(String pathwayID, ActionListener translationResult) {
-    this(pathwayID, Format.SBGNML, translationResult);
+    this(pathwayID, Format.SBGN, translationResult);
   }
 
 
@@ -106,8 +105,8 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
       NodeRealizer nr = simpleGraph.getRealizer(n);
       map.put(g, n);
       
-      nr.setX(g.getBbox().getX());
-      nr.setY(g.getBbox().getY());
+      nr.setCenterX(g.getBbox().getX());
+      nr.setCenterY(g.getBbox().getY());
       nr.setWidth(g.getBbox().getW());
       nr.setHeight(g.getBbox().getH());
       nr.setLabelText(g.getLabel().getText());
@@ -142,6 +141,6 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
   @Override
   protected boolean writeRealDocumentToFileUnchecked(File file, String format)
     throws Exception {
-    return ((KEGG2SBGN)translator).writeToFile(document, file.getPath());
+    return ((KEGG2SBGN)getTranslator()).writeToFile(document, file.getPath());
   }
 }

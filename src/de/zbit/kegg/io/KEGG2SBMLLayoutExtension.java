@@ -41,12 +41,12 @@ public class KEGG2SBMLLayoutExtension {
   /**
    * Layout extension namespace URL.
    */
-  private static final String LAYOUT_NS = "http://www.sbml.org/sbml/level3/version1/layout/version1";
+  public static final String LAYOUT_NS = "http://www.sbml.org/sbml/level3/version1/layout/version1";
   
   /**
    * Unique identifier to identify this Namespace/Extension.
    */
-  private static final String LAYOUT_NS_PREFIX = "layout";
+  public static final String LAYOUT_NS_NAME = "layout";
 
   
   /**
@@ -60,8 +60,8 @@ public class KEGG2SBMLLayoutExtension {
    */
   public static void addLayoutExtension(Pathway p, SBMLDocument doc, Model model) {
    
-    doc.addNamespace(LAYOUT_NS_PREFIX, "xmlns", LAYOUT_NS);
-    doc.getSBMLDocumentAttributes().put(LAYOUT_NS_PREFIX + ":required", "false");
+    doc.addNamespace(LAYOUT_NS_NAME, "xmlns", LAYOUT_NS);
+    doc.getSBMLDocumentAttributes().put(LAYOUT_NS_NAME + ":required", "false");
     
     ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) model.getExtension(LAYOUT_NS);
     if (layoutModel==null) {

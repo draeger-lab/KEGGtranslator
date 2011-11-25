@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JTabbedPane;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
@@ -36,6 +37,8 @@ import org.sbml.tolatex.io.LaTeXOptionsIO;
 
 import de.zbit.gui.GUITools;
 import de.zbit.io.SBFileFilter;
+import de.zbit.kegg.io.AbstractKEGGtranslator;
+import de.zbit.kegg.io.KEGG2SBMLqual;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.sbml.gui.SBMLModelSplitPane;
@@ -97,11 +100,91 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    */
   @Override
   public void createTabContent() throws Exception {
+    JTabbedPane tabs = new JTabbedPane();
     
     // Create a new visualization of the model.
-    add(new SBMLModelSplitPane(document, SBPreferences.getPreferencesFor(
-      LaTeXOptions.class).getBoolean(
-        LaTeXOptions.PRINT_NAMES_IF_AVAILABLE)));
+    SBMLModelSplitPane treePane = new SBMLModelSplitPane(document, 
+      SBPreferences.getPreferencesFor(LaTeXOptions.class).getBoolean(
+        LaTeXOptions.PRINT_NAMES_IF_AVAILABLE));
+    
+    // TODO: Nice icons
+    tabs.addTab("Detail view", null, treePane);
+    
+    
+    TranslatorPanel<SBMLDocument> quantGraph=null;
+    if (hasSpecies(document)) {
+      quantGraph = createGraphPanel(false);
+      tabs.addTab("Graph view", quantGraph);
+    }
+    
+    if (KEGG2SBMLqual.hasQualSpecies(document)) {
+      TranslatorPanel<SBMLDocument> qualGraph = createGraphPanel(true);
+      tabs.addTab("Graph view", qualGraph);
+      if (quantGraph!=null) {
+        tabs.setTitleAt(tabs.indexOfTabComponent(quantGraph), "Graph of quantitative model");
+        tabs.setTitleAt(tabs.indexOfTabComponent(qualGraph), "Graph of qualitative model");
+      }
+    }
+    
+    // Add tabs to content
+    add (tabs.getTabCount()>1?tabs:treePane);
+  }
+
+  /**
+   * @param forQual show the qual model or the quantitative model.
+   * @return {@link TranslatorSBMLgraphPanel} wrapping some methods
+   * of this panel.
+   */
+  protected TranslatorPanel<SBMLDocument> createGraphPanel(boolean forQual) {
+    final TranslatorSBMLPanel thiss = this;
+    TranslatorPanel<SBMLDocument> qualGraph = new TranslatorSBMLgraphPanel(inputFile, forQual?Format.SBML_QUAL: Format.SBML, translationListener, document, forQual) {
+      private static final long serialVersionUID = -2987555994319694097L;
+
+      /* (non-Javadoc)
+       * @see de.zbit.kegg.gui.TranslatorPanel#getTranslator()
+       */
+      @Override
+      public AbstractKEGGtranslator<?> getTranslator() {
+        return thiss.getTranslator();
+      }
+      
+      /* (non-Javadoc)
+       * @see de.zbit.kegg.gui.TranslatorPanel#getData(java.lang.String)
+       */
+      @Override
+      public Object getData(String key) {
+        return thiss.getData(key);
+      }
+      
+      /* (non-Javadoc)
+       * @see de.zbit.kegg.gui.TranslatorPanel#setData(java.lang.String, java.lang.Object)
+       */
+      @Override
+      public void setData(String key, Object object) {
+        thiss.setData(key, object);
+      }
+      
+      /* (non-Javadoc)
+       * @see de.zbit.kegg.gui.TranslatorPanel#isSaved()
+       */
+      @Override
+      public boolean isSaved() {
+        return thiss.isSaved();
+      }
+    };
+    return qualGraph;
+  }
+
+  /**
+   * Check if any {@link SBMLDocument} has at least one species.
+   * @param document
+   * @return true if the document has at least one species
+   */
+  public static boolean hasSpecies(SBMLDocument document) {
+    if (document==null) return false;
+    if (!document.isSetModel()) return false;
+    if (!document.getModel().isSetListOfSpecies()) return false;
+    return (document.getModel().getListOfSpecies().size()>0);
   }
 
   /* (non-Javadoc)
@@ -113,6 +196,7 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
     ff.add(SBFileFilter.createSBMLFileFilter());
     ff.add(SBFileFilter.createTeXFileFilter());
     ff.add(SBFileFilter.createPDFFileFilter());
+    // TODO: if graph is active also show graph file filters.
     return ff;
   }
 
@@ -132,11 +216,13 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    */
   @Override
   protected boolean writeToFileUnchecked(File file, String format) throws Exception {
+    // TODO Write graph formats (wrap to responsable panel).
     if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file) || format.equals("tex") || format.equals("pdf")) {
-      writeLaTeXReport(file);
+      if (!isReady()) return false;
+      writeLaTeXReport(file, document);
       return true; // Void result... can't check.
     } else {
-      return ((KEGG2jSBML)translator).writeToFile(document, file.getPath());
+      return ((KEGG2jSBML)getTranslator()).writeToFile(document, file.getPath());
     }
   }
   
@@ -144,8 +230,8 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
   /**
    * @param targetFile - can be null.
    */
-  public void writeLaTeXReport(File targetFile) {
-    if (!isReady()) return;
+  public static void writeLaTeXReport(File targetFile, SBMLDocument document) {
+    if (document==null) return;
     
     final SBMLDocument doc = (SBMLDocument) document;
     if ((doc != null) && LaTeXExportDialog.showDialog(null, doc, targetFile)) {

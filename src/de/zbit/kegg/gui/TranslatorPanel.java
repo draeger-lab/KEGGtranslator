@@ -122,7 +122,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   /**
    * We need to remember the translator for saving the file later on.
    */
-  AbstractKEGGtranslator<?> translator = null;
+  private AbstractKEGGtranslator<?> translator = null;
   
   /**
    * Allows the programmer to store any additional data along with this panel.
@@ -137,13 +137,13 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    */
   public static TranslatorPanel<?> createPanel(final File inputFile, final Format outputFormat, ActionListener translationResult) {
     switch (outputFormat) {
-      case SBML: case LaTeX:
+      case SBML: case LaTeX: case SBML_QUAL:
         return new TranslatorSBMLPanel(inputFile, outputFormat, translationResult);
       case GraphML: case GML: case JPG: case GIF: case YGF: case TGF: /* case SVG:*/
         return new TranslatorGraphPanel(inputFile, outputFormat, translationResult);
         
       // Please only insert working items here.
-      case SBGNML:
+      case SBGN:
         return new TranslatorSBGNPanel(inputFile, translationResult);
       default:
         GUITools.showErrorMessage(null, "Unknwon output Format: '" + outputFormat + "'.");
@@ -153,13 +153,13 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   
   public static TranslatorPanel<?> createPanel(final String pathwayID, final Format outputFormat, ActionListener translationResult) {
     switch (outputFormat) {
-      case SBML: case LaTeX:
+      case SBML: case LaTeX: case SBML_QUAL:
         return new TranslatorSBMLPanel(pathwayID, outputFormat, translationResult);
       case GraphML: case GML: case JPG: case GIF: case YGF: case TGF: /* case SVG:*/
         return new TranslatorGraphPanel(pathwayID, outputFormat, translationResult);
         
       // SBGN REMOVED, Please only insert working items here.
-      case SBGNML:
+      case SBGN:
         return new TranslatorSBGNPanel(pathwayID, translationResult);
       default:
         GUITools.showErrorMessage(null, "Unknwon output Format: '" + outputFormat + "'.");
@@ -224,6 +224,26 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       }
     };
     downloadWorker.execute();
+  }
+  
+  /**
+   * Use this constructor if the document has already been translated.
+   * This constructor does not call {@link #createTabContent()}.
+   * @param inputFile
+   * @param outputFormat
+   * @param translationResult
+   * @param translatedDocument
+   * @throws Exception 
+   */
+  protected TranslatorPanel(final File inputFile, final Format outputFormat, ActionListener translationResult, DocumentType translatedDocument) {
+    super();
+    setLayout(new BorderLayout());
+    setOpaque(false);
+    this.inputFile = inputFile;
+    this.outputFormat = outputFormat;
+    this.translationListener = translationResult;
+    this.document = translatedDocument;
+    // It is intended that crateTabContent() is NOT CALLED!
   }
   
   
@@ -356,7 +376,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   /**
    * @param actionEvent
    */
-  private void fireActionEvent(ActionEvent actionEvent) {
+  protected void fireActionEvent(ActionEvent actionEvent) {
     if (translationListener!=null) {
       translationListener.actionPerformed(actionEvent);
     }
@@ -368,6 +388,14 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    */
   public String getTitle() {
     return inputFile.getName();
+  }
+  
+  /**
+   * @return the {@link Translator} that has been used to
+   * Translate this document.
+   */
+  public AbstractKEGGtranslator<?> getTranslator() {
+    return translator;
   }
   
   /**

@@ -103,7 +103,7 @@ public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
   @Override
   protected boolean writeRealDocumentToFileUnchecked(File file, String format)
     throws Exception {
-    return ((KEGG2yGraph)translator).writeToFile(document, file.getPath(), format);
+    return ((KEGG2yGraph)getTranslator()).writeToFile(document, file.getPath(), format);
   }
 
 
