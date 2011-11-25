@@ -569,6 +569,7 @@ public class TranslatorTools {
     NodeMap dp2 = graph.createNodeMap();
     HierarchyManager hm = graph.getHierarchyManager();
     List<Node> resetLayout = new ArrayList<Node>();
+    List<Node> otherNodes = new ArrayList<Node>();
     for (Node n : graph.getNodeArray()) {
       dp.setBool(n, newNodes.contains(n));
       // Do never layout contents of any group node.
@@ -578,7 +579,11 @@ public class TranslatorTools {
       }
       
       if (!newNodes.contains(n)){// && hm.getParentNode(n)==null && !hm.isGroupNode(n)) {
-        resetLayout.add(n);
+        if (n.degree()<1) { // NEW; only store orphans
+          resetLayout.add(n);
+        } else {
+          otherNodes.add(n);
+        }
       }
       
     }
@@ -633,6 +638,29 @@ public class TranslatorTools {
       }
     }
     
+    // If we layout only a subset of nodes, the layout still moves
+    // all other nodes by a constant offset! Undo this transformation
+    DataMap nodeMap = descriptor2Map.get(GraphMLmaps.NODE_POSITION);
+    if (nodeMap!=null) {    
+      String splitBy = Pattern.quote("|");
+      int anyOldX = 0, anyOldY = 0;
+      int anyNewX = 0, anyNewY = 0;
+      for (Node n: otherNodes) {
+        Object pos = nodeMap.get(n);
+        if (pos==null) continue;
+        // pos is always X|Y
+        String[] XY = pos.toString().split(splitBy);
+        NodeRealizer nr = graph.getRealizer(n);
+        //log.finer(String.format("Resetting layout for %s from %s|%s to %s.", n, nr.getX(), nr.getY(), pos.toString()));
+        anyOldX = (Integer.parseInt(XY[0]));
+        anyOldY = (Integer.parseInt(XY[1]));
+        anyNewX = (int) nr.getX();
+        anyNewY = (int) nr.getY();
+        break;
+      }
+      graph.moveNodes(graph.nodes(), anyOldX-anyNewX, anyOldY-anyNewY);
+    }
+    //---
     
     // Write initial position to node annotations
     for (Node n:newNodes) {
@@ -652,6 +680,8 @@ public class TranslatorTools {
     graph.removeDataProvider(SmartOrganicLayouter.GROUP_NODE_MODE_DATA);
     
     // Reset layout, because subset scope doesn't work correctly.
+    // Not needed anymore, because of novel shift method (see above)
+    // => Only needed for orphans
     resetLayout(resetLayout);
   }
   

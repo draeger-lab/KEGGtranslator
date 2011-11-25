@@ -89,5 +89,6 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
     gfx.setColor(getLineColor());
     gfx.draw(path);
     // TODO: Show caption  and selection
+    
   }
 }

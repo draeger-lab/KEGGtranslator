@@ -20,6 +20,8 @@
  */
 package de.zbit.kegg.gui;
 
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -57,8 +59,10 @@ import y.base.Node;
 import y.base.NodeMap;
 import y.layout.hierarchic.HierarchicLayouter;
 import y.view.Arrow;
+import y.view.Drawable;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
+import y.view.LineType;
 import y.view.NodeRealizer;
 import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.gui.GUITools;
@@ -200,6 +204,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     
     // Convert each species to a graph node
     Map<String, Node> species2node = new HashMap<String, Node>();
+    Map<Reaction, ReactionNodeRealizer> reaction2node = new HashMap<Reaction, ReactionNodeRealizer>();
     Set<Node> unlayoutedNodes = new HashSet<Node>();
     int nodesWithoutCoordinates=0;
     int COLUMNS = species.size()/5; // Show in 5 rows by default
@@ -265,10 +270,11 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         nr.setHeight(min);
       }
       
-      if (!nodeHadLayoutInformation) {
+      if (nodeHadLayoutInformation) {
         // Remember in defined hashmap
         nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
       }
+      
       
       nr.setLabelText(s.getName());
     }
@@ -294,13 +300,13 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       
     } else {
       
-      
       // Add all reactions to the graph
       for (Reaction r : document.getModel().getListOfReactions()) {
         if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
           // Create the reaction node
           ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), species2node, simpleGraph);
           NodeRealizer nr = new ReactionNodeRealizer();
+          reaction2node.put(r, (ReactionNodeRealizer) nr);
           Node rNode = simpleGraph.createNode(nr);
           unlayoutedNodes.add(rNode); // TODO: really add them here?
           nr.setX(xy.getA());
@@ -337,6 +343,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
               Edge e = simpleGraph.createEdge(source, rNode);
               EdgeRealizer er = simpleGraph.getRealizer(e);
               er.setArrow(Arrow.TRANSPARENT_CIRCLE);
+              er.setLineType(LineType.LINE_1);
               er.setSourceArrow(Arrow.NONE);
             }
           }
@@ -346,7 +353,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       }
     }
     
-    // Fix layout
+    // Fix layout of reaction nodes.
     if (nodesWithoutCoordinates>0) {
       TranslatorTools tools = new TranslatorTools(simpleGraph);
       if (useLayoutExtension) {
@@ -359,7 +366,22 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       simpleGraph.unselectAll();
     }
         
-    // TODO: Fix ReactionNode edges
+    // Fix ReactionNode edges
+    for (Map.Entry<Reaction,ReactionNodeRealizer> en : reaction2node.entrySet()) {
+      Set<Node> reactants = new HashSet<Node>();
+      Set<Node> products = new HashSet<Node>();
+      Set<Node> modifier = new HashSet<Node>();
+      for (SimpleSpeciesReference sr : en.getKey().getListOfReactants()) {
+        reactants.add(species2node.get(sr.getSpecies()));
+      }
+      for (SimpleSpeciesReference sr : en.getKey().getListOfProducts()) {
+        products.add(species2node.get(sr.getSpecies()));
+      }
+      for (SimpleSpeciesReference sr : en.getKey().getListOfModifiers()) {
+        modifier.add(species2node.get(sr.getSpecies()));
+      }
+      en.getValue().fixLayout(reactants, products, modifier);
+    }
 
     
     return simpleGraph;
