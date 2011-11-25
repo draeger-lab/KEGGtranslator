@@ -20,12 +20,9 @@
  */
 package de.zbit.graph;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.geom.PathIterator;
+import java.awt.geom.GeneralPath;
 
-import y.base.Graph;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 
@@ -35,32 +32,6 @@ import y.view.ShapeNodeRealizer;
  */
 public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
   
-  // TODO: Fix this stub!
-  private void asffasf () {
-    int arc = (int) (getWidth()/2);
-    Polygon nodeshape = new Polygon() {
-      public java.awt.geom.PathIterator getPathIterator(java.awt.geom.AffineTransform at) {
-        PathIterator pi = super.getPathIterator(at);
-        
-        while (!pi.isDone()) {
-          pi.currentSegment(coords)
-        }
-        pi.
-        int windingRule = pi.getWindingRule();
-        while (!pi.isDone()) {
-          switch (pi.currentSegment(coords)) {
-            
-          }
-        }
-      };
-    }
-    nodeshape.addPoint((int)getX(), (int)getY());
-    nodeshape.addPoint((int) (getX()+getWidth()), (int)getY());
-    nodeshape.addPoint((int) (getX()+getWidth()), (int)(getY()+getHeight()-arc));
-    
-  
-  }
-
   public NucleicAcidFeatureNode() {
     super(ShapeNodeRealizer.RECT);
   }
@@ -98,11 +69,25 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
    * Paints the reaction-node.
    */
   public void paintNode(Graphics2D gfx) {
-    int arc = (int) (getWidth()/5.0);
-    gfx.drawRoundRect((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight(), arc, arc);
-    // TODO: Remove rounded upper edges
-    // TODO: Make non-rounded upper edges.
+    int arc = (int) (getWidth()/10);
+    
+    GeneralPath path = new GeneralPath();
+    path.moveTo(getX(), getY());
+    path.lineTo(getX()+getWidth(), getY());
+    path.lineTo(getX()+getWidth(), getY()+getHeight()-arc);
+    path.quadTo(getX()+getWidth(), getY()+getHeight(), getX()+getWidth()-arc, getY()+getHeight());
+    path.lineTo(getX()+arc, getY()+getHeight());
+    path.quadTo(getX(), getY()+getHeight(), getX(), getY()+getHeight()-arc);
+    path.closePath();
     
     
+    if (!isTransparent() && getFillColor()!=null) {
+      gfx.setColor(getFillColor());
+      gfx.fill(path);
+    }
+    
+    gfx.setColor(getLineColor());
+    gfx.draw(path);
+    // TODO: Show caption  and selection
   }
 }
