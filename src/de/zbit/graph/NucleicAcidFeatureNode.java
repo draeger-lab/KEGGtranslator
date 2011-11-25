@@ -27,6 +27,9 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 
 /**
+ * Node for a nucleic acid feature. This is basically
+ * a rectangle with normal upper corners and rounded
+ * lower corners.
  * @author Clemens Wrzodek
  * @version $Rev$
  */
@@ -50,25 +53,29 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
   }
   
   /* (non-Javadoc)
-   * @see y.view.NodeRealizer#paint(java.awt.Graphics2D)
+   * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
    */
   @Override
-  public void paint(Graphics2D arg0) {
-    paintNode(arg0);
+  protected void paintShapeBorder(Graphics2D gfx) {
+    gfx.setColor(getLineColor());
+    gfx.draw(getPath());
   }
   
   /* (non-Javadoc)
-   * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
+   * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
    */
   @Override
-  public void paintSloppy(Graphics2D arg0) {
-    paintNode(arg0);
+  protected void paintFilledShape(Graphics2D gfx) {
+   if (!isTransparent() && getFillColor()!=null) {
+      gfx.setColor(getFillColor());
+      gfx.fill(getPath());
+    }
   }
-  
+
   /**
-   * Paints the reaction-node.
+   * @return
    */
-  public void paintNode(Graphics2D gfx) {
+  protected GeneralPath getPath() {
     int arc = (int) (getWidth()/10);
     
     GeneralPath path = new GeneralPath();
@@ -79,16 +86,6 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
     path.lineTo(getX()+arc, getY()+getHeight());
     path.quadTo(getX(), getY()+getHeight(), getX(), getY()+getHeight()-arc);
     path.closePath();
-    
-    
-    if (!isTransparent() && getFillColor()!=null) {
-      gfx.setColor(getFillColor());
-      gfx.fill(path);
-    }
-    
-    gfx.setColor(getLineColor());
-    gfx.draw(path);
-    // TODO: Show caption  and selection
-    
+    return path;
   }
 }
