@@ -204,6 +204,13 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    */
   public static final Option<Boolean> CELLDESIGNER_ANNOTATIONS = new Option<Boolean>("CELLDESIGNER_ANNOTATIONS",Boolean.class,
       "If true, adds celldesigner annotations to the SBML-XML document.", (short) 2, "-cd", false);
+
+  /**
+   * If true, adds layout information to the SBML-document.
+   */
+  public static final Option<Boolean> ADD_LAYOUT_EXTENSION = new Option<Boolean>("ADD_LAYOUT_EXTENSION",Boolean.class,
+      "If true, adds layout information, using the SBML layout extension to the SBML document. " +
+      "As a side-effect, this will create an SBML Level 3 model.", (short) 2, "--layout", false);
   
   /**
    * Define various options that are used in SBML based translations.
@@ -212,6 +219,6 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   public static final OptionGroup<Boolean> SBML_OPTIONS = new OptionGroup<Boolean>(
       "Translation options for SBML outputs",
       "Define various options that are used in SBML based translations.",
-      CELLDESIGNER_ANNOTATIONS);
+      CELLDESIGNER_ANNOTATIONS, ADD_LAYOUT_EXTENSION);
   
 }

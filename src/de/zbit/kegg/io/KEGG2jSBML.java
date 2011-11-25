@@ -84,7 +84,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   /**
    * Generate pure SBML or do you want to add CellDesigner annotations?
    */
-  private boolean addCellDesignerAnnots = true;
+  private boolean addCellDesignerAnnots = false;
+  
+  /**
+   * Add the SBML-layout extension?
+   */
+  protected boolean addLayoutExtension = true;
   
   /**
    * If false, simply sets an SBO term to the species, based on entryType.
@@ -273,6 +278,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   /** Load the default preferences from the SBPreferences object. */
   private void loadPreferences() {
     addCellDesignerAnnots = KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
+    addLayoutExtension = KEGGtranslatorOptions.ADD_LAYOUT_EXTENSION.getValue(prefs);
   }
   
   /**
@@ -505,16 +511,25 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       cdu.addCellDesignerAnnotationToModel(p, model, compartment);
     }
     
+    // Layout extension
+    if (addLayoutExtension) {
+      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model);
+    }
+    
     return doc;
   }
   
   /**
-   * 
-   * @return the level and version of the SBML core (2,4)
+   * @return the level and version of the SBML core (2,4) if no extension
+   * should be used. Else: 3,1.
    */
   protected ValuePair<Integer, Integer> getLevelAndVersion() {
-    return new ValuePair<Integer, Integer>(Integer.valueOf(2),
-        Integer.valueOf(4));
+    // Layout extension requires Level 3
+    if (!addLayoutExtension) {
+    return new ValuePair<Integer, Integer>(Integer.valueOf(2), Integer.valueOf(4));
+    } else {
+      return new ValuePair<Integer, Integer>(Integer.valueOf(3), Integer.valueOf(1));
+    }
   }
   
   /**

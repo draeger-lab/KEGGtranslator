@@ -1,3 +1,23 @@
+/*
+ * $Id$
+ * $URL$
+ * ---------------------------------------------------------------------
+ * This file is part of KEGGtranslator, a program to convert KGML files
+ * from the KEGG database into various other formats, e.g., SBML, GML,
+ * GraphML, and many more. Please visit the project homepage at
+ * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
+ * obtain the latest version of KEGGtranslator.
+ *
+ * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ *
+ * KEGGtranslator is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * <http://www.gnu.org/licenses/lgpl-3.0-standalone.html>.
+ * ---------------------------------------------------------------------
+ */
 package de.zbit.kegg.io;
 
 import java.io.File;
@@ -17,7 +37,6 @@ import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
-import org.sbml.jsbml.test.gui.JSBMLvisualizer;
 import org.sbml.jsbml.util.ValuePair;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
@@ -32,6 +51,14 @@ import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.Utils;
 
+/**
+ * KEGG2SBML with a qualitative model (SBML L3 V1, using the SBML Qual extension,
+ * also KGML2JSBMLqual, KEGG2QUAL, KGML2QUAL).
+ * 
+ * @author Finja B&uuml;chel
+ * @author Clemens Wrzodek
+ * @version $Rev$
+ */
 public class KEGG2SBMLqual extends KEGG2jSBML {
   /**
    * Qual Namespace definition URL.
@@ -114,10 +141,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       model.unsetListOfSpecies();
     }
     
-//    boolean addLayoutExtension = true; // TODO: ...
-//    if (addLayoutExtension) {
-//      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model, qualModel);
-//    }
+    // Update (unset old and create new, qual-species related) layout extension
+    if (addLayoutExtension) {
+      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model);
+    }
     
     return doc;
   }
@@ -248,8 +275,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     String id = "qual_" + species.getId();
     QualitativeSpecies qs = qualModel.getQualitativeSpecies(id);
     if(qs == null){
-      //qs = qualModel.createQualitativeSpecies(id, "meta_" + id, species);
-      qs = qualModel.createQualitativeSpecies(id, species.getBoundaryCondition(), species.getCompartmentInstance().getId(), species.getConstant());
+      qs = qualModel.createQualitativeSpecies(id, "meta_" + id, species);
     }
     return qs;  
   }
@@ -318,7 +344,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       
       SBMLDocument doc = k2s.translate(new File("files/KGMLsamplefiles/hsa04210.xml"));
       new SBMLWriter().write(doc, "files/KGMLsamplefiles/hsa04210.sbml.xml"); 
-      new JSBMLvisualizer(doc);
+      
       // Remember already queried objects
       if (k2s.getKeggInfoManager().hasChanged()) {
         KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, k2s.getKeggInfoManager());

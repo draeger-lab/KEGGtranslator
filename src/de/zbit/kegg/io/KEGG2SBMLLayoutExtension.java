@@ -21,19 +21,18 @@
 package de.zbit.kegg.io;
 
 import org.sbml.jsbml.AbstractNamedSBase;
-import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
-import org.sbml.jsbml.ext.qual.QualitativeModel;
 
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
 
 /**
+ * Add support for the layout extension to SBML translations.
  * @author Clemens Wrzodek
  * @version $Rev$
  */
@@ -49,27 +48,40 @@ public class KEGG2SBMLLayoutExtension {
    */
   private static final String LAYOUT_NS_PREFIX = "layout";
 
+  
   /**
+   * Add (translate) layout extension to the given model. Translates
+   * all {@link Graphics} objects from KEGG to the layout extension.
+   * Works with all {@link AbstractNamedSBase}s, thus with Species
+   * as well as QualitativeSpecies. 
    * @param p
-   * @param qualModel
+   * @param doc
+   * @param model
    */
-  public static void addLayoutExtension(Pathway p, SBMLDocument doc, Model model, QualitativeModel qualModel) {
+  public static void addLayoutExtension(Pathway p, SBMLDocument doc, Model model) {
    
     doc.addNamespace(LAYOUT_NS_PREFIX, "xmlns", LAYOUT_NS);
     doc.getSBMLDocumentAttributes().put(LAYOUT_NS_PREFIX + ":required", "false");
     
-    ExtendedLayoutModel layoutModel = new ExtendedLayoutModel(model);
-    model.addExtension(LAYOUT_NS, layoutModel);
+    ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) model.getExtension(LAYOUT_NS);
+    if (layoutModel==null) {
+      layoutModel = new ExtendedLayoutModel(model);
+      model.addExtension(LAYOUT_NS, layoutModel);
+    } else {
+      // Remove all previous layouts.
+      layoutModel.unsetListOfLayouts();
+    }
+    
     
     // Give a warning if we have no relations.
     Layout layout = layoutModel.createLayout();
     for (Entry e : p.getEntries()) {
       Object s = e.getCustom();
       if (s!=null && e.hasGraphics()) {
-        Graphics g = e.getGraphics(); // TODO: Multiple graphics?
+        Graphics g = e.getGraphics();
+        // TODO: Multiple graphics (i.e. lines)?
         
         if (s instanceof AbstractNamedSBase) {
-          // TODO: Create create methods. TODO: For which species? somewhere must be the reference to the species.
           SpeciesGlyph glyph = layout.createSpeciesGlyph(((AbstractNamedSBase) s).getId());
           glyph.createBoundingBox(g.getWidth(), g.getHeight(), 1, g.getX(), g.getY(), 0);
         }
