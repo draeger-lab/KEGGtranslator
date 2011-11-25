@@ -147,26 +147,14 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
       public AbstractKEGGtranslator<?> getTranslator() {
         return thiss.getTranslator();
       }
-      
-      /* (non-Javadoc)
-       * @see de.zbit.kegg.gui.TranslatorPanel#getData(java.lang.String)
-       */
       @Override
       public Object getData(String key) {
         return thiss.getData(key);
       }
-      
-      /* (non-Javadoc)
-       * @see de.zbit.kegg.gui.TranslatorPanel#setData(java.lang.String, java.lang.Object)
-       */
       @Override
       public void setData(String key, Object object) {
         thiss.setData(key, object);
       }
-      
-      /* (non-Javadoc)
-       * @see de.zbit.kegg.gui.TranslatorPanel#isSaved()
-       */
       @Override
       public boolean isSaved() {
         return thiss.isSaved();
@@ -216,7 +204,7 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    */
   @Override
   protected boolean writeToFileUnchecked(File file, String format) throws Exception {
-    // TODO Write graph formats (wrap to responsable panel).
+    // TODO Write graph formats (wrap to responsible panel).
     if (SBFileFilter.isTeXFile(file) || SBFileFilter.isPDFFile(file) || format.equals("tex") || format.equals("pdf")) {
       if (!isReady()) return false;
       writeLaTeXReport(file, document);

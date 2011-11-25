@@ -265,7 +265,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       nr.setHeight(h);
       
       if (nodeShouldBeACircle) {
-        double min = Math.min(nr.getWidth(), nr.getHeight());
+        double min = 8;//Math.min(w, h); // KEGG compounds always have w and h of 8.
         nr.setWidth(min);
         nr.setHeight(min);
       }

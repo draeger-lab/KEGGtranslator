@@ -45,8 +45,8 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
   
   public ReactionNodeRealizer() {
     super(ShapeNodeRealizer.RECT);
-    setHeight(8);
-    setWidth(16);
+    setHeight(10);
+    setWidth(getHeight()*2);
   }
   
   public ReactionNodeRealizer(NodeRealizer nr) {
@@ -63,25 +63,11 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
   }
   
   /* (non-Javadoc)
-   * @see y.view.NodeRealizer#paint(java.awt.Graphics2D)
+   * @see y.view.ShapeNodeRealizer#paintShapeBorder(java.awt.Graphics2D)
    */
   @Override
-  public void paint(Graphics2D arg0) {
-    paintNode(arg0);
-  }
-  
-  /* (non-Javadoc)
-   * @see y.view.NodeRealizer#paintSloppy(java.awt.Graphics2D)
-   */
-  @Override
-  public void paintSloppy(Graphics2D arg0) {
-    paintNode(arg0);
-  }
-  
-  /**
-   * Paints the reaction-node.
-   */
-  public void paintNode(Graphics2D gfx) {
+  protected void paintShapeBorder(Graphics2D gfx) {
+    int extendBesidesBorder=0;
     gfx.setColor(Color.BLACK);
     int x = (int) getX(); int y = (int) getY();
     double min = Math.min(getWidth(), getHeight());
@@ -91,14 +77,13 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     // Draw the reaction node rectangle
     gfx.drawRect((int)offsetX+x, (int)offsetY+y, (int)min, (int)min);
     
-    boolean vertical = offsetY>offsetX;
-    if (!vertical) {
+    if (isHorizontal()) {
       int halfHeight = (int)(getHeight()/2.0);
       
       // Draw the small reaction lines on both sides, where substrates
       // and products should dock.
-      gfx.drawLine(0+x, halfHeight+y, (int)offsetX+x, halfHeight+y);
-      gfx.drawLine((int)(offsetX+min)+x, halfHeight+y, (int)getWidth()+x, halfHeight+y);
+      gfx.drawLine(0+x-extendBesidesBorder, halfHeight+y, (int)offsetX+x, halfHeight+y);
+      gfx.drawLine((int)(offsetX+min)+x, halfHeight+y, (int)getWidth()+x+extendBesidesBorder, halfHeight+y);
       
     } else {
       // Rotate node by 90°
@@ -106,11 +91,18 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
       
       // Draw the small reaction lines on both sides, where substrates
       // and products should dock.
-      gfx.drawLine(halfWidth+x, 0+y, halfWidth+x, (int)offsetY+y);
-      gfx.drawLine(halfWidth+x, (int)(offsetY+min)+y, halfWidth+x, (int)getHeight()+y);
+      gfx.drawLine(halfWidth+x, 0+y-extendBesidesBorder, halfWidth+x, (int)offsetY+y);
+      gfx.drawLine(halfWidth+x, (int)(offsetY+min)+y, halfWidth+x, (int)getHeight()+y+extendBesidesBorder);
       
     }
-    
+  }
+  
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#paintFilledShape(java.awt.Graphics2D)
+   */
+  @Override
+  protected void paintFilledShape(Graphics2D gfx) {
+    // Do NOT fill it.
   }
   
   /**
@@ -128,7 +120,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     double width = getWidth();
     double height = getHeight();
     setWidth(height);
-    setWidth(width);
+    setHeight(width);
   }
   
   /**
@@ -182,7 +174,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
       }
     } else {
       if (cases[0]>cases[2]) {
-        // Reactants are left of this node
+        // Reactants are above this node
         setEdgesToDockOnUpperSideOfNode(reactants);
         setEdgesToDockOnLowerSideOfNode(products);
       } else {
@@ -245,30 +237,10 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
         if (isSource) {
           er.setSourcePoint(dockToPoint);
         } else {
-          er.setTargetPoint(new YPoint(getWidth()/2*-1,0));
+          er.setTargetPoint(dockToPoint);
         }
       }
     }
   }
-  
-  
-  //  /* (non-Javadoc)
-  //   * @see y.view.NodeRealizer#getBoundingBox()
-  //   */
-  //  @Override
-  //  public Rectangle2D.Double getBoundingBox() {
-  //    Rectangle b = shape.getBounds();
-  //    return new Rectangle2D.Double(b.getX(), b.getY(), b.getWidth(), b.getHeight());
-  //  }
-  //  
-  //       
-  //  /* (non-Javadoc)
-  //   * @see y.view.ShapeNodeRealizer#calcUnionRect(java.awt.geom.Rectangle2D)
-  //   */
-  //  @Override
-  //  public void calcUnionRect(Rectangle2D arg0) {
-  //    super.calcUnionRect(arg0);
-  //    // should be same as "shape.getBounds2D().createUnion(rect);"
-  //  }
   
 }
