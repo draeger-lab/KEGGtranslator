@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.zbit.graph.ComplexNode;
+
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import de.zbit.graph.NucleicAcidFeatureNode;
@@ -83,7 +85,7 @@ public class SBMLVisualizationProperties {
     sbo2shape.put(materialEntityOfUnspecifiedNature, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // unspecified - material entity of unspecified nature
     sbo2shape.put(emptySet, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // unspecified - empty set
     
-    sbo2shape.put(nonCovalentComplex, new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT)); // complex - non-covalent complex
+    sbo2shape.put(nonCovalentComplex, new ComplexNode()); // complex - non-covalent complex
     
     
     SBMLVisualizationProperties.sbo2shape = Collections.unmodifiableMap(sbo2shape);
