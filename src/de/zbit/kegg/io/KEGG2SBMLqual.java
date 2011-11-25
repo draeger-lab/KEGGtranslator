@@ -7,7 +7,6 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.CVTerm;
-import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
@@ -27,18 +26,22 @@ import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
+import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.Utils;
 
 public class KEGG2SBMLqual extends KEGG2jSBML {
-  public static final String QUAL_NS = "http://www.sbml.org/sbml/level3/version1/qual/version1";
+  /**
+   * Qual Namespace definition URL.
+   */
+  private static final String QUAL_NS = "http://www.sbml.org/sbml/level3/version1/qual/version1";
   
-  public static final String QUAL_NS_PREFIX = "qual";
-  
-  
-  public QualitativeModel qualModel = null;
+  /**
+   * Unique identifier to identify this Namespace/Extension.
+   */
+  private static final String QUAL_NS_PREFIX = "qual";
   
   
   
@@ -60,6 +63,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   public KEGG2SBMLqual(KeggInfoManagement manager) {
     super(manager);
     // Important to manifest that we NEED the relations
+    // see considerRealtions()
     
     loadPreferences();
   }
@@ -70,63 +74,82 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * ===========================*/
   
   /** Load the default preferences from the SBPreferences object. */
-  private void loadPreferences() {
-  }
+  private void loadPreferences() {}
   
   /**
    * 
    * @return the level and version of the SBML core (2,4)
    */
   protected ValuePair<Integer, Integer> getLevelAndVersion() {
-    return new ValuePair<Integer, Integer>(Integer.valueOf(3),
-        Integer.valueOf(1));
+    return new ValuePair<Integer, Integer>(Integer.valueOf(3), Integer.valueOf(1));
   }
   
   @Override
   protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
+    // Translate to normal SBML
     SBMLDocument doc = super.translateWithoutPreprocessing(p);
-    // ... extend doc
+    
+    // Create qualitative model
     Model model = doc.getModel();
-    qualModel = new QualitativeModel(model);
+    QualitativeModel qualModel = new QualitativeModel(model);
    
+    // Add extension and namespace to model
     doc.addNamespace(KEGG2SBMLqual.QUAL_NS_PREFIX, "xmlns", KEGG2SBMLqual.QUAL_NS);
     doc.getSBMLDocumentAttributes().put(QUAL_NS_PREFIX + ":required", "true");
-    
-    
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
-    // KEGG2jSBML always just creates one compartment
-    Compartment compartment = model.getCompartment(0);
+    
+    // Create qual species for every species
+    createQualSpecies(p, qualModel);
     
     // Give a warning if we have no relations.
     if (p.getRelations().size()<1) {
-      log.warning("File does not contain any relations. Graph will look quite boring...");
+      log.fine("File does not contain any relations. Graph will look quite boring...");
     } else {
       for (Relation r : p.getRelations()) {
-        addKGMLRelation(r, p, compartment);
+        addKGMLRelation(r, p, qualModel);
       }  
     }
+    
     if(!considerReactions()) {
       model.unsetListOfSpecies();
     }
+    
+//    boolean addLayoutExtension = true; // TODO: ...
+//    if (addLayoutExtension) {
+//      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model, qualModel);
+//    }
     
     return doc;
   }
 
 
-  public Transition addKGMLRelation(Relation r, Pathway p, Compartment compartment) {
+  /**
+   * Creates a qual species for every entry in the pathway
+   * (as a side effect, also for every species in the model).
+   * @param model
+   * @param qualModel
+   */
+  private void createQualSpecies(Pathway p, QualitativeModel qualModel) {
+    for (Entry e: p.getEntries()) {
+      Object s = e.getCustom();
+      if (s!=null && s instanceof Species) {
+        QualitativeSpecies qs = createQualitativeSpeciesFromSpecies((Species) s, qualModel);
+        e.setCustom(qs);
+      }
+    }
+  }
+
+  public Transition addKGMLRelation(Relation r, Pathway p, QualitativeModel qualModel) {
     // create transition and add it to the model
     Transition t = qualModel.createTransition(NameToSId("tr"));
 
-    Species one = (Species) p.getEntryForId(r.getEntry1()).getCustom();
-    Species two = (Species) p.getEntryForId(r.getEntry2()).getCustom();
+    QualitativeSpecies qOne = (QualitativeSpecies) p.getEntryForId(r.getEntry1()).getCustom();
+    QualitativeSpecies qTwo = (QualitativeSpecies) p.getEntryForId(r.getEntry2()).getCustom();
 
-    if (one==null || two==null) {
+    if (qOne==null || qTwo==null) {
       System.out.println("Relation with unknown entry!");
       return null;
     }
-
-    QualitativeSpecies qOne = createQualitativeSpeciesFromSpecies(one);
-    QualitativeSpecies qTwo = createQualitativeSpeciesFromSpecies(two);
    
     // Input
     Input in = t.createInput(NameToSId("in"), qOne, InputTransitionEffect.none); //TODO: is this correct?
@@ -213,16 +236,21 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     return b.toString();
   }
 
-  private QualitativeSpecies createQualitativeSpeciesFromSpecies(Species species) {
+  /**
+   * Checks if there is already a qual species, matching the given species
+   * and returns it. If not, creates a new qual species for the given
+   * species.
+   * @param species
+   * @param qualModel
+   * @return
+   */
+  private QualitativeSpecies createQualitativeSpeciesFromSpecies(Species species, QualitativeModel qualModel) {
     String id = "qual_" + species.getId();
     QualitativeSpecies qs = qualModel.getQualitativeSpecies(id);
     if(qs == null){
-      qs = qualModel.createQualitativeSpecies(id, species.getBoundaryCondition(), species.getCompartment(), species.getConstant());
-      qs.setName(species.getName());
-      qs.setSBOTerm(species.getSBOTerm()); 
-      qs.setMetaId("meta_" + id);
+      //qs = qualModel.createQualitativeSpecies(id, "meta_" + id, species);
+      qs = qualModel.createQualitativeSpecies(id, species.getBoundaryCondition(), species.getCompartmentInstance().getId(), species.getConstant());
     }
-    
     return qs;  
   }
   
@@ -289,9 +317,8 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
 //      k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
       
       SBMLDocument doc = k2s.translate(new File("files/KGMLsamplefiles/hsa04210.xml"));
-      new SBMLWriter().write(doc, "files/KGMLsamplefiles/hsa04210.sbml.xml");
-      new JSBMLvisualizer(doc); 
-            
+      new SBMLWriter().write(doc, "files/KGMLsamplefiles/hsa04210.sbml.xml"); 
+      new JSBMLvisualizer(doc);
       // Remember already queried objects
       if (k2s.getKeggInfoManager().hasChanged()) {
         KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, k2s.getKeggInfoManager());

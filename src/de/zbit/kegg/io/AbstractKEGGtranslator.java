@@ -400,9 +400,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
 				Pathway p = l.get(0);
 				OutputFormat doc = translate(p);
 				return doc;
+			} else {
+			  throw new IOException(String.format("Empty or invalid input file %s.", f.getAbsolutePath()));
 			}
 		}
-		throw new IOException(String.format("Cannot translate input file %s.", f.getAbsolutePath()));
+		throw new IOException(String.format("Invalid input file %s.", f.getAbsolutePath()));
 	}
   
   /**

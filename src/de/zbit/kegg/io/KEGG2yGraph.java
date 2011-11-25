@@ -935,7 +935,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
 
     // Give a warning if we have no relations.
     if (p.getRelations().size()<1) {
-      log.warning("File does not contain any relations. Graph will look quite boring...");
+      log.fine("File does not contain any relations. Graph will look quite boring...");
     }
     
     
@@ -1339,6 +1339,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         graph.setCurrentView(old_v);
       }
     }
+    
+    // Remove unused view (also saves memory, because BG-images might be stored in view).
+    graph.removeView(view);
     
     return success;
   }
