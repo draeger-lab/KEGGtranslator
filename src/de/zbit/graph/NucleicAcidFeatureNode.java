@@ -23,6 +23,7 @@ package de.zbit.graph;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.geom.PathIterator;
 
 import y.base.Graph;
 import y.view.NodeRealizer;
@@ -34,6 +35,31 @@ import y.view.ShapeNodeRealizer;
  */
 public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
   
+  // TODO: Fix this stub!
+  private void asffasf () {
+    int arc = (int) (getWidth()/2);
+    Polygon nodeshape = new Polygon() {
+      public java.awt.geom.PathIterator getPathIterator(java.awt.geom.AffineTransform at) {
+        PathIterator pi = super.getPathIterator(at);
+        
+        while (!pi.isDone()) {
+          pi.currentSegment(coords)
+        }
+        pi.
+        int windingRule = pi.getWindingRule();
+        while (!pi.isDone()) {
+          switch (pi.currentSegment(coords)) {
+            
+          }
+        }
+      };
+    }
+    nodeshape.addPoint((int)getX(), (int)getY());
+    nodeshape.addPoint((int) (getX()+getWidth()), (int)getY());
+    nodeshape.addPoint((int) (getX()+getWidth()), (int)(getY()+getHeight()-arc));
+    
+  
+  }
 
   public NucleicAcidFeatureNode() {
     super(ShapeNodeRealizer.RECT);

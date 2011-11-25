@@ -56,17 +56,16 @@ import y.base.Edge;
 import y.base.Node;
 import y.base.NodeMap;
 import y.layout.hierarchic.HierarchicLayouter;
-import y.layout.organic.SmartOrganicLayouter;
 import y.view.Arrow;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
-import y.view.ShapeNodeRealizer;
 import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.gui.GUITools;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
+import de.zbit.kegg.ext.SBMLVisualizationProperties;
 import de.zbit.kegg.io.KEGG2SBMLLayoutExtension;
 import de.zbit.kegg.io.KEGG2SBMLqual;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -215,9 +214,10 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       if (!s.isSetSBOTerm()) {
         nr = simpleGraph.getRealizer(n);
       } else {
-        nr = new ShapeNodeRealizer(ShapeNodeRealizer.PARALLELOGRAM);
+        nr = SBMLVisualizationProperties.getNodeRealizer(s.getSBOTerm());
+        nr = nr.createCopy();
         simpleGraph.setRealizer(n, nr);
-        
+        nodeShouldBeACircle = SBMLVisualizationProperties.isCircleShape(s.getSBOTerm());
       } 
       
       // Initialize default layout variables
