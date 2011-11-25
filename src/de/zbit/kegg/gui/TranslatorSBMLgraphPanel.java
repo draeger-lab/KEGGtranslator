@@ -23,16 +23,24 @@ package de.zbit.kegg.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import org.sbml.jsbml.AbstractNamedSBase;
+import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SimpleSpeciesReference;
+import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
@@ -43,16 +51,28 @@ import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.Transition;
 
+import y.base.DataMap;
+import y.base.Edge;
 import y.base.Node;
+import y.base.NodeMap;
+import y.view.Arrow;
+import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.gui.GUITools;
 import de.zbit.io.SBFileFilter;
+import de.zbit.kegg.ext.GenericDataMap;
+import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.io.KEGG2SBMLLayoutExtension;
 import de.zbit.kegg.io.KEGG2SBMLqual;
 import de.zbit.kegg.io.KEGG2jSBML;
+import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
+import de.zbit.util.TranslatorTools;
+import de.zbit.util.Utils;
+import de.zbit.util.ValuePair;
 
 /**
  * A basic panel which uses a GraphLayer to visualize SBML documents.
@@ -172,11 +192,18 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       }
     }
     
+    // Add some standardized maps, required by some utility methods
+    NodeMap nodePosition = simpleGraph.createNodeMap();
+    GenericDataMap<DataMap, String> mapDescriptionMap = KEGG2yGraph.addMapDescriptionMapToGraph(simpleGraph);
+    mapDescriptionMap.set(nodePosition, GraphMLmaps.NODE_POSITION);
+    
     // Convert each species to a graph node
     Map<String, Node> species2node = new HashMap<String, Node>();
+    Set<Node> unlayoutedNodes = new HashSet<Node>();
     int nodesWithoutCoordinates=0;
     int COLUMNS = species.size()/5; // Show in 5 rows by default
     for (AbstractNamedSBase s : species) {
+      boolean nodeHadLayoutInformation = false;
       Node n = simpleGraph.createNode();
       species2node.put(s.getId(), n);
       
@@ -206,24 +233,32 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
           if (g.isSetPoint()) {
             x = g.getPoint().getX();
             y = g.getPoint().getY();
+            nodeHadLayoutInformation=true;
           }
         }
       }
       
       // Auto-set missing coordinates
+      
       if (Double.isNaN(x) || Double.isNaN(y)) {
         // Make a simple grid-layout to set some initial coords
         x = (nodesWithoutCoordinates%COLUMNS)*(w+w/2);
         y = (nodesWithoutCoordinates/COLUMNS)*(h+h);
         
         nodesWithoutCoordinates++;
-      }
+        unlayoutedNodes.add(n);
+      } 
       
       // Set coordinates
       nr.setCenterX(x);
       nr.setCenterY(y);
       nr.setWidth(w);
       nr.setHeight(h);
+      
+      if (!nodeHadLayoutInformation) {
+        // Remember in defined hashmap
+        nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
+      }
       
       nr.setLabelText(s.getName());
     }
@@ -246,15 +281,100 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
           }
         }
       }
+      
     } else {
-      // TODO: Reactions.
+      
+      
+      // Add all reactions to the graph
+      for (Reaction r : document.getModel().getListOfReactions()) {
+        if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
+          // Create the reaction node
+          ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), species2node, simpleGraph);
+          NodeRealizer nr = new ReactionNodeRealizer();
+          Node rNode = simpleGraph.createNode(nr);
+          nr.setX(xy.getA());
+          nr.setY(xy.getB());
+          
+          // Add edges to the reaction node
+          for (SpeciesReference sr : r.getListOfReactants()) {
+            Node source = species2node.get(sr.getSpecies());
+            if (source!=null) {
+              Edge e = simpleGraph.createEdge(source, rNode);
+              EdgeRealizer er = simpleGraph.getRealizer(e);
+              if (r.isReversible()) {
+                er.setSourceArrow(Arrow.PLAIN);
+              }
+              er.setArrow(Arrow.NONE);
+            }
+          }
+
+          for (SpeciesReference sr : r.getListOfProducts()) {
+            Node target = species2node.get(sr.getSpecies());
+            if (target!=null) {
+              Edge e = simpleGraph.createEdge(rNode, target);
+              EdgeRealizer er = simpleGraph.getRealizer(e);
+              er.setArrow(Arrow.PLAIN);
+            }
+          }
+          
+          for (ModifierSpeciesReference sr : r.getListOfModifiers()) {
+            Node source = species2node.get(sr.getSpecies());
+            if (source!=null) {
+              Edge e = simpleGraph.createEdge(source, rNode);
+              EdgeRealizer er = simpleGraph.getRealizer(e);
+              er.setArrow(Arrow.PLAIN);
+            }
+          }
+          
+          
+        }
+      }
     }
     
-    // TODO: Apply Hirarchic layout if no layoutExtension is available. 
+    if (nodesWithoutCoordinates>0) {
+      TranslatorTools tools = new TranslatorTools(simpleGraph);
+      if (useLayoutExtension) {
+        // Only layout nodes, that had no coords in the layout extension
+        tools.layoutNodeSubset(unlayoutedNodes);
+      }
+      // TODO: Apply Hirarchic layout if no layoutExtension is available.
+      // Apply Smart Organic if only for some nodes the layout is not available.
+      
+      simpleGraph.unselectAll();
+    }
     
     return simpleGraph;
   }
 
+
+  /**
+   * Calculates the mean x and y coordinates.
+   * @param <T>
+   * @param listOfReactants
+   * @param species2node
+   * @param simpleGraph
+   * @return
+   */
+  private <T extends SimpleSpeciesReference> ValuePair<Double, Double> calculateMeanCoords(Iterable<T> listOfReactants,
+    Map<String, Node> species2node, Graph2D simpleGraph) {
+    List<Double> xes = new ArrayList<Double>();
+    List<Double> yes = new ArrayList<Double>();
+    
+    Iterator<T> it = listOfReactants.iterator();
+    while (it.hasNext()) {
+      T s = it.next();
+      if (s.isSetSpecies()) {
+        Node n = species2node.get(s.getSpecies());
+        if (n!=null) {
+          NodeRealizer nr = simpleGraph.getRealizer(n);
+          xes.add(nr.getX());
+          yes.add(nr.getY());
+        }
+      }
+    }
+    
+    return new ValuePair<Double, Double>(Utils.average(xes), Utils.average(yes));
+  }
 
   /* (non-Javadoc)
    * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()

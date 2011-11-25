@@ -116,6 +116,13 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
       Node target = map.get(a.getTarget());
       
       //Edge e =
+      if (source==null) {
+        log.warning(String.format("Missing source glyph for arc %s.", a));
+        continue;
+      } if (target==null) {
+        log.warning(String.format("Missing target glyph for arc %s.", a));
+        continue;
+      }
       simpleGraph.createEdge(source, target);
       //EdgeRealizer nr = simpleGraph.getRealizer(e);
       // XXX: Set arrow heads and such...

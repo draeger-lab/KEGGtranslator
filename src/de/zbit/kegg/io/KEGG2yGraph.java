@@ -1077,9 +1077,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     /*
      * Create a data provider that stores the names of all
      * data providers (Maps).
-     */
-    GenericDataMap<DataMap, String> mapDescriptionMap = new GenericDataMap<DataMap, String>(mapDescription);
-    graph.addDataProvider(mapDescription, mapDescriptionMap);
+     */    
+    GenericDataMap<DataMap, String> mapDescriptionMap = addMapDescriptionMapToGraph(graph);
     
     mapDescriptionMap.set(nodeLabel, GraphMLmaps.NODE_LABEL);
     mapDescriptionMap.set(entrezIds, GraphMLmaps.NODE_GENE_ID);
@@ -1098,6 +1097,25 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     mapDescriptionMap.set(interactionDescription, GraphMLmaps.EDGE_TYPE);
     
     return graph;
+  }
+  
+  /**
+   * This will add the describing mapDescriptionMap to the graph.
+   * @param graph
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static GenericDataMap<DataMap, String> addMapDescriptionMapToGraph(Graph2D graph) {
+    GenericDataMap<DataMap, String> mapDescriptionMap = null;
+    try {
+      mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(mapDescription);
+    } catch (Throwable t) {};
+    if (mapDescriptionMap==null) {
+      // Actually it is always null ;-)
+      mapDescriptionMap = new GenericDataMap<DataMap, String>(mapDescription);
+      graph.addDataProvider(mapDescription, mapDescriptionMap);
+    }
+    return mapDescriptionMap;
   }
   
   

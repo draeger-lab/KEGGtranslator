@@ -508,7 +508,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     model.setNotes(notes.toString());
     if (addCellDesignerAnnots) {
       cdu.addCellDesignerAnnotationToModel(p, model, compartment);
-    }   
+    }
+    
+    // Eventually add layout extension
+    if (addLayoutExtension) {
+      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model);
+    }
     
     return doc;
   }
@@ -520,7 +525,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   protected ValuePair<Integer, Integer> getLevelAndVersion() {
     // Layout extension requires Level 3
     if (!addLayoutExtension) {
-    return new ValuePair<Integer, Integer>(Integer.valueOf(2), Integer.valueOf(4));
+      return new ValuePair<Integer, Integer>(Integer.valueOf(2), Integer.valueOf(4));
     } else {
       return new ValuePair<Integer, Integer>(Integer.valueOf(3), Integer.valueOf(1));
     }

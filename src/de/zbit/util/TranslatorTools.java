@@ -571,7 +571,7 @@ public class TranslatorTools {
     for (Node n : graph.getNodeArray()) {
       dp.setBool(n, newNodes.contains(n));
       // Do never layout contents of any group node.
-      if (hm.isGroupNode(n)) {
+      if (hm!=null && hm.isGroupNode(n)) {
         ((GroupNodeRealizer)graph.getRealizer(n)).updateAutoSizeBounds();
         dp2.set(n, SmartOrganicLayouter.GROUP_NODE_MODE_FIX_CONTENTS);
       }
