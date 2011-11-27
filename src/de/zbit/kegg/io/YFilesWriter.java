@@ -31,8 +31,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.zbit.kegg.Translator;
-
 /**
  * This class creates an {@link OutputStream} that can be used with
  * the yFiles Java library. It ensures that KEGGtranslator name 
@@ -74,12 +72,12 @@ public class YFilesWriter extends OutputStream implements Closeable {
      * </ul>
      * such that no notes of yFiles are being written to the file.
 		 */
-		toReplace.put("yFiles", Translator.APPLICATION_NAME);
-		toReplace.put("ySVG", Translator.APPLICATION_NAME);
+		toReplace.put("yFiles", System.getProperty("app.name"));
+		toReplace.put("ySVG", System.getProperty("app.name"));
 		// It is TOO RISKY to replace "2.8" by another number (collision with node positions, etc.)
 		//toReplace.put(y.util.YVersion.currentVersionString(), Translator.VERSION_NUMBER);
 		toReplace.put(String.format("for Java %s-->", y.util.YVersion.currentVersionString()), 
-		              String.format("for Java %s-->", Translator.VERSION_NUMBER));
+		              String.format("for Java %s-->", System.getProperty("app.version")));
 		
 		
 		realOut = out;

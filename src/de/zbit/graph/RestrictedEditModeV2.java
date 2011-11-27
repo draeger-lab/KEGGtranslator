@@ -73,7 +73,6 @@ import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.Overview;
 import de.zbit.gui.GUITools;
-import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -260,8 +259,9 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
       // Ask user if he wants to open the pathway and fire an event.
       String kgId = TranslatorTools.getKeggIDs(n);
       if (kgId!=null && kgId.toLowerCase().startsWith("path:")) {
+      	// TODO: Yes and No are already localized by standard JAVA. Use those!
         int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
-          Translator.APPLICATION_NAME, new Object[]{"Yes", "No"});
+          System.getProperty("app.name"), new Object[]{"Yes", "No"});
         if (ret==0) {
           ActionEvent e = new ActionEvent(kgId.trim().substring(5).toLowerCase(), JOptionPane.OK_OPTION, OPEN_PATHWAY);
           aListener.actionPerformed(e);

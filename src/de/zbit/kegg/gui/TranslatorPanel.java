@@ -52,11 +52,11 @@ import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
-import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.gui.BaseFrameTab;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.ProgressBarSwing;
 import de.zbit.gui.VerticalLayout;
+import de.zbit.gui.BaseFrame.BaseAction;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
@@ -441,7 +441,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     } else {
       // Display the panel in an jFrame
       JDialog f = new JDialog();
-      f.setTitle(Translator.APPLICATION_NAME);
+      f.setTitle(System.getProperty("app.name"));
       f.setSize(panel.getPreferredSize());
       f.setContentPane(panel);
       f.setPreferredSize(panel.getPreferredSize());
@@ -455,7 +455,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
     
     // Inform others of this action
     ActionEvent newBar = new ActionEvent(pb, JOptionPane.DEFAULT_OPTION, "NEW_PROGRESSBAR");
-    if (parent instanceof TranslatorPanel) {
+    if (parent instanceof TranslatorPanel<?>) {
       ((TranslatorPanel<?>)parent).fireActionEvent(newBar);
     } else if (parent instanceof TranslatorUI) {
       ((TranslatorUI)parent).actionPerformed(newBar);

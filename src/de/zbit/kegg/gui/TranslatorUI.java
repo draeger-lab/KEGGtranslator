@@ -31,7 +31,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +51,7 @@ import javax.swing.event.ChangeListener;
 
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 
+import de.zbit.AppConf;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
@@ -67,7 +67,6 @@ import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.StringUtil;
-import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
@@ -188,8 +187,12 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * 
 	 */
 	public TranslatorUI() {
-		super();
-		// init preferences
+		this(null);
+	}
+	
+	public TranslatorUI(AppConf appConf) {
+		super(appConf);
+  	// init preferences
 		initPreferences();
 		File file = new File(prefsIO.get(KEGGtranslatorIOOptions.INPUT));
 		openDir = file.isDirectory() ? file.getAbsolutePath() : file
@@ -202,14 +205,14 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		int[] resolutions=new int[]{16,32,48,128,256};
 		List<Image> icons = new LinkedList<Image>();
 		for (int res: resolutions) {
-		  Object icon = UIManager.get("KEGGtranslatorIcon_"+res);
+		  Object icon = UIManager.get("KEGGtranslatorIcon_" + res);
 		  if ((icon != null) && (icon instanceof ImageIcon)) {
 		    icons.add(((ImageIcon) icon).getImage());
 		  }
 		}
 		setIconImages(icons);
 	}
-	
+
 	/**
 	 * Init preferences, if not already done.
 	 */
@@ -339,7 +342,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  if (inFile!=null) {
 		    message = '\'' + inFile.getName() + "' is no valid input file.";
 		  }
-			JOptionPane.showMessageDialog(this, message, Translator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(this, message, System.getProperty("app.name"), JOptionPane.WARNING_MESSAGE);
 		} else {
 			Format f = null;
 			try {
@@ -347,7 +350,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			} catch (Throwable exc) {
 			  exc.printStackTrace();
 				JOptionPane.showMessageDialog(this, '\'' + format + "' is no valid output format.",
-						Translator.APPLICATION_NAME, JOptionPane.WARNING_MESSAGE);
+					System.getProperty("app.name"), JOptionPane.WARNING_MESSAGE);
 			}
 			if (f != null) {
 				// Tanslate and add tab.
@@ -469,16 +472,17 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @return true, if the tab has been closed.
 	 */
 	private boolean closeTab(int index) {
-		if (index<0 || index >= tabbedPane.getTabCount())
+		if ((index < 0) || (index >= tabbedPane.getTabCount())) {
 			return false;
+		}
 		Component comp = tabbedPane.getComponentAt(index);
 		String title = tabbedPane.getTitleAt(index);
-		if (title == null || title.length() < 1) {
+		if ((title == null) || (title.length() < 1)) {
 			title = "the currently selected document";
 		}
 
 		// Check if document already has been saved
-		if ((comp instanceof TranslatorPanel)
+		if ((comp instanceof TranslatorPanel<?>)
 				&& !((TranslatorPanel<?>) comp).isSaved()) {
 			if ((JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this,
 					StringUtil.toHTML(String.format(
@@ -523,7 +527,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
     if ( askOutputFormat || (format == null) || (format.length() < 1)) {
       JLabeledComponent outputFormat = (JLabeledComponent) PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, null);
       outputFormat.setTitle("Please select the output format");
-      JOptionPane.showMessageDialog(this, outputFormat, Translator.APPLICATION_NAME, JOptionPane.QUESTION_MESSAGE);
+			JOptionPane.showMessageDialog(this, outputFormat, System
+					.getProperty("app.name"), JOptionPane.QUESTION_MESSAGE);
       format =  outputFormat.getSelectedItem().toString();
     }
 
@@ -725,17 +730,6 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.zbit.gui.BaseFrame#getCommandLineOptions()
-	 */
-	@SuppressWarnings("unchecked")
-	public Class<? extends KeyProvider>[] getCommandLineOptions() {
-	  List<Class<? extends KeyProvider>> l = Translator.getCommandLineOptions();
-		return l.toArray(new Class[0]);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see de.zbit.gui.BaseFrame#getURLAboutMessage()
 	 */
 	public URL getURLAboutMessage() {
@@ -765,43 +759,5 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
   	// "../" does not work inside a jar.
 	  return Translator.class.getResource("html/help.html");
 	}
-
-  
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.BaseFrame#getApplicationName()
-	 */
-	public String getApplicationName() {
-		return Translator.APPLICATION_NAME;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.BaseFrame#getDottedVersionNumber()
-	 */
-	public String getDottedVersionNumber() {
-		return Translator.VERSION_NUMBER;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.BaseFrame#getURLOnlineUpdate()
-	 */
-	public URL getURLOnlineUpdate() {
-		try {
-			return Translator.getURLOnlineUpdate();
-		} catch (MalformedURLException exc) {
-			return null;
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.gui.BaseFrame#getMaximalFileHistorySize()
-	 */
-	public short getMaximalFileHistorySize() {
-		return 10;
-	}
+	
 }

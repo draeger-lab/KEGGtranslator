@@ -74,7 +74,6 @@ import y.view.Overview;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.ImageTools;
 import de.zbit.gui.SystemBrowser;
-import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -335,9 +334,10 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
           
         // Open clicked pathway in a new tab
         if (aListener!=null) {
+        	// TODO: Yes and No are already localized by standard JAVA. Use those!
           int ret = GUITools.showQuestionMessage(null, "Do you want to download and open the referenced pathway in a new tab?", 
-            Translator.APPLICATION_NAME, new Object[]{"Yes", "No"});
-          if (ret==0) {
+          	System.getProperty("app.name"), new Object[]{"Yes", "No"});
+          if (ret == 0) {
             ActionEvent e = new ActionEvent(kgId.trim().substring(5).toLowerCase(), JOptionPane.OK_OPTION, OPEN_PATHWAY);
             aListener.actionPerformed(e);
             ev.consume();

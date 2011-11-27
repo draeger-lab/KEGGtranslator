@@ -20,8 +20,6 @@
  */
 package de.zbit.kegg.gui;
 
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -59,7 +57,6 @@ import y.base.Node;
 import y.base.NodeMap;
 import y.layout.hierarchic.HierarchicLayouter;
 import y.view.Arrow;
-import y.view.Drawable;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.LineType;
