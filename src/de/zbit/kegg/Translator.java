@@ -394,7 +394,7 @@ public class Translator extends Launcher {
 	 * @see de.zbit.Launcher#getYearWhenProjectWasStarted()
 	 */
 	public short getYearWhenProjectWasStarted() {
-		return (short) 2009;
+		return (short) 2010;
 	}
 
 	/*

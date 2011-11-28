@@ -23,6 +23,7 @@ package de.zbit.kegg.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,14 +32,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
 import org.sbml.jsbml.AbstractNamedSBase;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.SimpleSpeciesReference;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.ext.SBasePlugin;
@@ -51,18 +56,23 @@ import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.Transition;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
+
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.Node;
 import y.base.NodeMap;
-import y.layout.hierarchic.HierarchicLayouter;
+import y.layout.organic.SmartOrganicLayouter;
 import y.view.Arrow;
 import y.view.EdgeRealizer;
 import y.view.Graph2D;
+import y.view.HitInfo;
 import y.view.LineType;
 import y.view.NodeRealizer;
 import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.gui.GUITools;
+import de.zbit.gui.LayoutHelper;
+import de.zbit.gui.VerticalLayout;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
@@ -72,6 +82,7 @@ import de.zbit.kegg.io.KEGG2SBMLqual;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
+import de.zbit.sbml.gui.SBasePanel;
 import de.zbit.util.TranslatorTools;
 import de.zbit.util.Utils;
 import de.zbit.util.ValuePair;
@@ -89,6 +100,12 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * shows the qual model.
    */
   private boolean showQualModel=false;
+  
+  /**
+   * Use this hashmap to map every graph-object
+   * to an SBML-identifier.
+   */
+  private Map<Object, String> GraphElement2SBMLid = new HashMap<Object, String>();
 
 
   /**
@@ -210,6 +227,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       boolean nodeShouldBeACircle = false;
       Node n = simpleGraph.createNode();
       species2node.put(s.getId(), n);
+      GraphElement2SBMLid.put(n, s.getId());
       
       // TODO: Set Node shape (and color?) based on SBO-terms
       NodeRealizer nr;
@@ -262,7 +280,13 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       nr.setHeight(h);
       
       if (nodeShouldBeACircle) {
-        double min = 8;//Math.min(w, h); // KEGG compounds always have w and h of 8.
+        double min;
+        if (unlayoutedNodes.contains(n)) {
+          min = 8; // KEGG compounds always have w and h of 8 by default.  
+        } else {
+          min = Math.min(w, h);
+        }
+        
         nr.setWidth(min);
         nr.setHeight(min);
       }
@@ -287,7 +311,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             Node source = species2node.get(i.getQualitativeSpecies());
             Node target = species2node.get(o.getQualitativeSpecies());
             
-            simpleGraph.createEdge(source, target);
+            Edge e = simpleGraph.createEdge(source, target);
+            GraphElement2SBMLid.put(e, t.getId());
             
             // TODO: Change edge shape based on properties
             //EdgeRealizer nr = simpleGraph.getRealizer(e);
@@ -305,6 +330,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
           NodeRealizer nr = new ReactionNodeRealizer();
           reaction2node.put(r, (ReactionNodeRealizer) nr);
           Node rNode = simpleGraph.createNode(nr);
+          GraphElement2SBMLid.put(rNode, r.getId());
           unlayoutedNodes.add(rNode); // TODO: really add them here?
           nr.setX(xy.getA());
           nr.setY(xy.getB());
@@ -314,6 +340,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             Node source = species2node.get(sr.getSpecies());
             if (source!=null) {
               Edge e = simpleGraph.createEdge(source, rNode);
+              GraphElement2SBMLid.put(e, r.getId());
               EdgeRealizer er = simpleGraph.getRealizer(e);
               if (r.isReversible()) {
                 er.setSourceArrow(Arrow.STANDARD);
@@ -328,6 +355,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             Node target = species2node.get(sr.getSpecies());
             if (target!=null) {
               Edge e = simpleGraph.createEdge(rNode, target);
+              GraphElement2SBMLid.put(e, r.getId());
               EdgeRealizer er = simpleGraph.getRealizer(e);
               er.setArrow(Arrow.STANDARD);
               er.setSourceArrow(Arrow.NONE);
@@ -338,6 +366,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             Node source = species2node.get(sr.getSpecies());
             if (source!=null) {
               Edge e = simpleGraph.createEdge(source, rNode);
+              GraphElement2SBMLid.put(e, r.getId());
               EdgeRealizer er = simpleGraph.getRealizer(e);
               er.setArrow(Arrow.TRANSPARENT_CIRCLE);
               er.setLineType(LineType.LINE_1);
@@ -358,7 +387,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         tools.layoutNodeSubset(unlayoutedNodes, true);
       } else {
         // Apply Hierarchic layout if no layoutExtension is available.
-        tools.layout(HierarchicLayouter.class);
+        tools.layout(SmartOrganicLayouter.class);
       }
       simpleGraph.unselectAll();
     }
@@ -438,4 +467,75 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       return ((KEGG2jSBML)getTranslator()).writeToFile(document, file.getPath());
     }
   }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
+   */
+  @Override
+  public boolean isDetailPanelAvailable() {
+    return true;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#updateDetailPanel(javax.swing.JPanel, y.view.HitInfo)
+   */
+  @Override
+  protected void updateDetailPanel(final JScrollPane detailPanel, HitInfo clickedObjects) {
+    
+    if (clickedObjects==null || !clickedObjects.hasHits()) {
+      synchronized (detailPanel) {
+        ((JScrollPane) detailPanel).setViewportView(null);
+      }
+    } else {
+      Set<Object> hits = TranslatorTools.getHitEdgesAndNodes(clickedObjects, true);
+      JPanel p = new JPanel(); // Gridlayout makes always same height...
+      LayoutHelper lh = new LayoutHelper(p);
+      for (Object nodeOrEdge: hits) {
+        if (Thread.currentThread().isInterrupted()) return;
+        
+        // Try to get actual SBML-element
+        String sbmlID = GraphElement2SBMLid.get(nodeOrEdge);
+        SBase base = null;
+        if (sbmlID!=null) {
+          if (!showQualModel) {
+            base = document.getModel().getSpecies(sbmlID);
+            if (base==null ){
+              base = document.getModel().getReaction(sbmlID);
+            }
+          } else {
+            SBasePlugin qm = document.getModel().getExtension(KEGG2SBMLqual.QUAL_NS);
+            if (qm!=null && qm instanceof QualitativeModel) {
+              QualitativeModel q = (QualitativeModel) qm;
+              base = q.getQualitativeSpecies(sbmlID);
+              if (base==null ){
+                base = q.getTransition(sbmlID);
+              }
+            }
+          }
+        }
+        
+        // Add a detail panel if we have the element.
+        if (base!=null) {
+          try {
+            lh.add(new SBasePanel(base, true), true);
+          } catch (IOException e) {
+            log.log(Level.WARNING, "Could not create detail panel.", e);
+          }
+        }
+      }
+      
+      // Add final panel
+      if (Thread.currentThread().isInterrupted()) return;
+      if (p.getComponentCount()>0) {
+        synchronized (detailPanel) {
+          ((JScrollPane) detailPanel).setViewportView(p);
+          
+          // Scroll to top.
+          GUITools.scrollToTop(detailPanel);
+        }
+      }
+    }
+    
+  }
+  
 }

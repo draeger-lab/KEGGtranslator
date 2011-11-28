@@ -20,6 +20,7 @@
  */
 package de.zbit.kegg.gui;
 
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -27,6 +28,10 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.filechooser.FileFilter;
 
 import y.view.DefaultGraph2DRenderer;
@@ -34,6 +39,7 @@ import y.view.EditMode;
 import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
+import y.view.HitInfo;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.ext.TranslatorPanelOptions;
@@ -62,6 +68,17 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * The current graph layer
    */
   Graph2D graphLayer;
+
+  /**
+   * This allows extending classes to build a panel with detailed
+   * information that is shown on node-selection.
+   */
+  private JScrollPane detailPanel=null;
+
+  /**
+   * Thread that updates the detail panel.
+   */
+  private Thread detailPanelUpdater;
 
 
   /**
@@ -174,7 +191,30 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     
     // Create a new visualization of the model.
     Graph2DView pane = new Graph2DView(graphLayer);
-    add(pane);
+    
+    if (isDetailPanelAvailable()) {
+      //Create a split pane
+      detailPanel = new JScrollPane();
+      updateDetailPanel(detailPanel, null); // Build initial panel
+      
+      // Set a minimum size if we use the split pane
+      Dimension minimumSize = new Dimension( (int)Math.max(pane.getMinimumSize().getWidth(), 100), (int)Math.max(pane.getMinimumSize().getHeight(), getHeight()/2) );
+      pane.setMinimumSize(minimumSize);
+      pane.setPreferredSize(new Dimension(100, (int) Math.max(getHeight()*0.6, 50)));
+      detailPanel.setMinimumSize(new Dimension(100,50));
+      detailPanel.setPreferredSize(new Dimension(100, (int)Math.max(getHeight()*0.4, 50)));
+      detailPanel.setSize(detailPanel.getPreferredSize());
+      
+      JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, pane, detailPanel);
+      splitPane.setOneTouchExpandable(false);
+      splitPane.setResizeWeight(0.8); // Make graph max visible
+
+      
+      add(splitPane);
+    } else {
+      add(pane);
+    }
+    
     
     // Important to draw nodes last, edges should be BELOW nodes.
     if (pane.getGraph2DRenderer() instanceof DefaultGraph2DRenderer ){
@@ -216,6 +256,68 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       pane.fitContent(true);
     } catch (Throwable t) {} // Not really a problem
     pane.setFitContentOnResize(true);
+  }
+
+  
+  /**
+   * Please see {@link #updateDetailPanel(JPanel, HitInfo)}.
+   * Please USE this method, BUT overwrite {@link #updateDetailPanel(JScrollPane, HitInfo)}!
+   * @param hitInfo
+   * @see #updateDetailPanel(JPanel, HitInfo)
+   */
+  public void updateDetailPanel(final HitInfo hitInfo) {
+    if (detailPanelUpdater!=null && !detailPanelUpdater.getState().equals(Thread.State.TERMINATED)) {
+      detailPanelUpdater.interrupt();
+    }
+    
+    Runnable buildDetailPanel = new Runnable() {
+      public void run() {
+        updateDetailPanel(detailPanel, hitInfo);
+        detailPanel.validate();
+        detailPanel.repaint();
+        if (Thread.currentThread().isInterrupted()) return;
+        detailPanel.validate();
+        detailPanel.repaint();
+      }
+    };
+    
+    JProgressBar prog = new JProgressBar();
+    prog.setIndeterminate(true);
+    JPanel p = new JPanel();
+    p.add(prog);
+    detailPanel.setViewportView(p);
+    
+    detailPanelUpdater = new Thread(buildDetailPanel);
+    detailPanelUpdater.start();
+  }
+
+  /**
+   * Only if {@link #isDetailPanelAvailable()}, update the {@link #detailPanel}
+   * to match current selection.
+   * <p><code>clickedObjects</code> might explicitly be <code>NULL</code>
+   * if nothing is selected, so please implement this method accordingly.
+   * 
+   * @param detailPanel
+   * @param clickedObjects
+   */
+  protected void updateDetailPanel(JScrollPane detailPanel, HitInfo clickedObjects) {
+    // Detail panel is disabled by default.
+  }
+
+
+  /**
+   * Return true if not only the graph, but also a detail panel
+   * that is activated on node-click should be visualized.
+   * 
+   * <p>This allows extending classes to build a panel with detailed
+   * information that is shown on node-selection.
+   * <p>Please overwrite this method to match your needs.
+   * @return <code>TRUE</code> if a split pane with more details for
+   * a node should be introduced, <code>FALSE</code> if only the
+   * graph should get visualized.
+   */
+  public boolean isDetailPanelAvailable() {
+    return false;
   }
 
 
@@ -341,5 +443,6 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
    * @throws Exception
    */
   protected abstract boolean writeRealDocumentToFileUnchecked(File file, String format) throws Exception;
+
   
 }

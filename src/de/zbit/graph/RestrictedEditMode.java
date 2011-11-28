@@ -76,6 +76,7 @@ import de.zbit.gui.ImageTools;
 import de.zbit.gui.SystemBrowser;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
+import de.zbit.kegg.gui.TranslatorGraphLayerPanel;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.util.EscapeChars;
@@ -356,6 +357,17 @@ public class RestrictedEditMode extends EditMode implements Graph2DSelectionList
       // let EditMode handle the click event
       super.mouseClicked(x,y);
     }
+    
+    // In any case, update eventual detail-panels.
+    if (parent instanceof TranslatorGraphLayerPanel<?>) {
+      TranslatorGraphLayerPanel<?> p = (TranslatorGraphLayerPanel<?>)parent;
+      if (p.isDetailPanelAvailable()) {
+        p.updateDetailPanel(getGraph2D().getHitInfo(x, y, false));
+      }
+    }
+    
+    
+    
   }
   
   /**

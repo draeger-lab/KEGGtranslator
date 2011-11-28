@@ -48,9 +48,11 @@ import y.base.YCursor;
 import y.layout.CanonicMultiStageLayouter;
 import y.layout.labeling.SALabeling;
 import y.layout.organic.SmartOrganicLayouter;
+import y.view.EdgeLabel;
 import y.view.Graph2D;
 import y.view.Graph2DLayoutExecutor;
 import y.view.Graph2DView;
+import y.view.HitInfo;
 import y.view.LineType;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
@@ -468,7 +470,7 @@ public class TranslatorTools {
    * a {@link EdgeMap} will be created.
    * @return the created map.
    */
-  private DataMap createMap(String descriptor, boolean nodeMap) {
+  public DataMap createMap(String descriptor, boolean nodeMap) {
     DataMap map;
     if (nodeMap) {
       map = graph.createNodeMap();
@@ -1065,6 +1067,35 @@ public class TranslatorTools {
     }
     
     return pw2node;
+  }
+
+  /**
+   * Returns the actual objects that are contained in <code>clickedObjects</code>.
+   * @param clickedObjects
+   * @param translateLabelHitsToObjects true to return the node for a click on a
+   * nodelabel. Same for edges and labels.
+   * @return
+   */
+  public static Set<Object> getHitEdgesAndNodes(HitInfo clickedObjects, boolean translateLabelHitsToObjects) {
+    Set<Object> hitObjects = new HashSet<Object>();
+    if (clickedObjects.hasHits()) {
+      YCursor c = clickedObjects.allHits();
+      while (c.ok()) {
+        Object x = c.current();
+        if (x instanceof Node) {
+          hitObjects.add(x);
+        } else if (x instanceof Edge) {
+          hitObjects.add(x);
+        } else if (translateLabelHitsToObjects && x instanceof EdgeLabel) {
+          hitObjects.add(((EdgeLabel)x).getEdge());
+        } else if (translateLabelHitsToObjects && x instanceof NodeLabel) {
+          hitObjects.add(((NodeLabel)x).getNode());
+        }
+        c.next();
+      }
+    }
+    
+    return hitObjects;
   }
   
   
