@@ -20,6 +20,7 @@
  */ 
 package de.zbit.kegg.ext;
 
+import java.awt.Color;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,13 +57,13 @@ public class SBMLVisualizationProperties {
   /**
    * 
    */
-  private static int Macromolecule_Enzyme1 = 245;
-  private static int Macromolecule_Enzyme2 = 252;
-  private static int simpleChemical = 247;
-  private static int gene = 354;
-  private static int materialEntityOfUnspecifiedNature = 285;
-  private static int emptySet = 552;
-  private static int nonCovalentComplex = 253;
+  private static final int Macromolecule_Enzyme1 = 245;
+  private static final int Macromolecule_Enzyme2 = 252;
+  private static final int simpleChemical = 247;
+  private static final int gene = 354;
+  private static final int materialEntityOfUnspecifiedNature = 285;
+  private static final int map = 552;
+  private static final int nonCovalentComplex = 253;
   
   
   /**
@@ -83,12 +84,34 @@ public class SBMLVisualizationProperties {
     sbo2shape.put(gene, new NucleicAcidFeatureNode()); // nucleic acid feature - gene
     
     sbo2shape.put(materialEntityOfUnspecifiedNature, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // unspecified - material entity of unspecified nature
-    sbo2shape.put(emptySet, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // unspecified - empty set
+    sbo2shape.put(map, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // unspecified - empty set
     
     sbo2shape.put(nonCovalentComplex, new ComplexNode()); // complex - non-covalent complex
     
     
     SBMLVisualizationProperties.sbo2shape = Collections.unmodifiableMap(sbo2shape);
+  }
+  
+  /**
+   * @return the color of the appropriate shabe
+   */
+  private static Color getColor(int sboTerm) {
+    switch (sboTerm) {
+      case nonCovalentComplex:
+        return new Color(24,116,205);    // DodgerBlue3
+      case gene:
+        return new Color( 255,255,0);    // Yellow
+      case Macromolecule_Enzyme1:
+        return new Color(0,205,0);       // Green 3
+      case Macromolecule_Enzyme2:
+        return new Color(0,205,0);       // Green 3
+      case simpleChemical:
+        return new Color(176,226,255);   // LightSkyBlue1
+      case map:
+        return new Color(224,238,238);   // azure2
+      default:
+        return new Color(144,238,144);   // LightGreen
+    }
   }
 
   /**
@@ -106,6 +129,9 @@ public class SBMLVisualizationProperties {
       ret = defaultShape;
       log.log(Level.FINE, "sboTerm: " + sboTerm + " couldn't be assigned to a shape, default shape is used");
     }
+    
+    ret.setFillColor(getColor(sboTerm));
+    
     return ret;
   }
 
