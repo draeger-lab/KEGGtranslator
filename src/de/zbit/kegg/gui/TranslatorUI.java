@@ -428,7 +428,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 //				writeLaTeXReport();
 //				break;
       case DOWNLOAD_KGML:
-        TranslatePathwayDialog.showAndEvaluateDialog(tabbedPane, this, null);
+        TranslatePathwayDialog.showAndEvaluateDialog(tabbedPane, this, (Format)null);
 //        try {
 //          tabbedPane.addTab(action.getName(), new TranslatorPanel(this));
 //          tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);

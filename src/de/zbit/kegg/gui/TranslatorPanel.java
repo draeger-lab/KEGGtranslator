@@ -315,12 +315,10 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       repaint();
       
       translate();
-      GUITools.packParentWindow(this);
     } else {
       log.warning("Pathway download failed.");
       // Remove the tab
       this.getParent().remove(this);
-      
     }
   }
   

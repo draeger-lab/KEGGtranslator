@@ -23,6 +23,8 @@ package de.zbit.kegg.gui;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -50,6 +52,8 @@ import de.zbit.util.prefs.SBProperties;
 public class TranslatePathwayDialog extends JPanel {
   private static final long serialVersionUID = 6884078022042984336L;
   
+  private static final Logger log = Logger.getLogger(GUITools.class.getName());
+  
   /**
    * Pre-selected output file format (optional)
    */
@@ -67,6 +71,10 @@ public class TranslatePathwayDialog extends JPanel {
    */
   PathwaySelector selector=null;
   
+  /**
+   * Allows to initialize a {@link TranslatorPanel} of a certain type. 
+   */
+  Class<? extends TranslatorPanel<?>> transPanelType = null;
   
   private LayoutHelper lh;
   
@@ -79,6 +87,17 @@ public class TranslatePathwayDialog extends JPanel {
     this.outputFormat = preSelectedOutputFormat;
     LayoutHelper lh = new LayoutHelper(this);
     showDownloadPanel(lh);
+  }
+  
+  /**
+   * Set the {@link TranslatorPanel} class that should get initialized.
+   * This class MUST HAVE A CONSTRUCTOR FOR
+   * ({@link String}, {@link Format}, {@link ActionListener}).
+   * @param transPanelType
+   */
+  public void setTranslatorPanelClassToInitialize(
+    Class<? extends TranslatorPanel<?>> transPanelType) {
+    this.transPanelType = transPanelType;
   }
 
   
@@ -128,7 +147,19 @@ public class TranslatePathwayDialog extends JPanel {
     }
     
     // Create the panel and initiate the translation
-    TranslatorPanel<?> tp = TranslatorPanel.createPanel(id, outFormat, translationResult);
+    TranslatorPanel<?> tp=null;
+    if (transPanelType!=null) {
+      try {
+        tp = transPanelType.getConstructor(String.class, Format.class, ActionListener.class)
+        .newInstance(id, outFormat, translationResult);
+      } catch (Exception e ){
+        log.log(Level.WARNING, "Could not instantiate given translator panel.", e);
+      }
+    }
+    if (tp==null) {
+      tp = TranslatorPanel.createPanel(id, outFormat, translationResult);
+    }
+     
     
     return tp;
   }
@@ -188,6 +219,17 @@ public class TranslatePathwayDialog extends JPanel {
    */
   public static void showAndEvaluateDialog(final JTabbedPane addTabsHere, final ActionListener translationResult, Format optionalPreSelectedFormat) {
     TranslatePathwayDialog d = new TranslatePathwayDialog(optionalPreSelectedFormat);
+    
+    showAndEvaluateDialog(addTabsHere, translationResult, d);
+  }
+  
+  /**
+   * Shows and evaluates this panel in a dialog.
+   * @param addTabsHere this is where the created {@link TranslatorPanel} will be added
+   * @param translationResult an optional action listener
+   * @param optionalPreSelectedFormat an optional pre-selection of desired output format
+   */
+  public static void showAndEvaluateDialog(final JTabbedPane addTabsHere, final ActionListener translationResult, TranslatePathwayDialog d) {
     
     GUITools.showOkCancelDialogInNewThred(d, "Download pathway", d.createOkButtonAction(addTabsHere, translationResult), null);
     d.selector.autoActivateOkButton(d);
