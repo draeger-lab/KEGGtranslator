@@ -581,7 +581,7 @@ public class TranslatorTools {
       }
       
       if (!newNodes.contains(n)){// && hm.getParentNode(n)==null && !hm.isGroupNode(n)) {
-        if (n.degree()<1) { // NEW; only store orphans
+        if (n.degree()<1) { // NEW: only store orphans (and actually separate cliques...) 
           resetLayout.add(n);
         } else {
           otherNodes.add(n);
@@ -647,7 +647,7 @@ public class TranslatorTools {
       String splitBy = Pattern.quote("|");
       int anyOldX = 0, anyOldY = 0;
       int anyNewX = 0, anyNewY = 0;
-      for (Node n: otherNodes) {
+      for (Node n: otherNodes) { // Breaks after the first node is found
         Object pos = nodeMap.get(n);
         if (pos==null) continue;
         // pos is always X|Y
