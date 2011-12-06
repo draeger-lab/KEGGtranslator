@@ -727,7 +727,13 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           if (infos.queryWasSuccessfull()) {
             
             String text = infos.getNames();
-            if (text!=null && text.length()!=0) name2+=(name2.length()>0?", ":"")+text.replace(", ", " ").replace(';', ' ').replace("\n", "");
+            if (text!=null && text.length()!=0) {
+              // Problem here is that space is used to separate gene synonyms, but
+              // compounds may contain spaces in names. Thus, they need special treatment
+              if (ko_id.startsWith("cpd:")) text = text.replace(" ", "-");
+              
+              name2+=(name2.length()>0?", ":"")+text.replace(", ", " ").replace(';', ' ').replace("\n", "");
+            }
             // Append formula for compounds. ONLY WITH SPACE, because compounds synonyms are space divided
             text = infos.getFormula();
             if (text!=null && text.length()!=0) name2+=(name2.length()>0?" ":"")+text;

@@ -548,6 +548,17 @@ public class TranslatorTools {
   }
 
   /**
+   * 
+   * @param n any {@link Node}
+   * @return <code>TRUE</code> if it is the title, or any
+   * pathway reference node.
+   */
+  public static boolean isPathwayReference(Node n) {
+    String id = getKeggIDs(n).toLowerCase().trim();
+    return (id.startsWith("path:"));
+  }
+
+  /**
    * @return the currently underlying {@link Graph2D} of this tools instance.
    */
   public Graph2D getGraph() {
