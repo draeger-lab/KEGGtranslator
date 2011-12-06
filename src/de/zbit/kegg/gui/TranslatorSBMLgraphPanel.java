@@ -518,7 +518,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         if (base!=null) {
           try {
             lh.add(new SBasePanel(base, true), true);
-          } catch (IOException e) {
+          } catch (Exception e) {
             log.log(Level.WARNING, "Could not create detail panel.", e);
           }
         }
