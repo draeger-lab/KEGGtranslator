@@ -233,11 +233,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		// final JPanel r = new JPanel(new VerticalLayout());
 		final JToolBar r = new JToolBar("Translate new file", JToolBar.HORIZONTAL);
 
-		JComponent jc = PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.INPUT, prefsIO, this);
+		JComponent jc = PreferencesPanel.createJComponentForOption(KEGGtranslatorIOOptions.INPUT, prefsIO, this);
 		// Allow a change of Focus (important!)
 		if (jc instanceof FileSelector) ((FileSelector)jc).removeInputVerifier();
 		r.add(jc);
-		r.add(PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, this));
+		r.add(PreferencesPanel.createJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, this));
 
 		// Button and action
 		JButton ok = new JButton("Translate now!", UIManager.getIcon("ICON_GEAR_16"));
@@ -525,7 +525,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
     // Ask output format
     String format = getOutputFileFormat(toolBar);
     if ( askOutputFormat || (format == null) || (format.length() < 1)) {
-      JLabeledComponent outputFormat = (JLabeledComponent) PreferencesPanel.getJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, null);
+      JLabeledComponent outputFormat = (JLabeledComponent) PreferencesPanel.createJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, null);
       outputFormat.setTitle("Please select the output format");
 			JOptionPane.showMessageDialog(this, outputFormat, System
 					.getProperty("app.name"), JOptionPane.QUESTION_MESSAGE);
@@ -698,7 +698,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  SBProperties props = new SBProperties();
 		  { // Save KEGGtranslatorIOOptions
 		    File f = getInputFile(toolBar);
-		    if (f != null && KEGGtranslatorIOOptions.INPUT.getRange().isInRange(f)) {
+		    if (f != null && KEGGtranslatorIOOptions.INPUT.getRange().isInRange(f, props)) {
 		      props.put(KEGGtranslatorIOOptions.INPUT, f);
 		    }
 		    props.put(KEGGtranslatorIOOptions.FORMAT, getOutputFileFormat(toolBar));

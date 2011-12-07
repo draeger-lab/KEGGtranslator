@@ -34,7 +34,6 @@ public class PreferencePanels {
   public static Class<?>[] getPreferencesClasses() {
     return new Class<?>[]{
         de.zbit.gui.prefs.GeneralOptionPanel.class,
-        de.zbit.gui.prefs.LaTeXPrefPanel.class, 
         de.zbit.gui.prefs.MultiplePreferencesPanel.class, 
         de.zbit.gui.prefs.PreferencesPanelForKeyProvider.class, 
         de.zbit.gui.prefs.TranslatorPanelOptionPanel.class
