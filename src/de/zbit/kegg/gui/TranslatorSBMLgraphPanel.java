@@ -254,9 +254,9 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             w = g.getDimensions().getWidth();
             h = g.getDimensions().getHeight();
           }
-          if (g.isSetPoint()) {
-            x = g.getPoint().getX();
-            y = g.getPoint().getY();
+          if (g.isSetPosition()) {
+            x = g.getPosition().getX();
+            y = g.getPosition().getY();
             nodeHadLayoutInformation=true;
           }
         }
