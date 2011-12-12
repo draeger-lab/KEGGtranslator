@@ -334,7 +334,9 @@ public class Translator extends Launcher {
 	 * @see de.zbit.Launcher#getInteractiveOptions()
 	 */
 	public List<Class<? extends KeyProvider>> getInteractiveOptions() {
-		return getCmdLineOptions();
+	  // Return NULL here to only show options as dialog, that
+	  // are defined in de.zbit.gui.prefsPreferencePanels
+		return null;
 	}
 
 	/*
