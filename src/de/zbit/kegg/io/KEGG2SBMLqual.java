@@ -242,17 +242,31 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     }
   }
 
+  /**
+   * 
+   * @param r
+   * @param p
+   * @param qualModel
+   * @return the created {@link Transition} or null, if there is a missing
+   * component or other conflicts occur.
+   */
   public Transition addKGMLRelation(Relation r, Pathway p, QualitativeModel qualModel) {
     // create transition and add it to the model
-    Transition t = qualModel.createTransition(NameToSId("tr"));
+    
+    Entry eOne = p.getEntryForId(r.getEntry1());
+    Entry eTwo = p.getEntryForId(r.getEntry2());
 
-    QualitativeSpecies qOne = (QualitativeSpecies) p.getEntryForId(r.getEntry1()).getCustom();
-    QualitativeSpecies qTwo = (QualitativeSpecies) p.getEntryForId(r.getEntry2()).getCustom();
+    QualitativeSpecies qOne = eOne==null?null:(QualitativeSpecies) eOne.getCustom();
+    QualitativeSpecies qTwo = eTwo==null?null:(QualitativeSpecies) eTwo.getCustom();
 
     if (qOne==null || qTwo==null) {
-      System.out.println("Relation with unknown entry!");
+      // Happens, e.g. when remove_pw_references is true and there is a
+      // relation to this (now removed) node.
+      log.finer("Relation with unknown or removed entry: " + r);
       return null;
     }
+    
+    Transition t = qualModel.createTransition(NameToSId("tr"));
    
     // Input
     Input in = t.createInput(NameToSId("in"), qOne, InputTransitionEffect.none); //TODO: is this correct?
