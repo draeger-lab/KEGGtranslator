@@ -33,9 +33,15 @@ import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Sbgn;
 
+import y.base.Edge;
+import y.base.Graph;
 import y.base.Node;
+import y.view.Arrow;
+import y.view.EdgeRealizer;
+import y.view.GenericEdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
+import y.view.ShapeNodeRealizer;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.io.KEGG2SBGN;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
@@ -109,13 +115,16 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
       nr.setCenterY(g.getBbox().getY());
       nr.setWidth(g.getBbox().getW());
       nr.setHeight(g.getBbox().getH());
-      nr.setLabelText(g.getLabel().getText());
+      if(g.getLabel() != null)
+    	  nr.setLabelText(g.getLabel().getText());
+      simpleGraph.createNode(nr);
     }
     for (Arc a : document.getMap().getArc()) {
       Node source = map.get(a.getSource());
       Node target = map.get(a.getTarget());
+      EdgeRealizer er = new GenericEdgeRealizer();
       
-      //Edge e =
+      
       if (source==null) {
         log.warning(String.format("Missing source glyph for arc %s.", a));
         continue;
@@ -123,9 +132,9 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
         log.warning(String.format("Missing target glyph for arc %s.", a));
         continue;
       }
-      simpleGraph.createEdge(source, target);
-      //EdgeRealizer nr = simpleGraph.getRealizer(e);
-      // XXX: Set arrow heads and such...
+      if(a.getClazz().equalsIgnoreCase(KEGG2SBGN.ArcType.production.toString()))
+    	  er.setTargetArrow(Arrow.STANDARD);
+      simpleGraph.createEdge(source, target, er);
     }
     return simpleGraph;
   }
