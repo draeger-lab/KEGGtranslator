@@ -46,6 +46,8 @@ import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.util.ValuePair;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
+import de.zbit.kegg.AtomBalanceCheck;
+import de.zbit.kegg.AtomBalanceCheck.AtomCheckResult;
 import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
@@ -298,6 +300,10 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     sr.setId(NameToSId(sr.getName()));
     sr.setMetaId("meta_" + sr.getId());
     sr.setSBOTerm(SBO);
+    
+    // Set the stoichiometry
+    Integer stoich = rc.getStoichiometry();
+    sr.setStoichiometry(stoich==null?1d:stoich);
     
     // Get Species for ReactionComponent and assign to SpeciesReference.
     Entry rcEntry = p.getEntryForReactionComponent(rc);
@@ -624,6 +630,22 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     }
     if (reID.getNumResources() > 0) sbReaction.addCVTerm(reID);
     if (rePWs.getNumResources() > 0) sbReaction.addCVTerm(rePWs);
+    
+    
+    // Check the atom balance (only makes sense if reactions are corrected,
+    // else, they are clearly wrong).
+    if (autocompleteReactions) {
+       AtomCheckResult defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
+      if (defects!=null && defects.hasDefects()) {
+        notes.append("<p>");
+        notes.append("<b><font color=\"#FF0000\">There are missing atoms in this reaction</font></b><br/>" +
+        		"<small><i>Values lower than zero indicate missing atoms on the " +
+        		"substrate side, whereas positive values indicate missing atoms " +
+        		"on the product side.</i></small><br/>\n");
+        notes.append(defects.getResultsAsHTMLtable());
+        notes.append("</p>");
+      }
+    }
     
     
     // Finally, add the fully configured reaction.

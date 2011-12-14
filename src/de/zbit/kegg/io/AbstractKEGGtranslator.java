@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import de.zbit.kegg.AtomBalanceCheck;
 import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
@@ -314,6 +315,12 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
         // Auto-completion requires API-infos and also adds new entries
         // => preFetch twice.
         KeggTools.preFetchInformation(p,manager,completeAndCacheReactions, progress);
+      }
+      
+      // In KGML, the stoichiometry of reaction components is missing.
+      // The following completes the stoichiometry from the equation.
+      if (considerReactions()) {
+        KeggTools.parseStoichiometryFromEquations(p,manager);
       }
       
       log.info("Information fetched. Translating pathway... ");

@@ -335,6 +335,10 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
           nr.setX(xy.getA());
           nr.setY(xy.getB());
           
+          // TODO: Add stoichiometry to edges (docked to corresponding node):
+          // subtrate on substrate node
+          // product on product node
+          
           // Add edges to the reaction node
           for (SpeciesReference sr : r.getListOfReactants()) {
             Node source = species2node.get(sr.getSpecies());

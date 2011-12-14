@@ -434,7 +434,7 @@ public class TranslatorTools {
     if (nodeMap==null) {
       // Create non-existing map automatically
       nodeMap = createMap(descriptor, (node_or_edge instanceof Node) );
-      log.fine(String.format("Created not existing Node to %s mapping.", (descriptor==null?"null":descriptor)));
+      log.finer(String.format("Created not existing Node to %s mapping.", (descriptor==null?"null":descriptor)));
     }
     
     // set / unset Value
@@ -457,7 +457,7 @@ public class TranslatorTools {
     if (nodeMap==null) {
       // Create non-existing map automatically
       nodeMap = createMap(descriptor, isNodeMap );
-      log.fine(String.format("Created not existing Node to %s mapping.", (descriptor==null?"null":descriptor)));
+      log.finer(String.format("Created not existing Node to %s mapping.", (descriptor==null?"null":descriptor)));
     }
     return nodeMap;
   }
@@ -551,10 +551,13 @@ public class TranslatorTools {
    * 
    * @param n any {@link Node}
    * @return <code>TRUE</code> if it is the title, or any
-   * pathway reference node.
+   * pathway reference node. If not (or in doubt),
+   * <code>FALSE</code> is returned.
    */
   public static boolean isPathwayReference(Node n) {
-    String id = getKeggIDs(n).toLowerCase().trim();
+    String id = getKeggIDs(n);
+    if (id==null) return false; // in doubt...
+    id = id.toLowerCase().trim();
     return (id.startsWith("path:"));
   }
 
@@ -934,7 +937,11 @@ public class TranslatorTools {
         }
       } catch (IllegalStateException e) {
         //  Map has been already disposed !
-        log.log(Level.FINE, String.format("Could not dispose map '%s'.",identifier), e);
+        Level l = Level.FINE;
+        if (e.getMessage()!=null && e.getMessage().contains("Map has been already disposed")) {
+          l = Level.FINEST;
+        }
+        log.log(l, String.format("Could not dispose map '%s'.",identifier), e);
       }
     }
     
