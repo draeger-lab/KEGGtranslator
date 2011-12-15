@@ -455,6 +455,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     Set<String> addedEntries = new HashSet<String>();
     for (Entry entry : entries) {
       progress.DisplayBar();
+      Species spec = null;
       
       // KEGG has pathways with duplicate entries (mostly signalling).
       // Take a look, e.g. at the "MAPK signalling pathway" and "DUSP14"
@@ -463,16 +464,19 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         // and link to this entry by adding the same species as "custom".
         Collection<Entry> col = p.getEntriesForName(entry.getName()); // should return at least 2 entries
         if (col!=null && col.size()>0) {
-          Species spec = null;
           Iterator<Entry> it = col.iterator();
           while (it.hasNext() && (spec = (Species)it.next().getCustom())==null);
           entry.setCustom(spec);
-          if (spec!=null) continue;
         }
+      } 
+      
+      if (spec==null) {
+        // Usual case if this entry is no duplicate.
+        spec = addKGMLEntry(entry, p, model, compartment, reactionModifiers);
       }
       
-      // Usual case if this entry is no duplicate.
-      addKGMLEntry(entry, p, model, compartment, reactionModifiers);
+      // Track reaction modifiers
+      addToReactionModifierList(entry, spec, reactionModifiers);
     }
     
     // Add CellDesigner information to species / entries.
@@ -1057,43 +1061,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     spec.setNotes(notes.toString());
     
     // Set SBO Term
-    if (treatEntrysWithReactionDifferent && entry.hasReaction()) {
-      for (String reaction: entry.getReactions()) {
-        // Q: Ist es richtig, sowohl dem Modifier als auch der species eine neue id zu geben? A: Nein, ist nicht richtig.
-        // spec.setSBOTerm(ET_SpecialReactionCase2SBO);
-        ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
-        
-        // Annotation is empty in ModifierSpeciesReference
-        //Annotation tempAnnot = new Annotation("");
-        //tempAnnot.setAbout("");
-        //modifier.setAnnotation(tempAnnot);
-        
-        if (addCellDesignerAnnots) {
-          modifier.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
-          modifier.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
-        }
-        modifier.setId(this.NameToSId("mod_" + reaction));
-        modifier.setMetaId("meta_" + modifier.getId());
-        modifier.setName(modifier.getId());
-        if (entry.getType().equals(EntryType.enzyme)   || entry.getType().equals(EntryType.gene)
-            || entry.getType().equals(EntryType.group) || entry.getType().equals(EntryType.ortholog)
-            || entry.getType().equals(EntryType.genes)) {
-          // 1 & 2: klar. 3 (group): Doku sagt "MOSTLY a protein complex". 4 (ortholog): Kommen in
-          // nicht-spezies spezifischen PWs vor und sind quasi otholog geclusterte gene.
-          // 5. (genes) ist group in kgml versionen <0.7.
-          modifier.setSBOTerm(ET_EnzymaticModifier2SBO); // 460 = Enzymatic catalyst
-        } else { // "Metall oder etwas anderes, was definitiv nicht enzymatisch wirkt"
-          modifier.setSBOTerm(ET_GeneralModifier2SBO); // 13 = Catalyst
-        }
-        
-        // Remember modifier for later association with reaction.
-        reactionModifiers.add(new Info<String, ModifierSpeciesReference>(reaction.toLowerCase().trim(), modifier));
-        
-      } 
-    }// else { // else removed, set SBO term for ALL species (modifier may have different SBO's!)
-      spec.setSBOTerm(getSBOTerm(entry.getType()));
-    //}
+    spec.setSBOTerm(getSBOTerm(entry.getType()));
     
+    // Add Miriam URNs
     addMiriamURNs(entry, spec);
     
     // Finally, add the fully configured species.
@@ -1105,6 +1075,49 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Not neccessary to add species to model, due to call in "model.createSpecies()".
     
     return spec;
+  }
+
+  /**
+   * Creates a {@link ModifierSpeciesReference} for entry and spec and adds this reference
+   * to the <code>reactionModifiers</code> list.
+   * 
+   * @param entry
+   * @param spec
+   * @param reactionModifiers
+   */
+  private void addToReactionModifierList(Entry entry, Species spec, List<Info<String, ModifierSpeciesReference>> reactionModifiers) {
+    if (!entry.hasReaction() || spec == null) return;
+    for (String reaction: entry.getReactions()) {
+      // Q: Ist es richtig, sowohl dem Modifier als auch der species eine neue id zu geben? A: Nein, ist nicht richtig.
+      // spec.setSBOTerm(ET_SpecialReactionCase2SBO);
+      ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
+      
+      // Annotation is empty in ModifierSpeciesReference
+      //Annotation tempAnnot = new Annotation("");
+      //tempAnnot.setAbout("");
+      //modifier.setAnnotation(tempAnnot);
+      
+      if (addCellDesignerAnnots) {
+        modifier.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
+        modifier.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+      }
+      modifier.setId(this.NameToSId("mod_" + reaction));
+      modifier.setMetaId("meta_" + modifier.getId());
+      modifier.setName(modifier.getId());
+      if (entry.getType().equals(EntryType.enzyme)   || entry.getType().equals(EntryType.gene)
+          || entry.getType().equals(EntryType.group) || entry.getType().equals(EntryType.ortholog)
+          || entry.getType().equals(EntryType.genes)) {
+        // 1 & 2: klar. 3 (group): Doku sagt "MOSTLY a protein complex". 4 (ortholog): Kommen in
+        // nicht-spezies spezifischen PWs vor und sind quasi otholog geclusterte gene.
+        // 5. (genes) ist group in kgml versionen <0.7.
+        modifier.setSBOTerm(ET_EnzymaticModifier2SBO); // 460 = Enzymatic catalyst
+      } else { // "Metall oder etwas anderes, was definitiv nicht enzymatisch wirkt"
+        modifier.setSBOTerm(ET_GeneralModifier2SBO); // 13 = Catalyst
+      }
+      
+      // Remember modifier for later association with reaction.
+      reactionModifiers.add(new Info<String, ModifierSpeciesReference>(reaction.toLowerCase().trim(), modifier));
+    }
   }
 
   

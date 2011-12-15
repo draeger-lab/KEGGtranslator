@@ -232,7 +232,7 @@ public class TranslatePathwayDialog extends JPanel {
    */
   public static void showAndEvaluateDialog(final JTabbedPane addTabsHere, final ActionListener translationResult, TranslatePathwayDialog d) {
     
-    GUITools.showOkCancelDialogInNewThred(d, "Download pathway", d.createOkButtonAction(addTabsHere, translationResult), null);
+    GUITools.showOkCancelDialogInNewThread(d, "Download pathway", d.createOkButtonAction(addTabsHere, translationResult), null);
     d.selector.autoActivateOkButton(d);
   }
   
