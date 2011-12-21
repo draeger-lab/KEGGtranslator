@@ -93,6 +93,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   protected boolean addLayoutExtension = true;
   
   /**
+   * Check the atom balance and write the result to
+   * the notes, if reaction is unbalanced.
+   */
+  protected boolean checkAtomBalance = false;
+  
+  /**
    * If false, simply sets an SBO term to the species, based on entryType.
    * If true, creates a ModifierSpeciesReference that gets the SBO term associated
    * and will be added to the reaction.
@@ -403,16 +409,16 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       appendAllIds(orgInfos.getTaxonomy(), mtOrgID, KeggInfos.miriam_urn_taxonomy);
       model.addCVTerm(mtOrgID);
       
-      notes.append(String.format("<h1>Model of %s%s%s in %s%s%s</h1>\n", quotStart, p.getTitle(), quotEnd, quotStart, orgInfos.getDefinition(), quotEnd));
+      notes.append(String.format("<h1>Model of %s%s%s in %s%s%s</h1>\n", quotStart, formatTextForHTMLnotes(p.getTitle()), quotEnd, quotStart, orgInfos.getDefinition(), quotEnd));
     } else {
-      notes.append(String.format("<h1>Model of " + quotStart + "%s"+ quotEnd + "</h1>\n", p.getTitle()));
+      notes.append(String.format("<h1>Model of " + quotStart + "%s"+ quotEnd + "</h1>\n",formatTextForHTMLnotes(p.getTitle()) ));
     }
     
     // Get PW infos from KEGG Api for Description and GO ids.
     KeggInfos pwInfos = KeggInfos.get(p.getName(), manager); // NAME, DESCRIPTION, DBLINKS verwertbar
     if (pwInfos.queryWasSuccessfull()) {
       if (pwInfos.getDescription()!=null) {
-        notes.append(String.format("%s<br/>\n", pwInfos.getDescription()));
+        notes.append(String.format("%s<br/>\n", formatTextForHTMLnotes(pwInfos.getDescription())));
       }
       
       // GO IDs
@@ -436,7 +442,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     if (p.getVersion() > 0 || (p.getComment() != null && p.getComment().length() > 0)) {
       notes.append("<p>");
       if (p.getComment() != null && p.getComment().length() > 0) {
-        notes.append(String.format("KGML comment: %s%s%s<br/>\n", quotStart, p.getComment(), quotEnd));
+        notes.append(String.format("KGML comment: %s%s%s<br/>\n", quotStart, formatTextForHTMLnotes(p.getComment()), quotEnd));
       }
       if (p.getVersion() > 0) {
         notes.append(String.format("KGML version was: %s<br/>\n", Double.toString(p.getVersion())));
@@ -528,7 +534,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     return doc;
   }
-  
+
   /**
    * @return the level and version of the SBML core (2,4) if no extension
    * should be used. Else: 3,1.
@@ -599,7 +605,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         notes.append("<p>");
         if (infos.getDefinition() != null) {
           notes.append(String.format("<b>Definition of %s%s%s:</b> %s<br/>\n",
-            quotStart, ko_id.toUpperCase(), quotEnd, EscapeChars.forHTML(infos.getDefinition().replace("\n", " "))));
+            quotStart, ko_id.toUpperCase(), quotEnd, formatTextForHTMLnotes(infos.getDefinition()) ));
           // System.out.println(sbReaction.getNotesString());
           // notes="<body xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>&#8220;TEST&#8221;</b> A &lt;&#061;&gt;&#62;&#x3e;\u003E B<br/></p></body>";
         } else
@@ -616,7 +622,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           notes.append("<br/>\n<b>Occurs in:</b><br/>\n");
           notes.append("<ul>\n");
           for (String desc : infos.getPathwayDescriptions().split(",")) { // e.g. ",Glycolysis / Gluconeogenesis,Metabolic pathways"
-            notes.append("<li>"+ desc + "</li>\n");
+            notes.append("<li>"+ formatTextForHTMLnotes(desc) + "</li>\n");
           }
           notes.append("</ul><br/>\n");
         }
@@ -638,7 +644,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Check the atom balance (only makes sense if reactions are corrected,
     // else, they are clearly wrong).
-    if (autocompleteReactions) {
+    if (autocompleteReactions && checkAtomBalance) {
        AtomCheckResult defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
       if (defects!=null && defects.hasDefects()) {
         notes.append("<p>");
@@ -749,12 +755,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         StringBuffer notes = new StringBuffer(notesStartString);
         if ((infos.getDefinition() != null) && (infos.getName() != null)) {
           notes.append(String.format("<p><b>Description for %s%s%s:</b> %s</p>\n",
-            quotStart, EscapeChars.forHTML(infos.getName()), quotEnd, EscapeChars.forHTML(infos.getDefinition().replace("\n", " "))));
+            quotStart, EscapeChars.forHTML(infos.getName()), quotEnd, formatTextForHTMLnotes(infos.getDefinition()) ));
         } else if (infos.getName() != null) {
           notes.append(String.format("<p><b>%s</b></p>\n", EscapeChars.forHTML(infos.getName())));
         }
         if (infos.containsMultipleNames())
-          notes.append(String.format("<p><b>All given names:</b><br/>%s</p>\n",EscapeChars.forHTML(infos.getNames().replace(";", ""))));
+          notes.append(String.format("<p><b>All given names:</b><br/>%s</p>\n",EscapeChars.forHTML(infos.getNames().replace(";", "")) ));
         if (infos.getCas() != null)
           notes.append(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
         if (infos.getFormula() != null) {

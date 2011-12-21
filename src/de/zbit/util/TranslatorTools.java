@@ -162,7 +162,9 @@ public class TranslatorTools {
   public void setColorOfAllNodesExceptPathwayReferences(Color colorForUnaffectedNodes) {
     // Set unaffected color for all other nodes but reference nodes.
     for (Node n: graph.getNodeArray()) {
-      if (TranslatorTools.getKeggIDs(n).toLowerCase().trim().startsWith("path:")) continue;
+      String id = getKeggIDs(n);
+      id = id==null?null:id.toLowerCase().trim();
+      if (id!=null && id.startsWith("path:")) continue;
       graph.getRealizer(n).setFillColor(colorForUnaffectedNodes);
     }
   }
@@ -507,7 +509,9 @@ public class TranslatorTools {
     if (graph==null) return null;
     
     for (Node n: graph.getNodeArray()) {
-      String id = getKeggIDs(n).toLowerCase().trim();
+      String id = getKeggIDs(n);
+      if (id==null) continue;
+      id = id.toLowerCase().trim();
       if (id.contains(":")) {
         String kga = id.substring(0, id.indexOf(':'));
         if (!(kga.equals("cpd") || kga.equals("map") || kga.equals("path"))) {
@@ -538,7 +542,9 @@ public class TranslatorTools {
   public static Node getTitleNode(Graph2D graph, String pathwayID) {
     pathwayID = pathwayID.toLowerCase().trim();
     for (Node n: graph.getNodeArray()) {
-      String id = getKeggIDs(n).toLowerCase().trim();
+      String id = getKeggIDs(n);
+      if (id==null) continue;
+      id = id.toLowerCase().trim();
       if (id.startsWith("path:") && id.contains(pathwayID)) {
         return n;
       }
@@ -680,9 +686,10 @@ public class TranslatorTools {
     
     // Write initial position to node annotations
     for (Node n:newNodes) {
-      NodeRealizer nr = n!=null?graph.getRealizer(n):null;
-      if (nr==null) continue;
-      this.setInfo(n, GraphMLmaps.NODE_POSITION, (int) nr.getX() + "|" + (int) nr.getY());
+      String orgPos = calculateNodeOriginalPosition(n);
+      if (orgPos!=null) {
+        this.setInfo(n, GraphMLmaps.NODE_POSITION, orgPos);
+      }
       
       // Paint above other nodes.
       graph.moveToLast(n);
@@ -698,7 +705,43 @@ public class TranslatorTools {
     // Reset layout, because subset scope doesn't work correctly.
     // Not needed anymore, because of novel shift method (see above)
     // => Only needed for orphans
-    resetLayout(resetLayout);
+    // Unfortunately also for not-conntected subgraphs...
+    resetLayout(Arrays.asList(graph.getNodeArray())); //resetLayout
+  }
+
+  /**
+   * @param nr
+   * @return
+   */
+  private String calculateNodeOriginalPosition(Node n) {
+    NodeRealizer nr = n!=null?graph.getRealizer(n):null;
+    if (nr==null) return null;
+    
+    // Look for adjacent node with known position
+    Node n2 = null;
+    String n2Pos = null;
+    int dividerPos = -1;
+    for ( NodeCursor nc = n.neighbors(); nc.ok(); nc.next() ) {
+      n2 = (Node)nc.current();
+      Object p = this.getInfo(n2, GraphMLmaps.NODE_POSITION);
+      if (p!=null && (dividerPos = p.toString().indexOf("|"))>0) {
+        n2Pos = p.toString();
+        break;
+      }
+    }
+    // For Orphans, simply return current position...
+    if (n2Pos==null) return (int) nr.getX() + "|" + (int) nr.getY();
+    
+    // Calculate relative coordinates
+    NodeRealizer nro = graph.getRealizer(n2);
+    int diffX = (int) (nro.getX() - nr.getX());
+    int diffY = (int) (nro.getY() - nr.getY());
+    
+    int xOther = Integer.parseInt(n2Pos.substring(0, dividerPos));
+    int yOther = Integer.parseInt(n2Pos.substring(dividerPos+1));
+    
+    
+    return (xOther-diffX) + "|" + (yOther-diffY);
   }
   
   /**

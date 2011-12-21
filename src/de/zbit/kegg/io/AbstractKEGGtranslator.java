@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import de.zbit.kegg.AtomBalanceCheck;
 import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggInfoManagement;
 import de.zbit.kegg.KeggInfos;
@@ -41,6 +40,7 @@ import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.ArrayUtils;
+import de.zbit.util.EscapeChars;
 import de.zbit.util.ProgressBar;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
@@ -657,6 +657,17 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       name = name.substring(0, pos).trim();
     }
     return name;
+  }
+  
+  /**
+   * Escapes all HTML-tags in the given string and
+   * replaces new lines with a space. 
+   * @param text
+   * @return
+   */
+  public String formatTextForHTMLnotes(String text) {
+    if (text==null) return "";
+    return EscapeChars.forHTML(text.replace('\n', ' '));
   }
 
 

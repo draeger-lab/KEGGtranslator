@@ -25,8 +25,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
@@ -77,6 +81,31 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * Unique identifier to identify this Namespace/Extension.
    */
   public static final String QUAL_NS_NAME = "qual";
+  
+  /**
+   * A map to translate {@link SubType}s to SBO terms
+   */
+  public static Map<String, Integer> Subtype2SBO = new HashMap<String, Integer>();
+  
+  static {
+    // Init subtype map
+    Subtype2SBO.put(SubType.ACTIVATION, 170); // = stimulation
+    Subtype2SBO.put(SubType.ASSOCIATION, 177); // = non-covalent binding
+    Subtype2SBO.put(SubType.BINDING, 177);
+    Subtype2SBO.put(SubType.BINDING_ASSOCIATION, 177);
+    Subtype2SBO.put(SubType.DEPHOSPHORYLATION, 330); // dephosphorylation
+    Subtype2SBO.put(SubType.DISSOCIATION, 177);
+    Subtype2SBO.put(SubType.EXPRESSION, 170); 
+    Subtype2SBO.put(SubType.GLYCOSYLATION, 217); // glycosylation
+    Subtype2SBO.put(SubType.INDIRECT_EFFECT, 344); // molecular interaction
+    Subtype2SBO.put(SubType.INHIBITION, 169);
+    Subtype2SBO.put(SubType.METHYLATION, 214); // methylation
+    Subtype2SBO.put(SubType.MISSING_INTERACTION, 396);  // uncertain process
+    Subtype2SBO.put(SubType.PHOSPHORYLATION, 216); // phosphorylation
+    Subtype2SBO.put(SubType.REPRESSION, 169);
+    Subtype2SBO.put(SubType.STATE_CHANGE, 168); // control
+    Subtype2SBO.put(SubType.UBIQUITINATION, 224); // ubiquitination
+  }
   
   /**
    * @param document
@@ -277,63 +306,77 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     //TODO: function term
 
-    Sign sign = null;
-    // Determine the sign variable
+
+    // Determine sign variable, SBO Terms and add MIRIAM URNs
+    Sign sign = Sign.unknown;
+    Set<Integer> SBOs = new HashSet<Integer>();
     List<SubType> subTypes = r.getSubtypes();
+    CVTerm cv = new CVTerm(CVTerm.Qualifier.BQB_IS);
     if (subTypes != null && subTypes.size() > 0) {
       Collection<String> subTypeNames = r.getSubtypesNames();
-
-      if (subTypeNames.contains(SubType.INHIBITION)) {
-        in.setSBOTerm(169);
-        sign = Sign.dual;
-      } else if (subTypeNames.contains(SubType.ACTIVATION)) { //stimulation SBO:0000170
+      
+      // Parse activations/ inhibitions separately for the sign
+      if (subTypeNames.contains(SubType.INHIBITION) || subTypeNames.contains(SubType.REPRESSION)) {
+        if (subTypeNames.contains(SubType.ACTIVATION) || subTypeNames.contains(SubType.EXPRESSION)) {
+          sign=Sign.dual;
+          in.setSBOTerm(168); // control is parent of inhibition and activation
+          SBOs.add(168);
+          
+        } else {
+          sign = Sign.negative;
+          in.setSBOTerm(Subtype2SBO.get(SubType.INHIBITION));
+        }
+        
+      } else if (subTypeNames.contains(SubType.ACTIVATION) || subTypeNames.contains(SubType.EXPRESSION)) {
         sign = Sign.positive;
-        in.setSBOTerm(170);
-      } else if(subTypeNames.contains(SubType.REPRESSION)) { //inhibition, repression SBO:0000169
-        sign = Sign.negative;
-        in.setSBOTerm(169);
-      } else if(subTypeNames.contains(SubType.INDIRECT_EFFECT)) { // indirect effect 
-        sign = Sign.unknown;        
-      } else if(subTypeNames.contains(SubType.STATE_CHANGE)) { //state change SBO:0000168        
-        sign = Sign.unknown; //TODO: is unknown correct?
-        in.setSBOTerm(168);
-      } else {
-        // just for debugging
-        sign = Sign.unknown;
-      }
-
-
-      CVTerm cv= new CVTerm(CVTerm.Qualifier.BQB_IS);
-      if (sign!=null){          
-        if(subTypeNames.contains("dissociation")) { // dissociation SBO:0000177
-          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(177));
-        } 
-        if(subTypeNames.contains("binding/association")) { // binding/association SBO:0000177
-          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(177));   
-        } 
-        if (subTypeNames.contains("phosphorylation")) { // phosphorylation SBO:0000216
-          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(216));
-        } 
-        if (subTypeNames.contains("dephosphorylation")) { // dephosphorylation SBO:0000330
-          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(330));
-        } 
-        if (subTypeNames.contains("glycosylation")) { // glycosylation SBO:0000217
-          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(217));
-        } 
-        if (subTypeNames.contains("ubiquitination")) { // ubiquitination SBO:0000224
-          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(224));
-        } 
-        if (subTypeNames.contains("methylation")) { // methylation SBO:0000214
-          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(214));
-        }
+        in.setSBOTerm(Subtype2SBO.get(SubType.ACTIVATION));
         
-        if (cv.getNumResources()>0) {          
-          setBiologicalQualifierISorHAS_VERSION(cv);
-          in.addCVTerm(cv);
-        }
+      } else if(subTypeNames.contains(SubType.STATE_CHANGE)) {
+        in.setSBOTerm(Subtype2SBO.get(SubType.STATE_CHANGE));
         
-        in.setSign(sign);
       }
+      
+      // Add all subtypes as MIRIAM annotation
+      for (String subType: subTypeNames) {
+        Integer subSBO = Subtype2SBO.get(subType);
+        if (subSBO!=null) {
+          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(subSBO));
+          SBOs.add(subSBO);
+        }
+      }
+      
+      in.setSign(sign);
+    }
+    
+    // Set SBO term and miriam URNs on transition.
+    if (SBOs.size()>0 ) {
+      // Remove unspecific ones, try to get the specific ones
+      if (SBOs.size()>1) {
+        SBOs.remove(Subtype2SBO.get(SubType.MISSING_INTERACTION));
+      }
+      if (SBOs.size()>1) {
+        // Remark: If activation and inhibition is set, 168 is always added as third sbo.
+        SBOs.remove(Subtype2SBO.get(SubType.ACTIVATION));
+        SBOs.remove(Subtype2SBO.get(SubType.INHIBITION));
+      }
+      if (SBOs.size()>1) {
+        SBOs.remove(Subtype2SBO.get(SubType.STATE_CHANGE));
+      }
+      if (SBOs.size()>1) {
+        SBOs.remove(Subtype2SBO.get(SubType.BINDING_ASSOCIATION));
+      }
+      if (SBOs.size()>1) {
+        SBOs.remove(Subtype2SBO.get(SubType.INDIRECT_EFFECT));
+      }
+      t.setSBOTerm(SBOs.iterator().next());
+    }
+    
+    if (cv.getNumResources()>0) {
+      // Use always "IS", because "methylation" and "activation"
+      // can both share the attribute IS and don't need
+      // to be annotated as different versions ("HAS_VERSION").
+      //setBiologicalQualifierISorHAS_VERSION(cv);
+      t.addCVTerm(cv);
     }
 
     return t;

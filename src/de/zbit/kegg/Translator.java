@@ -41,6 +41,7 @@ import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.FileTools;
 import de.zbit.util.prefs.KeyProvider;
+import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
 
 /**
@@ -159,6 +160,16 @@ public class Translator extends Launcher {
 		if (manager == null) {
 			manager = new KeggInfoManagement(10000);
 		}
+		
+		// Set cache size
+    int initialSize;
+    try {
+      SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
+      initialSize = KEGGtranslatorCommandLineOnlyOptions.CACHE_SIZE.getValue(prefs);
+    } catch (Exception e) {
+      initialSize = 10000; 
+    }
+    manager.setCacheSize(initialSize);
 		
 		return manager;
 	}
@@ -325,6 +336,7 @@ public class Translator extends Launcher {
 		List<Class<? extends KeyProvider>> configList = new ArrayList<Class<? extends KeyProvider>>(3);
 		configList.add(KEGGtranslatorIOOptions.class);
 		configList.add(KEGGtranslatorOptions.class);
+		configList.add(KEGGtranslatorCommandLineOnlyOptions.class);
 		configList.add(GUIOptions.class);
 		return configList;
 	}
@@ -345,6 +357,14 @@ public class Translator extends Launcher {
 	 */
 	public String[] getLogPackages() {
 		return new String[] {"de.zbit", "org.sbml"};
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.zbit.Launcher#getLogLevel()
+	 */
+	@Override
+	public Level getLogLevel() {
+	  return Level.INFO;
 	}
 
 	/*

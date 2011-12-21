@@ -49,8 +49,6 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.sbml.tolatex.gui.LaTeXExportDialog;
-
 import de.zbit.AppConf;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.gui.ActionCommand;
@@ -166,7 +164,12 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			  UIManager.put(path.substring(0, path.lastIndexOf('.')), new ImageIcon(url));
 		  }
 		}
-		LaTeXExportDialog.initImages();
+		try {
+		  org.sbml.tolatex.gui.LaTeXExportDialog.initImages();
+		} catch (Throwable t) {
+		  // Also allow KEGGtranslator to compile without
+		  // SBML2LaTeX !
+		}
 	}
 
 	/**
