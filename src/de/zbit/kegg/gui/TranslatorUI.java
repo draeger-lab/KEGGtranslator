@@ -548,7 +548,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * pane content.
 	 */
 	private void updateButtons() {
-		GUITools.setEnabled(false, getJMenuBar(), BaseAction.FILE_SAVE,
+		GUITools.setEnabled(false, getJMenuBar(), BaseAction.FILE_SAVE_AS,
 				//Action.TO_LATEX,
 				BaseAction.FILE_CLOSE);
 		TranslatorPanel<?> o = getCurrentlySelectedPanel();

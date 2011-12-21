@@ -597,10 +597,10 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
    */
   public void updateButtons(JMenuBar menuBar) {
     if (isReady()) {
-      GUITools.setEnabled(true, menuBar, BaseAction.FILE_SAVE, BaseAction.FILE_CLOSE);
+      GUITools.setEnabled(true, menuBar, BaseAction.FILE_SAVE_AS, BaseAction.FILE_CLOSE);
     } else {
       // E.g. when translation still in progress, or on download frame
-      GUITools.setEnabled(false, menuBar, BaseAction.FILE_SAVE, /*Action.TO_LATEX,*/ BaseAction.FILE_CLOSE);
+      GUITools.setEnabled(false, menuBar, BaseAction.FILE_SAVE_AS, /*Action.TO_LATEX,*/ BaseAction.FILE_CLOSE);
       
       if (this.inputFile==null) {
         // Download frame or invalid menu item

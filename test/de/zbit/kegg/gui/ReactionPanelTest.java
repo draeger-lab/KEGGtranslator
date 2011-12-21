@@ -81,7 +81,7 @@ public class ReactionPanelTest {
 		SBMLDocument doc = new SBMLDocument(2, 4);
 		Model model = doc.createModel("MyModel");
 		model.setNotes("<notes><body xmlns=\"http://www.w3.org/1999/xhtml\">Bla bla</body></notes>");
-		model.appendNotes("bla bla");
+		model.appendNotes("<notes><body xmlns=\"http://www.w3.org/1999/xhtml\"> foo bar</body></notes>");
 		Compartment c = model.createCompartment("default");
 		Species substrates[] = new Species[numReactants];
 		Species products[] = new Species[numProducts];
