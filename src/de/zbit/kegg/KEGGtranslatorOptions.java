@@ -21,6 +21,7 @@
 package de.zbit.kegg;
 
 import de.zbit.gui.ActionCommand;
+import de.zbit.kegg.ext.TranslatorPanelOptions;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
@@ -143,6 +144,13 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    */
   public static final Option<Boolean> AUTOCOMPLETE_REACTIONS = new Option<Boolean>("AUTOCOMPLETE_REACTIONS",Boolean.class,
       "If true, automatically looks for missing reactants and enzymes of reactions and adds them to the document.", (short) 2, "-ar", true);
+  
+  /**
+   * Check atom balance
+   */
+  public static final Option<Boolean> CHECK_ATOM_BALANCE = new Option<Boolean>("CHECK_ATOM_BALANCE",Boolean.class,
+      "Check the atom balance of metabolic reactions and write a summary to the reaction notes.", (short) 2, "-cbal", true, 
+      AUTOCOMPLETE_REACTIONS, TranslatorPanelOptions.TRUE_RANGE);
 
   /**
    * If true, removes all entries (nodes, species, etc.) referring to other pathways.
@@ -209,7 +217,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    * If true, adds layout information to the SBML-document.
    */
   public static final Option<Boolean> ADD_LAYOUT_EXTENSION = new Option<Boolean>("ADD_LAYOUT_EXTENSION",Boolean.class,
-      "If true, adds layout information, using the SBML layout extension to the SBML document. " +
+      "If true, adds layout information, using the SBML layout extension to the SBML document." +
       "As a side-effect, this will create an SBML Level 3 model.", (short) 2, "-layout", false);
   
   /**
@@ -219,6 +227,6 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   public static final OptionGroup<Boolean> SBML_OPTIONS = new OptionGroup<Boolean>(
       "Translation options for SBML outputs",
       "Define various options that are used in SBML based translations.",
-      CELLDESIGNER_ANNOTATIONS, ADD_LAYOUT_EXTENSION);
+      CELLDESIGNER_ANNOTATIONS, ADD_LAYOUT_EXTENSION, CHECK_ATOM_BALANCE);
   
 }

@@ -286,6 +286,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   private void loadPreferences() {
     addCellDesignerAnnots = KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
     addLayoutExtension = KEGGtranslatorOptions.ADD_LAYOUT_EXTENSION.getValue(prefs);
+    checkAtomBalance = KEGGtranslatorOptions.CHECK_ATOM_BALANCE.getValue(prefs);
   }
   
   /**
@@ -648,11 +649,19 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
        AtomCheckResult defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
       if (defects!=null && defects.hasDefects()) {
         notes.append("<p>");
-        notes.append("<b><font color=\"#FF0000\">There are missing atoms in this reaction</font></b><br/>" +
+        notes.append("<b><font color=\"#FF0000\">There are missing atoms in this reaction.</font></b><br/>" +
         		"<small><i>Values lower than zero indicate missing atoms on the " +
         		"substrate side, whereas positive values indicate missing atoms " +
         		"on the product side.</i></small><br/>\n");
         notes.append(defects.getResultsAsHTMLtable());
+        notes.append("</p>");
+      } else if (defects==null) {
+        notes.append("<p>");
+        notes.append("<b><font color=\"#FF0000\">Could not check the atom balance of this reaction.</font></b>\n");
+        notes.append("</p>");
+      } else {
+        notes.append("<p>");
+        notes.append("<b><font color=\"#00FF00\">There are no missing atoms in this reaction.</font></b>\n");
         notes.append("</p>");
       }
     }
