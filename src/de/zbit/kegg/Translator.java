@@ -50,8 +50,6 @@ import de.zbit.util.prefs.SBProperties;
  * <p>
  * Recommended VM-Arguments:
  * <pre>-Xms128m -Xmx512m -splash:bin/de/zbit/kegg/gui/img/Logo.gif -Duser.language=en -Duser.country=US</pre>
- * And for MacOS, please use
- * <pre>-Dapple.awt.graphics.EnableQ2DX=true -Dapple.laf.useScreenMenuBar=true -Dcom.apple.macos.smallTabs=true -Dcom.apple.macos.useScreenMenuBar=true -Dcom.apple.mrj.application.apple.menu.about.name="KEGGtranslator" -Dcom.apple.mrj.application.growbox.intrudes=false -Dcom.apple.mrj.application.live-resize=true</pre>
  * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
@@ -378,7 +376,7 @@ public class Translator extends Launcher {
     try {
       url = new URL("http://www.gnu.org/licenses/lgpl-3.0-standalone.html");
     } catch (MalformedURLException exc) {
-      logger.log(Level.FINER, exc.getLocalizedMessage(), exc);
+      logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
     }
     return url;
 	}
@@ -391,8 +389,8 @@ public class Translator extends Launcher {
 		URL url = null;
     try {
       url = new URL("http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/");
-    } catch (MalformedURLException exc) {
-      logger.log(Level.FINER, exc.getLocalizedMessage(), exc);
+    } catch (MalformedURLException e) {
+      logger.log(Level.FINE, e.getLocalizedMessage(), e);
     }
     return url;
 	}
@@ -419,6 +417,14 @@ public class Translator extends Launcher {
 	 */
 	public short getYearWhenProjectWasStarted() {
 		return (short) 2010;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.zbit.Launcher#addCopyrightToSplashScreen()
+	 */
+	@Override
+	protected boolean addCopyrightToSplashScreen() {
+	  return false;
 	}
 
 	/*

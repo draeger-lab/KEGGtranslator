@@ -195,6 +195,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	
 	public TranslatorUI(AppConf appConf) {
 		super(appConf);
+    
   	// init preferences
 		initPreferences();
 		File file = new File(prefsIO.get(KEGGtranslatorIOOptions.INPUT));
@@ -203,6 +204,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		file = new File(prefsIO.get(KEGGtranslatorIOOptions.OUTPUT));
 		saveDir = file.isDirectory() ? file.getAbsolutePath() : file
 				.getParent();
+		
 		// Depending on the current OS, we should add the following image
 		// icons: 16x16, 32x32, 48x48, 128x128 (MAC), 256x256 (Vista).
 		int[] resolutions=new int[]{16,32,48,128,256};
