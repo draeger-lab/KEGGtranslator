@@ -130,13 +130,13 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    * If true, shows the chemical formula for all compounds, instead of the name.
    */
   public static final Option<Boolean> SHOW_FORMULA_FOR_COMPOUNDS = new Option<Boolean>("SHOW_FORMULA_FOR_COMPOUNDS",Boolean.class,
-      "If true, shows the chemical formula for all compounds, instead of the name.", false);
+      "If true, shows the chemical formula for all compounds, instead of the name.", (short) 2, "-formula", false);
   
   /**
    * If true, removes all gene-nodes in the KEGG document, which are white.
    */
   public static final Option<Boolean> REMOVE_WHITE_GENE_NODES = new Option<Boolean>("REMOVE_WHITE_GENE_NODES",Boolean.class,
-      "If true, removes all gene-nodes in the KEGG document, which are white.", false);
+      "If true, removes all gene-nodes in the KEGG document, which are white.", (short) 2, "-nowhite", false);
 
   /**
    * If true, automatically looks for missing reactants and enzymes of reactions and adds them to the document. 
@@ -177,14 +177,14 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    * If true, merges all nodes that have exactly the same relations (sources, targets and types). 
    */
   public static final Option<Boolean> MERGE_NODES_WITH_SAME_EDGES = new Option<Boolean>("MERGE_NODES_WITH_SAME_EDGES",Boolean.class,
-      "If true, merges all nodes that have exactly the same relations (sources, targets and types).", (short) 2, "--merge", false);
+      "If true, merges all nodes that have exactly the same relations (sources, targets and types).", (short) 2, "-merge", false);
   public static final Option<Boolean> CREATE_EDGE_LABELS = new Option<Boolean>("CREATE_EDGE_LABELS",Boolean.class,
-      "If true, creates describing labels for each edge in the graph.", (short) 2, "--cel", false);
+      "If true, creates describing labels for each edge in the graph.", (short) 2, "-cel", false);
   public static final Option<Boolean> HIDE_LABELS_FOR_COMPOUNDS = new Option<Boolean>("HIDE_LABELS_FOR_COMPOUNDS",Boolean.class,
-      "If true, hides labels for all compounds (=small molecules).", (short) 2, "--hc", false);
+      "If true, hides labels for all compounds (=small molecules).", (short) 2, "-hc", false);
   public static final Option<Boolean> DRAW_GREY_ARROWS_FOR_REACTIONS = new Option<Boolean>("DRAW_GREY_ARROWS_FOR_REACTIONS",Boolean.class,
       "If true, creates grey arrows for reactions and arrows with transparent circles as heads for reaction modifiers. This does only " +
-      "affect reactions defined by KEGG, not the relations.", (short) 2, "--dar", false);
+      "affect reactions defined by KEGG, not the relations.", (short) 2, "-dar", false);
   
   /**
    * Define various options that are used in yFiles based translations.
@@ -210,7 +210,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    */
   public static final Option<Boolean> ADD_LAYOUT_EXTENSION = new Option<Boolean>("ADD_LAYOUT_EXTENSION",Boolean.class,
       "If true, adds layout information, using the SBML layout extension to the SBML document. " +
-      "As a side-effect, this will create an SBML Level 3 model.", (short) 2, "--layout", false);
+      "As a side-effect, this will create an SBML Level 3 model.", (short) 2, "-layout", false);
   
   /**
    * Define various options that are used in SBML based translations.

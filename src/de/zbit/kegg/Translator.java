@@ -49,7 +49,9 @@ import de.zbit.util.prefs.SBProperties;
  * 
  * <p>
  * Recommended VM-Arguments:
- * <pre>-splash:bin/de/zbit/kegg/gui/img/Logo.gif -Duser.language=en -Duser.country=US</pre>
+ * <pre>-Xms128m -Xmx512m -splash:bin/de/zbit/kegg/gui/img/Logo.gif -Duser.language=en -Duser.country=US</pre>
+ * And for MacOS, please use
+ * <pre>-Dapple.awt.graphics.EnableQ2DX=true -Dapple.laf.useScreenMenuBar=true -Dcom.apple.macos.smallTabs=true -Dcom.apple.macos.useScreenMenuBar=true -Dcom.apple.mrj.application.apple.menu.about.name="KEGGtranslator" -Dcom.apple.mrj.application.growbox.intrudes=false -Dcom.apple.mrj.application.live-resize=true</pre>
  * 
  * @author Andreas Dr&auml;ger
  * @author Clemens Wrzodek
