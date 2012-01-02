@@ -221,7 +221,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     Map<Reaction, ReactionNodeRealizer> reaction2node = new HashMap<Reaction, ReactionNodeRealizer>();
     Set<Node> unlayoutedNodes = new HashSet<Node>();
     int nodesWithoutCoordinates=0;
-    int COLUMNS = species.size()/5; // Show in 5 rows by default
+    int COLUMNS = Math.max(1, species.size()/5); // Show in 5 rows by default
     for (AbstractNamedSBase s : species) {
       boolean nodeHadLayoutInformation = false;
       boolean nodeShouldBeACircle = false;

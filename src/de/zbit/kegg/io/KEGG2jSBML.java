@@ -110,7 +110,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * Contains all ids already assigned to an element in the sbml document.
    * Used for avoiding giving the same id to two or more different elements.
    */
-  private ArrayList<String> SIds = new ArrayList<String>();
+  private Set<String> SIds = new HashSet<String>();
   
   /**
    * Default compartment size.
@@ -356,7 +356,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     //doc.addChangeListener(this);
     
     // Reset lists and buffers.
-    SIds = new ArrayList<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
+    SIds = new HashSet<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
     CellDesignerUtils cdu = null;
     if (addCellDesignerAnnots) cdu = new CellDesignerUtils(); 
     
