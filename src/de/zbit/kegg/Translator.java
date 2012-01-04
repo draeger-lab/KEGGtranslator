@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import de.zbit.AppConf;
 import de.zbit.Launcher;
 import de.zbit.gui.GUIOptions;
+import de.zbit.kegg.ext.TranslatorPanelOptions;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
@@ -344,8 +345,8 @@ public class Translator extends Launcher {
 	public List<Class<? extends KeyProvider>> getCmdLineOptions() {
 		List<Class<? extends KeyProvider>> configList = new ArrayList<Class<? extends KeyProvider>>(3);
 		configList.add(KEGGtranslatorIOOptions.class);
-		configList.add(KEGGtranslatorOptions.class);
 		configList.add(KEGGtranslatorCommandLineOnlyOptions.class);
+		configList.add(KEGGtranslatorOptions.class);
 		configList.add(GUIOptions.class);
 		return configList;
 	}
@@ -356,8 +357,15 @@ public class Translator extends Launcher {
 	 */
 	public List<Class<? extends KeyProvider>> getInteractiveOptions() {
 	  // Return NULL here to only show options as dialog, that
-	  // are defined in de.zbit.gui.prefsPreferencePanels
-		return null;
+	  // are defined in de.zbit.gui.prefs.PreferencePanels
+	  
+	  // All options here are made persistent, in contrast to getCmdLineOptions()
+    List<Class<? extends KeyProvider>> configList = new ArrayList<Class<? extends KeyProvider>>(3);
+    configList.add(KEGGtranslatorIOOptions.class);
+    configList.add(KEGGtranslatorOptions.class);
+    configList.add(TranslatorPanelOptions.class);
+    //configList.add(GUIOptions.class);
+    return configList;
 	}
 
 	/*

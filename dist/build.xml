@@ -1,6 +1,8 @@
 <!-- ANT build script for yfiles obfuscation           -->
 <!-- The java based ANT tool is available from         -->
 <!-- http://jakarta.apache.org/ant                     -->
+
+           	
 <project name="KEGGtranslator with Obfuscation" default="sign" basedir=".">
 
   <target name="help">
@@ -21,6 +23,9 @@
 
   <!-- define some properties that are used throughout the tasks -->
   <target name="init">
+  	<echo>
+  	  PLESE MAKE SURE LOG LEVEL IN Translator.java MAIN METHOD IS SET TO INFO!
+  	</echo>
     <!-- the base directory of the KEGGtranslator repository -->
     <property name="base" location=".."/>
   	
@@ -98,6 +103,7 @@
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/keggapi.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/wsdl4j.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/axis.jar"/>
+    	      <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/Java5/saaj.jar"/>-->
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/WSDbfetch.jar"/>-->
             <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-cli-1.1.jar"/>

@@ -20,6 +20,7 @@
  */
 package de.zbit.kegg;
 
+import de.zbit.util.InfoManagement;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.Range;
@@ -38,5 +39,12 @@ public interface KEGGtranslatorCommandLineOnlyOptions extends KeyProvider {
   public static final Option<Integer> CACHE_SIZE = new Option<Integer>("CACHE_SIZE",Integer.class,
       "Specify the number of API entries from KEGG to keep into cache (default: 10000).", 
       new Range<Integer>(Integer.class, "{[100,1000000]}"), 10000, "-cache");
+  
+  /**
+   * Causes a call to {@link InfoManagement#clearFailCache()} on startup.
+   */
+  public static final Option<Boolean> CLEAR_FAIL_CACHE = new Option<Boolean>("CLEAR_FAIL_CACHE",Boolean.class,
+      "Clear the cache of failed KEGG API queries (cases the application to retry those IDs).",Boolean.FALSE,
+      Boolean.FALSE);
   
 }
