@@ -74,7 +74,7 @@ public class Translator extends Launcher {
 	/**
 	 * The {@link Logger} for this class.
 	 */
-	private static final transient Logger logger = Logger.getLogger(Translator.class.getName());
+	private static final transient Logger log = Logger.getLogger(Translator.class.getName());
 
 	/**
    * The cache to be used by all KEGG interacting classes.
@@ -114,7 +114,7 @@ public class Translator extends Launcher {
 				try {
 					File f = new File(Translator.cacheFunctionFileName);
 					if (f.exists() && f.canRead()) {
-						logger.info(String.format("Deleting invalid cache file %s.", f
+						log.info(String.format("Deleting invalid cache file %s.", f
 								.getName()));
 						f.delete();
 					}
@@ -147,7 +147,7 @@ public class Translator extends Launcher {
 			  try {
 			    File f = new File(Translator.cacheFileName);
 			    if (f.exists() && f.canRead()) {
-						logger.info(String.format("Deleting invalid cache file %s.", f
+						log.info(String.format("Deleting invalid cache file %s.", f
 								.getName()));
 			      f.delete();
 			    }
@@ -161,15 +161,24 @@ public class Translator extends Launcher {
 			manager = new KeggInfoManagement(10000);
 		}
 		
-		// Set cache size
-    int initialSize;
+		// Set cache size and eventually remove some items from the cache
+    int initialSize=-1;
     try {
       SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
       initialSize = KEGGtranslatorCommandLineOnlyOptions.CACHE_SIZE.getValue(prefs);
+      
+      if (KEGGtranslatorCommandLineOnlyOptions.CLEAR_FAIL_CACHE.getValue(prefs)) {
+        manager.clearFailCache();
+      }
     } catch (Exception e) {
-      initialSize = 10000; 
+      e.printStackTrace();
+    }
+    if (initialSize<=0) {
+      initialSize = 10000;
     }
     manager.setCacheSize(initialSize);
+
+
 		
 		return manager;
 	}
@@ -186,7 +195,7 @@ public class Translator extends Launcher {
 	public static Object translate(Format format, File in) throws IOException {
 		// Check and build input
 		if ((in == null) || !in.canRead() || in.isDirectory()) {
-			logger.fine("Invalid or not-readable input file.");
+			log.severe("Invalid or not-readable input file.");
 			return null;
 		}
 		
@@ -241,7 +250,7 @@ public class Translator extends Launcher {
 		File in = input == null ? null : new File(input);
 		if ((in == null) || !in.canRead()) { 
 			// in might also be a directory
-			logger.fine("Invalid or not-readable input file.");
+			log.severe("Invalid or not-readable input file.");
 			return false;
 		}
 		
@@ -261,16 +270,16 @@ public class Translator extends Launcher {
 		  if ((out == null) || (output.length() < 1) || out.isDirectory()) {
 		    String fileExtension = BatchKEGGtranslator.getFileExtension(translator);
 		    out = new File(FileTools.removeFileExtension(input) + fileExtension);
-				logger.info(String.format("Writing to %s.", out));
+				log.info(String.format("Writing to %s.", out));
 		  }
 		  
 		  // Further check out
 		  if (out.exists()) {
-		    logger.info(String.format("Overwriting exising file %s.", out));
+		    log.info(String.format("Overwriting exising file %s.", out));
 		  }
 		  out.createNewFile();
 		  if (!out.canWrite()) {
-		    logger.fine(String.format("Cannot write to file %s.", out));
+		    log.severe(String.format("Cannot write to file %s.", out));
 		    return false;
 		  }
 		}
@@ -316,7 +325,7 @@ public class Translator extends Launcher {
 				props.get(KEGGtranslatorIOOptions.INPUT),
 				props.get(KEGGtranslatorIOOptions.OUTPUT));
 		} catch (IOException exc) {
-			logger.fine(exc.getLocalizedMessage());
+			log.warning(exc.getLocalizedMessage());
 		}
 	}
 
@@ -376,7 +385,7 @@ public class Translator extends Launcher {
     try {
       url = new URL("http://www.gnu.org/licenses/lgpl-3.0-standalone.html");
     } catch (MalformedURLException exc) {
-      logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+      log.log(Level.FINE, exc.getLocalizedMessage(), exc);
     }
     return url;
 	}
@@ -390,7 +399,7 @@ public class Translator extends Launcher {
     try {
       url = new URL("http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/");
     } catch (MalformedURLException e) {
-      logger.log(Level.FINE, e.getLocalizedMessage(), e);
+      log.log(Level.FINE, e.getLocalizedMessage(), e);
     }
     return url;
 	}
