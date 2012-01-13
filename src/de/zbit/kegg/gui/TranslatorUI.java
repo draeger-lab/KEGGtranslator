@@ -246,9 +246,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 
 		// Button and action
 		JButton ok = new JButton("Translate now!", UIManager.getIcon("ICON_GEAR_16"));
-		ok.setToolTipText(StringUtil.toHTML(
-								"Starts the conversion of the input file to the selected output format and displays the result on this workbench.",
-								GUITools.TOOLTIP_LINE_LENGTH));
+		ok.setToolTipText(StringUtil
+				.toHTMLToolTip("Starts the conversion of the input file to the selected output format and displays the result on this workbench."));
 		ok.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Get selected file and format
@@ -490,9 +489,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		if ((comp instanceof TranslatorPanel<?>)
 				&& !((TranslatorPanel<?>) comp).isSaved()) {
 			if ((JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this,
-					StringUtil.toHTML(String.format(
+					StringUtil.toHTMLToolTip(
 							"Do you really want to close %s without saving?",
-							title), GUITools.TOOLTIP_LINE_LENGTH), "Close selected document",
+							title), "Close selected document",
 					JOptionPane.YES_NO_OPTION))) {
 				return false;
 			}
@@ -504,8 +503,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#openFile(java.io.File[])
 	 */
 	public File[] openFile(File... files) {
@@ -580,11 +578,12 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * 
 	 * @see de.zbit.gui.BaseFrame#saveFile()
 	 */
-	public void saveFile() {
+	public File saveFile() {
 		TranslatorPanel<?> o = getCurrentlySelectedPanel();
 		if (o != null) {
-			o.saveToFile();
+			return o.saveToFile();
 		}
+		return null;
 	}
 
 	/*

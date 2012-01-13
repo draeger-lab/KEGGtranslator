@@ -148,7 +148,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   /**
    * Check atom balance
    */
-  public static final Option<Boolean> CHECK_ATOM_BALANCE = new Option<Boolean>("CHECK_ATOM_BALANCE",Boolean.class,
+  public static final Option<Boolean> CHECK_ATOM_BALANCE = new Option<Boolean>("CHECK_ATOM_BALANCE", Boolean.class,
       "Check the atom balance of metabolic reactions and write a summary to the reaction notes.", (short) 2, "-cbal", true, 
       AUTOCOMPLETE_REACTIONS, TranslatorPanelOptions.TRUE_RANGE);
 

@@ -231,13 +231,13 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
     
     // Merge the three strings to a single tooltip
     StringBuffer tooltip = new StringBuffer();
-    if (nodeLabel!=null) {
-      tooltip.append(StringUtil.insertLineBreaks(nodeLabel, GUITools.TOOLTIP_LINE_LENGTH, "<br/>"));
+    if (nodeLabel != null) {
+      tooltip.append(StringUtil.insertLineBreaks(nodeLabel, StringUtil.TOOLTIP_LINE_LENGTH, "<br/>"));
     }
-    if (description!=null) {
-      tooltip.append(StringUtil.insertLineBreaks(description, GUITools.TOOLTIP_LINE_LENGTH, "<br/>"));
+    if (description != null) {
+      tooltip.append(StringUtil.insertLineBreaks(description, StringUtil.TOOLTIP_LINE_LENGTH, "<br/>"));
     }
-    if (image!=null && image.length()>0) {
+    if ((image != null) && (image.length() > 0)) {
       tooltip.append("<div align=\"center\">"+image+"</div>");
     }
     
