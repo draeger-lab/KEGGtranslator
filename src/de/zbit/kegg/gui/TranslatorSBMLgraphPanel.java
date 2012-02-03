@@ -23,7 +23,6 @@ package de.zbit.kegg.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,8 +55,6 @@ import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.Transition;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
-
 import y.base.DataMap;
 import y.base.Edge;
 import y.base.Node;
@@ -72,7 +69,6 @@ import y.view.NodeRealizer;
 import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.LayoutHelper;
-import de.zbit.gui.VerticalLayout;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
@@ -211,6 +207,17 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       }
     }
     
+    // Create a list of all species IDs that act as enzymes.
+    Set<String> enzymeSpeciesIDs = new HashSet<String>();
+    {
+      Set<ModifierSpeciesReference> ref = document.getModel().getModifierSpeciesReferences();
+      for (ModifierSpeciesReference msr : ref) {
+        if ( msr.isSetSpecies() && msr.getSpecies().length()>0) {
+          enzymeSpeciesIDs.add(msr.getSpecies());
+        }
+      }
+    }
+    
     // Add some standardized maps, required by some utility methods
     NodeMap nodePosition = simpleGraph.createNodeMap();
     GenericDataMap<DataMap, String> mapDescriptionMap = KEGG2yGraph.addMapDescriptionMapToGraph(simpleGraph);
@@ -229,12 +236,23 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       species2node.put(s.getId(), n);
       GraphElement2SBMLid.put(n, s.getId());
       
-      // TODO: Set Node shape (and color?) based on SBO-terms
+      // Set Node shape (and color) based on SBO-terms
       NodeRealizer nr;
       if (!s.isSetSBOTerm()) {
         nr = simpleGraph.getRealizer(n);
       } else {
-        nr = SBMLVisualizationProperties.getNodeRealizer(s.getSBOTerm());
+        // ... except for enzymes
+        /*
+         * IMPORTANT ReactionModifiers (referencing to species)
+         * should get the enzyme shape, even if the species is a gene!
+         * The picture will otherwise show genes, catalyzing reactions
+         * instead of enzymes!!!!!
+         */
+        if (enzymeSpeciesIDs.contains(s.getId())) {
+          nr = SBMLVisualizationProperties.getEnzymeRelizer();
+        } else {
+          nr = SBMLVisualizationProperties.getNodeRealizer(s.getSBOTerm());
+        }
         nr = nr.createCopy();
         simpleGraph.setRealizer(n, nr);
         nodeShouldBeACircle = SBMLVisualizationProperties.isCircleShape(s.getSBOTerm());
@@ -263,7 +281,6 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       }
       
       // Auto-set missing coordinates
-      
       if (Double.isNaN(x) || Double.isNaN(y)) {
         // Make a simple grid-layout to set some initial coords
         x = (nodesWithoutCoordinates%COLUMNS)*(w+w/2);
@@ -308,6 +325,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         // (correct SBML/SBGN-Style).
         for (Input i: t.getListOfInputs()) {
           for (Output o: t.getListOfOutputs()) {
+            
             Node source = species2node.get(i.getQualitativeSpecies());
             Node target = species2node.get(o.getQualitativeSpecies());
             
@@ -324,6 +342,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       
       // Add all reactions to the graph
       for (Reaction r : document.getModel().getListOfReactions()) {
+        
         if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
           // Create the reaction node
           ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), species2node, simpleGraph);
@@ -384,6 +403,9 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     }
     
     // Fix layout of reaction nodes.
+    /* TODO: These reaction nodes are not nice and require still massive improvements!
+     * 
+     */
     if (nodesWithoutCoordinates>0) {
       TranslatorTools tools = new TranslatorTools(simpleGraph);
       if (useLayoutExtension) {

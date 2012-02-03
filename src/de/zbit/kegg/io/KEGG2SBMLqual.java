@@ -31,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -175,16 +174,6 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", "true");
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     
-    //Should be set to false or removed after everything is fine with layout extension
-    if (false) {
-      String file = "matchingSpeciesLayout_" + p.getName().replace(":", "") + ".txt";
-      try {        
-        writeMatchingFile(file, p);
-      } catch (IOException e) {
-        log.log(Level.WARNING, "Could not write matching file: " + file, e);
-      }
-    }
-    
     // Create qual species for every species
     createQualSpecies(p, qualModel);
     
@@ -194,7 +183,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     } else {
       for (Relation r : p.getRelations()) {
         addKGMLRelation(r, p, qualModel);
-      }  
+      }
     }
     
     if(!considerReactions()) {
@@ -380,7 +369,6 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     }
 
     return t;
-
   }
   
   /**
@@ -422,6 +410,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * @throws XMLStreamException
    * @throws ClassNotFoundException
    */
+  @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network
     // load and heavily reduces computation time.

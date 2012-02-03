@@ -61,6 +61,11 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
      */
     ALL_FIRST_NAMES,
     /**
+     * Same as {@link #INTELLIGENT}, but preferes EC numbers, when
+     * available.
+     */    
+    INTELLIGENT_WITH_EC_NUMBERS,
+    /**
      * 
      */
     INTELLIGENT;
@@ -92,8 +97,10 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
           return "Name genes according to name in KGML.";
         case FIRST_NAME:
           return "Name genes according to the first name, given by the KEGG API. This is usually the HGNC symbol.";
+        case INTELLIGENT_WITH_EC_NUMBERS:
+          return "Assigns EC numbers to enzymes and official symbols/ family prefixes or short names to others";
         case INTELLIGENT:
-          return "Tries to assign: -HGNC (first name) to genes, -prefixes to families, -short names for compounds.";
+          return "Assigns HGNC symbols to genes, prefixes to families and short names to compounds.";
         case ALL_FIRST_NAMES:
           return "Name genes according to the first names, given by the KEGG API. " +
           		"This is will create multiple names if one KEGG entry consists of multiple genes and is thus NOT RECOMMENDED.";
@@ -127,6 +134,12 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
       new Range<NODE_NAMING>(NODE_NAMING.class, Range.toRangeString(NODE_NAMING.class)),
       NODE_NAMING.INTELLIGENT, "Label genes by");
 
+  /*
+   * TODO add an option as extension to GENE_NAMES:
+   * - "Always use EC numbers as label for enzymes"
+   *  
+   */
+  
   /**
    * If true, shows the chemical formula for all compounds, instead of the name.
    */

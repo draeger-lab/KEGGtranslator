@@ -27,10 +27,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zbit.graph.ComplexNode;
-
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import de.zbit.graph.ComplexNode;
 import de.zbit.graph.NucleicAcidFeatureNode;
 
 /**
@@ -76,8 +75,8 @@ public class SBMLVisualizationProperties {
   private static void init() {
     sbo2shape = new HashMap<Integer, NodeRealizer>();
    
-    sbo2shape.put(Macromolecule_Enzyme1, new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT)); // macromolecule - enzyme
-    sbo2shape.put(Macromolecule_Enzyme2, new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT)); // macromolecule - enzyme
+    sbo2shape.put(Macromolecule_Enzyme1, getEnzymeRelizerRaw()); // macromolecule - enzyme
+    sbo2shape.put(Macromolecule_Enzyme2, sbo2shape.get(Macromolecule_Enzyme1)); // macromolecule - enzyme
     
     sbo2shape.put(simpleChemical, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // simple chemical - simple chemical
     
@@ -145,6 +144,24 @@ public class SBMLVisualizationProperties {
     } else {
       return false;
     }
+  }
+  
+  /**
+   * Get a raw (unmodified) realizer for an enzyme.
+   * @return {@link ShapeNodeRealizer}, specially made for enzymes.
+   */
+  private static ShapeNodeRealizer getEnzymeRelizerRaw() {
+    return new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT);
+  }
+  
+  /**
+   * Get a realizer for an enzyme.
+   * @return {@link ShapeNodeRealizer}, specially made for enzymes.
+   */
+  public static ShapeNodeRealizer getEnzymeRelizer() {
+    ShapeNodeRealizer ret = getEnzymeRelizerRaw();
+    ret.setFillColor(getColor(Macromolecule_Enzyme1));
+    return ret;
   }
   
   

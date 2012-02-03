@@ -521,6 +521,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     
       if (showFormulaForCompounds && infos[i].getFormula()!=null && infos[i].getFormula().length()>0) {
         name.append(infos[i].getFormula());
+      } else if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.INTELLIGENT_WITH_EC_NUMBERS) &&
+          (!entry.getType().equals(EntryType.map)) && infos[i].isSetECcodes()){
+        // If EC codes preferred, not is no PW-reference and has ECcodes, take them.
+        name.append(StringUtil.implode(infos[i].getECcodes(), ","));
       } else if (infos[i].getKegg_ID().startsWith("br:")){
         name.append(infos[i].getDefinition().replace(";\n", ", ").replace(";", ","));
       } else if (infos[i].getNames()!=null){
@@ -599,7 +603,8 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
         // return separated by ';' to indicate different genes!
         return ArrayUtils.implode(firstNames, "; ");
         
-      } else if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.INTELLIGENT)) {
+      } else if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.INTELLIGENT) ||
+          nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.INTELLIGENT_WITH_EC_NUMBERS) ) {
         // Shortest for compounds
         if (entry.getType().equals(EntryType.compound)) {
           return shortenName(ArrayUtils.implode(multiNames, ", "));
