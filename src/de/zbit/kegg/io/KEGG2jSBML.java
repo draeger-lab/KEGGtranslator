@@ -1018,7 +1018,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Get a good name for the node
 //    boolean hasMultipleIDs = false;
 //    if (entry.getName().trim().contains(" ")) hasMultipleIDs = true;
-    if (entry.hasGraphics()&& entry.getGraphics().getName().length() > 0) {
+    if (entry.hasGraphics() && entry.getGraphics().getName().length() > 0) {
       name = entry.getGraphics().getName(); // + " (" + name + ")"; // Append ko Id(s) possible!
     }
     // Set name to real and human-readable name (from Inet data - Kegg API).
@@ -1131,7 +1131,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       }
       
       // Remember modifier for later association with reaction.
-      reactionModifiers.add(new Info<String, ModifierSpeciesReference>(reaction.toLowerCase().trim(), modifier));
+      Info<String, ModifierSpeciesReference> info = new Info<String, ModifierSpeciesReference>(reaction.toLowerCase().trim(), modifier);
+      if (!reactionModifiers.contains(info)) { 
+        /* If we have duplicate entries (for visualization reasons) but only create one species,
+         * then we would add 2 equal modifiers here. Thus, we need the "contains" check.
+         */
+        reactionModifiers.add(new Info<String, ModifierSpeciesReference>(reaction.toLowerCase().trim(), modifier));
+      }
     }
   }
 
