@@ -318,7 +318,7 @@ public class CellDesignerUtils {
       target.append("<celldesigner:singleLine width=\"" + (isGroupNode ? "2.0" : (i == 1 ? "1.0" : "0.0")) + "\"/>\n");
       
       String col = "FFFFFF";
-      if (g.isBGcolorSet()) {
+      if (g.isSetBGcolor()) {
         col = g.getBgcolor().replace("#", "").toLowerCase();
       }
       target.append(String.format("<celldesigner:paint color=\""

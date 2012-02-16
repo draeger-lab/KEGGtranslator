@@ -616,7 +616,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           
           // New Text
           String newText = null;
-          if (nl.getText().length()==0 || nl.getText().equals("undefined")) {
+          if (nl.getText().length()==0 || nl.getText().startsWith("undefined")) {
             newText = "Group";
           }
           nr = setupGroupNode(nl, newText);
@@ -1150,12 +1150,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Colors
     try {
-      if (g.isBGcolorSet())
+      if (g.isSetBGcolor())
         nr.setFillColor(ColorFromHTML(g.getBgcolor()));
     } catch (Throwable t) {t.printStackTrace();}
     
     try {
-      if (g.isFGcolorSet()) {
+      if (g.isSetFGcolor()) {
         Color color = ColorFromHTML(g.getFgcolor());
         nl.setTextColor(color);
         if (nr instanceof LineNodeRealizer) {

@@ -1144,7 +1144,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   
 
   /**
-   * Extends a list of ReactionComponent by adding all children
+   * Extends a list of {@link ReactionComponent}s by adding all children
    * of all group nodes, in addition to the group nodes itself.
    * @param src
    * @return
