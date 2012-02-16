@@ -353,7 +353,7 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
       if (brighten==null || brighten<0) brighten = 0;
       
       String image = translator.getLastTranslatedPathway().getImage();
-      if (image!=null) {
+      if (image!=null && image.length()>0) {
         Thread t = RestrictedEditMode.addDynamicBackgroundImage(new URL(image), pane, brighten);
         if (waitUntilComplete) {
           ThreadManager.awaitTermination(t);
