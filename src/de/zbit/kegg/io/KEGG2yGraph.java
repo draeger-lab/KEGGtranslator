@@ -544,7 +544,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     
     // Set the link
-    if (p.getLink()!=null && p.getLink().length()!=0) {
+    if (p.isSetLink()) {
       try {
         graph.setURL(new URL(p.getLink()));
       } catch (MalformedURLException e1) {

@@ -396,6 +396,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     CVTerm mtPwID = new CVTerm();
     mtPwID.setQualifierType(Type.MODEL_QUALIFIER);
     mtPwID.setModelQualifierType(Qualifier.BQM_IS);
+    
+    /* TODO: if it's an original KEGG pathway, the name ALWAYS
+     * starts with "path:". Use different prefixes for pathways
+     * from other sources and catch those cases here (also in
+     * KEGG2GraphML and oterhs).
+     */
+    
     // next line is same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
     String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(p.getName());
     if (kgMiriamEntry != null) mtPwID.addResource(kgMiriamEntry);
@@ -433,11 +440,18 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       }
     }
     
-    String alternativeImageURL = "http://www.genome.jp/kegg-bin/show_pathway?"+
-    (p.getName().contains(":")?p.getName().substring(p.getName().indexOf(":")+1): p.getName());
+    String imageURL = null;
+    if (p.isSetImage()) {
+      imageURL = p.getImage();
+    } else {
+      imageURL = "http://www.genome.jp/kegg-bin/show_pathway?"+KeggInfos.suffix(p.getName());
+      // TODO: Insert here special cases to catch, e.g. biocarta IDs, etc.
+    }
     
-    notes.append(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", p.getImage(), p.getImage(), alternativeImageURL));
-    notes.append(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
+    notes.append(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", imageURL, imageURL, p.getTitle()));
+    if (p.isSetLink()) {
+      notes.append(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
+    }
     
     // Write model version and creation date, if available, into model notes.
     if (p.getVersion() > 0 || (p.getComment() != null && p.getComment().length() > 0)) {
@@ -1041,7 +1055,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     //specAnnot.setAbout("");
     //spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
     StringBuffer notes = new StringBuffer(notesStartString);
-    notes.append(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
+    if (entry.isSetLink()) {
+      notes.append(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
+    }
     
     
     // Process Component information
