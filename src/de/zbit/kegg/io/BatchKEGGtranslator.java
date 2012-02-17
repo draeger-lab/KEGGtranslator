@@ -68,11 +68,11 @@ public class BatchKEGGtranslator {
    */
   private String getAndCreateOutDir(String dir) {
     String myDir = dir;
-    if (changeOutdirTo!=null && changeOutdirTo.length()>0) {
+    if ((changeOutdirTo != null) && (changeOutdirTo.length() > 0)) {
       myDir = changeOutdirTo + myDir.substring(orgOutdir.length());
       try {
         new File(myDir).mkdirs();
-      } catch (Exception e) {} // Gibts schon...
+      } catch (Exception e) {} // already existing...
     }
     return myDir;
   }
