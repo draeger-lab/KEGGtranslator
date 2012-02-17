@@ -34,12 +34,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.filechooser.FileFilter;
 
+import y.base.Node;
+import y.layout.organic.SmartOrganicLayouter;
 import y.view.DefaultGraph2DRenderer;
 import y.view.EditMode;
 import y.view.Graph2D;
 import y.view.Graph2DView;
 import y.view.Graph2DViewMouseWheelZoomListener;
 import y.view.HitInfo;
+import y.view.NodeRealizer;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.ext.TranslatorPanelOptions;
@@ -189,6 +192,12 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   public void createTabContent() throws Exception {
     graphLayer = createGraphFromDocument(document);
     
+    // If all coordinates are at the same position, make some automatic layout
+    if (allNodesAtSamePosition(graphLayer)) {
+      new TranslatorTools(graphLayer).layout(SmartOrganicLayouter.class);
+      graphLayer.unselectAll();
+    }
+    
     // Create a new visualization of the model.
     Graph2DView pane = new Graph2DView(graphLayer);
     
@@ -259,6 +268,32 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   }
 
   
+  /**
+   * Check if all nodes lay at the same coordinates.
+   * @param graph
+   * @return <code>TRUE</code> if all nodes in the graph are
+   * at same positions.
+   */
+  private static boolean allNodesAtSamePosition(Graph2D graph) {
+    double X = Double.NaN; double Y = Double.NaN;
+    for (Node n : graph.getNodeArray()) {
+      NodeRealizer re = graph.getRealizer(n);
+      
+      if (Double.isNaN(X)) X = re.getX();
+      else if (re.getX()!=X) {
+        return false;
+      }
+      
+      if (Double.isNaN(Y)) Y = re.getY();
+      else if (re.getY()!=Y) {
+        return false;
+      }
+
+    }
+    return true;
+  }
+
+
   /**
    * Please see {@link #updateDetailPanel(JPanel, HitInfo)}.
    * Please USE this method, BUT overwrite {@link #updateDetailPanel(JScrollPane, HitInfo)}!
