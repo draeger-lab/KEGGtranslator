@@ -864,7 +864,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       
       Edge myEdge;
       // XXX: Hier noch moeglich die Type der reaktion (PPI, etc.) hinzuzufuegen.
-      if (r.getSubtypes()!=null && r.getSubtypes().size()>0) {
+      if (r.isSetSubTypes()) {
         for (int stI=0; stI<r.getSubtypes().size(); stI++) {
           SubType st = r.getSubtypes().get(stI);
           EdgeRealizer er = new GenericEdgeRealizer();
