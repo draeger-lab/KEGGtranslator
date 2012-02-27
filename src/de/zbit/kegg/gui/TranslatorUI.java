@@ -61,6 +61,7 @@ import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.SBFileFilter;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.util.AbstractProgressBar;
@@ -490,8 +491,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				&& !((TranslatorPanel<?>) comp).isSaved()) {
 			if ((JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this,
 					StringUtil.toHTMLToolTip(
-							"Do you really want to close %s without saving?",
-							title), "Close selected document",
+							"Do you really want to close %s%s%s without saving?",
+							KEGG2jSBML.quotStart,title,KEGG2jSBML.quotEnd), "Close selected document",
 					JOptionPane.YES_NO_OPTION))) {
 				return false;
 			}

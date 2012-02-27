@@ -473,14 +473,21 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Create species
     ArrayList<Entry> entries = p.getEntries();
-    Set<String> addedEntries = new HashSet<String>();
+    Set<String> addedEntries = new HashSet<String>(); // contains just entrys with KEGG ids (no "undefined" entries) 
     for (Entry entry : entries) {
       progress.DisplayBar();
       Species spec = null;
       
-      // KEGG has pathways with duplicate entries (mostly signalling).
-      // Take a look, e.g. at the "MAPK signalling pathway" and "DUSP14"
-      if (!addedEntries.add(entry.getName())) {
+      /*
+       *  KEGG has pathways with duplicate entries (mostly signalling).
+       *  Take a look, e.g. at the "MAPK signalling pathway" and "DUSP14"
+       *  --
+       *  BUT, if entry is no concrete KEGG entry (i.e. contains no ":"),
+       *  then we should not group this to one. See e.g. the "ABC transporter
+       *  pathway" with several groups called "undefined", but different content.
+       *  Do NOT create just one species of all nodes called undefined.
+       */
+      if (entry.getName().contains(":") && !addedEntries.add(entry.getName())) {
         // Look for already added species from other entry
         // and link to this entry by adding the same species as "custom".
         Collection<Entry> col = p.getEntriesForName(entry.getName()); // should return at least 2 entries
@@ -489,7 +496,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           while (it.hasNext() && (spec = (Species)it.next().getCustom())==null);
           entry.setCustom(spec);
         }
-      } 
+      }
       
       if (spec==null) {
         // Usual case if this entry is no duplicate.
@@ -1061,7 +1068,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     
     // Process Component information
-    if (entry.getComponents()!=null && entry.getComponents().size()>0) {
+    if (entry.hasComponents()) {
       StringBuilder notesAppend = new StringBuilder(
         String.format("<p>This species is a group, consisting of %s components:<br/><ul>", entry.getComponents().size()));
       CVTerm cvt = new CVTerm(Type.BIOLOGICAL_QUALIFIER,Qualifier.BQB_IS_ENCODED_BY);
@@ -1186,7 +1193,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       if (isGroupNode(s) && s.hasComponents()) {
         for (Integer c: s.getComponents()) {
           Entry child = p.getEntryForId(c);
-          if (child!=null) ret.add(new ReactionComponent(child.getName()));
+          if (child!=null) ret.add(new ReactionComponent(child));
         }
       }
     }

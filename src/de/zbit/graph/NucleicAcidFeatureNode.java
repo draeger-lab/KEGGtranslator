@@ -44,7 +44,7 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
     // If the given node realizer is of this type, then apply copy semantics. 
     if (nr instanceof NucleicAcidFeatureNode) {
       NucleicAcidFeatureNode fnr = (NucleicAcidFeatureNode) nr;
-      // TODO: Copy the values of custom attributes. 
+      // Copy the values of custom attributes (there are none).
     }
   }
   

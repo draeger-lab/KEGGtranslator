@@ -169,6 +169,7 @@ public class Translator extends Launcher {
       initialSize = KEGGtranslatorCommandLineOnlyOptions.CACHE_SIZE.getValue(prefs);
       
       if (KEGGtranslatorCommandLineOnlyOptions.CLEAR_FAIL_CACHE.getValue(prefs)) {
+        log.info("Clearing cache of failed-to-retrieve objects.");
         manager.clearFailCache();
       }
     } catch (Exception e) {

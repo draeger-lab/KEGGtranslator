@@ -27,6 +27,10 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 
 /**
+ * The "Complex"-node is a kind of a <b>group node</b> in SBGN.
+ * It is actually a normal rectangle with four cutted edges.
+ * See {@link #getPolygon()} for an ASCII-art.
+ * 
  * @author Finja B&uuml;chel
  * @version $Rev$
  */
@@ -42,7 +46,7 @@ public class ComplexNode extends ShapeNodeRealizer {
     // If the given node realizer is of this type, then apply copy semantics. 
     if (nr instanceof ComplexNode) {
       ComplexNode fnr = (ComplexNode) nr;
-      // TODO: Copy the values of custom attributes. 
+      // Copy the values of custom attributes (there are none). 
     }
   }
   
@@ -72,6 +76,7 @@ public class ComplexNode extends ShapeNodeRealizer {
   
   /**
    * Paints the complex-node.
+   * <pre>
    *       1 . . . . . 2
    *     .               .
    *   8                   3
@@ -80,7 +85,7 @@ public class ComplexNode extends ShapeNodeRealizer {
    *   7                   4
    *    .                 .
    *      6 . . . . . . 5
-   * 
+   * </pre>
    */
   public Polygon getPolygon() {
     int arc = (int) (Math.min(getWidth(), getHeight())/5);

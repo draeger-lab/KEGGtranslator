@@ -86,6 +86,9 @@ import de.zbit.util.ValuePair;
 
 /**
  * A basic panel which uses a GraphLayer to visualize SBML documents.
+ * SBML-visualization is performed according to the SBGN
+ * process descriptions.<br/>
+ * <img src="http://www.sbgn.org/images/4/4a/Refcard-PD.png"/>
  * @author Clemens Wrzodek
  * @version $Rev$
  */
@@ -274,9 +277,12 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             h = g.getDimensions().getHeight();
           }
           if (g.isSetPosition()) {
-            x = g.getPosition().getX();
-            y = g.getPosition().getY();
-            nodeHadLayoutInformation=true;
+            // Ignore 0|0 positions. They're due to default values
+            if (g.getPosition().getX()!=0d || g.getPosition().getY()!=0d) {
+              x = g.getPosition().getX();
+              y = g.getPosition().getY();
+              nodeHadLayoutInformation=true;
+            }
           }
         }
       }
@@ -338,12 +344,10 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             } else if (i.getSign().equals(Sign.negative)) {
               simpleGraph.getRealizer(e).setArrow(Arrow.T_SHAPE);
             } else if (i.getSign().equals(Sign.dual)) {
+              // Diamond is used in SBGN-PD as "modulation".
               simpleGraph.getRealizer(e).setArrow(Arrow.DIAMOND);
             }
             
-            
-            // TODO: Change edge shape based on properties
-            //EdgeRealizer nr = simpleGraph.getRealizer(e);
           }
         }
       }
@@ -355,12 +359,16 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         
         if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
           // Create the reaction node
-          ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), species2node, simpleGraph);
+          ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), r.getListOfProducts(), species2node, simpleGraph);
           NodeRealizer nr = new ReactionNodeRealizer();
           reaction2node.put(r, (ReactionNodeRealizer) nr);
           Node rNode = simpleGraph.createNode(nr);
           GraphElement2SBMLid.put(rNode, r.getId());
-          unlayoutedNodes.add(rNode); // TODO: really add them here?
+          // Adding them to the to-be-layouted list will lead to position
+          // them as freely as possible by yFiles, which is WRONG for these
+          // nodes. Actually, they should always be between products and
+          // substrate... needing special layouting!
+          //unlayoutedNodes.add(rNode);
           nr.setX(xy.getA());
           nr.setY(xy.getB());
           
@@ -428,7 +436,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       simpleGraph.unselectAll();
     }
         
-    // Fix ReactionNode edges
+    // Fix ReactionNode edges (determines 90° rotatable node orientation)
     for (Map.Entry<Reaction,ReactionNodeRealizer> en : reaction2node.entrySet()) {
       Set<Node> reactants = new HashSet<Node>();
       Set<Node> products = new HashSet<Node>();
@@ -477,6 +485,28 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     }
     
     return new ValuePair<Double, Double>(Utils.average(xes), Utils.average(yes));
+  }
+  
+  /**
+   * First, calculates the mean of all x/y coordinates of all
+   * products and substrates separately. Then, calculates
+   * the mean of those means. The result should be X/Y
+   * coordinates that are perfectly between the given 
+   * products and substrates.
+   * @param <T>
+   * @param listOfSubstrates
+   * @param listOfProducts
+   * @param species2node
+   * @param simpleGraph
+   * @return
+   */
+  private <T extends SimpleSpeciesReference> ValuePair<Double, Double> calculateMeanCoords(Iterable<T> listOfSubstrates,
+    Iterable<T> listOfProducts, Map<String, Node> species2node, Graph2D simpleGraph) {
+    
+    ValuePair<Double, Double> subs = calculateMeanCoords(listOfSubstrates, species2node, simpleGraph);
+    ValuePair<Double, Double> prod = calculateMeanCoords(listOfProducts, species2node, simpleGraph);
+    
+    return new ValuePair<Double, Double>(Utils.average(subs.getA(), prod.getA()), Utils.average(subs.getB(), prod.getB()));
   }
 
   /* (non-Javadoc)
