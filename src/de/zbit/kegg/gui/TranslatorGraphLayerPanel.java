@@ -269,26 +269,21 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
 
   
   /**
-   * Check if all nodes lay at the same coordinates.
+   * Check if all nodes lay at the same X position.
    * @param graph
-   * @return <code>TRUE</code> if all nodes in the graph are
-   * at same positions.
+   * @return <code>TRUE</code> if all nodes in the graph
+   * have the same center X coordinate.
    */
   private static boolean allNodesAtSamePosition(Graph2D graph) {
-    double X = Double.NaN; double Y = Double.NaN;
+    double X = Double.NaN;
     for (Node n : graph.getNodeArray()) {
       NodeRealizer re = graph.getRealizer(n);
       
-      if (Double.isNaN(X)) X = re.getX();
-      else if (re.getX()!=X) {
+      if (Double.isNaN(X)) X = re.getCenterX();
+      else if (re.getCenterX()!=X) {
         return false;
       }
       
-      if (Double.isNaN(Y)) Y = re.getY();
-      else if (re.getY()!=Y) {
-        return false;
-      }
-
     }
     return true;
   }

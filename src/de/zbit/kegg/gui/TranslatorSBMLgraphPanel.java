@@ -53,6 +53,7 @@ import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
+import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
 
 import y.base.DataMap;
@@ -331,6 +332,15 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             
             Edge e = simpleGraph.createEdge(source, target);
             GraphElement2SBMLid.put(e, t.getId());
+            
+            if (i.getSign().equals(Sign.positive)) {
+              simpleGraph.getRealizer(e).setArrow(Arrow.STANDARD);
+            } else if (i.getSign().equals(Sign.negative)) {
+              simpleGraph.getRealizer(e).setArrow(Arrow.T_SHAPE);
+            } else if (i.getSign().equals(Sign.dual)) {
+              simpleGraph.getRealizer(e).setArrow(Arrow.DIAMOND);
+            }
+            
             
             // TODO: Change edge shape based on properties
             //EdgeRealizer nr = simpleGraph.getRealizer(e);
