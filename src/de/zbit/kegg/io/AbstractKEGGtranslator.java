@@ -294,6 +294,8 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   private void preProcessPathway(Pathway p) {
     boolean completeAndCacheReactions = considerReactions()&&autocompleteReactions;
+    //TODO: or should auto... be set in the qual class?
+    
     if (!retrieveKeggAnnots) {
       KeggInfoManagement.offlineMode = true;
     } else {
@@ -322,9 +324,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       if (considerReactions()) {
         KeggTools.parseStoichiometryFromEquations(p,manager);
       }
-      
+            
       log.info("Information fetched. Translating pathway... ");
     }
+   
     
     // Skip it, if it's white
     if (removeWhiteNodes) {
