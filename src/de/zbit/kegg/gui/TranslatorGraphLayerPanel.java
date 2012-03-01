@@ -36,6 +36,7 @@ import javax.swing.filechooser.FileFilter;
 
 import y.base.Node;
 import y.layout.organic.SmartOrganicLayouter;
+import y.layout.router.OrganicEdgeRouter;
 import y.view.DefaultGraph2DRenderer;
 import y.view.EditMode;
 import y.view.Graph2D;
@@ -192,10 +193,19 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
   public void createTabContent() throws Exception {
     graphLayer = createGraphFromDocument(document);
     
+    /*
+     * Get settings to control visualization behavior
+     */
+    SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
+    
     // If all coordinates are at the same position, make some automatic layout
     if (allNodesAtSamePosition(graphLayer)) {
       new TranslatorTools(graphLayer).layout(SmartOrganicLayouter.class);
       graphLayer.unselectAll();
+    }
+    
+    if (TranslatorPanelOptions.LAYOUT_EDGES.getValue(prefs)) {
+      new TranslatorTools(graphLayer).layout(OrganicEdgeRouter.class);
     }
     
     // Create a new visualization of the model.
@@ -233,11 +243,6 @@ public abstract class TranslatorGraphLayerPanel <DocumentType> extends Translato
     // Make group nodes collapsible.
     // Unfortunately work-in-progress.
     //pane.addViewMode(new CollapseGroupNodesViewMode((Graph2D) graphLayer));
-    
-    /*
-     * Get settings to control visualization behavior
-     */
-    SBPreferences prefs = SBPreferences.getPreferencesFor(TranslatorPanelOptions.class);
     
     // Set KEGGtranslator logo as background
     addBackgroundImage(pane, getTranslator(), prefs);

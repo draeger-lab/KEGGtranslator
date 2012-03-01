@@ -45,7 +45,7 @@ import y.base.Node;
 import y.base.NodeCursor;
 import y.base.NodeMap;
 import y.base.YCursor;
-import y.layout.CanonicMultiStageLayouter;
+import y.layout.Layouter;
 import y.layout.labeling.SALabeling;
 import y.layout.organic.SmartOrganicLayouter;
 import y.view.EdgeLabel;
@@ -748,7 +748,7 @@ public class TranslatorTools {
    * Layout the graph with the given layout.
    * @param layouterClass
    */
-  public void layout(Class<? extends CanonicMultiStageLayouter> layouterClass) {
+  public void layout(Class<? extends Layouter> layouterClass) {
     graph.unselectAll();
     
     // Remember group node sizes and insets
@@ -756,7 +756,7 @@ public class TranslatorTools {
     glc.prepareAll();
     
     // Create layouter and perform layout
-    CanonicMultiStageLayouter layouter;
+    Layouter layouter;
     try {
       layouter = layouterClass.newInstance();
     } catch (Exception e) {
