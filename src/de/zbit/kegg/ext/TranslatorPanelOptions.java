@@ -83,7 +83,7 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
    * Layout edges everytime a graph is displayed
    */
   public static final Option<Boolean> LAYOUT_EDGES = new Option<Boolean>("LAYOUT_EDGES",Boolean.class,
-      "If true, performs an organic edge routing algorithm for every graph.", true);
+      "If true, performs an organic edge routing algorithm for every graph.", false);
   
   
   @SuppressWarnings("unchecked")

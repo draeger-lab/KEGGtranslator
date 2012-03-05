@@ -579,6 +579,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       if (e.hasGraphics()) {
         g = e.getGraphics();
       } else if (showEntriesWithoutGraphAttribute || autocompleteReactions) {
+        // Create any graphics object with default attributes
         g = new Graphics(e);
       }
       

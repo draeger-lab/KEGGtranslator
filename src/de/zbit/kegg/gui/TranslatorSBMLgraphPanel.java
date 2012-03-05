@@ -330,6 +330,10 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
         // TODO: Actually, instead of making n*m edges
         // make n edges to a fake-node, that branches off to m-nodes
         // (correct SBML/SBGN-Style).
+        if (!t.isSetListOfInputs() || !t.isSetListOfOutputs()) {
+          continue;
+        }
+        
         for (Input i: t.getListOfInputs()) {
           for (Output o: t.getListOfOutputs()) {
             
@@ -339,13 +343,15 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
             Edge e = simpleGraph.createEdge(source, target);
             GraphElement2SBMLid.put(e, t.getId());
             
-            if (i.getSign().equals(Sign.positive)) {
-              simpleGraph.getRealizer(e).setArrow(Arrow.STANDARD);
-            } else if (i.getSign().equals(Sign.negative)) {
-              simpleGraph.getRealizer(e).setArrow(Arrow.T_SHAPE);
-            } else if (i.getSign().equals(Sign.dual)) {
-              // Diamond is used in SBGN-PD as "modulation".
-              simpleGraph.getRealizer(e).setArrow(Arrow.DIAMOND);
+            if (i.isSetSign()) {
+              if (i.getSign().equals(Sign.positive)) {
+                simpleGraph.getRealizer(e).setArrow(Arrow.STANDARD);
+              } else if (i.getSign().equals(Sign.negative)) {
+                simpleGraph.getRealizer(e).setArrow(Arrow.T_SHAPE);
+              } else if (i.getSign().equals(Sign.dual)) {
+                // Diamond is used in SBGN-PD as "modulation".
+                simpleGraph.getRealizer(e).setArrow(Arrow.DIAMOND);
+              }
             }
             
           }
