@@ -1319,7 +1319,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     configureView(view, !isGraphOutput);
     try {
       TranslatorGraphPanel.addBackgroundImage(view, this, null, true);
-    } catch (MalformedURLException e) {
+    } catch (Exception e) { // NullPointer or MalformedURLException
       log.warning("Could not setup background image for output file.");
     }
     
