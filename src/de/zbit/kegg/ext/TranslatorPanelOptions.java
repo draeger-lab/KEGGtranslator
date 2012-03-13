@@ -77,7 +77,7 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
    * Show a table with the node/edge properties on the right side.
    */
   public static final Option<Boolean> SHOW_PROPERTIES_TABLE = new Option<Boolean>("SHOW_PROPERTIES_TABLE",Boolean.class,
-      "If true, shows a properties table on the right side of each graph.", false);
+      "If true, shows a properties table on the upper right corner of each graph.", false);
   
   /**
    * Layout edges everytime a graph is displayed
@@ -86,7 +86,7 @@ public abstract interface TranslatorPanelOptions extends KeyProvider{
       "If true, performs an organic edge routing algorithm for every graph.", false);
   
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public static final OptionGroup GRAPH_PANEL_OPTIONS = new OptionGroup(
       "Graph visualization options",
       "Define various options that control the look and feel of GraphML visualizing panels.",

@@ -29,21 +29,21 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
-import de.zbit.kegg.KeggInfoManagement;
-import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.KeggTools;
+import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
-import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.EscapeChars;
-import de.zbit.util.ProgressBar;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
+import de.zbit.util.progressbar.AbstractProgressBar;
+import de.zbit.util.progressbar.ProgressBar;
 
 
 /**

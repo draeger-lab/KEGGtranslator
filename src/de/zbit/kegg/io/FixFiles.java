@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-import de.zbit.util.DirectoryParser;
+import de.zbit.io.DirectoryParser;
 
 
 /**

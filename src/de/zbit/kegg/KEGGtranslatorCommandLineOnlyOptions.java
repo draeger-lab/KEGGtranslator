@@ -20,7 +20,8 @@
  */
 package de.zbit.kegg;
 
-import de.zbit.util.InfoManagement;
+import de.zbit.cache.InfoManagement;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.Range;

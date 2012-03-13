@@ -42,7 +42,7 @@ import y.view.GenericEdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
-import de.zbit.io.SBFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.io.KEGG2SBGN;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 

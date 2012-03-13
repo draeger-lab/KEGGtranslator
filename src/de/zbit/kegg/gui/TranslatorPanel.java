@@ -54,17 +54,17 @@ import javax.swing.filechooser.FileFilter;
 
 import de.zbit.gui.BaseFrameTab;
 import de.zbit.gui.GUITools;
-import de.zbit.gui.ProgressBarSwing;
-import de.zbit.gui.VerticalLayout;
 import de.zbit.gui.BaseFrame.BaseAction;
-import de.zbit.io.SBFileFilter;
+import de.zbit.gui.layout.VerticalLayout;
+import de.zbit.io.FileDownload;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
-import de.zbit.util.AbstractProgressBar;
-import de.zbit.util.FileDownload;
-import de.zbit.util.ValuePairUncomparable;
+import de.zbit.util.objectwrapper.ValuePairUncomparable;
+import de.zbit.util.progressbar.AbstractProgressBar;
+import de.zbit.util.progressbar.gui.ProgressBarSwing;
 
 /**
  * This should be used as a panel on a JTabbedPane.

@@ -51,23 +51,23 @@ import javax.swing.event.ChangeListener;
 
 import de.zbit.AppConf;
 import de.zbit.graph.RestrictedEditMode;
-import de.zbit.gui.ActionCommand;
 import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.JTabbedLogoPane;
+import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
-import de.zbit.io.SBFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
-import de.zbit.util.AbstractProgressBar;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.prefs.SBProperties;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * The main UI of KEGGtranslator.

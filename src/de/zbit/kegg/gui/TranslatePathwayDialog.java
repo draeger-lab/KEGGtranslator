@@ -33,7 +33,7 @@ import javax.swing.JTabbedPane;
 
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
-import de.zbit.gui.LayoutHelper;
+import de.zbit.gui.layout.LayoutHelper;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;

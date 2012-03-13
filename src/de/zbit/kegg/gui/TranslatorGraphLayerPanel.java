@@ -45,7 +45,7 @@ import y.view.Graph2DViewMouseWheelZoomListener;
 import y.view.HitInfo;
 import y.view.NodeRealizer;
 import de.zbit.graph.RestrictedEditMode;
-import de.zbit.io.SBFileFilter;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.ext.TranslatorPanelOptions;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;

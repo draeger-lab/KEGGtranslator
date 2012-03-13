@@ -29,7 +29,7 @@ import y.base.NodeCursor;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.hierarchy.HierarchyManager;
-import de.zbit.util.Utils;
+import de.zbit.math.MathUtils;
 
 /**
  * A Stacking layout (example for two columns:<br/>
@@ -264,7 +264,7 @@ public class StackingNodeLayout {
     }
     
     // averageNodeWidth is the width of one column.
-    averageNodeWidth = Utils.median(widths);
+    averageNodeWidth = MathUtils.median(widths);
     //averageNodeHeight = Math.min(averageNodeHeight, 30);
     //averageNodeWidth = Math.min(averageNodeWidth, 60);
     

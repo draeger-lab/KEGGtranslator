@@ -23,12 +23,12 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.util.List;
 
-import de.zbit.io.SBFileFilter;
-import de.zbit.kegg.KeggInfoManagement;
+import de.zbit.io.DirectoryParser;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
-import de.zbit.util.DirectoryParser;
 
 
 /**

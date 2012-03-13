@@ -49,9 +49,9 @@ import org.sbml.jsbml.xml.stax.SBMLWriter;
 import de.zbit.kegg.AtomBalanceCheck;
 import de.zbit.kegg.AtomBalanceCheck.AtomCheckResult;
 import de.zbit.kegg.KEGGtranslatorOptions;
-import de.zbit.kegg.KeggInfoManagement;
-import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -62,9 +62,9 @@ import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.EscapeChars;
-import de.zbit.util.Info;
 import de.zbit.util.SortedArrayList;
 import de.zbit.util.Utils;
+import de.zbit.util.objectwrapper.Info;
 
 /**
  * KEGG2JSBML converter (also KGML2JSBML, KEGG2SBML, KGML2SBML).

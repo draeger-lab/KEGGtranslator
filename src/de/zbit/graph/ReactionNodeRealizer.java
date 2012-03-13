@@ -33,7 +33,7 @@ import y.view.EdgeRealizer;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
-import de.zbit.util.Utils;
+import de.zbit.math.MathUtils;
 
 /**
  * Creates a small node that should be used as reaction node
@@ -155,7 +155,7 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     }
     
     // Determine orientation of this node
-    double max = Utils.max(Arrays.asList(cases));
+    double max = MathUtils.max(Arrays.asList(cases));
     boolean horizontal = isHorizontal();
     if (cases[0]==max && horizontal) rotateNode();
     else if (cases[1]==max && !horizontal) rotateNode();

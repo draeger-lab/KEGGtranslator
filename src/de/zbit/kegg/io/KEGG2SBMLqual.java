@@ -49,9 +49,9 @@ import org.sbml.jsbml.ext.qual.Transition;
 import org.sbml.jsbml.util.ValuePair;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
-import de.zbit.kegg.KeggInfoManagement;
-import de.zbit.kegg.KeggInfos;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -60,6 +60,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.ArrayUtils;
+import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
 
 /**
@@ -379,7 +380,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   private String formatSBO(int i) {
     StringBuilder b = new StringBuilder("SBO%3A");
     String iString = Integer.toString(i);
-    b.append(Utils.replicateCharacter('0', 7-iString.length()));
+    b.append(StringUtil.replicateCharacter('0', 7-iString.length()));
     b.append(iString);
     return b.toString();
   }

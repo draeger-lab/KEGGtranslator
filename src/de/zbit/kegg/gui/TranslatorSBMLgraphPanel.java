@@ -69,8 +69,8 @@ import y.view.LineType;
 import y.view.NodeRealizer;
 import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.gui.GUITools;
-import de.zbit.gui.LayoutHelper;
-import de.zbit.io.SBFileFilter;
+import de.zbit.gui.layout.LayoutHelper;
+import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.ext.SBMLVisualizationProperties;
@@ -79,10 +79,10 @@ import de.zbit.kegg.io.KEGG2SBMLqual;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
+import de.zbit.math.MathUtils;
 import de.zbit.sbml.gui.SBasePanel;
 import de.zbit.util.TranslatorTools;
-import de.zbit.util.Utils;
-import de.zbit.util.ValuePair;
+import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * A basic panel which uses a GraphLayer to visualize SBML documents.
@@ -490,7 +490,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       }
     }
     
-    return new ValuePair<Double, Double>(Utils.average(xes), Utils.average(yes));
+    return new ValuePair<Double, Double>(MathUtils.mean(xes), MathUtils.mean(yes));
   }
   
   /**
@@ -512,7 +512,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     ValuePair<Double, Double> subs = calculateMeanCoords(listOfSubstrates, species2node, simpleGraph);
     ValuePair<Double, Double> prod = calculateMeanCoords(listOfProducts, species2node, simpleGraph);
     
-    return new ValuePair<Double, Double>(Utils.average(subs.getA(), prod.getA()), Utils.average(subs.getB(), prod.getB()));
+    return new ValuePair<Double, Double>(MathUtils.mean(subs.getA(), prod.getA()), MathUtils.mean(subs.getB(), prod.getB()));
   }
 
   /* (non-Javadoc)

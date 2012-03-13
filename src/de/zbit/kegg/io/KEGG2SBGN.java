@@ -46,11 +46,11 @@ import org.sbgn.bindings.Map;
 import org.sbgn.bindings.Sbgn;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
-import de.zbit.kegg.KeggInfoManagement;
-import de.zbit.kegg.KeggInfos;
-import de.zbit.kegg.KeggQuery;
 import de.zbit.kegg.KeggTools;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
+import de.zbit.kegg.api.cache.KeggQuery;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
