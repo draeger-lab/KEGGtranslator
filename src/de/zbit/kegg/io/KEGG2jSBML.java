@@ -43,6 +43,7 @@ import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.util.ValuePair;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
@@ -367,11 +368,27 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     Model model = doc.createModel(NameToSId(p.getName().replace(":", "_")));
     model.setMetaId("meta_" + model.getId());
     model.setName(p.getTitle());
+    if (lv.getL().intValue()>2) {
+      // Make consistent units for level 3 (same as in l2v4).
+      UnitDefinition ud = UnitDefinition.getPredefinedUnit(UnitDefinition.TIME, 2, 4);
+      // TODO: SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
+      model.setTimeUnits(ud);
+      
+      ud = UnitDefinition.getPredefinedUnit(UnitDefinition.VOLUME, 2, 4);
+      // TODO: SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
+      model.setVolumeUnits(ud);
+      
+      ud = UnitDefinition.getPredefinedUnit(UnitDefinition.SUBSTANCE, 2, 4);
+      // TODO: SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
+      model.setSubstanceUnits(ud);
+    }
+    
     Compartment compartment = model.createCompartment("default");
     // Create neccessary default compartment
     compartment.setSize(defaultCompartmentSize);
-    compartment.setUnits(model.getUnitDefinition("volume"));
-    compartment.setConstant(true); //TODO: I'm not sure if this is OK
+//    compartment.setUnits(model.getUnitDefinition("volume"));
+    compartment.setSpatialDimensions(3d); // a cell has 3 dimensions
+//    compartment.setConstant(true);
     // Be careful: compartment ID ant other compartment stuff are HARDCODED
     // in cellDesigner extension code generation!
     
@@ -1051,7 +1068,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     spec.setCompartment(compartment); // spec.setId("s_" +
     // entry.getId());
     spec.setInitialAmount(speciesDefaultInitialAmount);
-    spec.setUnits(model.getUnitDefinition("substance"));
+//    spec.setUnits(model.getUnitDefinition("substance"));
     
     // ID has to be at this place, because other refer to it by id and if id is not set. refenreces go to null.
     // spec.setId(NameToSId(entry.getName().replace(' ', '_')));
