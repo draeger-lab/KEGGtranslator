@@ -61,6 +61,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
+import de.zbit.sbml.util.SBMLtools;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.SortedArrayList;
@@ -371,15 +372,15 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     if (lv.getL().intValue()>2) {
       // Make consistent units for level 3 (same as in l2v4).
       UnitDefinition ud = UnitDefinition.getPredefinedUnit(UnitDefinition.TIME, 2, 4);
-      // TODO: SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
+      SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
       model.setTimeUnits(ud);
       
       ud = UnitDefinition.getPredefinedUnit(UnitDefinition.VOLUME, 2, 4);
-      // TODO: SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
+      SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
       model.setVolumeUnits(ud);
       
       ud = UnitDefinition.getPredefinedUnit(UnitDefinition.SUBSTANCE, 2, 4);
-      // TODO: SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
+      SBMLtools.setLevelAndVersion(ud, lv.getL().intValue(), lv.getV().intValue());
       model.setSubstanceUnits(ud);
     }
     
@@ -508,7 +509,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         // Look for already added species from other entry
         // and link to this entry by adding the same species as "custom".
         Collection<Entry> col = p.getEntriesForName(entry.getName()); // should return at least 2 entries
-        if (col!=null && col.size()>0) {
+        if ((col != null) && (col.size() > 0)) {
           Iterator<Entry> it = col.iterator();
           while (it.hasNext() && (spec = (Species)it.next().getCustom())==null);
           entry.setCustom(spec);
@@ -1065,6 +1066,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Initialize species object
     Species spec = model.createSpecies();
+    if (model.getLevel() > 2) {
+    	/*
+    	 * In order to obtain Level 3 models with identical properties than
+    	 * in Level 2, we use the default value of earlier SBML releases:
+    	 */
+    	spec.setHasOnlySubstanceUnits(false);
+    }
     spec.setCompartment(compartment); // spec.setId("s_" +
     // entry.getId());
     spec.setInitialAmount(speciesDefaultInitialAmount);
