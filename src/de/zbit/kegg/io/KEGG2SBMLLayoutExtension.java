@@ -20,16 +20,28 @@
  */
 package de.zbit.kegg.io;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.sbml.jsbml.AbstractNamedSBase;
 import org.sbml.jsbml.Model;
+import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
+import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Graphics;
+import de.zbit.kegg.parser.pathway.GraphicsType;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.util.ArrayUtils;
+import de.zbit.util.Utils;
 
 /**
  * Add support for the layout extension to SBML translations.
@@ -37,6 +49,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * @version $Rev$
  */
 public class KEGG2SBMLLayoutExtension {
+  private static final transient Logger log = Logger.getLogger(KEGG2SBMLLayoutExtension.class.getName());
   
   /**
    * Layout extension namespace URL.
@@ -57,12 +70,16 @@ public class KEGG2SBMLLayoutExtension {
    * @param p
    * @param doc
    * @param model
+   * @param metabolic if true, will set {@link ReactionGlyph}s instead
+   * of {@link SpeciesGlyph} whereever possible.
    */
-  public static void addLayoutExtension(Pathway p, SBMLDocument doc, Model model) {
+  public static void addLayoutExtension(Pathway p, SBMLDocument doc, Model model, boolean metabolic) {
    
+    // Make extension is available
     doc.addNamespace(LAYOUT_NS_NAME, "xmlns", LAYOUT_NS);
     doc.getSBMLDocumentAttributes().put(LAYOUT_NS_NAME + ":required", "false");
     
+    // Create layout model
     ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) model.getExtension(LAYOUT_NS);
     if (layoutModel==null) {
       layoutModel = new ExtendedLayoutModel(model);
@@ -72,18 +89,110 @@ public class KEGG2SBMLLayoutExtension {
       layoutModel.unsetListOfLayouts();
     }
     
+    // Map enzymes to reactions in metabolic models
+    Map<String, Collection<Reaction>> enzyme2rct = null;
+    if (metabolic) {
+      enzyme2rct = getEnzyme2ReactionMap(doc);
+    }
     
-    // Give a warning if we have no relations.
+    // Create Species and Reaction Glyps.
     Layout layout = layoutModel.createLayout();
-    for (Entry e : p.getEntries()) {
+    for (Entry e : p.getEntries()) { // In KGML, only entries have graph objects.
       Object s = e.getCustom();
       if (s!=null && e.hasGraphics()) {
         Graphics g = e.getGraphics();
-        // TODO: Multiple graphics (i.e. lines)?
+        // TODO: Are lines (also in mutliple graphics tags) possible?
         
         if (s instanceof AbstractNamedSBase) {
-          SpeciesGlyph glyph = layout.createSpeciesGlyph(((AbstractNamedSBase) s).getId());
-          glyph.createBoundingBox(g.getWidth(), g.getHeight(), 1, g.getX(), g.getY(), 0);
+          String speciesId = ((AbstractNamedSBase) s).getId();
+          
+          /*
+           * Create reaction glyph with x/y and species glyph with width/height.
+           */
+          if (metabolic && enzyme2rct.containsKey(speciesId)) {
+            
+            // Try to match reactions (if we have multiple instances of the same enzyme)
+            Reaction rct = null;
+            Collection<Reaction> rcts = enzyme2rct.get(speciesId);
+            String[] entryReactions = e.getReactions();
+            if (entryReactions!=null && rcts.size()>1) {
+              // Match reactions
+              for (Reaction r: rcts) {
+                int pos = ArrayUtils.indexOf(entryReactions, r.toString());
+                if (pos>=0) {
+                  rct = r;
+                  break;
+                }
+              }
+            }
+            if (rct==null) {
+              // No match => take first without layout
+              for (Reaction r: rcts) {
+                if (layout.getReactionGlyph(r.getId())==null) {
+                  rct = r;
+                  break;
+                }
+              }
+              log.fine("Could not match unique ReactionGlyph to " + e);
+            }
+            
+            // Removing the reation is a bad idea, because sometimes there
+            // are multiple instances of the same entry pointin to the same
+            // reaction. We then prefer the reactangle (NOT the line GraphicsType).
+            // Thus, we should not remove set reactions.
+            //Utils.removeFromMapOfSets(enzyme2rct, rct, speciesId);
+            
+            
+            // Set X and Y on the reactionGlyph
+            if (!g.isDefaultPosition() && (layout.getReactionGlyph(rct.getId())==null || 
+                !g.getType().equals(GraphicsType.line))) {
+              // LINE coordinate are much worse than rectangles. So prefer rectangles!
+              ReactionGlyph glyph = layout.getReactionGlyph(rct.getId());
+              if (glyph==null) {
+                glyph = layout.createReactionGlyph(rct.getId());
+              }
+              glyph.unsetBoundingBox();
+              BoundingBox box = glyph.createBoundingBox();
+              box.createPosition(g.getX(), g.getY(), 0);
+            }
+            
+            // Set width and height on the species glyph
+            if (layout.getSpeciesGlyph(speciesId)==null || 
+                !g.getType().equals(GraphicsType.line)) {
+              SpeciesGlyph sGlyph = layout.getSpeciesGlyph(speciesId);
+              if (sGlyph==null) {
+                sGlyph = layout.createSpeciesGlyph(speciesId);
+              } 
+              BoundingBox box = sGlyph.getBoundingBox();
+              if (box==null) {
+                box = sGlyph.createBoundingBox(); 
+              }
+              box.createDimensions(g.getWidth(), g.getHeight(), 1);
+            }
+            
+          } else {
+            
+            /*
+             * Signaling map (or metabolic and species is no enzyme)
+             * => Just create SpeciesGlyph.
+             */
+            
+            // Create a Glyph with x/y/width/height for the species
+            SpeciesGlyph sGlyph = layout.getSpeciesGlyph(speciesId);
+            if (sGlyph==null) {
+              sGlyph = layout.createSpeciesGlyph(speciesId);
+            }
+            
+            BoundingBox box = sGlyph.getBoundingBox();
+            if (box==null) {
+              box = sGlyph.createBoundingBox(); 
+            }
+            box.createDimensions(g.getWidth(), g.getHeight(), 1);
+            if (!g.isDefaultPosition()) {
+              box.createPosition(g.getX(), g.getY(), 0);
+            }
+          }
+
         }
       }
     }
@@ -92,5 +201,25 @@ public class KEGG2SBMLLayoutExtension {
     //return;
   }
   
+  /**
+   * Create a map from species with enzymatic activity to reactions,
+   * in which they occur as enzymes.
+   * @param document
+   * @return a map that links from every enzyme (species intance) to a list of reactions,
+   * in which this enzyme occurs as modifier.
+   */
+  public static Map<String, Collection<Reaction>> getEnzyme2ReactionMap(SBMLDocument document) {
+    Map<String, Collection<Reaction>> enzymeSpeciesIDs = new HashMap<String, Collection<Reaction>>();
+    for (Reaction r : document.getModel().getListOfReactions()) {
+      if (r.isSetListOfModifiers()) {
+        for (ModifierSpeciesReference msr : r.getListOfModifiers()) {
+          if ( msr.isSetSpecies() && msr.getSpecies().length()>0) {
+            Utils.addToMapOfSets(enzymeSpeciesIDs, msr.getSpecies(), r);
+          }
+        }
+      }
+    }
+    return enzymeSpeciesIDs;
+  }
   
 }

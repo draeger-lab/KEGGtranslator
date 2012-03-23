@@ -135,7 +135,9 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
     
     // Determine location of adjacent nodes
     Integer[] cases = new Integer[4];
+    double[] meanDiff = new double[2];
     Arrays.fill(cases, 0);
+    Arrays.fill(meanDiff, 0); // [0] = X, [1] = Y
 //    int reactantsAbove=0;
 //    int reactantsLeft=1;
 //    int productsAbove=2;
@@ -149,15 +151,28 @@ public class ReactionNodeRealizer extends ShapeNodeRealizer {
       if (products.contains(other)) {
         if (nr.getX()<getCenterX()) cases[0]++;
         if (nr.getY()<getCenterY()) cases[1]++;
+        meanDiff[0]+=Math.abs(getCenterX() - nr.getX());
+        meanDiff[1]+=Math.abs(getCenterY() - nr.getY());
       } else if (reactants.contains(other)) {
         if (nr.getX()<getCenterX()) cases[2]++;
-        if (nr.getY()<getCenterY()) cases[3]++;      }
+        if (nr.getY()<getCenterY()) cases[3]++;
+        meanDiff[0]+=Math.abs(getCenterX() - nr.getX());
+        meanDiff[1]+=Math.abs(getCenterY() - nr.getY());
+      }
     }
     
     // Determine orientation of this node
     double max = MathUtils.max(Arrays.asList(cases));
     boolean horizontal = isHorizontal();
-    if (cases[0]==max && horizontal) rotateNode();
+    if (cases[0]==max && cases[1]==max ||
+        cases[2]==max && cases[3]==max) {
+      if (meanDiff[0]>meanDiff[1]) { // X-Distance larger
+        if (!horizontal) rotateNode();
+      } else { // Y-Distance larger
+        if (horizontal) rotateNode();
+      }
+    }
+    else if (cases[0]==max && horizontal) rotateNode();
     else if (cases[1]==max && !horizontal) rotateNode();
     else if (cases[2]==max && horizontal) rotateNode();
     else if (cases[3]==max && !horizontal) rotateNode();

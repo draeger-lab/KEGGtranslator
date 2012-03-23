@@ -495,6 +495,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     for (Entry entry : entries) {
       progress.DisplayBar();
       Species spec = null;
+
       
       /*
        *  KEGG has pathways with duplicate entries (mostly signalling).
@@ -569,7 +570,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Eventually add layout extension
     if (addLayoutExtension) {
-      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model);
+      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model, true);
     }
     
     return doc;

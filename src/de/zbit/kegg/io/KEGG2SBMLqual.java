@@ -191,9 +191,9 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       model.unsetListOfSpecies();
     }
     
-    // Update (unset old and create new, qual-species related) layout extension
+    // Update (UNSET OLD METABOLIC and create new, qual-species related) layout extension
     if (addLayoutExtension) {
-      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model);
+      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model, false);
     }
     
     

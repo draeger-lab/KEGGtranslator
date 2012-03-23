@@ -41,6 +41,7 @@ import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.StringUtil;
+import de.zbit.util.Utils;
 import de.zbit.util.prefs.SBPreferences;
 import de.zbit.util.progressbar.AbstractProgressBar;
 import de.zbit.util.progressbar.ProgressBar;
@@ -623,9 +624,21 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
         }
         if (firstNames.size()>1) {
           String LCP = StringUtil.getLongestCommonPrefix(firstNames.toArray(new String[0]),true);
+          // Require at least 3 chars for family identifiers
           if (LCP!=null && LCP.length()>2) {
-            // Require at least 3 chars for family identifiers
-            return LCP;
+            String removedPart = firstNames.iterator().next().substring(LCP.length());
+            if (Utils.isNumber(removedPart, true)) {
+              // ALG13 and ALG14 have the common prefix ALG1 => remove 1
+              while (Character.isDigit(LCP.charAt(LCP.length()-1))) {
+                LCP = LCP.substring(0, LCP.length()-1);
+                if (LCP.length()<2) break;
+              }
+
+            }
+            
+            if (LCP.length()>2) {
+              return LCP;
+            }
           }
         } 
         

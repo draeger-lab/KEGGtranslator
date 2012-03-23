@@ -495,8 +495,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     nr.setTransparent(true);
     
     if (changeCaption!=null) {
-      String newText = changeCaption; //"Group";
-      nl.setText(newText);
+      nl.setText(changeCaption);
     }
     
     nr.setMinimalInsets(new YInsets(5, 2, 2, 2)); // top, left, bottom, right
@@ -774,7 +773,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         
         // Assign new name based on API and user selection
         name = getNameForEntry(e, keggInfos.toArray(new KeggInfos[0]));
-        graph.getRealizer(n).setLabelText(name);
+        
+        if (name!=null && name.startsWith("undefined") && 
+            !graph.getRealizer(n).getLabelText().startsWith("undefined")) {
+          // The new name is less meaningfull than the old one. Keep old one.
+          // Actualy, this is onle the case for group nodes!
+        } else {
+          graph.getRealizer(n).setLabelText(name);
+        }
         if (hideLabelsForCompounds && e.getType().equals(EntryType.compound)) {
           graph.getRealizer(n).removeLabel(graph.getRealizer(n).getLabel());
         }

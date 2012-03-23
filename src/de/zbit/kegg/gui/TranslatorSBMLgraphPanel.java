@@ -49,6 +49,7 @@ import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
+import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.Output;
@@ -106,6 +107,13 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
    * to an SBML-identifier.
    */
   private Map<Object, String> GraphElement2SBMLid = new HashMap<Object, String>();
+  
+  /**
+   * Clone enzymes in a way that exclusively one enzyme copy is
+   * available for each reaction.
+   * <p>Later, we may create an option for that...
+   */
+  private boolean splitEnzymesToOnlyOccurOnceInAnyReaction = true;
 
 
   /**
@@ -193,34 +201,33 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     // Eventually get the layout extension
     SBasePlugin layoutExtension = document.getModel().getExtension(KEGG2SBMLLayoutExtension.LAYOUT_NS);
     boolean useLayoutExtension = layoutExtension!=null;
-    Map<String, BoundingBox> layoutMap = null;
+    Map<String, BoundingBox> speciesLayoutMap = null;
+    Map<String, BoundingBox> reactionLayoutMap = null;
     if (useLayoutExtension) {
       if (((ExtendedLayoutModel)layoutExtension).isSetListOfLayouts()) {
         // TODO: For generic releases, it would be nice to have a JList
         // that let's the user choose the layout.
         Layout l = ((ExtendedLayoutModel)layoutExtension).getLayout(0);
-        layoutMap = new HashMap<String, BoundingBox>();
+        speciesLayoutMap = new HashMap<String, BoundingBox>();
         for (SpeciesGlyph sg: l.getListOfSpeciesGlyphs()) {
           if (sg.isSetBoundingBox()) {
-            layoutMap.put(sg.getSpecies(), sg.getBoundingBox());
+            speciesLayoutMap.put(sg.getSpecies(), sg.getBoundingBox());
           }
         }
-        useLayoutExtension = layoutMap.size()>0;
+        reactionLayoutMap = new HashMap<String, BoundingBox>();
+        for (ReactionGlyph sg: l.getListOfReactionGlyphs()) {
+          if (sg.isSetBoundingBox()) {
+            speciesLayoutMap.put(sg.getReaction(), sg.getBoundingBox());
+          }
+        }
+        useLayoutExtension = speciesLayoutMap.size()>0 || reactionLayoutMap.size()>0;
       } else {
         useLayoutExtension = false;
       }
     }
     
-    // Create a list of all species IDs that act as enzymes.
-    Set<String> enzymeSpeciesIDs = new HashSet<String>();
-    {
-      Set<ModifierSpeciesReference> ref = document.getModel().getModifierSpeciesReferences();
-      for (ModifierSpeciesReference msr : ref) {
-        if ( msr.isSetSpecies() && msr.getSpecies().length()>0) {
-          enzymeSpeciesIDs.add(msr.getSpecies());
-        }
-      }
-    }
+    // Create alist of species with enzymatic activity.
+    Set<String> enzymeSpeciesIDs = getListOfEnzymes(document);
     
     // Add some standardized maps, required by some utility methods
     NodeMap nodePosition = simpleGraph.createNodeMap();
@@ -270,7 +277,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       
       // Get information from the layout extension
       if (useLayoutExtension) {
-        BoundingBox g = layoutMap.get(s.getId());
+        BoundingBox g = speciesLayoutMap.get(s.getId());
         if (g!=null) {
           if (g.isSetDimensions()) {
             w = g.getDimensions().getWidth();
@@ -361,22 +368,47 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
     } else {
       
       // Add all reactions to the graph
+      Set<Node> usedEnzymes = new HashSet<Node>();
       for (Reaction r : document.getModel().getListOfReactions()) {
         
         if (r.isSetListOfReactants() && r.isSetListOfProducts()) {
+          
           // Create the reaction node
-          ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), r.getListOfProducts(), species2node, simpleGraph);
           NodeRealizer nr = new ReactionNodeRealizer();
           reaction2node.put(r, (ReactionNodeRealizer) nr);
           Node rNode = simpleGraph.createNode(nr);
           GraphElement2SBMLid.put(rNode, r.getId());
+          
+          // Get information from the layout extension
+          double x=Double.NaN;
+          double y=Double.NaN;
+          if (useLayoutExtension) {
+            BoundingBox g = reactionLayoutMap.get(r.getId());
+            if (g!=null) {
+              if (g.isSetDimensions()) {
+                nr.setWidth(g.getDimensions().getWidth());
+                nr.setHeight(g.getDimensions().getHeight());
+              }
+              if (g.isSetPosition()) {
+                // Ignore 0|0 positions. They're due to default values
+                if (g.getPosition().getX()!=0d || g.getPosition().getY()!=0d) {
+                  x = g.getPosition().getX();
+                  y = g.getPosition().getY();
+                }
+              }
+            }
+          }
+          
           // Adding them to the to-be-layouted list will lead to position
           // them as freely as possible by yFiles, which is WRONG for these
           // nodes. Actually, they should always be between products and
           // substrate... needing special layouting!
           //unlayoutedNodes.add(rNode);
-          nr.setX(xy.getA());
-          nr.setY(xy.getB());
+          if (Double.isNaN(x) || Double.isNaN(y)) {
+            ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), r.getListOfProducts(), species2node, simpleGraph);
+            nr.setX(xy.getA());
+            nr.setY(xy.getB());
+          }
           
           // TODO: Add stoichiometry to edges (docked to corresponding node):
           // subtrate on substrate node
@@ -412,12 +444,22 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
           for (ModifierSpeciesReference sr : r.getListOfModifiers()) {
             Node source = species2node.get(sr.getSpecies());
             if (source!=null) {
+              if (splitEnzymesToOnlyOccurOnceInAnyReaction) {
+                // Split enzymes to have a nicer visualization. 
+                if (usedEnzymes.contains(source)) {
+                  // TODO: IMPORTANT Cloned node must have a black 1/3 bottom!
+                  source = source.createCopy(simpleGraph);
+                  unlayoutedNodes.add(source);
+                  GraphElement2SBMLid.put(source, sr.getSpecies());
+                }
+              }
               Edge e = simpleGraph.createEdge(source, rNode);
               GraphElement2SBMLid.put(e, r.getId());
               EdgeRealizer er = simpleGraph.getRealizer(e);
               er.setArrow(Arrow.TRANSPARENT_CIRCLE);
               er.setLineType(LineType.LINE_1);
               er.setSourceArrow(Arrow.NONE);
+              usedEnzymes.add(source);
             }
           }
           
@@ -461,6 +503,27 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
 
     
     return simpleGraph;
+  }
+
+  /**
+   * Create a list of species (by identifier) that 
+   * show an enzymatic activity. 
+   * @param document
+   * @return List of species identifiers that are in the
+   * list list of {@link ModifierSpeciesReference}s.
+   */
+  public static Set<String> getListOfEnzymes(SBMLDocument document) {
+    // Create a list of all species IDs that act as enzymes.
+    Set<String> enzymeSpeciesIDs = new HashSet<String>();
+    {
+      Set<ModifierSpeciesReference> ref = document.getModel().getModifierSpeciesReferences();
+      for (ModifierSpeciesReference msr : ref) {
+        if ( msr.isSetSpecies() && msr.getSpecies().length()>0) {
+          enzymeSpeciesIDs.add(msr.getSpecies());
+        }
+      }
+    }
+    return enzymeSpeciesIDs;
   }
 
 
@@ -604,6 +667,10 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
           
           // Scroll to top.
           GUITools.scrollToTop(detailPanel);
+        }
+      } else {
+        synchronized (detailPanel) {
+          ((JScrollPane) detailPanel).setViewportView(null);
         }
       }
     }
