@@ -361,7 +361,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       t.setSBOTerm(SBOs.iterator().next());
     }
     
-    if (cv.getNumResources()>0) {
+    if (cv.getResourceCount()>0) {
       // Use always "IS", because "methylation" and "activation"
       // can both share the attribute IS and don't need
       // to be annotated as different versions ("HAS_VERSION").

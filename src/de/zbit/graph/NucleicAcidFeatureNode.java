@@ -33,7 +33,12 @@ import y.view.ShapeNodeRealizer;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
+public class NucleicAcidFeatureNode extends ShapeNodeRealizer implements SimpleCloneMarker {
+  /**
+   * Is this node a cloned node? (I.e. another
+   * instance must exist in the same graph).
+   */
+  private boolean isClonedNode=false;
   
   public NucleicAcidFeatureNode() {
     super(ShapeNodeRealizer.RECT);
@@ -45,6 +50,9 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
     if (nr instanceof NucleicAcidFeatureNode) {
       NucleicAcidFeatureNode fnr = (NucleicAcidFeatureNode) nr;
       // Copy the values of custom attributes (there are none).
+    }
+    if (nr instanceof CloneMarker) {
+      setNodeIsCloned(((CloneMarker) nr).isNodeCloned());
     }
   }
   
@@ -69,6 +77,8 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
    if (!isTransparent() && getFillColor()!=null) {
       gfx.setColor(getFillColor());
       gfx.fill(getPath());
+      
+      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, getPath());
     }
   }
 
@@ -87,5 +97,19 @@ public class NucleicAcidFeatureNode extends ShapeNodeRealizer {
     path.quadTo(getX(), getY()+getHeight(), getX(), getY()+getHeight()-arc);
     path.closePath();
     return path;
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.graph.CloneMarker#setNodeIsCloned(boolean)
+   */
+  public void setNodeIsCloned(boolean b) {
+    isClonedNode = b;
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.graph.CloneMarker#isNodeCloned()
+   */
+  public boolean isNodeCloned() {
+    return isClonedNode;
   }
 }

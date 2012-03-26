@@ -101,14 +101,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   protected boolean checkAtomBalance = false;
   
   /**
-   * If false, simply sets an SBO term to the species, based on entryType.
-   * If true, creates a ModifierSpeciesReference that gets the SBO term associated
-   * and will be added to the reaction.
-   * Probably setting it to true, will return the better model.
-   */
-  private boolean treatEntrysWithReactionDifferent = true;
-  
-  /**
    * Contains all ids already assigned to an element in the sbml document.
    * Used for avoiding giving the same id to two or more different elements.
    */
@@ -139,62 +131,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    */
   public static String quotEnd = "&#8221;"; // "\u201D";//"&#8221;"; // &rdquo;
   
-  /**
-   * SBO Term for EntryType "general modifier" (compound, map, other).
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is true.
-   */
-  public static int ET_GeneralModifier2SBO = 13; // 13=catalyst // 460="enzymatic catalyst"
   
-  /**
-   * SBO Term for EntryType enzyme, gene, group, ortholog, genes.
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is true.
-   */
-  public static int ET_EnzymaticModifier2SBO = 460;
-  
-  /**
-   * SBO Term for EntryType Ortholog.
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is false.
-   */
-  public static int ET_Ortholog2SBO = 354; // 354="informational molecule segment"
-  
-  /**
-   * SBO Term for EntryType Enzyme.
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is false.
-   */
-  public static int ET_Enzyme2SBO = 245; // 245="macromolecule",	// 252="polypeptide chain"
-  
-  /**
-   * SBO Term for EntryType Gene.
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is false.
-   */
-  public static int ET_Gene2SBO = 354; // 354="informational molecule segment"
-  
-  /**
-   * SBO Term for EntryType Group.
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is false.
-   */
-  public static int ET_Group2SBO = 253; // 253="non-covalent complex"
-  
-  /**
-   * SBO Term for EntryType Compound.
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is false.
-   */
-  public static int ET_Compound2SBO = 247; // 247="Simple Chemical"
-  
-  /**
-   * SBO Term for EntryType Map.
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is false.
-   */
-  public static int ET_Map2SBO = 552; // 552="reference annotation"
-  /**
-   * SBO Term for EntryType Other.
-   * Only if @link {@link #treatEntrysWithReactionDifferent} is false.
-   */
-  public static int ET_Other2SBO = 285; // 285="material entity of unspecified nature"
-  
-  /*===========================
-   * CONSTRUCTORS
-   * ===========================*/
   
   /**
    * Initialize a new Kegg2jSBML object, using a new Cache and a new KeggAdaptor.
@@ -229,19 +166,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    */
   public void setAddCellDesignerAnnots(boolean addCellDesignerAnnots) {
     this.addCellDesignerAnnots = addCellDesignerAnnots;
-  }
-  /**
-   * See {@link #treatEntrysWithReactionDifferent}
-   * @return
-   */
-  public boolean isTreatEntrysWithReactionDifferent() {
-    return treatEntrysWithReactionDifferent;
-  }
-  /**
-   * @param b - see {@link #treatEntrysWithReactionDifferent}.
-   */
-  public void setTreatEntrysWithReactionDifferent(boolean b) {
-    this.treatEntrysWithReactionDifferent = b;
   }
   
   /**
@@ -453,7 +377,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         mtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
         mtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
         appendAllGOids(pwInfos.getGo_id(), mtGoID);
-        if (mtGoID.getNumResources() > 0)
+        if (mtGoID.getResourceCount() > 0)
           model.addCVTerm(mtGoID);
       }
     }
@@ -679,8 +603,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         }
       }
     }
-    if (reID.getNumResources() > 0) sbReaction.addCVTerm(reID);
-    if (rePWs.getNumResources() > 0) sbReaction.addCVTerm(rePWs);
+    if (reID.getResourceCount() > 0) sbReaction.addCVTerm(reID);
+    if (rePWs.getResourceCount() > 0) sbReaction.addCVTerm(rePWs);
     
     
     // Check the atom balance (only makes sense if reactions are corrected,
@@ -873,38 +797,38 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       
     }
     // Add all non-empty ressources.
-    if (cvtKGID.getNumResources() > 0) {
+    if (cvtKGID.getResourceCount() > 0) {
       setBiologicalQualifierISorHAS_VERSION(cvtKGID);
       spec.addCVTerm(cvtKGID);
     }
-    if (cvtEntrezID.getNumResources() > 0) spec.addCVTerm(cvtEntrezID);
-    if (cvtOmimID.getNumResources() > 0) spec.addCVTerm(cvtOmimID);
-    if (cvtEnsemblID.getNumResources() > 0) spec.addCVTerm(cvtEnsemblID);
-    if (cvtUniprotID.getNumResources() > 0) {
+    if (cvtEntrezID.getResourceCount() > 0) spec.addCVTerm(cvtEntrezID);
+    if (cvtOmimID.getResourceCount() > 0) spec.addCVTerm(cvtOmimID);
+    if (cvtEnsemblID.getResourceCount() > 0) spec.addCVTerm(cvtEnsemblID);
+    if (cvtUniprotID.getResourceCount() > 0) {
       setBiologicalQualifierISorHAS_VERSION(cvtUniprotID);
       spec.addCVTerm(cvtUniprotID);
     }
-    if (cvtChebiID.getNumResources() > 0) {
+    if (cvtChebiID.getResourceCount() > 0) {
       setBiologicalQualifierISorHAS_VERSION(cvtChebiID);
       spec.addCVTerm(cvtChebiID);
     }
-    if (cvtDrugbankID.getNumResources() > 0) {
+    if (cvtDrugbankID.getResourceCount() > 0) {
       setBiologicalQualifierISorHAS_VERSION(cvtDrugbankID);
       spec.addCVTerm(cvtDrugbankID);
     }
-    if (cvtGoID.getNumResources() > 0) spec.addCVTerm(cvtGoID);
-    if (cvtHGNCID.getNumResources() > 0) spec.addCVTerm(cvtHGNCID);
-    if (cvtPubchemID.getNumResources() > 0) spec.addCVTerm(cvtPubchemID);
-    if (cvt3dmetID.getNumResources() > 0) spec.addCVTerm(cvt3dmetID);
-    if (cvtReactionID.getNumResources() > 0) spec.addCVTerm(cvtReactionID);
-    if (cvtTaxonomyID.getNumResources() > 0) spec.addCVTerm(cvtTaxonomyID);
-    if (PDBeChem.getNumResources() > 0) {
+    if (cvtGoID.getResourceCount() > 0) spec.addCVTerm(cvtGoID);
+    if (cvtHGNCID.getResourceCount() > 0) spec.addCVTerm(cvtHGNCID);
+    if (cvtPubchemID.getResourceCount() > 0) spec.addCVTerm(cvtPubchemID);
+    if (cvt3dmetID.getResourceCount() > 0) spec.addCVTerm(cvt3dmetID);
+    if (cvtReactionID.getResourceCount() > 0) spec.addCVTerm(cvtReactionID);
+    if (cvtTaxonomyID.getResourceCount() > 0) spec.addCVTerm(cvtTaxonomyID);
+    if (PDBeChem.getResourceCount() > 0) {
       setBiologicalQualifierISorHAS_VERSION(PDBeChem);
       spec.addCVTerm(PDBeChem);
     }
-    if (GlycomeDB.getNumResources() > 0) spec.addCVTerm(GlycomeDB);
-    if (LipidBank.getNumResources() > 0) spec.addCVTerm(LipidBank);
-    if (ECNumbers.getNumResources() > 0) spec.addCVTerm(ECNumbers);
+    if (GlycomeDB.getResourceCount() > 0) spec.addCVTerm(GlycomeDB);
+    if (LipidBank.getResourceCount() > 0) spec.addCVTerm(LipidBank);
+    if (ECNumbers.getResourceCount() > 0) spec.addCVTerm(ECNumbers);
     
     // Set a static ECO Code
     // ECO_CODE "ECO:0000313"="imported information used in automatic assertion"   
@@ -970,7 +894,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @param CVterm any CVTerm
    */
   protected void setBiologicalQualifierISorHAS_VERSION(CVTerm CVterm) {
-    if (CVterm.getNumResources() > 1) {
+    if (CVterm.getResourceCount() > 1) {
       // Multiple proteins in one node
       CVterm.setBiologicalQualifierType(Qualifier.BQB_HAS_VERSION);
     } else {
@@ -1115,7 +1039,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         }
         
       }
-      if (cvt.getNumResources() > 0) spec.addCVTerm(cvt);
+      if (cvt.getResourceCount() > 0) spec.addCVTerm(cvt);
       notesAppend.append("</ul></p>");
       notes.append(notesAppend.toString());
     }
@@ -1125,7 +1049,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     spec.setNotes(notes.toString());
     
     // Set SBO Term
-    spec.setSBOTerm(getSBOTerm(entry.getType()));
+    spec.setSBOTerm(SBOMapping.getSBOTerm(entry));
     
     // Add Miriam URNs
     addMiriamURNs(entry, spec);
@@ -1174,9 +1098,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         // 1 & 2: klar. 3 (group): Doku sagt "MOSTLY a protein complex". 4 (ortholog): Kommen in
         // nicht-spezies spezifischen PWs vor und sind quasi otholog geclusterte gene.
         // 5. (genes) ist group in kgml versionen <0.7.
-        modifier.setSBOTerm(ET_EnzymaticModifier2SBO); // 460 = Enzymatic catalyst
+        modifier.setSBOTerm(SBOMapping.ET_EnzymaticModifier2SBO); // 460 = Enzymatic catalyst
       } else { // "Metall oder etwas anderes, was definitiv nicht enzymatisch wirkt"
-        modifier.setSBOTerm(ET_GeneralModifier2SBO); // 13 = Catalyst
+        modifier.setSBOTerm(SBOMapping.ET_GeneralModifier2SBO); // 13 = Catalyst
       }
       
       // Remember modifier for later association with reaction.
@@ -1373,35 +1297,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         return false;
     return true;
   }
-  
-  
-  /**
-   * Returns the SBO Term for an EntryType.
-   * @param type - the KEGG EntryType, you want an SBMO Term for.
-   * @return SBO Term (integer).
-   */
-  private static int getSBOTerm(EntryType type) {
-    if (type.equals(EntryType.compound))
-      return ET_Compound2SBO;
-    if (type.equals(EntryType.enzyme))
-      return ET_Enzyme2SBO;
-    if (type.equals(EntryType.gene))
-      return ET_Gene2SBO;
-    if (type.equals(EntryType.group))
-      return ET_Group2SBO;
-    if (type.equals(EntryType.genes))
-      return ET_Group2SBO;
-    if (type.equals(EntryType.map))
-      return ET_Map2SBO;
-    if (type.equals(EntryType.ortholog))
-      return ET_Ortholog2SBO;
-    
-    if (type.equals(EntryType.other))
-      return ET_Other2SBO;
-    
-    return ET_Other2SBO;
-  }
-  
   
   /**
    * Provides some direct access to KEGG2JSBML functionalities.

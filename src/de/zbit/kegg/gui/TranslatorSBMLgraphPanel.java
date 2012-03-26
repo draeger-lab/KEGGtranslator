@@ -68,6 +68,7 @@ import y.view.Graph2D;
 import y.view.HitInfo;
 import y.view.LineType;
 import y.view.NodeRealizer;
+import de.zbit.graph.CloneMarker;
 import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.layout.LayoutHelper;
@@ -448,7 +449,13 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
                 // Split enzymes to have a nicer visualization. 
                 if (usedEnzymes.contains(source)) {
                   // TODO: IMPORTANT Cloned node must have a black 1/3 bottom!
-                  source = source.createCopy(simpleGraph);
+                  Node oldSource = source;
+                  source = oldSource.createCopy(simpleGraph);
+                  NodeRealizer realizer = simpleGraph.getRealizer(source);
+                  if (realizer instanceof CloneMarker) {
+                    ((CloneMarker) realizer).setNodeIsCloned(true);
+                    ((CloneMarker) simpleGraph.getRealizer(oldSource)).setNodeIsCloned(true);
+                  }
                   unlayoutedNodes.add(source);
                   GraphElement2SBMLid.put(source, sr.getSpecies());
                 }

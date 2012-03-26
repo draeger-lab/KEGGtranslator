@@ -34,8 +34,13 @@ import y.view.ShapeNodeRealizer;
  * @author Finja B&uuml;chel
  * @version $Rev$
  */
-public class ComplexNode extends ShapeNodeRealizer {
+public class ComplexNode extends ShapeNodeRealizer implements SimpleCloneMarker {
   
+  /**
+   * Is this node a cloned node? (I.e. another
+   * instance must exist in the same graph).
+   */
+  private boolean isClonedNode=false;
 
   public ComplexNode() {
     super(ShapeNodeRealizer.ROUND_RECT);
@@ -48,10 +53,27 @@ public class ComplexNode extends ShapeNodeRealizer {
       ComplexNode fnr = (ComplexNode) nr;
       // Copy the values of custom attributes (there are none). 
     }
+    if (nr instanceof CloneMarker) {
+      setNodeIsCloned(((CloneMarker) nr).isNodeCloned());
+    }
   }
   
   public NodeRealizer createCopy(NodeRealizer nr) {
     return new ComplexNode(nr);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.CloneMarker#setNodeIsCloned(boolean)
+   */
+  public void setNodeIsCloned(boolean b) {
+    isClonedNode = b;
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.graph.CloneMarker#isNodeCloned()
+   */
+  public boolean isNodeCloned() {
+    return isClonedNode;
   }
   
   /* (non-Javadoc)
@@ -71,6 +93,8 @@ public class ComplexNode extends ShapeNodeRealizer {
    if (!isTransparent() && getFillColor()!=null) {
       gfx.setColor(getFillColor());
       gfx.fill(getPolygon());
+      
+      CloneMarker.Tools.paintLowerBlackIfCloned(gfx, this, getPolygon());
     }
   }
   

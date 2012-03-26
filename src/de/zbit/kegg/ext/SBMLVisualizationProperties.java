@@ -31,6 +31,7 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import de.zbit.graph.ComplexNode;
 import de.zbit.graph.NucleicAcidFeatureNode;
+import de.zbit.graph.ShapeNodeRealizerSupportingCloneMarker;
 
 /**
  * This class stores the sbo terms and the corresponding NodeRealizer classes to visualize SBGN
@@ -51,7 +52,7 @@ public class SBMLVisualizationProperties {
   /**
    * default shape is an Ellipse
    */
-  private final static ShapeNodeRealizer defaultShape = new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE);
+  private final static ShapeNodeRealizer defaultShape = new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE);
   
   /**
    * 
@@ -78,12 +79,12 @@ public class SBMLVisualizationProperties {
     sbo2shape.put(Macromolecule_Enzyme1, getEnzymeRelizerRaw()); // macromolecule - enzyme
     sbo2shape.put(Macromolecule_Enzyme2, sbo2shape.get(Macromolecule_Enzyme1)); // macromolecule - enzyme
     
-    sbo2shape.put(simpleChemical, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // simple chemical - simple chemical
+    sbo2shape.put(simpleChemical, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // simple chemical - simple chemical
     
     sbo2shape.put(gene, new NucleicAcidFeatureNode()); // nucleic acid feature - gene
     
-    sbo2shape.put(materialEntityOfUnspecifiedNature, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // unspecified - material entity of unspecified nature
-    sbo2shape.put(map, new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE)); // unspecified - empty set
+    sbo2shape.put(materialEntityOfUnspecifiedNature, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // unspecified - material entity of unspecified nature
+    sbo2shape.put(map, new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ELLIPSE)); // unspecified - empty set
     
     sbo2shape.put(nonCovalentComplex, new ComplexNode()); // complex - non-covalent complex
     
@@ -151,7 +152,7 @@ public class SBMLVisualizationProperties {
    * @return {@link ShapeNodeRealizer}, specially made for enzymes.
    */
   private static ShapeNodeRealizer getEnzymeRelizerRaw() {
-    return new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT);
+    return new ShapeNodeRealizerSupportingCloneMarker(ShapeNodeRealizer.ROUND_RECT);
   }
   
   /**
