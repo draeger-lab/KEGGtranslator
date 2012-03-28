@@ -455,6 +455,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
                   if (realizer instanceof CloneMarker) {
                     ((CloneMarker) realizer).setNodeIsCloned(true);
                     ((CloneMarker) simpleGraph.getRealizer(oldSource)).setNodeIsCloned(true);
+                  } else {
+                    log.warning("Can not setup clone marker on " + realizer.getClass().getSimpleName());
                   }
                   unlayoutedNodes.add(source);
                   GraphElement2SBMLid.put(source, sr.getSpecies());
@@ -483,6 +485,7 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       TranslatorTools tools = new TranslatorTools(simpleGraph);
       if (useLayoutExtension) {
         // Only layout nodes, that had no coords in the layout extension
+        // XXX: Would be nicer if we could somehow layout the subset with OrthogonalLayouter
         tools.layoutNodeSubset(unlayoutedNodes, true);
       } else {
         // Apply Hierarchic layout if no layoutExtension is available.

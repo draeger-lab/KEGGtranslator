@@ -25,15 +25,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.sbml.jsbml.AbstractSBase;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.SBMLDocument;
@@ -60,7 +59,6 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.ArrayUtils;
-import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
 
 /**
@@ -83,29 +81,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   public static final String QUAL_NS_NAME = "qual";
   
   /**
-   * A map to translate {@link SubType}s to SBO terms
+   * If false, the result will contain ONLY a qual model with
+   * qual species and transitions.
+   * if true, the resulting SBML will contain species and reactions,
+   * as well as qualSpecies and transitions.
    */
-  public static Map<String, Integer> Subtype2SBO = new HashMap<String, Integer>();
+  private boolean considerReactions = false;
   
-  static {
-    // Init subtype map
-    Subtype2SBO.put(SubType.ACTIVATION, 170); // = stimulation
-    Subtype2SBO.put(SubType.ASSOCIATION, 177); // = non-covalent binding
-    Subtype2SBO.put(SubType.BINDING, 177);
-    Subtype2SBO.put(SubType.BINDING_ASSOCIATION, 177);
-    Subtype2SBO.put(SubType.DEPHOSPHORYLATION, 330); // dephosphorylation
-    Subtype2SBO.put(SubType.DISSOCIATION, 177);
-    Subtype2SBO.put(SubType.EXPRESSION, 170); 
-    Subtype2SBO.put(SubType.GLYCOSYLATION, 217); // glycosylation
-    Subtype2SBO.put(SubType.INDIRECT_EFFECT, 344); // molecular interaction
-    Subtype2SBO.put(SubType.INHIBITION, 169);
-    Subtype2SBO.put(SubType.METHYLATION, 214); // methylation
-    Subtype2SBO.put(SubType.MISSING_INTERACTION, 396);  // uncertain process
-    Subtype2SBO.put(SubType.PHOSPHORYLATION, 216); // phosphorylation
-    Subtype2SBO.put(SubType.REPRESSION, 169);
-    Subtype2SBO.put(SubType.STATE_CHANGE, 168); // control
-    Subtype2SBO.put(SubType.UBIQUITINATION, 224); // ubiquitination
-  }
   
   /**
    * @param document
@@ -169,7 +151,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     // Create qualitative model
     Model model = doc.getModel();
     QualitativeModel qualModel = new QualitativeModel(model);
-   
+    
     // Add extension and namespace to model
     doc.addNamespace(KEGG2SBMLqual.QUAL_NS_NAME, "xmlns", KEGG2SBMLqual.QUAL_NS);
     doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", "true");
@@ -196,8 +178,6 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model, false);
     }
     
-    
-    
     return doc;
   }
   
@@ -212,10 +192,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * @throws IOException 
    */
   public static void writeMatchingFile(String fileName, Pathway p)
-      throws IOException {
+  throws IOException {
     BufferedWriter matchWriter = new BufferedWriter(new FileWriter(fileName));
     List<String> output = new LinkedList<String>();
-
+    
     for (Entry entry : p.getEntries()) {
       Object s = entry.getCustom();
       if (s != null && s instanceof Species) {
@@ -234,15 +214,15 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
               output.add(g.getCoords()[i] + "");
             }
           }
-
+          
           matchWriter.append(ArrayUtils.implode(output, "\t"));
           matchWriter.append('\n');
         }
       }
     }
-
+    
     matchWriter.close();
-
+    
   }
   
   /**
@@ -260,7 +240,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       }
     }
   }
-
+  
   /**
    * 
    * @param r
@@ -274,10 +254,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     Entry eOne = p.getEntryForId(r.getEntry1());
     Entry eTwo = p.getEntryForId(r.getEntry2());
-
+    
     QualitativeSpecies qOne = eOne==null?null:(QualitativeSpecies) eOne.getCustom();
     QualitativeSpecies qTwo = eTwo==null?null:(QualitativeSpecies) eTwo.getCustom();
-
+    
     if (qOne==null || qTwo==null) {
       // Happens, e.g. when remove_pw_references is true and there is a
       // relation to this (now removed) node.
@@ -286,17 +266,17 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     }
     
     Transition t = qualModel.createTransition(NameToSId("tr"));
-   
+    
     // Input
     Input in = t.createInput(NameToSId("in"), qOne, InputTransitionEffect.none); //TODO: is this correct?
     in.setMetaId("meta_" + in.getId());
-
+    
     // Output
     t.createOutput(NameToSId("out"), qTwo, OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
     
-    //TODO: function term
-
-
+    //XXX: "function term" is intentionally not set in KEGG2X (info not provided).
+    
+    
     // Determine sign variable, SBO Terms and add MIRIAM URNs
     Sign sign = Sign.unknown;
     Set<Integer> SBOs = new HashSet<Integer>();
@@ -314,23 +294,24 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
           
         } else {
           sign = Sign.negative;
-          in.setSBOTerm(Subtype2SBO.get(SubType.INHIBITION));
+          setSBOTerm(in, SBOMapping.getSBOTerm(SubType.INHIBITION));
+          
         }
         
       } else if (subTypeNames.contains(SubType.ACTIVATION) || subTypeNames.contains(SubType.EXPRESSION)) {
         sign = Sign.positive;
-        in.setSBOTerm(Subtype2SBO.get(SubType.ACTIVATION));
+        setSBOTerm(in, SBOMapping.getSBOTerm(SubType.ACTIVATION));
         
       } else if(subTypeNames.contains(SubType.STATE_CHANGE)) {
-        in.setSBOTerm(Subtype2SBO.get(SubType.STATE_CHANGE));
+        setSBOTerm(in, SBOMapping.getSBOTerm(SubType.STATE_CHANGE));
         
       }
       
       // Add all subtypes as MIRIAM annotation
       for (String subType: subTypeNames) {
-        Integer subSBO = Subtype2SBO.get(subType);
-        if (subSBO!=null) {
-          cv.addResource(KeggInfos.miriam_urn_sbo + formatSBO(subSBO));
+        Integer subSBO = SBOMapping.getSBOTerm(subType);
+        if (subSBO!=null && subSBO>0) {
+          cv.addResource(KeggInfos.miriam_urn_sbo + SBOMapping.formatSBOforMIRIAM(subSBO));
           SBOs.add(subSBO);
         }
       }
@@ -342,21 +323,21 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     if (SBOs.size()>0 ) {
       // Remove unspecific ones, try to get the specific ones
       if (SBOs.size()>1) {
-        SBOs.remove(Subtype2SBO.get(SubType.MISSING_INTERACTION));
+        SBOs.remove(SBOMapping.getSBOTerm(SubType.MISSING_INTERACTION));
       }
       if (SBOs.size()>1) {
         // Remark: If activation and inhibition is set, 168 is always added as third sbo.
-        SBOs.remove(Subtype2SBO.get(SubType.ACTIVATION));
-        SBOs.remove(Subtype2SBO.get(SubType.INHIBITION));
+        SBOs.remove(SBOMapping.getSBOTerm(SubType.ACTIVATION));
+        SBOs.remove(SBOMapping.getSBOTerm(SubType.INHIBITION));
       }
       if (SBOs.size()>1) {
-        SBOs.remove(Subtype2SBO.get(SubType.STATE_CHANGE));
+        SBOs.remove(SBOMapping.getSBOTerm(SubType.STATE_CHANGE));
       }
       if (SBOs.size()>1) {
-        SBOs.remove(Subtype2SBO.get(SubType.BINDING_ASSOCIATION));
+        SBOs.remove(SBOMapping.getSBOTerm(SubType.BINDING_ASSOCIATION));
       }
       if (SBOs.size()>1) {
-        SBOs.remove(Subtype2SBO.get(SubType.INDIRECT_EFFECT));
+        SBOs.remove(SBOMapping.getSBOTerm(SubType.INDIRECT_EFFECT));
       }
       t.setSBOTerm(SBOs.iterator().next());
     }
@@ -368,23 +349,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       //setBiologicalQualifierISorHAS_VERSION(cv);
       t.addCVTerm(cv);
     }
-
+    
     return t;
   }
   
-  /**
-   * Formats an SBO term. E.g. "177" to "SBO%3A0000177".
-   * @param i
-   * @return
-   */
-  private String formatSBO(int i) {
-    StringBuilder b = new StringBuilder("SBO%3A");
-    String iString = Integer.toString(i);
-    b.append(StringUtil.replicateCharacter('0', 7-iString.length()));
-    b.append(iString);
-    return b.toString();
-  }
-
   /**
    * Checks if there is already a qual species, matching the given species
    * and returns it. If not, creates a new qual species for the given
@@ -400,6 +368,17 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       qs = qualModel.createQualitativeSpecies(id, "meta_" + id, species);
     }
     return qs;  
+  }
+  
+  /**
+   * Accepts values smaller than zero to unset the SBO term.
+   * Else, sets the SBO term to the given value.
+   * @param sbase
+   * @param term
+   */
+  private static void setSBOTerm(AbstractSBase sbase, int term) {
+    if (term<0) sbase.unsetSBOTerm();
+    else sbase.setSBOTerm(term);
   }
   
   /**
@@ -463,7 +442,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     long start = System.currentTimeMillis();
     try {
       //k2s.translate("files/KGMLsamplefiles/hsa04010.xml", "files/KGMLsamplefiles/hsa04010.sbml.xml");
-//      k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
+      //      k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
       
       SBMLDocument doc = k2s.translate(new File("files/KGMLsamplefiles/hsa04210.xml"));
       new SBMLWriter().write(doc, "files/KGMLsamplefiles/hsa04210.sbml.xml"); 
@@ -482,13 +461,23 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   }
   
   
+  /**
+   * See {@link #considerReactions}. Please stick to the default
+   * (false) as this has a massive influence on the ouput of this class.
+   * 
+   * @param b
+   */
+  public void setConsiderReactions(boolean b) {
+    considerReactions = b;
+  }
+  
   @Override
   protected boolean considerRelations() {
     return true;
   }
-
+  
   @Override
   protected boolean considerReactions() {    
-    return false;
+    return considerReactions; // FALSE in doubt
   }
 }

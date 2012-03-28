@@ -121,8 +121,8 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
       TranslatorPanel<SBMLDocument> qualGraph = createGraphPanel(true);
       tabs.addTab("Graph view", qualGraph);
       if (quantGraph!=null) {
-        tabs.setTitleAt(tabs.indexOfTabComponent(quantGraph), "Graph of quantitative model");
-        tabs.setTitleAt(tabs.indexOfTabComponent(qualGraph), "Graph of qualitative model");
+        tabs.setTitleAt(tabs.indexOfComponent(quantGraph), "Graph of quantitative model");
+        tabs.setTitleAt(tabs.indexOfComponent(qualGraph), "Graph of qualitative model");
       }
     }
     

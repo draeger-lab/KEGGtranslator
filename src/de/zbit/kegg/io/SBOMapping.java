@@ -20,10 +20,16 @@
  */
 package de.zbit.kegg.io;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
+import de.zbit.kegg.parser.pathway.Relation;
+import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.kegg.parser.pathway.ext.EntryExtended;
 import de.zbit.kegg.parser.pathway.ext.GeneType;
+import de.zbit.util.StringUtil;
 
 /**
  * This static class defines how to map from certain
@@ -113,6 +119,31 @@ public class SBOMapping {
   
   
   /**
+   * A map to translate {@link SubType}s of {@link Relation}s to SBO terms
+   */
+  private static Map<String, Integer> subtype2SBO = new HashMap<String, Integer>();
+  
+  static {
+    // Init subtype map
+    subtype2SBO.put(SubType.ACTIVATION, 170); // = stimulation
+    subtype2SBO.put(SubType.ASSOCIATION, 177); // = non-covalent binding
+    subtype2SBO.put(SubType.BINDING, 177);
+    subtype2SBO.put(SubType.BINDING_ASSOCIATION, 177);
+    subtype2SBO.put(SubType.DEPHOSPHORYLATION, 330); // dephosphorylation
+    subtype2SBO.put(SubType.DISSOCIATION, 177);
+    subtype2SBO.put(SubType.EXPRESSION, 170); 
+    subtype2SBO.put(SubType.GLYCOSYLATION, 217); // glycosylation
+    subtype2SBO.put(SubType.INDIRECT_EFFECT, 344); // molecular interaction
+    subtype2SBO.put(SubType.INHIBITION, 169);
+    subtype2SBO.put(SubType.METHYLATION, 214); // methylation
+    subtype2SBO.put(SubType.MISSING_INTERACTION, 396);  // uncertain process
+    subtype2SBO.put(SubType.PHOSPHORYLATION, 216); // phosphorylation
+    subtype2SBO.put(SubType.REPRESSION, 169);
+    subtype2SBO.put(SubType.STATE_CHANGE, 168); // control
+    subtype2SBO.put(SubType.UBIQUITINATION, 224); // ubiquitination
+  }
+  
+  /**
    * Get the most appropriate SBO term for this
    * <code>entry</code>.
    * @param entry
@@ -170,7 +201,55 @@ public class SBOMapping {
     
     return ET_Other2SBO;
   }
+
+
+  /**
+   * Get an SBO term for a {@link SubType}.
+   * Typically, {@link SubType}s are used in {@link Relation}s.
+   * @param subtype one of the constants, defined in the {@link SubType} class.
+   * @return appropriate SBO term.
+   */
+  public static int getSBOTerm(String subtype) {
+    // NOTE: It is intended to return -1 for "compound"!
+    Integer ret = subtype2SBO.get(subtype);
+    if (ret==null) ret = -1;
+    return ret;
+  }
   
+
+  /**
+   * Formats an SBO term. E.g. "177" to "SBO:0000177".
+   * @param sbo
+   * @return
+   */
+  public static String formatSBO(int sbo) {
+    return formatSBO(sbo, "SBO:");
+  }
   
+  /**
+   * Formats an SBO term. E.g. "177" to "SBO%3A0000177".
+   * Uses HTML encoding %3A to encode the double point.
+   * @param sbo
+   * @return
+   */
+  public static String formatSBOforMIRIAM(int sbo) {
+    return formatSBO(sbo, "SBO%3A");
+  }
+  
+  /**
+   * Formats an SBO term to contain 7 digits after an
+   * arbitrary prefix. E.g., "177" and prefix "SBO%3A"
+   * to "SBO%3A0000177".
+   * @param sbo
+   * @param prefix
+   * @return
+   */
+  private static String formatSBO(int sbo, String prefix) { 
+    StringBuilder b = new StringBuilder(prefix);
+    String iString = Integer.toString(sbo);
+    b.append(StringUtil.replicateCharacter('0', 7-iString.length()));
+    b.append(iString);
+    return b.toString();
+  }
   
 }

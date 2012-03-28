@@ -346,7 +346,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
      */
     
     // next line is same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
-    String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(p.getName());
+    String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(p.getName());
     if (kgMiriamEntry != null) mtPwID.addResource(kgMiriamEntry);
     model.addCVTerm(mtPwID);
     
@@ -399,10 +399,10 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     if (p.getVersion() > 0 || (p.getComment() != null && p.getComment().length() > 0)) {
       notes.append("<p>");
       if (p.getComment() != null && p.getComment().length() > 0) {
-        notes.append(String.format("KGML comment: %s%s%s<br/>\n", quotStart, formatTextForHTMLnotes(p.getComment()), quotEnd));
+        notes.append(String.format("%s comment: %s%s%s<br/>\n", p.getOriginFormatName(), quotStart, formatTextForHTMLnotes(p.getComment()), quotEnd));
       }
       if (p.getVersion() > 0) {
-        notes.append(String.format("KGML version was: %s<br/>\n", Double.toString(p.getVersion())));
+        notes.append(String.format("%s version was: %s<br/>\n", p.getOriginFormatName(), Double.toString(p.getVersion())));
       }
       notes.append("</p>");
     }
@@ -561,7 +561,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     CVTerm rePWs = new CVTerm(); rePWs.setQualifierType(Type.BIOLOGICAL_QUALIFIER); rePWs.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
     
     for (String ko_id : r.getName().split(" ")) {
-      String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(ko_id);
+      String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(ko_id);
       if (kgMiriamEntry != null) reID.addResource(kgMiriamEntry);
       
       // Retrieve further information via Kegg API
@@ -717,7 +717,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents()) continue; // "undefined" = group node, which contains "Components"
       
       // Add Kegg-id Miriam identifier
-      String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(ko_id, entry.getType());
+      String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(ko_id, entry.getType());
       if (kgMiriamEntry != null) cvtKGID.addResource(kgMiriamEntry);
       
       // Retrieve further information via Kegg API -- Be careful: very slow! Precache all queries at top of this function!
@@ -1032,7 +1032,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           
           // Append all kegg ids as "has_part"
           for (String kg_id: ce.getName().split(" ")) {
-            String kgMiriamEntry = KeggInfos.getMiriamURIforKeggID(kg_id, ce.getType());
+            String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(kg_id, ce.getType());
             if (kgMiriamEntry != null) cvt.addResource(kgMiriamEntry);
           }
           
@@ -1231,9 +1231,16 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     if (IDs==null || IDs.length()<1) return;
     for (String id : IDs.split(" ")) {
       if (id!=null && id.trim().length()>0) {
-        String urn = miriam_URNPrefix + KeggInfos.suffix(id);
+        String urn = miriam_URNPrefix==null?"":miriam_URNPrefix;
+        urn += KeggInfos.suffix(id);
         if (!myCVterm.getResources().contains(urn)) {
           myCVterm.addResource(urn);
+          /* XXX Note: we could add an option to provide URIs instead of URNs:
+           * Example:
+           *  urn:miriam:3dmet:B01130
+           * to
+           *  http://identifiers.org/3dmet/B01130 
+           */
         }
       }
     }
