@@ -73,6 +73,7 @@ import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.layout.LayoutHelper;
 import de.zbit.io.filefilter.SBFileFilter;
+import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.ext.SBMLVisualizationProperties;
@@ -511,6 +512,8 @@ public class TranslatorSBMLgraphPanel extends TranslatorGraphLayerPanel<SBMLDocu
       en.getValue().fixLayout(reactants, products, modifier);
     }
 
+    // TODO: This is for temporary debugging. please do not commit it or remove it.
+    KEGG2yGraph.createKEGG2GraphML(Translator.getManager()).writeToFile(simpleGraph,"C:/Users/buechel/Downloads/graphmlFile.GraphML");
     
     return simpleGraph;
   }

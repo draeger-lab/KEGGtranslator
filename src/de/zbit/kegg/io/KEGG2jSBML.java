@@ -1109,10 +1109,10 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     } else {
       name = name.trim();
       char c = name.charAt(0);
-      if (!(Character.isLetter(c) || c == '_')) ret = "SId_"; else ret = Character.toString(c);
+      if (!(isLetter(c) || c == '_')) ret = "SId_"; else ret = Character.toString(c);
       for (int i = 1; i < name.length(); i++) {
         c = name.charAt(i);
-        if (Character.isLetter(c) || Character.isDigit(c) || c == '_') ret += Character.toString(c);
+        if (isLetter(c) || Character.isDigit(c) || c == '_') ret += Character.toString(c);
       }
       if (SIds.contains(ret)) ret = incrementSIdSuffix(ret);
       SIds.add(ret);
@@ -1121,6 +1121,16 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     return ret;
   }
   
+  /**
+   * Returns true if c is out of A-Z or a-z.
+   * @param c
+   * @return
+   */
+  private static boolean isLetter(char c) {
+    // Unfortunately Character.isLetter also acceps ß, but SBML doesn't.
+    int type = Character.getType(c);
+    return type==Character.UPPERCASE_LETTER || type==Character.LOWERCASE_LETTER;
+  }
   
   /**
    * Appends "_<Number>" to a given String. <Number> is being set to the next
