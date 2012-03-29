@@ -9,7 +9,6 @@
  * obtain the latest version of KEGGtranslator.
  *
  * Copyright (C) 2011 by the University of Tuebingen, Germany.
- *
  * KEGGtranslator is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
@@ -1128,8 +1127,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    */
   private static boolean isLetter(char c) {
     // Unfortunately Character.isLetter also acceps ß, but SBML doesn't.
-    int type = Character.getType(c);
-    return type==Character.UPPERCASE_LETTER || type==Character.LOWERCASE_LETTER;
+    // a-z or A-Z
+    return (c>=97 && c<=122) || (c>=65 && c<=90);
   }
   
   /**
