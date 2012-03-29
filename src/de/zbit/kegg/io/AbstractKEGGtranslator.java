@@ -119,7 +119,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * This manager uses a cache and retrieved informations from the KeggDB. By
    * using the cache, it is very fast in retrieving informations.
    */
-  protected KeggInfoManagement manager;
+  protected static KeggInfoManagement manager;
   
   /**
    * A flag, if the last sbml file that has been written by this class was
@@ -145,11 +145,14 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * ===========================*/
   
   /**
-   * @param manager2
+   * @param manage
    */
-  public AbstractKEGGtranslator(KeggInfoManagement manager) {
-    if (manager==null) manager = new KeggInfoManagement();
-    this.manager = manager;
+  public AbstractKEGGtranslator(KeggInfoManagement manage) {
+    if (manager==null && manage==null) {
+      manager = new KeggInfoManagement();
+    } else if (manage!=null) {
+      setKeggInfoManager(manage);
+    }
     
     loadPreferences();
   }
@@ -227,15 +230,15 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
 
   /**
    * See {@link #manager}
-   * @param manager
+   * @param manage
    */
-  public void setKeggInfoManager(KeggInfoManagement manager) {
-    this.manager = manager;
+  public static void setKeggInfoManager(KeggInfoManagement manage) {
+    manager = manage;
   }
   /**
    * @return - see {@link #manager}.
    */
-  public KeggInfoManagement getKeggInfoManager() {
+  public static KeggInfoManagement getKeggInfoManager() {
     return manager;
   }
   /**
@@ -686,7 +689,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @param text
    * @return
    */
-  public String formatTextForHTMLnotes(String text) {
+  public static String formatTextForHTMLnotes(String text) {
     if (text==null) return "";
     return EscapeChars.forHTML(text.replace('\n', ' '));
   }

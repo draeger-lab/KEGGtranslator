@@ -38,6 +38,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -96,6 +97,10 @@ import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.kegg.parser.pathway.ext.EntryExtended;
+import de.zbit.util.ArrayUtils;
+import de.zbit.util.DatabaseIdentifiers;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 import de.zbit.util.SortedArrayList;
 import de.zbit.util.Utils;
 
@@ -709,19 +714,33 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         // Remember node in KEGG Structure for further references.
         e.setCustom(n);
         
-        
-        // KeggAdaptor.
-        //boolean hasMultipleIDs = false;
-        //if (e.getName().trim().contains(" ")) hasMultipleIDs = true;
-        
+        // Init variables
         List<KeggInfos> keggInfos = new LinkedList<KeggInfos>();
         String name2="",definition="",entrezIds2="",uniprotIds2="",eType="",ensemblIds2="";
+        
+        // Get a map of existing identifiers or create a new one
+        Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> ids = new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
+        if (e instanceof EntryExtended) {
+          ids = ((EntryExtended)e).getDatabaseIdentifiers();
+          
+          String temp = extractExistingIdentifiers(ids, IdentifierDatabases.EntrezGene);
+          if (temp!=null) entrezIds2 = temp;
+          temp = extractExistingIdentifiers(ids, IdentifierDatabases.UniProt_AC);
+          if (temp!=null) uniprotIds2 = temp;
+          temp = extractExistingIdentifiers(ids, IdentifierDatabases.Ensembl);
+          if (temp!=null) ensemblIds2 = temp;
+        }
+        
+        // Get all available annotations
         for (String ko_id:e.getName().split(" ")) {
           //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zusaetzlich: in sortedArrayList merken.
           if (ko_id.trim().equalsIgnoreCase("undefined") || e.hasComponents()) continue;
           
           KeggInfos infos = KeggInfos.get(ko_id, manager);
           keggInfos.add(infos);
+          
+          // Add all available identifiers (enzrez gene, ensembl, etc)
+          infos.addAllIdentifiers(ids);
           
           // "NCBI-GeneID:","UniProt:", "Ensembl:", ... aus dem GET rausparsen
           if (infos.queryWasSuccessfull()) {
@@ -746,6 +765,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
               if (text!=null && text.length()!=0) definition+=(definition.length()!=0?",":"")+text.replace(",", "").replace("\n", " ");
             }
             
+            // Set entrez, uniprot and ensembl identifiers
             text = infos.getEntrez_id(); //KeggAdaptor.extractInfo(infos, "NCBI-GeneID:", "\n"); //adap.getEntrezIDs(ko_id);
             if (text!=null && text.length()!=0) entrezIds2+=(entrezIds2.length()!=0?",":"")+text; //.replace(",", "");
             text = infos.getUniprot_id(); //KeggAdaptor.extractInfo(infos, "UniProt:", "\n"); //adap.getUniprotIDs(ko_id);
@@ -753,8 +773,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
             text = infos.getEnsembl_id(); //KeggAdaptor.extractInfo(infos, "Ensembl:", "\n"); //adap.getEnsemblIDs(ko_id);
             if (text!=null && text.length()!=0) ensemblIds2+=(ensemblIds2.length()!=0?",":"")+text; //.replace(",", "");
             
-            ////eType+=(!eType.length()==0?",":"")+e.getType().toString();
-            //eType+=(!eType.length()==0?",":"");
+            
             if (eType.length()==0) { // Not yet set
               if (e.getType().equals(EntryType.compound))
                 eType = "small molecule";
@@ -1110,6 +1129,24 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     mapDescriptionMap.set(interactionDescription, GraphMLmaps.EDGE_TYPE);
     
     return graph;
+  }
+  
+  /**
+   * @param ids
+   * @return comma separated list of existing identifiers for the given db,
+   * or null of non exists. 
+   */
+  public String extractExistingIdentifiers(Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> ids,
+    DatabaseIdentifiers.IdentifierDatabases db) {
+    Collection<String> temp = ids.get(db);
+    if (temp!=null && temp.size()>0) {
+      String union = ArrayUtils.implode(temp, ",");
+      while ((union = union.replace(",,", "")).contains(",,"));
+      if (union.trim().length()>0) {
+        return union;
+      }
+    }
+    return null;
   }
   
   /**
@@ -1509,8 +1546,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       }
       
       // Remember already queried objects (save cache)
-      if (k2g.getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, k2g.getKeggInfoManager());
+      if (AbstractKEGGtranslator.getKeggInfoManager().hasChanged()) {
+        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, AbstractKEGGtranslator.getKeggInfoManager());
       }
       
       return;
@@ -1526,8 +1563,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       //k2g.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010." + k2g.getOutputHandler().getFileNameExtension());
       
       // Remember already queried objects
-      if (k2g.getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, k2g.getKeggInfoManager());
+      if (AbstractKEGGtranslator.getKeggInfoManager().hasChanged()) {
+        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, AbstractKEGGtranslator.getKeggInfoManager());
       }
       
     } catch (Exception e) {

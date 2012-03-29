@@ -28,7 +28,7 @@ import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.kegg.parser.pathway.ext.EntryExtended;
-import de.zbit.kegg.parser.pathway.ext.GeneType;
+import de.zbit.kegg.parser.pathway.ext.EntryTypeExtended;
 import de.zbit.util.StringUtil;
 
 /**
@@ -152,17 +152,19 @@ public class SBOMapping {
   public static int getSBOTerm(Entry entry) {
     if (entry instanceof EntryExtended && 
         ((EntryExtended) entry).isSetGeneType()) {
-      GeneType type = ((EntryExtended) entry).getGeneType();
+      EntryTypeExtended type = ((EntryExtended) entry).getGeneType();
       
-      if (type.equals(GeneType.protein)) {
+      if (type.equals(EntryTypeExtended.protein)) {
         return GT_Protein2SBO;
-      } else if (type.equals(GeneType.dna)) {
+      } else if (type.equals(EntryTypeExtended.gene)) {
+        return ET_Gene2SBO;
+      } else if (type.equals(EntryTypeExtended.dna)) {
         return GT_DNA2SBO;
-      } else if (type.equals(GeneType.dna_region)) {
+      } else if (type.equals(EntryTypeExtended.dna_region)) {
         return GT_DNARegion2SBO;
-      } else if (type.equals(GeneType.rna)) {
+      } else if (type.equals(EntryTypeExtended.rna)) {
         return GT_RNA2SBO;
-      } else if (type.equals(GeneType.rna_region)) {
+      } else if (type.equals(EntryTypeExtended.rna_region)) {
         return GT_RNARegion2SBO;
       } else {
         // GeneType is NOT mandatory and just additionally
@@ -186,7 +188,7 @@ public class SBOMapping {
     if (type.equals(EntryType.enzyme))
       return ET_Enzyme2SBO;
     if (type.equals(EntryType.gene))
-      return ET_Gene2SBO;
+      return GT_Protein2SBO;
     if (type.equals(EntryType.group))
       return ET_Group2SBO;
     if (type.equals(EntryType.genes))

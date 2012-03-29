@@ -347,7 +347,10 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
           // Change the tab to the corresponding content.
           createTabContent();
         } catch (Throwable e) {
-          GUITools.showErrorMessage(null, e);
+          if (!Thread.currentThread().isInterrupted()) {
+            // Don't show errors for interrupted threads
+            GUITools.showErrorMessage(null, e);
+          }
           fireActionEvent(new ActionEvent(thiss,JOptionPane.ERROR,TranslatorUI.Action.TRANSLATION_DONE.toString()));
           return;
         }

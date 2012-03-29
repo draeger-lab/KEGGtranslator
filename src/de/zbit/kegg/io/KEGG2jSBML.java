@@ -24,9 +24,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -61,8 +63,12 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
+import de.zbit.kegg.parser.pathway.ext.EntryExtended;
 import de.zbit.sbml.util.SBMLtools;
 import de.zbit.util.ArrayUtils;
+import de.zbit.util.DatabaseIdentifierTools;
+import de.zbit.util.DatabaseIdentifiers;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.SortedArrayList;
 import de.zbit.util.Utils;
@@ -353,12 +359,10 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Retrieve further information via Kegg Adaptor
     KeggInfos orgInfos = KeggInfos.get("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
     if (orgInfos.queryWasSuccessfull()) {
-      CVTerm mtOrgID = new CVTerm();
-      mtOrgID.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
-      mtOrgID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-      appendAllIds(orgInfos.getTaxonomy(), mtOrgID, KeggInfos.miriam_urn_taxonomy);
-      model.addCVTerm(mtOrgID);
-      
+      CVTerm mtOrgID = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.NCBI_Taxonomy, null, orgInfos.getTaxonomy().split("\\s"));
+      if (mtOrgID.getResourceCount() > 0) {
+        model.addCVTerm(mtOrgID);
+      }
       notes.append(String.format("<h1>Model of %s%s%s in %s%s%s</h1>\n", quotStart, formatTextForHTMLnotes(p.getTitle()), quotEnd, quotStart, orgInfos.getDefinition(), quotEnd));
     } else {
       notes.append(String.format("<h1>Model of " + quotStart + "%s"+ quotEnd + "</h1>\n",formatTextForHTMLnotes(p.getTitle()) ));
@@ -373,12 +377,10 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       
       // GO IDs
       if (pwInfos.getGo_id() != null) {
-        CVTerm mtGoID = new CVTerm();
-        mtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
-        mtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
-        appendAllGOids(pwInfos.getGo_id(), mtGoID);
-        if (mtGoID.getResourceCount() > 0)
+        CVTerm mtGoID = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.GeneOntology, null, pwInfos.getGo_id().split("\\s"));
+        if (mtGoID.getResourceCount() > 0) {
           model.addCVTerm(mtGoID);
+        }
       }
     }
     
@@ -682,46 +684,33 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   }
   
   /**
-   * Adds all available MIRIAM URNs and ids to the given species/entry.
+   * Adds all available MIRIAM URNs and ids to the given species.
+   * @param entry
+   * @param spec
    */
-  private void addMiriamURNs(Entry entry, Species spec) {
-    /* Some Biological qualifier BQB is set later!
-     * - KEGG
-     * - Uniprot
-     * - Chebi
-     * - Drugbank
-     * - PDBeChem
-     */
-    CVTerm cvtKGID = new CVTerm(); cvtKGID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtKGID.setBiologicalQualifierType(Qualifier.BQB_IS);
-    CVTerm cvtEntrezID = new CVTerm(); cvtEntrezID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEntrezID.setBiologicalQualifierType(Qualifier.BQB_IS_ENCODED_BY);
-    CVTerm cvtOmimID = new CVTerm(); cvtOmimID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtOmimID.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-    CVTerm cvtEnsemblID = new CVTerm(); cvtEnsemblID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtEnsemblID.setBiologicalQualifierType(Qualifier.BQB_IS_ENCODED_BY);
-    CVTerm cvtUniprotID = new CVTerm(); cvtUniprotID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtUniprotID.setBiologicalQualifierType(Qualifier.BQB_HAS_VERSION);
-    CVTerm cvtChebiID = new CVTerm(); cvtChebiID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtChebiID.setBiologicalQualifierType(Qualifier.BQB_IS);
-    CVTerm cvtDrugbankID = new CVTerm(); cvtDrugbankID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtDrugbankID.setBiologicalQualifierType(Qualifier.BQB_IS);
-    CVTerm cvtGoID = new CVTerm(); cvtGoID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtGoID.setBiologicalQualifierType(Qualifier.BQB_IS_DESCRIBED_BY);
-    CVTerm cvtHGNCID = new CVTerm(); cvtHGNCID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtHGNCID.setBiologicalQualifierType(Qualifier.BQB_IS_ENCODED_BY);
-    CVTerm cvtPubchemID = new CVTerm(); cvtPubchemID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtPubchemID.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-    CVTerm cvt3dmetID = new CVTerm(); cvt3dmetID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvt3dmetID.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-    CVTerm cvtReactionID = new CVTerm(); cvtReactionID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtReactionID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-    CVTerm cvtTaxonomyID = new CVTerm(); cvtTaxonomyID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); cvtTaxonomyID.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
-    // New as of October 2010:
-    CVTerm PDBeChem = new CVTerm(); PDBeChem.setQualifierType(Type.BIOLOGICAL_QUALIFIER); PDBeChem.setBiologicalQualifierType(Qualifier.BQB_IS);
-    CVTerm GlycomeDB = new CVTerm(); GlycomeDB.setQualifierType(Type.BIOLOGICAL_QUALIFIER); GlycomeDB.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-    CVTerm LipidBank = new CVTerm(); LipidBank.setQualifierType(Type.BIOLOGICAL_QUALIFIER); LipidBank.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);
-    
-    CVTerm ECNumbers = new CVTerm(); ECNumbers.setQualifierType(Type.BIOLOGICAL_QUALIFIER); ECNumbers.setBiologicalQualifierType(Qualifier.BQB_HAS_PROPERTY);    
+  public static void addMiriamURNs(Entry entry, Species spec) {
+    // Get a map of existing identifiers or create a new one
+    Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> ids = new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
+    if (entry instanceof EntryExtended) {
+      ids = ((EntryExtended)entry).getDatabaseIdentifiers();
+    }
     
     // Parse every gene/object in this node.
     for (String ko_id : entry.getName().split(" ")) {
       if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents()) continue; // "undefined" = group node, which contains "Components"
       
-      // Add Kegg-id Miriam identifier
-      String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(ko_id, entry.getType());
-      if (kgMiriamEntry != null) cvtKGID.addResource(kgMiriamEntry);
-      
       // Retrieve further information via Kegg API -- Be careful: very slow! Precache all queries at top of this function!
       KeggInfos infos = KeggInfos.get(ko_id, manager);
+      // Some infos can also be extracted if query was NOT succesfull
+      
+      // Add reactions as miriam annotation
+      String reactionID = concatReactionIDs(entry.getParentPathway().getReactionsForEntry(entry), ArrayUtils.merge(entry.getReactions(), infos.getReaction_id()));
+      if (reactionID != null && reactionID.length()>0) {
+        Utils.addToMapOfSets(ids, IdentifierDatabases.KEGG_Reaction, reactionID.split("\\s"));
+      }
+      // Add all available identifiers (enzrez gene, ensembl, etc)
+      infos.addAllIdentifiers(ids);
+      
       if (infos.queryWasSuccessfull()) {
         
         // HTML Information
@@ -752,88 +741,22 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           notes.append(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
         notes.append(notesEndString);
         spec.appendNotes(notes.toString());
-        
-        // Parse "NCBI-GeneID:","UniProt:", "Ensembl:", ...
-        if (infos.getEnsembl_id() != null)
-          appendAllIds(infos.getEnsembl_id(), cvtEnsemblID, KeggInfos.miriam_urn_ensembl);
-        if (infos.getChebi() != null)
-          appendAllIds(infos.getChebi(), cvtChebiID, KeggInfos.miriam_urn_chebi, "CHEBI:");
-        if (infos.getDrugbank() != null)
-          appendAllIds(infos.getDrugbank(), cvtDrugbankID, KeggInfos.miriam_urn_drugbank);
-        if (infos.getEntrez_id() != null)
-          appendAllIds(infos.getEntrez_id(), cvtEntrezID, KeggInfos.miriam_urn_entrezGene);
-        if (infos.getGo_id() != null)
-          appendAllGOids(infos.getGo_id(), cvtGoID);
-        if (infos.getHgnc_id() != null)
-          appendAllIds(infos.getHgnc_id(), cvtHGNCID, KeggInfos.miriam_urn_hgnc, "HGNC:");
-        
-        if (infos.getOmim_id() != null)
-          appendAllIds(infos.getOmim_id(), cvtOmimID, KeggInfos.miriam_urn_omim);
-        if (infos.getPubchem() != null)
-          appendAllIds(infos.getPubchem(), cvtPubchemID, KeggInfos.miriam_urn_PubChem_Substance);
-        
-        if (infos.getThree_dmet() != null)
-          appendAllIds(infos.getThree_dmet(), cvt3dmetID, KeggInfos.miriam_urn_3dmet);
-        if (infos.getUniprot_id() != null)
-          appendAllIds(infos.getUniprot_id(), cvtUniprotID, KeggInfos.miriam_urn_uniprot);
-        
-        String reactionID = concatReactionIDs(entry.getParentPathway().getReactionsForEntry(entry), ArrayUtils.merge(entry.getReactions(), infos.getReaction_id()));
-        if (reactionID != null && reactionID.length()>0)
-          appendAllIds(reactionID, cvtReactionID, KeggInfos.miriam_urn_kgReaction);
-        
-        if (infos.getTaxonomy() != null)
-          appendAllIds(infos.getTaxonomy(), cvtTaxonomyID, KeggInfos.miriam_urn_taxonomy);
-        
-        if (infos.getPDBeChem()!= null)
-          appendAllIds(infos.getPDBeChem(), PDBeChem, KeggInfos.miriam_urn_PDBeChem);
-        if (infos.getGlycomeDB()!= null)
-          appendAllIds(infos.getGlycomeDB(), GlycomeDB, KeggInfos.miriam_urn_GlycomeDB);
-        if (infos.getLipidBank()!= null)
-          appendAllIds(infos.getLipidBank(), LipidBank, KeggInfos.miriam_urn_LipidBank);
-      }
-      // ECcodes can also extracted if query was NOT succesfull
-      appendAllIds(infos.getECcodes(), ECNumbers, KeggInfos.miriam_urn_ezymeECcode);
-      
-      
-    }
+      }      
+    }    
+    
     // Add all non-empty ressources.
-    if (cvtKGID.getResourceCount() > 0) {
-      setBiologicalQualifierISorHAS_VERSION(cvtKGID);
-      spec.addCVTerm(cvtKGID);
+    String pointOfView = entry.getRealType();
+    if (pointOfView.equals("complex")) pointOfView = "protein"; // complex are multple proteins.
+    List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(ids, pointOfView);
+    if (cvTerms!=null && cvTerms.size()>0) {
+      for (CVTerm cvTerm : cvTerms) {
+        spec.addCVTerm(cvTerm);
+      }
     }
-    if (cvtEntrezID.getResourceCount() > 0) spec.addCVTerm(cvtEntrezID);
-    if (cvtOmimID.getResourceCount() > 0) spec.addCVTerm(cvtOmimID);
-    if (cvtEnsemblID.getResourceCount() > 0) spec.addCVTerm(cvtEnsemblID);
-    if (cvtUniprotID.getResourceCount() > 0) {
-      setBiologicalQualifierISorHAS_VERSION(cvtUniprotID);
-      spec.addCVTerm(cvtUniprotID);
-    }
-    if (cvtChebiID.getResourceCount() > 0) {
-      setBiologicalQualifierISorHAS_VERSION(cvtChebiID);
-      spec.addCVTerm(cvtChebiID);
-    }
-    if (cvtDrugbankID.getResourceCount() > 0) {
-      setBiologicalQualifierISorHAS_VERSION(cvtDrugbankID);
-      spec.addCVTerm(cvtDrugbankID);
-    }
-    if (cvtGoID.getResourceCount() > 0) spec.addCVTerm(cvtGoID);
-    if (cvtHGNCID.getResourceCount() > 0) spec.addCVTerm(cvtHGNCID);
-    if (cvtPubchemID.getResourceCount() > 0) spec.addCVTerm(cvtPubchemID);
-    if (cvt3dmetID.getResourceCount() > 0) spec.addCVTerm(cvt3dmetID);
-    if (cvtReactionID.getResourceCount() > 0) spec.addCVTerm(cvtReactionID);
-    if (cvtTaxonomyID.getResourceCount() > 0) spec.addCVTerm(cvtTaxonomyID);
-    if (PDBeChem.getResourceCount() > 0) {
-      setBiologicalQualifierISorHAS_VERSION(PDBeChem);
-      spec.addCVTerm(PDBeChem);
-    }
-    if (GlycomeDB.getResourceCount() > 0) spec.addCVTerm(GlycomeDB);
-    if (LipidBank.getResourceCount() > 0) spec.addCVTerm(LipidBank);
-    if (ECNumbers.getResourceCount() > 0) spec.addCVTerm(ECNumbers);
     
     // Set a static ECO Code
     // ECO_CODE "ECO:0000313"="imported information used in automatic assertion"   
     spec.addCVTerm(new CVTerm(Qualifier.BQB_UNKNOWN, KeggInfos.miriam_urn_eco + "ECO%3A0000313"));
-    
   }
   
   
@@ -845,7 +768,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @return <code>NULL</code> if input did not contain valid reactionIDs.
    * else, a space-separated {@link String} with unique reaction ids.
    */
-  private String concatReactionIDs(Collection<Reaction> reactions, String... reactionIDs) { 
+  private static String concatReactionIDs(Collection<Reaction> reactions, String... reactionIDs) { 
     Set<String> ret = new HashSet<String>();
     
     // Add all reaction names from the list of reactions
@@ -1030,7 +953,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           String ce_name = getNameForEntry(ce);
           notesAppend.append(String.format("<li>%s</li>",ce_name));
           
-          // Append all kegg ids as "has_part"
+          // Append all kegg ids as "has_part" NLN: Should be "IS_ENCONDED_BY"
           for (String kg_id: ce.getName().split(" ")) {
             String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(kg_id, ce.getType());
             if (kgMiriamEntry != null) cvt.addResource(kgMiriamEntry);
@@ -1202,110 +1125,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   }
   
   /**
-   * Adds one or multiple goIDs to a CVTerm. Will automatically
-   * split the IDs and append the MIRIAM URN.
-   * @param goIDs - divided by space. Every id is exactly 7 digits long.
-   * @param mtGoID - CVTerm to add MIRIAM URNs with GO ids to.
-   */
-  private static void appendAllGOids(String goIDs, CVTerm mtGoID) {
-    for (String go_id : goIDs.split(" ")) {
-      if (go_id.length() != 7 || !containsOnlyDigits(go_id))
-        continue; // Invalid GO id.
-      String urn = KeggInfos.getGo_id_with_MiriamURN(go_id);
-      if (!mtGoID.getResources().contains(urn)) {
-        mtGoID.addResource(urn);
-      }
-    }
-  }
-  
-  /**
-   * Append all IDs with Miriam URNs to a CV term. Multiple IDs are separated
-   * by a space. Only the part behind the ":" will be added (if an ID contains
-   * a ":").
-   * 
-   * @param IDs
-   * @param myCVterm
-   * @param miriam_URNPrefix
-   */
-  private static void appendAllIds(String IDs, CVTerm myCVterm, String miriam_URNPrefix) {
-    if (IDs==null || IDs.length()<1) return;
-    for (String id : IDs.split(" ")) {
-      if (id!=null && id.trim().length()>0) {
-        String urn = miriam_URNPrefix==null?"":miriam_URNPrefix;
-        urn += KeggInfos.suffix(id);
-        if (!myCVterm.getResources().contains(urn)) {
-          myCVterm.addResource(urn);
-          /* XXX Note: we could add an option to provide URIs instead of URNs:
-           * Example:
-           *  urn:miriam:3dmet:B01130
-           * to
-           *  http://identifiers.org/3dmet/B01130 
-           */
-        }
-      }
-    }
-  }
-  
-  /**
-   * @see #appendAllIds(String, CVTerm, String)
-   */
-  private static void appendAllIds(Iterable<String> IDs, CVTerm myCVterm, String miriam_URNPrefix) {
-    if (IDs==null || !IDs.iterator().hasNext()) return;
-    for (String id : IDs) {
-      if (id!=null && id.trim().length()>0) {
-        String urn = miriam_URNPrefix + KeggInfos.suffix(id);
-        if (!myCVterm.getResources().contains(urn)) {
-          myCVterm.addResource(urn);
-        }
-      }
-    }
-  }
-  
-  /**
-   * Append all IDs with Miriam URNs to a CV term. Multiple IDs are separated
-   * by a space. All ids are required to contain a ":". If not,
-   * mayContainDoublePointButAppendThisStringIfNot will be used. E.g.
-   * "[mayContainDoublePointButAppendThisStringIfNot]:[ID]" or [ID] if it
-   * contains ":".
-   * 
-   * @param IDs
-   * @param myCVterm
-   * @param miriam_URNPrefix
-   * @param mayContainDoublePointButAppendThisStringIfNot
-   */
-  private static void appendAllIds(String IDs, CVTerm myCVterm, String miriam_URNPrefix, String mayContainDoublePointButAppendThisStringIfNot) {
-    // Trim double point from
-    // 'mayContainDoublePointButAppendThisStringIfNot' eventually.
-    String s = mayContainDoublePointButAppendThisStringIfNot;
-    if (s.endsWith(":")) {
-      s = s.substring(0, s.length() - 1);
-    }
-    
-    // Add every id to CVTerm.
-    for (String id : IDs.split(" ")) {
-      // Add prefix + id (with or without ":").
-      String urn = miriam_URNPrefix + (id.contains(":") ? id.trim() : s + ":" + id.trim()).replace(":", "%3A");
-      if (!myCVterm.getResources().contains(urn)) {
-        myCVterm.addResource(urn);
-      }
-    }
-  }
-  
-  /**
-   * Checks wether a Strings consists just of digits or not.
-   * @param myString - String to check.
-   * @return true if and only if every Character in the given
-   * String is a digit.
-   */
-  private static boolean containsOnlyDigits(String myString) {
-    char[] ch = myString.toCharArray();
-    for (char c : ch)
-      if (!Character.isDigit(c))
-        return false;
-    return true;
-  }
-  
-  /**
    * Provides some direct access to KEGG2JSBML functionalities.
    * @param args
    * @throws Exception 
@@ -1351,8 +1170,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       }
       
       // Remember already queried objects (save cache)
-      if (k2s.getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, k2s.getKeggInfoManager());
+      if (AbstractKEGGtranslator.getKeggInfoManager().hasChanged()) {
+        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, AbstractKEGGtranslator.getKeggInfoManager());
       }
       
       return;
@@ -1369,8 +1188,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
       
       // Remember already queried objects
-      if (k2s.getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, k2s.getKeggInfoManager());
+      if (AbstractKEGGtranslator.getKeggInfoManager().hasChanged()) {
+        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, AbstractKEGGtranslator.getKeggInfoManager());
       }
       
     } catch (Exception e) {
