@@ -205,6 +205,20 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   }
   
   /**
+   * @param b
+   */
+  public void setShowFormulaForCompounds(boolean b) {
+    showFormulaForCompounds = b;
+  }
+  
+  /**
+   * @param b
+   */
+  public void setRemovePathwayReferences(boolean b) {
+    removePathwayReferences = b;
+  }
+  
+  /**
    * See {@link #nameToAssign}
    * @param node_naming how to label translated entries.
    */

@@ -208,6 +208,15 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     speciesDefaultInitialAmount=d;
   }
   
+  public void setAddLayoutExtension(boolean b) {
+    addLayoutExtension = b;
+  }
+  
+  public void setCheckAtomBalance(boolean b) {
+    checkAtomBalance = b;
+  }
+
+  
   
   
   /*===========================
@@ -341,21 +350,24 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     }
     
     // Parse Kegg Pathway information
-    CVTerm mtPwID = new CVTerm();
-    mtPwID.setQualifierType(Type.MODEL_QUALIFIER);
-    mtPwID.setModelQualifierType(Qualifier.BQM_IS);
-    
-    /* TODO: if it's an original KEGG pathway, the name ALWAYS
-     * starts with "path:". Use different prefixes for pathways
-     * from other sources and catch those cases here (also in
-     * KEGG2GraphML and oterhs).
-     */
-    
-    // next line is same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
-    String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(p.getName());
-    if (kgMiriamEntry != null) mtPwID.addResource(kgMiriamEntry);
-    model.addCVTerm(mtPwID);
-    
+    boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getName());
+    if (isKEGGPathway) {
+      CVTerm mtPwID = new CVTerm();
+      mtPwID.setQualifierType(Type.MODEL_QUALIFIER);
+      mtPwID.setModelQualifierType(Qualifier.BQM_IS);
+
+      /* TODO: if it's an original KEGG pathway, the name ALWAYS
+       * starts with "path:". Use different prefixes for pathways
+       * from other sources and catch those cases here (also in
+       * KEGG2GraphML and oterhs).
+       */
+
+      // next line is same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
+      String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(p.getName());
+      if (kgMiriamEntry != null) mtPwID.addResource(kgMiriamEntry);
+      model.addCVTerm(mtPwID);
+    }
+
     // Retrieve further information via Kegg Adaptor
     KeggInfos orgInfos = KeggInfos.get("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
     if (orgInfos.queryWasSuccessfull()) {
@@ -387,12 +399,14 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     String imageURL = null;
     if (p.isSetImage()) {
       imageURL = p.getImage();
-    } else {
+    } else if (isKEGGPathway) {
       imageURL = "http://www.genome.jp/kegg-bin/show_pathway?"+KeggInfos.suffix(p.getName());
-      // TODO: Insert here special cases to catch, e.g. biocarta IDs, etc.
     }
+    // TODO: Insert here special cases to catch, e.g. biocarta IDs, etc.
     
-    notes.append(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", imageURL, imageURL, p.getTitle()));
+    if (imageURL!=null) {
+      notes.append(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", imageURL, imageURL, p.getTitle()));
+    }
     if (p.isSetLink()) {
       notes.append(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
     }
