@@ -759,6 +759,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Add all non-empty ressources.
     String pointOfView = entry.getRealType();
+    if (pointOfView == null) pointOfView = "protein";
     if (pointOfView.equals("complex")) pointOfView = "protein"; // complex are multple proteins.
     List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(ids, pointOfView);
     if (cvTerms!=null && cvTerms.size()>0) {
