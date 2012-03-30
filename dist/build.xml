@@ -93,6 +93,7 @@
               <exclude name="de/zbit/resources/liftover/*"/>
            	  <exclude name="de/zbit/mapper/*"/>
             	<exclude name="**/package.html"/>
+           	  <exclude name="overview.html"/>
            </fileset>
 <!-- Achtung, im ersten SysBio release befinden sich bugs in KeggInfos.java ! -->
 <!--    	      <zipfileset excludes="META-INF/*,de/zbit/resources/liftover/*,**/package.html" src="${base}/lib/sysbio_v1_light.jar"/> -->
@@ -111,15 +112,15 @@
             <fileset dir="${JSBMLPath}/bin">
               <exclude name="log4j.properties"/> <!-- log4j.properties is in SBML2Latex and jSBML -->
             </fileset>
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/biojava-1.7-ontology.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/biojava-1.7-ontology.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/junit-4.8.jar"/>-->
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/log4j-1.2.8.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/log4j-1.2.8.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/stax-api-1.0.1.jar"/> -->
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/staxmate-2.0.0.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/xstream-1.3.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/jigsaw-dateParser.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/stax2-api-3.0.3.jar"/>
-            <zipfileset excludes="META-INF/*.SF,META-INF/LICENSE*" src="${JSBMLPath}/lib/woodstox-core-lgpl-4.0.9.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/staxmate-2.0.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/xstream-1.3.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/jigsaw-dateParser.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/stax2-api-3.0.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF,META-INF/LICENSE*" src="${JSBMLPath}/core/lib/woodstox-core-lgpl-4.0.9.jar"/>
             
             <fileset dir="${SBML2LaTeXPath}/bin"/>
             <zipfileset excludes="META-INF/*.SF" src="${SBML2LaTeXPath}/lib/html2latex.jar"/>

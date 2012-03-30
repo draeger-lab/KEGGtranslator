@@ -87,7 +87,7 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
   
   /**
    * This is the path where the background-logo will be loaded from. This must be
-   * relative to the current path!
+   * relative to the current path (of this class)!
    */
   public static String logoResourcePath = "img/Logo2.png";
   

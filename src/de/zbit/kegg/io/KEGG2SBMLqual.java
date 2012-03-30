@@ -20,13 +20,9 @@
  */
 package de.zbit.kegg.io;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -54,11 +50,9 @@ import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
-import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
-import de.zbit.util.ArrayUtils;
 import de.zbit.util.Utils;
 
 /**
@@ -179,50 +173,6 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     }
     
     return doc;
-  }
-  
-  /**
-   * 
-   * for writing a matching file in the form 
-   * species_id x y width height
-   * 
-   * the default is false;
-   * @param entry
-   * @param s
-   * @throws IOException 
-   */
-  public static void writeMatchingFile(String fileName, Pathway p)
-  throws IOException {
-    BufferedWriter matchWriter = new BufferedWriter(new FileWriter(fileName));
-    List<String> output = new LinkedList<String>();
-    
-    for (Entry entry : p.getEntries()) {
-      Object s = entry.getCustom();
-      if (s != null && s instanceof Species) {
-        if (entry.hasGraphics()) {
-          Graphics g = entry.getGraphics();
-          output = new LinkedList<String>();
-          output.add(((Species) s).getId());
-          if (!g.isSetCoords()) {
-            output.add(g.getX() + "");
-            output.add(g.getY() + "");
-            output.add(g.getWidth() + "");
-            output.add(g.getHeight() + "");
-          } else {
-            output.add("coords");
-            for (int i = 0; i < g.getCoords().length; i++) {
-              output.add(g.getCoords()[i] + "");
-            }
-          }
-          
-          matchWriter.append(ArrayUtils.implode(output, "\t"));
-          matchWriter.append('\n');
-        }
-      }
-    }
-    
-    matchWriter.close();
-    
   }
   
   /**
