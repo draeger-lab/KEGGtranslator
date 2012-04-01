@@ -44,6 +44,7 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.io.KEGG2SBGN;
+import de.zbit.kegg.io.KEGG2SBGNProperties.ArcType;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 
 /**
@@ -105,7 +106,9 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
   protected Graph2D createGraphFromDocument(Sbgn document) {
     Graph2D simpleGraph = new Graph2D();
     if (document==null) return simpleGraph;
+    
     Map<Glyph, Node> map = new HashMap<Glyph, Node>();
+    
     for (Glyph g : document.getMap().getGlyph()) {
       Node n = simpleGraph.createNode();
       NodeRealizer nr = simpleGraph.getRealizer(n);
@@ -119,6 +122,7 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
     	  nr.setLabelText(g.getLabel().getText());
       simpleGraph.createNode(nr);
     }
+    
     for (Arc a : document.getMap().getArc()) {
       Node source = map.get(a.getSource());
       Node target = map.get(a.getTarget());
@@ -132,10 +136,11 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
         log.warning(String.format("Missing target glyph for arc %s.", a));
         continue;
       }
-      if(a.getClazz().equalsIgnoreCase(KEGG2SBGN.ArcType.production.toString()))
+      if(a.getClazz().equalsIgnoreCase(ArcType.production.toString()))
     	  er.setTargetArrow(Arrow.STANDARD);
       simpleGraph.createEdge(source, target, er);
     }
+    
     return simpleGraph;
   }
 

@@ -23,11 +23,9 @@ package de.zbit.kegg.io;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JTable;
 import javax.xml.bind.JAXBException;
 
 import keggapi.KEGG;
@@ -46,6 +44,11 @@ import org.sbgn.bindings.Map;
 import org.sbgn.bindings.Sbgn;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
+import de.zbit.kegg.io.KEGG2SBGNProperties.GlyphType;
+import de.zbit.kegg.io.KEGG2SBGNProperties.GlyphOrientation;
+import de.zbit.kegg.io.KEGG2SBGNProperties.ArcType;
+import de.zbit.kegg.api.KeggInfos;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.KeggTools;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.api.KeggInfos;
@@ -78,96 +81,17 @@ import de.zbit.kegg.parser.pathway.SubType;
  */
 public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	
-	public enum GlyphType
-	{
-	    unspecified_entity,
-	    simple_chemical,
-	    macromolecule,
-	    nucleic_acid_feature,
-	    simple_chemical_multimer,
-	    macromolecule_multimer,
-	    nucleic_acid_feature_multimer,
-	    complex,
-	    complex_multimer,
-	    source_and_sink,
-	    perturbation,
-	    biological_activity,
-	    perturbing_agent,
-	    compartment,
-	    submap,
-	    tag,
-	    terminal,
-	    process,
-	    omitted_process,
-	    uncertain_process,
-	    association,
-	    dissociation,
-	    phenotype,
-	    and,
-	    or,
-	    not,
-	    state_variable,
-	    unit_of_information,
-	    stoichiometry,
-	    entity,
-	    outcome,
-	    observable,
-	    interaction,
-	    influence_target,
-	    annotation,
-	    variable_value,
-	    implicit_xor,
-	    delay,
-	    existence,
-	    location,
-	    cardinality;
-	    
-	    public String toString(){
-	    	return this.name().replaceAll("_", " ");
-	    }
-	}
+	private boolean DEBUG = false;
 	
-	public enum GlyphOrientation
-	{
-        horizontal,
-        vertical,
-        left,
-        right,
-        up,
-        down,
-	}
-	
-	public enum ArcType
-	{
-        production,
-        consumption,
-        catalysis,
-        modulation,
-        stimulation,
-        inhibition,
-        assignment,
-        interaction,
-        absolute_inhibition,
-        absolute_stimulation,
-        positive_influence,
-        negative_influence,
-        unknown_influence,
-        equivalence_arc,
-        necessary_stimulation,
-        logic_arc;
-        
-	    public String toString(){
-	    	return this.name().replaceAll("_", " ");
-	    }
-	}
-	
-	/**
-	 * Mapping of the glyphs
-	 */
-	private HashMap<String, String> glyphType = new HashMap<String, String>();
 	private Sbgn sbgn;
 	private Map map;
+	private HashMap<Glyph, Integer> glyphNames = new HashMap<Glyph, Integer>();
 	private int id;
+	
+	private double xRightFactor = 2.5;
+	private double xLeftFactor = 2.3;
+	private double yLeftFactor = 0.75;
+	private double yRightFactor = 1;
 	
 	/**
 	 * Constructor
@@ -175,24 +99,6 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	 */
 	public KEGG2SBGN(KeggInfoManagement manager) {
 		super(manager);
-
-		// create mapping for the glyphs
-		this.glyphType.put(EntryType.compound.name(), GlyphType.simple_chemical.toString());
-		this.glyphType.put(EntryType.enzyme.name(), GlyphType.macromolecule.toString());
-		this.glyphType.put(EntryType.gene.name(), GlyphType.macromolecule.toString());
-		this.glyphType.put(EntryType.group.name(), GlyphType.complex.toString());
-		this.glyphType.put(EntryType.map.name(), GlyphType.submap.toString());
-		this.glyphType.put(EntryType.ortholog.name(), GlyphType.unspecified_entity.toString());
-		this.glyphType.put(EntryType.other.name(), GlyphType.unspecified_entity.toString());
-	}
-	
-	/**
-	 * transform the glyph type of a KEGG Entry into a SBGN glyph type
-	 * @param glyphType	String of a KEGG glyph type
-	 * @return SBGN glyph type
-	 */
-	protected String determineGlyphType(String glyphType){
-		return this.glyphType.get(glyphType);
 	}
 
 	@Override
@@ -204,20 +110,14 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		this.map = new Map();
 		sbgn.setMap (map);
 	
-		//////////////////////////////////
 		// for every entry in the pathway
-		////////////////////////////////
 		handleAllEntries(p);
 		
-		////////////////////////////////////////////////////////////////////
-		// for every relation in the pathway if considerRealtions() is true
-		//////////////////////////////////////////////////////////////////
+		// for every relation in the pathway
 		if(this.considerRelations())
 			handleAllRelations(p);
 		
-		////////////////////////////////////////////////////////////////////
-		// for every reaction in the pathway if considerReactions() is true
-		//////////////////////////////////////////////////////////////////
+		// for every reaction in the pathway
 		if(this.considerReactions())
 			handleAllReactions(p);
 	
@@ -231,7 +131,9 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	private void handleAllEntries(Pathway p) {
 		for (Entry e : p.getEntries()) {
 			// initiate
-			Glyph g = new Glyph();
+			Glyph g = createGlyph(KEGG2SBGNProperties.determineGlyphType.get(e.getType().toString()));
+			if(g == null)
+				System.out.println("null");
 			Bbox bb = new Bbox();
 			Label l = new Label();
 		
@@ -256,9 +158,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			l.setText(name);
 			
 			// set the values for the glyph
-			g.setClazz(determineGlyphType(e.getType().toString()));
 			g.setBbox(bb);
-			g.setId("glyph" + id++);
 			g.setLabel(l);
 			g.setOrientation(GlyphOrientation.horizontal.name());
 			
@@ -296,40 +196,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			for(int i = 0; i < relation.getSubtypes().size(); i++){
 				// get the name of the relation subtype
 				String currentRelation = relation.getSubtypes().get(i).getName();
-
-				// check what relation subtype we got
-				if(currentRelation.equalsIgnoreCase(SubType.PHOSPHORYLATION))
-					createPhosphorylation(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.ACTIVATION))
-					createActivation(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.ASSOCIATION))
-					createAssociation(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.BINDING))
-					createBinding(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.BINDING_ASSOCIATION))
-					createBindingAssociation(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.DEPHOSPHORYLATION))
-					createDephosphorylation(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.DISSOCIATION))
-					createDissociation(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.EXPRESSION))
-					createExpression(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.GLYCOSYLATION))
-					createGlycosylation(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.INDIRECT_EFFECT))
-					createIndirectEffect(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.INHIBITION))
-					createInhibition(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.METHYLATION))
-					createMethylation(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.MISSING_INTERACTION))
-					createMissingInteraction(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.REPRESSION))
-					createRepression(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.STATE_CHANGE))
-					createStateChange(source, target);
-				if(currentRelation.equalsIgnoreCase(SubType.UBIQUITINATION))
-					createUbiquitination(source, target);
+				
+//				if(currentRelation.equalsIgnoreCase(SubType.PHOSPHORYLATION)){
+					createLink(source, target);
+//				}
 			}
 		}
 	}
@@ -352,150 +222,193 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 //		}
 	}
 	
+	private Glyph createGlyph(String clazz){
+		Glyph glyph = new Glyph();
+		glyph.setClazz(clazz);
+		glyph.setId("glyph" + id++);
+		glyphNames.put(glyph, 1);
+		return glyph;
+	}
+	
+	private Port createPortForGlyph(Glyph glyph){
+		Port port = new Port();
+		int subId = glyphNames.get(glyph);
+		port.setId(glyph.getId() + "." + subId);
+		glyphNames.put(glyph, subId++);
+		return port;
+	}
+	
 	private void createPhosphorylation(Glyph source, Glyph target){
-		Glyph process = new Glyph();
-		process.setClazz("process");
-		process.setId("glyph" + id++);
 		
-		float anchorSourceX = 0f;
-		float anchorSourceY = 0f;
-		float anchorTargetX = 0f;
-		float anchorTargetY = 0f;
+		Glyph ATP = createGlyph(GlyphType.simple_chemical.toString());
+		Glyph ADP = createGlyph(GlyphType.simple_chemical.toString());
+		Glyph LastGlyph = map.getGlyph().get(map.getGlyph().size());
 		
-		if(isTargetRightOfSource(source, target)) {
-			anchorSourceX = source.getBbox().getX() + source.getBbox().getW();
-			anchorSourceY = source.getBbox().getY() + source.getBbox().getH()/2;
-			anchorTargetX = target.getBbox().getX();
-			anchorTargetY = target.getBbox().getY() + target.getBbox().getH()/2;
-		}
-		if(isTargetInLineWithSource(source, target)) {
-			if(isTargetOverSource(source, target)){
-				anchorSourceX = source.getBbox().getX() + source.getBbox().getW();
-				anchorSourceY = source.getBbox().getY() + source.getBbox().getH()/2;
-				anchorTargetX = target.getBbox().getX();
-				anchorTargetY = target.getBbox().getY() + target.getBbox().getH()/2;
-			}
-			if(isTargetUnderSource(source, target)){
-				anchorSourceX = source.getBbox().getX() + source.getBbox().getW();
-				anchorSourceY = source.getBbox().getY() + source.getBbox().getH()/2;
-				anchorTargetX = target.getBbox().getX();
-				anchorTargetY = target.getBbox().getY() + target.getBbox().getH()/2;
-			}
-		}
+		Port in = createPortForGlyph(LastGlyph);
+		Port out = createPortForGlyph(LastGlyph);
+	
+		Arc ATPConsumption = new Arc();
+		Arc ADPProduction = new Arc();
 		
-		float changeX = (anchorTargetX - anchorSourceX)/2;
-		float changeY = (anchorTargetY - anchorSourceY)/2;
+		float anchorATPConsumptionX = 0f;
+		float anchorATPConsumptionY = 0f;
+		float anchorADPProductionX = 0f;
+		float anchorADPProductionY = 0f;
 		
-		Bbox b = new Bbox();
-		b.setH(10);
-		b.setW(10);
-		b.setX(anchorSourceX + changeX - b.getH()/2);
-		b.setY(anchorSourceY + changeY - b.getH()/2);
-		process.setBbox(b);
-		Port in = new Port();
-		Port out = new Port();
+		LastGlyph.getPort().add(in);
+		LastGlyph.getPort().add(out);
 		
-		in.setId(process.getId() + "." + "1");
-		out.setId(process.getId() + "." + "2");
-		in.setX(process.getBbox().getX() - process.getBbox().getW()/2);
-		in.setY(process.getBbox().getY() + process.getBbox().getH()/2);
-		out.setX(process.getBbox().getX() + process.getBbox().getW() * 1.5f);
-		out.setY(process.getBbox().getY() + process.getBbox().getH()/2);
-		
-		process.getPort().add(in);
-		process.getPort().add(out);
-		sbgn.getMap().getGlyph().add(process);
-		
-		Arc arc1 = new Arc();
-		Arc arc2 = new Arc();
-		Start start1 = new Start();
-		Start start2 = new Start();
-		End end1 = new End();
-		End end2 = new End();
-		
-		start1.setX(anchorSourceX);
-		start1.setY(anchorSourceY);
-		end1.setX(process.getBbox().getX());
-		end1.setY(process.getBbox().getY());
-		start2.setX(process.getBbox().getX());
-		start2.setY(process.getBbox().getY());
-		end2.setX(anchorTargetX);
-		end2.setY(anchorTargetY);
-		
-		arc1.setStart(start1);
-		arc1.setEnd(end1);
-		arc1.setClazz(ArcType.consumption.toString());
-		arc1.setSource(source);
-		arc1.setTarget(process);
-		
-		arc2.setStart(start2);
-		arc2.setEnd(end2);
-		arc2.setClazz(ArcType.production.toString());
-		arc2.setSource(process);
-		arc2.setTarget(target);
-		
-		Glyph ATP = new Glyph();
-		Glyph ADP = new Glyph();
-		ATP.setId("glyph" + id++);
-		ADP.setId("glyph" + id++);
-		Label l1 = new Label();
-		Label l2 = new Label();
-		l1.setText("ATP");
-		l2.setText("ADP");
-		ATP.setLabel(l1);
-		ADP.setLabel(l2);
-		Clone c1 = new Clone();
-		Clone c2 = new Clone();
-		Bbox b1 = new Bbox();
-		Bbox b2 = new Bbox();
-		ATP.setClazz(GlyphType.simple_chemical.toString());
-		ADP.setClazz(GlyphType.simple_chemical.toString());
-		ATP.setClone(c1);
-		ADP.setClone(c2);
-		b1.setH(30);
-		b1.setW(30);
-		b2.setH(30);
-		b2.setW(30);
-		b1.setX(process.getBbox().getX() - 30);
-		b1.setY(process.getBbox().getY() + 30);
-		b2.setX(process.getBbox().getX() + process.getBbox().getW() + 30);
-		b2.setY(process.getBbox().getY() + 30);
-		ATP.setBbox(b1);
-		ADP.setBbox(b2);
-		
-		Arc arc3 = new Arc();
-		Arc arc4 = new Arc();
-		Start start3 = new Start();
-		Start start4 = new Start();
-		End end3 = new End();
-		End end4 = new End();
-		
-		start3.setX(ATP.getBbox().getX() + ATP.getBbox().getW()/2);
-		start3.setY(ATP.getBbox().getY());
-		start4.setX(ADP.getBbox().getX() + ADP.getBbox().getW()/2);
-		start4.setY(ADP.getBbox().getY());
-		end3.setX(process.getBbox().getX() + process.getBbox().getW()/2);
-		end3.setY(process.getBbox().getY());
-		end4.setX(process.getBbox().getX() + process.getBbox().getW()/2);
-		end4.setY(process.getBbox().getY());
-		
-		arc3.setClazz(ArcType.consumption.toString());
-		arc4.setClazz(ArcType.production.toString());
-		arc3.setStart(start3);
-		arc3.setEnd(end3);
-		arc4.setStart(start4);
-		arc4.setEnd(end4);
-		arc3.setSource(ATP);
-		arc3.setTarget(in);
-		arc4.setSource(out);
-		arc4.setTarget(ADP);
-		
-		sbgn.getMap().getArc().add(arc1);
-		sbgn.getMap().getArc().add(arc2);
-		sbgn.getMap().getArc().add(arc3);
-		sbgn.getMap().getArc().add(arc4);
-		sbgn.getMap().getGlyph().add(ATP);
-		sbgn.getMap().getGlyph().add(ADP);
+//		if(isTargetCompletelyRightOfSource(source, target) && isTargetOverSource(source, target)){
+//			if(DEBUG) System.out.println("Completely Right + Over Source");
+//			processBbox.setX(anchorSourceX + changeX - processBbox.getW() * 2);
+//			processBbox.setY(anchorTargetY + changeY - processBbox.getH());
+//		}
+//		if(isTargetCompletelyRightOfSource(source, target) && isTargetUnderSource(source, target)){
+//			if(DEBUG) System.out.println("Completely Right + Under Source");
+//			processBbox.setX(anchorSourceX + changeX - processBbox.getW() * 2);
+//			processBbox.setY(anchorSourceY + changeY - processBbox.getH());
+//		}
+//		if(isTargetCompletelyRightOfSource(source, target) && changeY == 0){
+//			if(DEBUG) System.out.println("Completely Right + Equals Source");
+//			processBbox.setX(anchorSourceX + changeX - processBbox.getW() * 2);
+//			processBbox.setY(anchorSourceY + changeY - processBbox.getH());
+//		}
+//		if(isTargetCompletelyLeftOfSource(source, target) && isTargetOverSource(source, target)){
+//			if(DEBUG) System.out.println("Completely Left + Over Source");
+//			processBbox.setX(anchorTargetX + changeX - processBbox.getW() * 2);
+//			processBbox.setY(anchorTargetY + changeY - processBbox.getH());
+//		}
+//		if(isTargetCompletelyLeftOfSource(source, target) && isTargetUnderSource(source, target)){
+//			if(DEBUG) System.out.println("Completely Left + Under Source");
+//			processBbox.setX(anchorTargetX + changeX - processBbox.getW() * 2);
+//			processBbox.setY(anchorSourceY + changeY - processBbox.getH());
+//		}
+//		if(isTargetCompletelyLeftOfSource(source, target) && changeY == 0){
+//			if(DEBUG) System.out.println("Completely Left + Equals Source");
+//			processBbox.setX(anchorTargetX + changeX - processBbox.getW() * 2);
+//			processBbox.setY(anchorSourceY + changeY - processBbox.getH());
+//		}
+//		if(isTargetInLineWithSource(source, target)){
+//			if(isTargetOverSource(source, target) && isTargetLeftOfSource(source, target)){
+//				if(DEBUG) System.out.println("In Line With + Over Source + Left of Source");
+//				processBbox.setX(anchorTargetX + changeX - processBbox.getW() * 2);
+//				processBbox.setY(anchorTargetY + changeY - processBbox.getH());
+//			}
+//			if(isTargetOverSource(source, target) && isTargetRightOfSource(source, target)){
+//				if(DEBUG) System.out.println("In Line With + Over Source + Right of Source");
+//				processBbox.setX(anchorSourceX + changeX - processBbox.getW() * 2);
+//				processBbox.setY(anchorTargetY + changeY - processBbox.getH());
+//			}
+//			if(isTargetUnderSource(source, target) && isTargetLeftOfSource(source, target)){
+//				if(DEBUG) System.out.println("In Line With + Under Source + Left of Source");
+//				processBbox.setX(anchorTargetX + changeX - processBbox.getW() * 2);
+//				processBbox.setY(anchorSourceY + changeY - processBbox.getH());
+//			}
+//			if(isTargetUnderSource(source, target) && isTargetRightOfSource(source, target)){
+//				if(DEBUG) System.out.println("In Line With + Under Source + Right of Source");
+//				processBbox.setX(anchorSourceX + changeX - processBbox.getW() * 2);
+//				processBbox.setY(anchorSourceY + changeY - processBbox.getH());
+//			}
+//		}
+//		
+//		process.setBbox(processBbox);
+//		
+////		System.out.println("Source Position: " + "(" + source.getBbox().getX() + "," + source.getBbox().getY() + ")");
+////		System.out.println("Target Position: " + "(" + target.getBbox().getX() + "," + target.getBbox().getY() + ")");
+////		System.out.println("Source Anchor Position: " + "(" + anchorSourceX + "," + anchorSourceY + ")");
+////		System.out.println("Target Anchor Position: " + "(" + anchorTargetX + "," + anchorTargetY + ")");
+////		System.out.println("New Position: " + "(" + processBbox.getX() + "," + processBbox.getY() + ")");
+//		
+////		in.setX(process.getBbox().getX() - process.getBbox().getW()/2);
+////		in.setY(process.getBbox().getY() + process.getBbox().getH()/2);
+////		out.setX(process.getBbox().getX() + process.getBbox().getW() * 1.5f);
+////		out.setY(process.getBbox().getY() + process.getBbox().getH()/2);
+////		
+////		process.getPort().add(in);
+////		process.getPort().add(out);
+//		
+//		Start startSource = new Start();
+//		Start startTarget = new Start();
+//		End EndSource = new End();
+//		End EndTarget = new End();
+//		
+//		startSource.setX(anchorSourceX);
+//		startSource.setY(anchorSourceY);
+//		EndSource.setX(process.getBbox().getX());
+//		EndSource.setY(process.getBbox().getY());
+//		startTarget.setX(process.getBbox().getX());
+//		startTarget.setY(process.getBbox().getY());
+//		EndTarget.setX(anchorTargetX);
+//		EndTarget.setY(anchorTargetY);
+//		
+//		SourceConsumption.setStart(startSource);
+//		SourceConsumption.setEnd(EndSource);
+//		SourceConsumption.setClazz(ArcType.consumption.toString());
+//		SourceConsumption.setSource(source);
+//		SourceConsumption.setTarget(process);
+//		
+//		TargetProduction.setStart(startTarget);
+//		TargetProduction.setEnd(EndTarget);
+//		TargetProduction.setClazz(ArcType.production.toString());
+//		TargetProduction.setSource(process);
+//		TargetProduction.setTarget(target);
+//		
+////		Label l1 = new Label();
+////		Label l2 = new Label();
+////		l1.setText("ATP");
+////		l2.setText("ADP");
+////		ATP.setLabel(l1);
+////		ADP.setLabel(l2);
+////		Clone c1 = new Clone();
+////		Clone c2 = new Clone();
+////		Bbox ATPBbox = new Bbox();
+////		Bbox ADPBbox = new Bbox();
+////		ATP.setClone(c1);
+////		ADP.setClone(c2);
+////		ATPBbox.setH(30);
+////		ATPBbox.setW(30);
+////		ADPBbox.setH(30);
+////		ADPBbox.setW(30);
+////		ATPBbox.setX(process.getBbox().getX() - 30);
+////		ATPBbox.setY(process.getBbox().getY() + 30);
+////		ADPBbox.setX(process.getBbox().getX() + process.getBbox().getW() + 30);
+////		ADPBbox.setY(process.getBbox().getY() + 30);
+////		ATP.setBbox(ATPBbox);
+////		ADP.setBbox(ADPBbox);
+////		
+////		Start startATP = new Start();
+////		Start startADP = new Start();
+////		End endATP = new End();
+////		End endADP = new End();
+////		
+////		startATP.setX(ATP.getBbox().getX() + ATP.getBbox().getW()/2);
+////		startATP.setY(ATP.getBbox().getY());
+////		startADP.setX(ADP.getBbox().getX() + ADP.getBbox().getW()/2);
+////		startADP.setY(ADP.getBbox().getY());
+////		endATP.setX(process.getBbox().getX() + process.getBbox().getW()/2);
+////		endATP.setY(process.getBbox().getY());
+////		endADP.setX(process.getBbox().getX() + process.getBbox().getW()/2);
+////		endADP.setY(process.getBbox().getY());
+////		
+////		PhosphorConsumption.setClazz(ArcType.consumption.toString());
+////		PhosphorProduction.setClazz(ArcType.production.toString());
+////		PhosphorConsumption.setStart(startATP);
+////		PhosphorConsumption.setEnd(endATP);
+////		PhosphorProduction.setStart(startADP);
+////		PhosphorProduction.setEnd(endADP);
+////		PhosphorConsumption.setSource(ATP);
+////		PhosphorConsumption.setTarget(in);
+////		PhosphorProduction.setSource(out);
+////		PhosphorProduction.setTarget(ADP);
+//		
+//		// add the glyphs and arcs to the map
+//		sbgn.getMap().getArc().add(SourceConsumption);
+//		sbgn.getMap().getArc().add(TargetProduction);
+////		sbgn.getMap().getArc().add(PhosphorConsumption);
+////		sbgn.getMap().getArc().add(PhosphorProduction);
+//		sbgn.getMap().getGlyph().add(process);
+////		sbgn.getMap().getGlyph().add(ATP);
+////		sbgn.getMap().getGlyph().add(ADP);
 	}
 	
 	private void createUbiquitination(Glyph source, Glyph target) {
@@ -558,20 +471,186 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		// TODO Auto-generated method stub
 	}
 	
+	private void createCompound(Glyph source, Glyph target) {
+		// TODO Auto-generated method stub	
+	}
+	
+	private void createLink(Glyph source, Glyph target){
+
+		Glyph process = createGlyph("process");
+		
+		Arc SourceConsumption = new Arc();
+		Arc TargetProduction = new Arc();
+		
+		// determine the positions of the anchors
+		float anchorSourceX = 0f;
+		float anchorSourceY = 0f;
+		float anchorTargetX = 0f;
+		float anchorTargetY = 0f;
+		
+		if(isTargetRightOfSource(source, target)) {
+			anchorSourceX = source.getBbox().getX() + source.getBbox().getW();
+			anchorSourceY = source.getBbox().getY() + source.getBbox().getH()/2;
+			anchorTargetX = target.getBbox().getX();
+			anchorTargetY = target.getBbox().getY() + target.getBbox().getH()/2;
+		}
+		if(isTargetLeftOfSource(source, target)) {
+			anchorSourceX = source.getBbox().getX();
+			anchorSourceY = source.getBbox().getY() + source.getBbox().getH()/2;
+			anchorTargetX = target.getBbox().getX() + target.getBbox().getW();
+			anchorTargetY = target.getBbox().getY() + target.getBbox().getH()/2;
+		}
+		if(isTargetInLineWithSource(source, target)) {
+			if(isTargetOverSource(source, target)){
+				anchorSourceX = source.getBbox().getX() + source.getBbox().getW()/2;
+				anchorSourceY = source.getBbox().getY();
+				anchorTargetX = target.getBbox().getX() + target.getBbox().getW()/2;
+				anchorTargetY = target.getBbox().getY() + target.getBbox().getH();
+			}
+			if(isTargetUnderSource(source, target)){
+				anchorSourceX = source.getBbox().getX() + source.getBbox().getW()/2;
+				anchorSourceY = source.getBbox().getY() + source.getBbox().getH();
+				anchorTargetX = target.getBbox().getX() + target.getBbox().getW()/2;
+				anchorTargetY = target.getBbox().getY();
+			}
+		}
+		
+		float changeX = Math.abs((anchorTargetX - anchorSourceX)/2);
+		float changeY = Math.abs((anchorTargetY - anchorSourceY)/2);
+		
+		// connect the parts
+		Bbox processBbox = new Bbox();
+		// make boxes scaleable
+		processBbox.setH(10);
+		processBbox.setW(10);
+		
+		if(isTargetCompletelyRightOfSource(source, target) && isTargetOverSource(source, target)){
+			if(DEBUG) System.out.println("Completely Right + Over Source");
+			processBbox.setX(anchorSourceX + changeX - (int) (processBbox.getW() * xRightFactor));
+			processBbox.setY(anchorTargetY + changeY - (int) (processBbox.getH() * yRightFactor));
+		}
+		if(isTargetCompletelyRightOfSource(source, target) && isTargetUnderSource(source, target)){
+			if(DEBUG) System.out.println("Completely Right + Under Source");
+			processBbox.setX(anchorSourceX + changeX - (int) (processBbox.getW() * xRightFactor));
+			processBbox.setY(anchorSourceY + changeY - (int) (processBbox.getH() * yRightFactor));
+		}
+		if(isTargetCompletelyRightOfSource(source, target) && changeY == 0){
+			if(DEBUG) System.out.println("Completely Right + Equals Source");
+			processBbox.setX(anchorSourceX + changeX - (int) (processBbox.getW() * xRightFactor));
+			processBbox.setY(anchorSourceY + changeY - (int) (processBbox.getH() * yRightFactor));
+		}
+		if(isTargetCompletelyLeftOfSource(source, target) && isTargetOverSource(source, target)){
+			if(DEBUG) System.out.println("Completely Left + Over Source");
+			processBbox.setX(anchorTargetX + changeX - (int) (processBbox.getW() * xLeftFactor));
+			processBbox.setY(anchorTargetY + changeY - (int) (processBbox.getH() * yLeftFactor));
+		}
+		if(isTargetCompletelyLeftOfSource(source, target) && isTargetUnderSource(source, target)){
+			if(DEBUG) System.out.println("Completely Left + Under Source");
+			processBbox.setX(anchorTargetX + changeX - (int) (processBbox.getW() * xLeftFactor));
+			processBbox.setY(anchorSourceY + changeY - (int) (processBbox.getH() * yLeftFactor));
+		}
+		if(isTargetCompletelyLeftOfSource(source, target) && changeY == 0){
+			if(DEBUG) System.out.println("Completely Left + Equals Source");
+			processBbox.setX(anchorTargetX + changeX - (int) (processBbox.getW() * xLeftFactor));
+			processBbox.setY(anchorSourceY + changeY - (int) (processBbox.getH() * yLeftFactor));
+		}
+		if(isTargetInLineWithSource(source, target)){
+			if(isTargetOverSource(source, target) && isTargetLeftOfSource(source, target)){
+				if(DEBUG) System.out.println("In Line With + Over Source + Left of Source");
+				processBbox.setX(anchorTargetX + changeX - (int) (processBbox.getW() * xLeftFactor));
+				processBbox.setY(anchorTargetY + changeY - (int) (processBbox.getH() * yLeftFactor));
+			}
+			if(isTargetOverSource(source, target) && isTargetRightOfSource(source, target)){
+				if(DEBUG) System.out.println("In Line With + Over Source + Right of Source");
+				processBbox.setX(anchorSourceX + changeX - (int) (processBbox.getW() * xRightFactor));
+				processBbox.setY(anchorTargetY + changeY - (int) (processBbox.getH() * yRightFactor));
+			}
+			if(isTargetUnderSource(source, target) && isTargetLeftOfSource(source, target)){
+				if(DEBUG) System.out.println("In Line With + Under Source + Left of Source");
+				processBbox.setX(anchorTargetX + changeX - (int) (processBbox.getW() * xRightFactor));
+				processBbox.setY(anchorSourceY + changeY - (int) (processBbox.getH() * yRightFactor));
+			}
+			if(isTargetUnderSource(source, target) && isTargetRightOfSource(source, target)){
+				if(DEBUG) System.out.println("In Line With + Under Source + Right of Source");
+				processBbox.setX(anchorSourceX + changeX - (int) (processBbox.getW() * xRightFactor));
+				processBbox.setY(anchorSourceY + changeY - (int) (processBbox.getH() * yRightFactor));
+			}
+			// These cases are wired
+			if(isTargetOverSource(source, target) && processBbox.getX() == 0 && processBbox.getY() == 0){
+				if(DEBUG) System.out.println("In Line With");
+				processBbox.setX(anchorSourceX + changeX - (int) (processBbox.getW() * xRightFactor));
+				processBbox.setY(anchorSourceY - changeY - (int) (processBbox.getH() * yLeftFactor));
+			}
+			if(isTargetUnderSource(source, target) && processBbox.getX() == 0 && processBbox.getY() == 0){
+				if(DEBUG) System.out.println("In Line With");
+				processBbox.setX(anchorSourceX + changeX - (int) (processBbox.getW() * xRightFactor));
+				processBbox.setY(anchorSourceY + changeY - (int) (processBbox.getH() * yLeftFactor));
+			}
+		}
+		
+		process.setBbox(processBbox);
+	
+		Start startSource = new Start();
+		Start startTarget = new Start();
+		End EndSource = new End();
+		End EndTarget = new End();
+		
+		startSource.setX(anchorSourceX);
+		startSource.setY(anchorSourceY);
+		EndSource.setX(process.getBbox().getX());
+		EndSource.setY(process.getBbox().getY());
+		startTarget.setX(process.getBbox().getX());
+		startTarget.setY(process.getBbox().getY());
+		EndTarget.setX(anchorTargetX);
+		EndTarget.setY(anchorTargetY);
+		
+		SourceConsumption.setStart(startSource);
+		SourceConsumption.setEnd(EndSource);
+		SourceConsumption.setClazz(ArcType.consumption.toString());
+		SourceConsumption.setSource(source);
+		SourceConsumption.setTarget(process);
+		
+		TargetProduction.setStart(startTarget);
+		TargetProduction.setEnd(EndTarget);
+		TargetProduction.setClazz(ArcType.production.toString());
+		TargetProduction.setSource(process);
+		TargetProduction.setTarget(target);
+		
+		sbgn.getMap().getArc().add(SourceConsumption);
+		sbgn.getMap().getArc().add(TargetProduction);
+		sbgn.getMap().getGlyph().add(process);
+	}
+	
 	private boolean isTargetRightOfSource(Glyph source, Glyph target){
+		return (source.getBbox().getX() < target.getBbox().getX());
+	}
+	
+	private boolean isTargetCompletelyRightOfSource(Glyph source, Glyph target){
 		return (source.getBbox().getX() + source.getBbox().getW()) < target.getBbox().getX();
 	}
 	
 	private boolean isTargetLeftOfSource(Glyph source, Glyph target){
+		return source.getBbox().getX() > target.getBbox().getX();
+	}
+	
+	private boolean isTargetCompletelyLeftOfSource(Glyph source, Glyph target){
 		return source.getBbox().getX() > target.getBbox().getX() + target.getBbox().getW();
 	}
 	
 	private boolean isTargetOverSource(Glyph source, Glyph target){
-		return source.getBbox().getY() < target.getBbox().getY();
+		return source.getBbox().getY() > target.getBbox().getY();
+	}
+	
+	private boolean isTargetCompletelyOverSource(Glyph source, Glyph target){
+		return source.getBbox().getY() > target.getBbox().getY() + target.getBbox().getH();
 	}
 	
 	private boolean isTargetUnderSource(Glyph source, Glyph target){
 		return source.getBbox().getY() < target.getBbox().getY();
+	}
+	
+	private boolean isTargetCompletelyUnderSource(Glyph source, Glyph target){
+		return source.getBbox().getY() + source.getBbox().getH() < target.getBbox().getY();
 	}
 	
 	private boolean isTargetInLineWithSource(Glyph source, Glyph target){
