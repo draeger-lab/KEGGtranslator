@@ -170,7 +170,7 @@ public abstract class SB_2GraphML <T> {
     // Apply a layouting algorithm to unlayouted nodes
     if (unlayoutedNodes.size()>0) {
       TranslatorTools tools = new TranslatorTools(simpleGraph);
-      if (!isAnyLayoutInformationAvailable()) {
+      if (isAnyLayoutInformationAvailable()) {
         // Only layout nodes, that had no coords in the layout extension
         // XXX: Would be nicer if we could somehow layout the subset with OrthogonalLayouter
         tools.layoutNodeSubset(unlayoutedNodes, true);
@@ -243,7 +243,7 @@ public abstract class SB_2GraphML <T> {
     } else {
       
       nr = SBGNVisualizationProperties.getNodeRealizer(sboTerm);
-      nr = nr.createCopy();
+      nr = nr.createCopy(); // TODO: does this also copy pre-defined labels? (it should!)
       simpleGraph.setRealizer(n, nr);
       nodeShouldBeACircle = SBGNVisualizationProperties.isCircleShape(sboTerm);
     }
@@ -274,6 +274,7 @@ public abstract class SB_2GraphML <T> {
     nr.setHeight(height);
     
     if (nodeShouldBeACircle) {
+      // Make a square (w=h)
       double min;
       if (unlayoutedNodes.contains(n)) {
         min = 8; // KEGG compounds always have w and h of 8 by default.  

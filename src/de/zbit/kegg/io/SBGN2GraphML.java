@@ -91,6 +91,9 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       if (a.getSource()!=null && a.getSource() instanceof Glyph) {
         source = (Node) id2node.get(((Glyph)a.getSource()).getId());
       }
+      // TODO: These methods require glyphs to have an unique ID. But
+      // the specification says, that one should identify glyphs by instance
+      // and NOT by id...
       if (a.getTarget()!=null && a.getTarget() instanceof Glyph) {
         target = (Node) id2node.get(((Glyph)a.getTarget()).getId());
       }
@@ -128,6 +131,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
    * @param document
    */
   private void addGlyphsToGraph(Sbgn document) {
+    anyNodeContainedLayout=false;
     for (Glyph g : document.getMap().getGlyph()) {
       // Get the SBO-term (defining the shape and color)
       int sboTerm=0;
@@ -167,9 +171,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
       }
       
       // TODO: Draw the state (and also other attributes)
-      //g.getState().getVariable()
-      // value @ variable
-      // P     @ 253
+      //g.getState().getVariable() = "value @ variable" (e.g. "P@253".)
     }
   }
   
@@ -179,6 +181,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
    */
   @Override
   protected void improveReactionNodeLayout() {
+    if (reaction2node==null) return;
     for (Map.Entry<Glyph,ReactionNodeRealizer> en : reaction2node.entrySet()) {
       // TODO Iterate through all ARCS, inspect source and target and classify into:
       Set<Node> reactants = new HashSet<Node>();

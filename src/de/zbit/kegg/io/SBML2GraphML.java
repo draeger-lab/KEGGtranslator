@@ -179,6 +179,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    */
   @Override
   protected void improveReactionNodeLayout() {
+    if (reaction2node==null) return; // QUAL-Model
     for (Map.Entry<Reaction,ReactionNodeRealizer> en : reaction2node.entrySet()) {
       Set<Node> reactants = new HashSet<Node>();
       Set<Node> products = new HashSet<Node>();

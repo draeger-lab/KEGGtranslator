@@ -188,7 +188,7 @@ public class SBGNVisualizationProperties {
     } else if (sboTerm == simpleChemical ||
         Arrays.binarySearch(simpleChemical_synonyms, sboTerm)>=0) {
       return new Color(176,226,255);   // LightSkyBlue1
-    } else if (sboTerm == map) {
+    } else if (sboTerm == map || sboTerm == submap) {
       return new Color(224,238,238);   // azure2
     } else {
       return new Color(144,238,144);   // LightGreen
