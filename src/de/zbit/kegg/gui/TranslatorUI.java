@@ -418,6 +418,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				    //tabbedPane.setTitleAt(index, source.getTitle());
 				  }
 				}
+				getStatusBar().hideProgress();
 				updateButtons();
 				break;
 				/* Moved to BaseFrame.

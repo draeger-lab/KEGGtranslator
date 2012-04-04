@@ -249,9 +249,11 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
         //unlayoutedNodes.add(rNode);
         if (Double.isNaN(x) || Double.isNaN(y)) {
           ValuePair<Double, Double> xy = calculateMeanCoords(r.getListOfReactants(), r.getListOfProducts(), id2node, simpleGraph);
-          nr.setX(xy.getA());
-          nr.setY(xy.getB());
+          x = (xy.getA());
+          y = (xy.getB());
         }
+        nr.setCenterX(x);
+        nr.setCenterY(y);
         
         // TODO: Add stoichiometry to edges (docked to corresponding node):
         // subtrate on substrate node

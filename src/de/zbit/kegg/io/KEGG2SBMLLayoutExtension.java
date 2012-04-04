@@ -135,6 +135,8 @@ public class KEGG2SBMLLayoutExtension {
               }
               log.fine("Could not match unique ReactionGlyph to " + e);
             }
+            // Sometimes, reactions occur twice in documents or have two enzymes.
+            // then, rct is NULL here!
             
             // Removing the reation is a bad idea, because sometimes there
             // are multiple instances of the same entry pointin to the same
@@ -144,7 +146,7 @@ public class KEGG2SBMLLayoutExtension {
             
             
             // Set X and Y on the reactionGlyph
-            if (!g.isDefaultPosition() && (layout.getReactionGlyph(rct.getId())==null || 
+            if (!g.isDefaultPosition() && rct!=null && (layout.getReactionGlyph(rct.getId())==null || 
                 !g.getType().equals(GraphicsType.line))) {
               // LINE coordinate are much worse than rectangles. So prefer rectangles!
               ReactionGlyph glyph = layout.getReactionGlyph(rct.getId());
@@ -168,6 +170,10 @@ public class KEGG2SBMLLayoutExtension {
                 box = sGlyph.createBoundingBox(); 
               }
               box.createDimensions(g.getWidth(), g.getHeight(), 1);
+              if (rct==null) {
+                // X and Y are unused
+                box.createPosition(g.getX(), g.getY(), 0);
+              }
             }
             
           } else {

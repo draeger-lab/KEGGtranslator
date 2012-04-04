@@ -227,11 +227,7 @@ public class SBGNVisualizationProperties {
    */
   public static boolean isCircleShape(int sboTerm) {
     if (sboTerm == simpleChemical ||
-        Arrays.binarySearch(simpleChemical_synonyms, sboTerm)>=0 ||
-        // Well actually map/submaps are no circles, but should have
-        // a square shape (w=h).
-        sboTerm == map ||
-        sboTerm == submap) {
+        Arrays.binarySearch(simpleChemical_synonyms, sboTerm)>=0) {
       return true;
     } else {
       return false;
