@@ -1,6 +1,6 @@
 /*
- * $Id:  GraphMLmaps.java 11:31:11 wrzodek $
- * $URL: GraphMLmaps.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,

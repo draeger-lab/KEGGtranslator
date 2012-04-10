@@ -1,6 +1,6 @@
 /*
- * $Id:  TranslatorTools.java 19:03:26 wrzodek $
- * $URL: TranslatorTools.java $
+ * $Id$
+ * $URL$
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
