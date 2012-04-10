@@ -1,0 +1,203 @@
+\documentclass[citeauthoryear]{llncs}
+\usepackage{graphicx}
+%
+\begin{document}
+
+\title{Identification of Disease Associated SNPs Depending on Pathway and Protein-Interaction~Data}
+\titlerunning{<Your abbreviated contribution title>}
+
+\author{Finja B\"uchel\inst{1} \and Florian Mittag\inst{1} \and Clemens Wrzodek\inst{1}
+\and Claudia Schulte\inst{2} \and Manu~Sharma\inst{2} 
+\and Thomas Gasser\inst{2} \and Andreas Zell\inst{1}}
+\authorrunning{<abbreviated author list>}
+
+\institute{Center for Bioinformatics Tuebingen (ZBIT), University of Tuebingen, T\"ubingen, Germany
+\and
+Center of Neurology and Hertie-Institute for Clinical Brain Research, University~of~Tuebingen, T\"ubingen, Germany
+}
+
+\maketitle
+
+
+\begin{abstract}
+%problem statement:
+%      what problem are you going to solve?
+%
+%motivation/relevance:
+%      why is it important to solve this problem?
+%
+%approach/method:
+%      how did you go about solving the problem?
+%
+%results:
+%      what is your solution to the problem?
+%
+%conclusions:
+%      what are the implications of your solution?
+\begin{itemize}
+\item problem statement: Identification of associated disease specific SNP sets\\
+\item up to now the potential utility of GWAS not used\\
+\item identification of associated SNPs computational challenging\\
+\item We developed a new method by applying a priori biological knowledge (pathway, interaction, known and predicted)\\
+\item Statistical evaluation with variation of Fishers method\\
+\item Tested the method on PD data.
+\end{itemize}
+
+\end{abstract}
+
+\section{Introduction}
+%Opening statement
+%    Problem: what problem are you going to solve?
+%    Relevance: why is it important to solve this problem?
+%
+%Literature review:
+%    Summarize the current state of knowledge in the area of
+%              investigation
+%    What previous research has been done on the problem?
+%    Mark the gap in the current state of knowledge:
+%    What piece of knowledge is still lacking in the area of
+%              investigation?
+%
+%Brief overview of your own study:
+%    Approach/method: how did you go about filling this gap?
+%    Results: what did you find out?
+%    Conclusion: what do these results mean (why are these
+%               results significant?
+
+\begin{itemize}
+\item Problem: GWAS is expensive, information content is high, but it is not easy to get it out, i.e. computational costs for pair-wise identifcation of associated SNPs
+\item previous studies: pathway, network, SNP restriction (but how to restrict?)
+\item what is lacking: combination and the possibility to allow/investigate possibly new interactions
+\item Tested our method on PD data
+\item Results: interaction classes perform very good
+\end{itemize}
+
+
+
+
+
+\section{Material and Methods}
+%What we did
+%
+%How was the problem studied?
+%    Include detailed information, so that a knowledgeable
+%         reader can reproduce the experiment
+%    Extensive detail can be described in the supplementary
+%         material
+
+\begin{itemize}
+\item Short desciption of the PD GWAS
+\item SNP data structure: Explanation of the use and combinded data
+\item SNP set building (background, why we build them like that)
+\item jSLAT explanation
+\item application to PD
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[t!h]
+\centering \includegraphics[width=0.8\columnwidth]{Overview.jpg}
+\caption{Method...}
+\label{fig:Ceramide}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%% END FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[t!h]
+\centering \includegraphics[width=0.8\columnwidth]{DataStructure.jpg}
+\caption{SNP data structure}
+\label{fig:Ceramide}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%% END FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Results}
+%What have we found out?
+%
+%Only representative results, essential for the Discussion,
+%    should be presented
+%Add supplementary materials for data of secondary
+%    importance
+%Do not attempt to "hide" data in the hope of saving it for a
+%    later paper.
+
+\begin{itemize}
+\item Table with percentage of interaction sets
+\item Results of PD
+\item Programm + link to homepage
+\end{itemize}
+
+
+
+
+\section{Discussion}
+%(Short summary: What did you find out?)
+%
+%What did you learn from your study?
+%
+%What inferences can be drawn from the findings?
+%
+%What are the practical and theoretical implications of your
+%        findings?
+%
+%How do your results relate previous research?
+%
+% (Which problems are next to be solved?)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+ Problem: GWAS is expensive keeps lots of information which is propbaly not used\\
+ 1. Furhter meta-analyses, pathway, interaction\\
+ 2. Our method is perfect because it combines all aspects of previous research\\
+ 3. Combines known and predicted interaction information => known and new information in this study\\
+ 4. makes the investigation smaller but augment the information content\\
+ 5. The best sets are interaction sets, shows that the method combines the best SNPs (see diagram)\\
+ 6. Comparison with literature, esp. known PD genes/SNPs\\
+ 7. Results are transparent and can be repeated (see programm on the following page..\\
+
+
+
+
+
+\section{Conclusion}
+%How the work advances the filed from the present state of
+%     knowledge
+%
+%Without clear Conclusions, reviewers and readers will find it
+%     difficult to judge the work, and whether or not it merits
+%     publication in the journal
+%
+%Do not repeat the abstract or just list experimental
+%     results!!!
+
+We advance the field with a new method that augement the use of GWAS.\\
+It was necessary to use a new method combining pathway and interaction data\\
+We solved the problem of the extreme computational power, by resticting with a good biological background the set combination.\\
+
+
+
+\section*{Acknowledgements}
+\paragraph{Funding:}
+Federal Ministry of Education and Research (BMBF, Germany) in the National
+Genome Research Network (NGFN+) under grant number 01GS08134.
+\paragraph{Conflict of interest:} None declared.
+
+\bibliography{document}
+%\begin{thebibliography}{document.bib}
+%
+%
+%\bibitem[CE1]{clareke}
+%Clarke, F., Ekeland, I.:
+%Nonlinear oscillations and boundary-value problems for
+%Hamiltonian systems.
+%Arch. Rat. Mech. Anal. {\bfseries 78} (1982) 315--333
+%.
+%.
+%\end{thebibliography}
+
+
+\end{document} 
