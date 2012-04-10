@@ -17,11 +17,16 @@ con-tent
 re-search-ers
 in-di-vid-u-al
 de-scrip-tion
+path-way
+i-den-ti-fi-ers
+read-a-ble
 }
 
 \begin{document}
 \application
 \firstpage{1}
+
+% Highlight changes in RED: \textcolor[rgb]{1,0,0}{
 
 %\title[KEGGtranslator]{KEGGtranslator: visualizing and translating the KEGG PATHWAY database}
 \title[KEGGtranslator]{KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats}
@@ -73,16 +78,21 @@ KEGGtranslator is freely available as a Java\TTra Web Start application and for 
 
 
 
-Many academic researchers, who want to use pathway-based information, utilize the KEGG PATHWAY database \citep{Kanehisa2000}. The database, established in 1995, contains manually created maps for various pathways. These maps are visualized on the web and can be downloaded free of charge (for academics) as XML-files in the KEGG Markup Language (KGML) \citep{KGML}. The elements in a pathway XML-file (such as reactions or genes) are usually identified by a KEGG identifier only. Thus, KEGG PATHWAY is strongly related to other KEGG databases, that resolve and further describe the identifiers.
+Many academic researchers, who want to use pathway-based information, utilize the KEGG PATHWAY database \citep{Kanehisa2000}. The database, established in 1995, contains manually created maps for various pathways. These maps are visualized on the web and can be downloaded free of charge (for academics) as XML-files in the KEGG Markup Language (KGML). The elements in a pathway XML-file (such as reactions or genes) are usually identified by a KEGG identifier only. Thus, KEGG PATHWAY is strongly related to other KEGG databases that resolve and further describe the identifiers.
 %
 However, the content of these KGML-formatted XML-files itself is limited. Gene names are often encoded as barely readable abbreviations and elements are only annotated by a single KEGG identifier.
 %The reason for this is that KEGG releases those XML-files primarily for graphical visualizations of the pathway. For creating fully functional models of the pathway, the content of the XML-file is not sufficient.
-By improving the annotation and translating the KGML-files to other file formats, researchers could use the KEGG database for many applications: Individual pathway pictures could be created; pathway simulation and modeling applications could be executed; graph-operations on the pathways or stoichiometric analyses (e.g., linear relationships) could be performed; or the KEGG pathway database could be used for gene set enrichment analyses.
+By improving the annotation and translating the KGML-files to other file formats, researchers could use the KEGG database for many applications: Individual pathway pictures could be created; pathway simulation and modeling applications could be executed; graph-operations on the pathways or stoichiometric analyses could be performed \citep[see, e.g.,][chap. 3]{Heinrich2006}; or the KEGG pathway database could be used for gene set enrichment analyses.
 %
-For these purposes, only a few converters are available: KEGGconverter \citep{KEGGconverter}, SuBliMinaL \citep{Swainston2011}, or KEGG2SBML \citep{KEGG2SBML} offer command-line or web-based conversion of KGML-files to SBML-files. KEGGgraph \citep{KEGGgraph} is able to convert KGML-files to R-based graph structures. None of these tools has a graphical user interface, is capable to validate and autocomplete KEGG reactions, adds standard identifiers (such as MIRIAM URNs) to pathway elements, or is able to write KGML files in multiple ouput formats.
+For these purposes, only a few converters are available: KEGGconverter \citep{KEGGconverter} or KEGG2SBML \citep{KEGG2SBML} offer command-line or web-based conversion of KGML-files to SBML-files. KEGGgraph \citep{KEGGgraph} is able to convert KGML-files to R-based graph structures. None of these tools has a graphical user interface, is capable to validate and autocomplete KEGG reactions, adds standard identifiers (such as MIRIAM URNs) to pathway elements, or is able to write KGML files in multiple ouput formats.
+%At least the annotation with MIRIAM URNs and some methods to improve the KEGG reactions are included in the recently introduced, SBML-based command-line toolbox SuBliMinaL \citep{Swainston2011}.
+Along with this work, the command-line toolbox SuBliMinaL \citep{Swainston2011} overcomes some of these limitations.
 
-We here present KEGGtranslator, which reads and completes the content of an XML-file by retrieving online-annotation of all genes and reactions using the KEGG API \citep{KEGGapi}. KGML-files can be converted to many output formats. Minor deficiencies are corrected (e.g., the name of a gene), new information is added (e.g., multiple MIRIAM identifiers for each gene and reaction \citep{Novere2005}, or SBO terms describing the function) and some crucial deficiencies (like missing reactants) are addressed.
+We here present KEGGtranslator, which reads and completes the content of an XML-file by retrieving online-annotation of all genes and reactions using the KEGG API. KGML-files can be converted to many output formats. Minor deficiencies are corrected (e.g., the name of a gene), new information is added (e.g., multiple MIRIAM identifiers for each gene and reaction \citep{Novere2005}, or SBO terms describing the function) and some crucial deficiencies (like missing reactants) are addressed.
 
+% (KGML -- \href{http://www.genome.jp/kegg/xml/}{http://www.genome.jp/kegg/xml/})
+% API (\href{http://www.genome.jp/kegg/soap/}{http://www.genome.jp/kegg/soap/})
+%
 %Beispiel aus Glycloyse (hsa00010.xml)
 %XML file contains:
 %===================
@@ -194,10 +204,11 @@ We gratefully acknowledge very fruitful discussions with Jochen Supper, Akira Fu
 %\bibliography{Document}
 
 
+\vspace{-.1cm}
+
 %XXX: Uncomment for dynamic reference addition
 %\bibliography{KEGGtranslator}
 
-\vspace{-.1cm}
 
 \begin{thebibliography}{}
 
@@ -227,18 +238,23 @@ Funahashi, A. \emph{et al.} (2004).
 \newblock {\em 8th Annual International Conference on Research in Computational
   Molecular Biology\/}.
 
+\bibitem[Heinrich and Schuster(2006)Heinrich and Schuster]{Heinrich2006}
+Heinrich, R. and Schuster, S. (2006).
+\newblock {\em {The Regulation of Cellular Systems}\/}.
+\newblock Springer, Berlin, 2nd edition.
+
 \bibitem[Kanehisa and Goto(2000)Kanehisa and Goto]{Kanehisa2000}
 Kanehisa, M. and Goto, S. (2000).
 \newblock {KEGG: Kyoto Encyclopedia of Genes and Genomes}.
 \newblock {\em Nucleic Acids Res\/}, {\bf 28}(1), 27--30.
 
-\bibitem[{KEGG team}(2007){KEGG team}]{KEGGapi}
-{KEGG team} (2007).
-\newblock {\em KEGG API [{http://www.genome.jp/kegg/soap/}]\/}.
-
-\bibitem[{KEGG team}(2010){KEGG team}]{KGML}
-{KEGG team} (2010).
-\newblock {\em {KEGG Markup Language [http://www.genome.jp/kegg/xml/docs]}\/}.
+%\bibitem[{KEGG team}(2007){KEGG team}]{KEGGapi}
+%{KEGG team} (2007).
+%\newblock {\em KEGG API [{http://www.genome.jp/kegg/soap/}]\/}.
+%
+%\bibitem[{KEGG team}(2010){KEGG team}]{KGML}
+%{KEGG team} (2010).
+%\newblock {\em {KEGG Markup Language [http://www.genome.jp/kegg/xml/docs]}\/}.
 
 \bibitem[Moutselos {\em et~al.}(2009)Moutselos, Kanaris, Chatziioannou,
   Maglogiannis, and Kolisis]{KEGGconverter}
@@ -258,7 +274,7 @@ Nov\`{e}re, N.~L. \emph{et al.} (2005).
 \bibitem[Swainston {\em et~al.}(2011)]{Swainston2011}
 Swainston, N. \emph{et al.} (2011).
 \newblock {The SuBliMinaL Toolbox: automating steps in the reconstruction of metabolic networks}.
-\newblock {\em Submitted to Journal of Integrative Bioinformatics\/}. %Integr. Bioinf. ?
+\newblock {\em Submitted to Journal of Integrative Bioinformatics\/}. %J Integr Bioinform.
 
 \bibitem[Wiese {\em et~al.}(2001)Wiese, Eiglsperger, and Kaufmann]{yFiles}
 Wiese, R. \emph{et al.} (2001).
