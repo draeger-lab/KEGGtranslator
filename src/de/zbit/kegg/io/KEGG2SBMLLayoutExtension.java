@@ -33,6 +33,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
+import org.sbml.jsbml.ext.layout.LayoutConstant;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 
@@ -54,7 +55,7 @@ public class KEGG2SBMLLayoutExtension {
   /**
    * Layout extension namespace URL.
    */
-  public static final String LAYOUT_NS = "http://www.sbml.org/sbml/level3/version1/layout/version1";
+  public static final String LAYOUT_NS = LayoutConstant.namespaceURI;
   
   /**
    * Unique identifier to identify this Namespace/Extension.

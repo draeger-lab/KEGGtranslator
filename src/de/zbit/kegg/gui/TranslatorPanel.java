@@ -145,6 +145,10 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       // Please only insert working items here.
       case SBGN:
         return new TranslatorSBGNPanel(inputFile, translationResult);
+        
+      case BioPAX_level2: case BioPAX_level3:
+        return new TranslatorBioPAXPanel(inputFile, outputFormat, translationResult);
+        
       default:
         GUITools.showErrorMessage(null, "Unknwon output Format: '" + outputFormat + "'.");
         return null;
@@ -158,9 +162,12 @@ public abstract class TranslatorPanel <DocumentType> extends JPanel implements B
       case GraphML: case GML: case JPG: case GIF: case YGF: case TGF: /* case SVG:*/
         return new TranslatorGraphPanel(pathwayID, outputFormat, translationResult);
         
-      // SBGN REMOVED, Please only insert working items here.
       case SBGN:
         return new TranslatorSBGNPanel(pathwayID, translationResult);
+        
+      case BioPAX_level2: case BioPAX_level3:
+        return new TranslatorBioPAXPanel(pathwayID, outputFormat, translationResult);
+        
       default:
         GUITools.showErrorMessage(null, "Unknwon output Format: '" + outputFormat + "'.");
         return null;

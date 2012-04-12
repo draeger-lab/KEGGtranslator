@@ -135,6 +135,12 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected Pathway lastTranslatedPathway = null;
   
   /**
+   * Contains all ids already assigned to an element in, e.g., the sbml document.
+   * Used for avoiding giving the same id to two or more different elements.
+   */
+  protected Set<String> SIds = new HashSet<String>();
+  
+  /**
    * ProgressBar for KEGG translation
    */
   protected AbstractProgressBar progress=null;
@@ -382,8 +388,13 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     // REMARK: This class is and must be called by all other translate functions.
     preProcessPathway(p);
     
+    // Reset lists and buffers.
+    SIds = new HashSet<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
+    
     // Remember just the pathway object with core information for later information
-    lastTranslatedPathway = new Pathway(p.getName(), p.getOrg(), p.getNumber(), p.getTitle(), p.getImage(), p.getLink());
+    //lastTranslatedPathway = new Pathway(p.getName(), p.getOrg(), p.getNumber(), p.getTitle(), p.getImage(), p.getLink());
+    // Since some methods really need the whole document, we now store it.
+    lastTranslatedPathway = p;
     
     OutputFormat doc = translateWithoutPreprocessing(p);
     
@@ -754,6 +765,69 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     if (i>1) return name.substring(0, i);
     else return name;
   }
+  
+  
+  /**
+   * Generates a valid SId from a given name. If the name already is a valid
+   * SId, the name is returned. If the SId already exists in this document,
+   * "_&lt;number>" will be appended and the next free number is being assigned.
+   * => See SBML L2V4 document for the Definition of SId. (Page 12/13)
+   * 
+   * @param name
+   * @return SId
+   */
+  protected String NameToSId(String name) {
+    /*
+     * letter ::= �a�..�z�,�A�..�Z� digit ::= �0�..�9� idChar ::= letter |
+     * digit | �_� SId ::= ( letter | �_� ) idChar*
+     */
+    String ret = "";
+    if (name == null || name.trim().length() == 0) {
+      ret = incrementSIdSuffix("SId");
+      SIds.add(ret);
+    } else {
+      name = name.trim();
+      char c = name.charAt(0);
+      if (!(isLetter(c) || c == '_')) ret = "SId_"; else ret = Character.toString(c);
+      for (int i = 1; i < name.length(); i++) {
+        c = name.charAt(i);
+        if (c==' ') c='_'; // Replace spaces with "_"
+        if (isLetter(c) || Character.isDigit(c) || c == '_') ret += Character.toString(c);
+      }
+      if (SIds.contains(ret)) ret = incrementSIdSuffix(ret);
+      SIds.add(ret);
+    }
+    
+    return ret;
+  }
+  
+  /**
+   * Returns true if c is out of A-Z or a-z.
+   * @param c
+   * @return
+   */
+  private static boolean isLetter(char c) {
+    // Unfortunately Character.isLetter also acceps ß, but SBML doesn't.
+    // a-z or A-Z
+    return (c>=97 && c<=122) || (c>=65 && c<=90);
+  }
+  
+  /**
+   * Appends "_<Number>" to a given String. <Number> is being set to the next
+   * free number, so that this sID is unique in this sbml document. Should
+   * only be called from "NameToSId".
+   * 
+   * @return
+   */
+  private String incrementSIdSuffix(String prefix) {
+    int i = 1;
+    String aktString = prefix + "_" + i;
+    while (SIds.contains(aktString)) {
+      aktString = prefix + "_" + (++i);
+    }
+    return aktString;
+  }
+  
 
 
   /**

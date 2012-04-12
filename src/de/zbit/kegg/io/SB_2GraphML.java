@@ -36,6 +36,7 @@ import de.zbit.graph.ReactionNodeRealizer;
 import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
 import de.zbit.kegg.ext.SBGNVisualizationProperties;
+import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.util.TranslatorTools;
 
 /**

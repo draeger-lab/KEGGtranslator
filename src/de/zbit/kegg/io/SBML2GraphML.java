@@ -39,10 +39,12 @@ import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
+import org.sbml.jsbml.ext.layout.LayoutConstant;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.Output;
+import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
@@ -94,7 +96,16 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * This map helps to enhance the reactionNode-layout, after the graph
    * is completely built and layouted.
    */
-  Map<Reaction, ReactionNodeRealizer> reaction2node=null;
+  private Map<Reaction, ReactionNodeRealizer> reaction2node=null;
+  
+  /**
+   * The namespace URI of the qual extension.
+   */
+  private final static String qualNamespace = QualConstant.namespaceURI;
+  /**
+   * The namespace URI of the layout extension.
+   */
+  private final static String layoutNamespace = LayoutConstant.namespaceURI;
   
   public SBML2GraphML() {
     super();
@@ -121,7 +132,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
   public void setShowQualModel(boolean showQualModel) {
     this.showQualModel = showQualModel;
   }
-
+  
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.SB_2GraphML#createNodesAndEdges(java.lang.Object)
    */
@@ -134,7 +145,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
     // Get list of species
     List<? extends AbstractNamedSBase> species;
     if (showQualModel) {
-      SBasePlugin qm = document.getModel().getExtension(KEGG2SBMLqual.QUAL_NS);
+      SBasePlugin qm = document.getModel().getExtension(qualNamespace);
       if (qm!=null && qm instanceof QualitativeModel) {
         QualitativeModel q = (QualitativeModel) qm;
         if (!q.isSetListOfQualitativeSpecies()) return;
@@ -158,7 +169,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
       /*
        * RELATIONS
        */
-      QualitativeModel qm = ((QualitativeModel)document.getModel().getExtension(KEGG2SBMLqual.QUAL_NS));
+      QualitativeModel qm = ((QualitativeModel)document.getModel().getExtension(qualNamespace));
       for (Transition t : qm.getListOfTransitions()) {
         createRelation(t);
       }
@@ -383,7 +394,7 @@ public class SBML2GraphML extends SB_2GraphML<SBMLDocument> {
    * @param document
    */
   private void parseLayoutInformation(SBMLDocument document) {
-    SBasePlugin layoutExtension = document.getModel().getExtension(KEGG2SBMLLayoutExtension.LAYOUT_NS);
+    SBasePlugin layoutExtension = document.getModel().getExtension(layoutNamespace);
     useLayoutExtension = layoutExtension!=null;
     id2layoutMap = null;
     if (useLayoutExtension) {

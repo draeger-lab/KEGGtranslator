@@ -249,6 +249,12 @@ public class BatchKEGGtranslator {
 		case TGF:
 			translator = KEGG2yGraph.createKEGG2TGF(manager);
 			break;
+		case BioPAX_level2:
+		  translator = new KEGG2BioPAX_level2(manager);
+      break;
+    case BioPAX_level3:
+      translator = new KEGG2BioPAX_level3(manager);
+      break;
 		case SBGN:
 			translator  = new KEGG2SBGN(manager);
 			break;

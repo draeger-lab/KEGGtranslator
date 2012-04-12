@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -104,12 +105,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * the notes, if reaction is unbalanced.
    */
   protected boolean checkAtomBalance = false;
-  
-  /**
-   * Contains all ids already assigned to an element in the sbml document.
-   * Used for avoiding giving the same id to two or more different elements.
-   */
-  private Set<String> SIds = new HashSet<String>();
   
   /**
    * Default compartment size.
@@ -239,9 +234,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @param SBO
    */
   private void configureReactionComponent(Pathway p, ReactionComponent rc, SpeciesReference sr, int SBO) {
-    if (!rc.hasId() && !rc.hasName()) {
+    if (!rc.isSetID() && !rc.isSetName()) {
       rc = rc.getAlt();
-      if (rc==null || ((!rc.hasId() && !rc.hasName()))) return;
+      if (rc==null || ((!rc.isSetID() && !rc.isSetName()))) return;
     }
     sr.setName(rc.getName());
     sr.setId(NameToSId(sr.getName()));
@@ -275,7 +270,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
 			writer.write(doc, outFile, System.getProperty("app.name"), System
 					.getProperty("app.version"));
     } catch (Exception e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, "Could not write SBML document.", e);
       return false;
     }
     return true;
@@ -296,7 +291,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     //doc.addChangeListener(this);
     
     // Reset lists and buffers.
-    SIds = new HashSet<String>(); // Reset list of given SIDs. These are being remembered to avoid double ids.
     CellDesignerUtils cdu = null;
     if (addCellDesignerAnnots) cdu = new CellDesignerUtils(); 
     
@@ -472,24 +466,23 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     if(considerReactions()){
       // I noticed, that some reations occur multiple times in one KGML document,
       // (maybe its intended? e.g. R00014 in hsa00010.xml)
-      List<String> processedReactions = new SortedArrayList<String>();
+      Set<String> processedReactions = new HashSet<String>();
       
       
       // All species added. Parse reactions and relations.
       for (Reaction r : p.getReactions()) {
-        if (!processedReactions.contains(r.getName())) {
+        if (processedReactions.add(r.getName())) {
           org.sbml.jsbml.Reaction sbReaction = addKGMLReaction(r,p,model,compartment,reactionModifiers);
           
-          if (addCellDesignerAnnots && sbReaction!=null)
+          if (addCellDesignerAnnots && sbReaction!=null) {
             cdu.addCellDesignerAnnotationToReaction(sbReaction, r);
-          processedReactions.add(r.getName());
+          }
         }
       }
       
       // Give a warning if we have no reactions.
       if (p.getReactions().size()<1 && !considerRelations()) {
-        System.err.println("Warning: File does not contain any reactions.");
-        //  Consider setting 'considerRelations' to true.
+        log.info(String.format("Pathway '%s' does not contain any reactions.", p.getName()!=null?p.getName():"Unknown"));
       }
     }
     // ------------------------------------------------------------------
@@ -698,6 +691,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   
   /**
    * Adds all available MIRIAM URNs and ids to the given species.
+   * AND adds a description and more information from the KEGG api to the
+   * species's description.
    * @param entry
    * @param spec
    */
@@ -782,7 +777,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @return <code>NULL</code> if input did not contain valid reactionIDs.
    * else, a space-separated {@link String} with unique reaction ids.
    */
-  private static String concatReactionIDs(Collection<Reaction> reactions, String... reactionIDs) { 
+  public static String concatReactionIDs(Collection<Reaction> reactions, String... reactionIDs) { 
     Set<String> ret = new HashSet<String>();
     
     // Add all reaction names from the list of reactions
@@ -988,7 +983,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Set SBO Term
     spec.setSBOTerm(SBOMapping.getSBOTerm(entry));
     
-    // Add Miriam URNs
+    // Add Miriam URNs and Description
     addMiriamURNs(entry, spec);
     
     // Finally, add the fully configured species.
@@ -1086,66 +1081,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     }
     
     return ret;
-  }
-  
-  /**
-   * Generates a valid SId from a given name. If the name already is a valid
-   * SId, the name is returned. If the SId already exists in this document,
-   * "_<number>" will be appended and the next free number is being assigned.
-   * => See SBML L2V4 document for the Definition of SId. (Page 12/13)
-   * 
-   * @param name
-   * @return SId
-   */
-  protected String NameToSId(String name) {
-    /*
-     * letter ::= �a�..�z�,�A�..�Z� digit ::= �0�..�9� idChar ::= letter |
-     * digit | �_� SId ::= ( letter | �_� ) idChar*
-     */
-    String ret = "";
-    if (name == null || name.trim().length() == 0) {
-      ret = incrementSIdSuffix("SId");
-      SIds.add(ret);
-    } else {
-      name = name.trim();
-      char c = name.charAt(0);
-      if (!(isLetter(c) || c == '_')) ret = "SId_"; else ret = Character.toString(c);
-      for (int i = 1; i < name.length(); i++) {
-        c = name.charAt(i);
-        if (isLetter(c) || Character.isDigit(c) || c == '_') ret += Character.toString(c);
-      }
-      if (SIds.contains(ret)) ret = incrementSIdSuffix(ret);
-      SIds.add(ret);
-    }
-    
-    return ret;
-  }
-  
-  /**
-   * Returns true if c is out of A-Z or a-z.
-   * @param c
-   * @return
-   */
-  private static boolean isLetter(char c) {
-    // Unfortunately Character.isLetter also acceps ß, but SBML doesn't.
-    // a-z or A-Z
-    return (c>=97 && c<=122) || (c>=65 && c<=90);
-  }
-  
-  /**
-   * Appends "_<Number>" to a given String. <Number> is being set to the next
-   * free number, so that this sID is unique in this sbml document. Should
-   * only be called from "NameToSId".
-   * 
-   * @return
-   */
-  private String incrementSIdSuffix(String prefix) {
-    int i = 1;
-    String aktString = prefix + "_" + i;
-    while (SIds.contains(aktString)) {
-      aktString = prefix + "_" + (++i);
-    }
-    return aktString;
   }
   
   /**

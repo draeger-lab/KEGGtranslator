@@ -37,6 +37,7 @@ import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.InputTransitionEffect;
 import org.sbml.jsbml.ext.qual.OutputTransitionEffect;
+import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
 import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 import org.sbml.jsbml.ext.qual.Sign;
@@ -67,7 +68,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   /**
    * Qual Namespace definition URL.
    */
-  public static final String QUAL_NS = "http://www.sbml.org/sbml/level3/version1/qual/version1";
+  public static final String QUAL_NS = QualConstant.namespaceURI;
   
   /**
    * Unique identifier to identify this Namespace/Extension.

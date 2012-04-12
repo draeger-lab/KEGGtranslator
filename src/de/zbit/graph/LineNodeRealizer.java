@@ -33,7 +33,7 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 
 /**
- * Creates a spline (node). Note that this nodes ignores
+ * Creates a spline (node). Note that this node ignores
  * the X/Y/W/H properties and thus, can not be replaced
  * or moved! The only control is by adding points with
  * {@link #addSplineCoords(int, int)} as absolute

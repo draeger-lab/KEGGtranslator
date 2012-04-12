@@ -277,6 +277,19 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     this.outputHandler = outputHandler;
   }
   
+  /**
+   * @return the drawArrowsForReactions
+   */
+  public boolean isDrawArrowsForReactions() {
+    return drawArrowsForReactions;
+  }
+  /**
+   * @param drawArrowsForReactions the drawArrowsForReactions to set
+   */
+  public void setDrawArrowsForReactions(boolean drawArrowsForReactions) {
+    this.drawArrowsForReactions = drawArrowsForReactions;
+  }
+  
   /*===========================
    * FUNCTIONS
    * ===========================*/

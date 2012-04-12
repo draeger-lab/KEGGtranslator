@@ -37,6 +37,7 @@ import y.view.EdgeRealizer;
 import y.view.GenericEdgeRealizer;
 import y.view.Graph2D;
 import de.zbit.graph.ReactionNodeRealizer;
+import de.zbit.kegg.io.KEGG2SBGNProperties;
 import de.zbit.kegg.io.KEGG2SBGNProperties.ArcType;
 import de.zbit.kegg.io.KEGG2SBGNProperties.GlyphType;
 
@@ -57,7 +58,7 @@ public class SBGN2GraphML extends SB_2GraphML<Sbgn> {
   Map<Glyph, ReactionNodeRealizer> reaction2node=null;
   
   /**
-   * 
+   * True if and only if any glyph added as node contained x/y information.
    */
   private boolean anyNodeContainedLayout = false;
   

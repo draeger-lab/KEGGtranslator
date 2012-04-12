@@ -123,6 +123,11 @@ public class SBOMapping {
    */
   private static Map<String, Integer> subtype2SBO = new HashMap<String, Integer>();
   
+  /**
+   * A try to translate the {@link SubType}s to GO terms.
+   */
+  private static Map<String, Integer> subtype2GO = new HashMap<String, Integer>();
+  
   static {
     // Init subtype map
     subtype2SBO.put(SubType.ACTIVATION, 170); // = stimulation
@@ -141,6 +146,23 @@ public class SBOMapping {
     subtype2SBO.put(SubType.REPRESSION, 169);
     subtype2SBO.put(SubType.STATE_CHANGE, 168); // control
     subtype2SBO.put(SubType.UBIQUITINATION, 224); // ubiquitination
+    
+    //subtype2GO.put(SubType.ACTIVATION, UNKNOWN); // = stimulation
+    subtype2GO.put(SubType.ASSOCIATION, 5488); // = non-covalent binding
+    subtype2GO.put(SubType.BINDING, 5488);
+    subtype2GO.put(SubType.BINDING_ASSOCIATION, 5488);
+    subtype2GO.put(SubType.DEPHOSPHORYLATION, 16311); // dephosphorylation
+    //subtype2GO.put(SubType.DISSOCIATION, 177);
+    subtype2GO.put(SubType.EXPRESSION, 10467); // = gene expression 
+    subtype2GO.put(SubType.GLYCOSYLATION, 70085); // glycosylation
+    //subtype2GO.put(SubType.INDIRECT_EFFECT, 344);
+    //subtype2GO.put(SubType.INHIBITION, 169);
+    subtype2GO.put(SubType.METHYLATION, 32259); // methylation
+    //subtype2GO.put(SubType.MISSING_INTERACTION, 396);
+    subtype2GO.put(SubType.PHOSPHORYLATION, 16310); // phosphorylation
+    //subtype2GO.put(SubType.REPRESSION, 169);
+    //subtype2GO.put(SubType.STATE_CHANGE, 168);
+    subtype2GO.put(SubType.UBIQUITINATION, 16567); // protein ubiquitination
   }
   
   /**
@@ -216,6 +238,18 @@ public class SBOMapping {
     Integer ret = subtype2SBO.get(subtype);
     if (ret==null) ret = -1;
     return ret;
+  }
+  
+  /**
+   * Get a GO term for a {@link SubType}.
+   * @param subtype
+   * @return
+   */
+  public static int getGOTerm(String subtype) {
+    // NOTE: There are some subtypes without GO terms!
+    Integer ret = subtype2GO.get(subtype);
+    if (ret==null) ret = -1;
+    return ret;    
   }
   
 

@@ -62,6 +62,14 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 		/**
 		 * 
 		 */
+		BioPAX_level2,
+		/**
+		 * 
+		 */
+		BioPAX_level3,
+		/**
+		 * 
+		 */
 		LaTeX,
 		/**
 		 * 
