@@ -1,12 +1,13 @@
-\documentclass[citeauthoryear]{llncs}
+\documentclass{llncs}
 \usepackage{graphicx}
+%\usepackage{natbib}
 %
 \begin{document}
 
 \title{Preparing KEGG pathway models for various applications}
 \titlerunning{KEGG pathways as models}
 
-\author{Clemens Wrzodek\inst{1} \and Andreas Dr\"ager\inst{1} \and Finja B\"uchel\inst{1} \and Andreas Zell\inst{1}}
+\author{Clemens Wrzodek\inst{1} \and Andreas Dr\"ager\inst{1} \and Finja B\"uchel\inst{1} \and Manuel Ruff\inst{1} \and Andreas Zell\inst{1}}
 \authorrunning{Wrzodek \emph{et al.}}
 
 \institute{Center for Bioinformatics Tuebingen (ZBIT), University of Tuebingen, T\"ubingen, Germany}
@@ -29,15 +30,6 @@
 %
 %conclusions:
 %      what are the implications of your solution?
-\begin{itemize}
-\item problem statement: Identification of associated disease specific SNP sets\\
-\item up to now the potential utility of GWAS not used\\
-\item identification of associated SNPs computational challenging\\
-\item We developed a new method by applying a priori biological knowledge (pathway, interaction, known and predicted)\\
-\item Statistical evaluation with variation of Fishers method\\
-\item Tested the method on PD data.
-\end{itemize}
-
 \end{abstract}
 
 \section{Introduction}
@@ -59,19 +51,35 @@
 %    Conclusion: what do these results mean (why are these
 %               results significant?
 
-\begin{itemize}
-\item Problem: GWAS is expensive, information content is high, but it is not easy to get it out, i.e. computational costs for pair-wise identifcation of associated SNPs
-\item previous studies: pathway, network, SNP restriction (but how to restrict?)
-\item what is lacking: combination and the possibility to allow/investigate possibly new interactions
-\item Tested our method on PD data
-\item Results: interaction classes perform very good
-\end{itemize}
+% 1. KEGG ist toll weil
+% 2. Modelling
+% 3. ...und man könnte tolle Sachen machen wenn man tolle Modelle hätte.
+% 4. Deshalb gibt es Converter
+The KEGG PATHWAY database provides a valuable resource for initial modeling approaches of specific biological networks \cite{Kanehisa2000}. The database contains pathway maps for a multitude of different organisms and most provided information is cross-linked with other KEGG databases. Since many years, this database is one of the most important sources for building initial structural models of various pathways \cite{Bauer-Mehren2009,Oberhardt2009}. All pathway information is stored in KGML formatted xml-files, which are barely supported by other applications. In systems biology, two wide-spread formats for modeling and exchanging pathways are the SBML and BioPAX formats (TODO: Cite SBML and BioPAX). These formats can be used with graphical modeling applications, like CellDesigner (), annotated with kinetics (squeezer subliminal), used for flux balance analysis (fasimu), etc. (TODO anwendungen für BioPAX finden). Therefore, converters exist that perform mostly basic conversions from KGML to those formats \cite{KEGGconverter,KEGG2SBML}. The drawback of many of those conversions is, that even for creating initial models a basic translation of a KGML document to, e.g., an SBML document is not sufficient.
+
+% 5. Wo ist das Problem mit den bisherigen Convertern?
+The KGML documents provided by KEGG are mainly for graphical representations of pathways and consist of entries (which correspond to nodes in a pathway map), relations (which correspond to edges in a pathway map) and reactions. Those reactions are primarily contained in metabolic pathway maps and allow to draw the conclusion that converting all entries and reactions would already lead to good metabolic models. But a closer look on the actual maps shows that even those reactions are mainly for visualization and not for modeling or simulation purposes. Reactions are sometimes being "bundled", e.g., one reaction instance is built and multiple reaction identifiers, that point to different reactions, are assigned. There are often missing reactants for reactions, stoichiometric information is completely wiped out and also the list of enzymes, catalyzing a reaction, is not necessarily entirely contained in the KGML document. Similar problems arise for the entries in a KGML document. The pathways contain some duplicates of entries, which make sense for nice graphical representations but not for modeling and simulation. Furthermore, one entry might consist of multiple proteins/ genes, etc. which are grouped together for some reason. All those exemplary mentioned problems show that simple one-to-one translations of KEGG pathway maps are not sufficient to build reliable and useful models.
+
+% 6. Wie sind besser und lösen alles.
+To overcome all those drawbacks, we performed many case-studies on those KGML documents and developed strategies for building useful initial models in SBML and BioPAX. Besides automatically fixing many of the mentioned issues, we heavily annotate and augment all provided information to ease further model building and usage of those translated pathway maps. This ranges from adding simple database cross-references (e.g., to UniProt or Entrez Gene), over annotation of chemical formulas and molecular weight of small molecules, to an automated atom balance check of all reactions. All those strategies are now included in the second release of the KEGGtranslator application \cite{Wrzodek2011}.
 
 
+
+% 1. KEGG ist toll weil
+% 2. Wo ist das Problem (beschreibt grafische Zusammenhänge)
+% Verschiedene Formate für versch. Sachen, nicht verlustfrei möglich
+% Man braucht (korrekte) Gleichungen, am besten noch chemische formeln, molekular gewicht, etc.
+% für graphen malen braucht man größe, position, farbe, noch entrez gene, uniprot (und kanten)
+% Inhalt ist für grafik, Reaktionen da fehlt einiges, sowie annotationen, etc.
+% Relationen zu qual
 
 
 
 \section{Material and Methods}
+
+% 1. Generell erklären, dass fast alles per optionen kontrolliert werden kann.
+% 2. 
+
 %What we did
 %
 %How was the problem studied?
@@ -80,34 +88,28 @@
 %    Extensive detail can be described in the supplementary
 %         material
 
-\begin{itemize}
-\item Short desciption of the PD GWAS
-\item SNP data structure: Explanation of the use and combinded data
-\item SNP set building (background, why we build them like that)
-\item jSLAT explanation
-\item application to PD
-\end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}[t!h]
-\centering \includegraphics[width=0.8\columnwidth]{Overview.jpg}
-\caption{Method...}
-\label{fig:Ceramide}
-\end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%% END FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}[t!h]
-\centering \includegraphics[width=0.8\columnwidth]{DataStructure.jpg}
-\caption{SNP data structure}
-\label{fig:Ceramide}
-\end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%% END FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{figure}[t!h]
+%\centering \includegraphics[width=0.8\columnwidth]{Overview.jpg}
+%\caption{Method...}
+%\label{fig:Ceramide}
+%\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% END FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{figure}[t!h]
+%\centering \includegraphics[width=0.8\columnwidth]{DataStructure.jpg}
+%\caption{SNP data structure}
+%\label{fig:Ceramide}
+%\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% END FIGURE 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \section{Results}
@@ -120,11 +122,6 @@
 %Do not attempt to "hide" data in the hope of saving it for a
 %    later paper.
 
-\begin{itemize}
-\item Table with percentage of interaction sets
-\item Results of PD
-\item Programm + link to homepage
-\end{itemize}
 
 
 
@@ -145,17 +142,6 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
- Problem: GWAS is expensive keeps lots of information which is propbaly not used\\
- 1. Furhter meta-analyses, pathway, interaction\\
- 2. Our method is perfect because it combines all aspects of previous research\\
- 3. Combines known and predicted interaction information => known and new information in this study\\
- 4. makes the investigation smaller but augment the information content\\
- 5. The best sets are interaction sets, shows that the method combines the best SNPs (see diagram)\\
- 6. Comparison with literature, esp. known PD genes/SNPs\\
- 7. Results are transparent and can be repeated (see programm on the following page..\\
-
-
-
 
 
 \section{Conclusion}
@@ -169,10 +155,6 @@
 %Do not repeat the abstract or just list experimental
 %     results!!!
 
-We advance the field with a new method that augement the use of GWAS.\\
-It was necessary to use a new method combining pathway and interaction data\\
-We solved the problem of the extreme computational power, by resticting with a good biological background the set combination.\\
-
 
 
 \section*{Acknowledgements}
@@ -181,18 +163,9 @@ Federal Ministry of Education and Research (BMBF, Germany) in the National
 Genome Research Network (NGFN+) under grant number 01GS08134.
 \paragraph{Conflict of interest:} None declared.
 
-\bibliography{KEGGtranslator_v2_methods}
-%\begin{thebibliography}{document.bib}
-%
-%
-%\bibitem[CE1]{clareke}
-%Clarke, F., Ekeland, I.:
-%Nonlinear oscillations and boundary-value problems for
-%Hamiltonian systems.
-%Arch. Rat. Mech. Anal. {\bfseries 78} (1982) 315--333
-%.
-%.
-%\end{thebibliography}
+%\bibliographystyle{natbib}
+\bibliographystyle{splncs}
 
+\bibliography{KEGGtranslator_v2_methods}
 
 \end{document} 
