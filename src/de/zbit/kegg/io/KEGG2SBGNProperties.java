@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.sbgn.bindings.Glyph;
+import org.sbgn.bindings.Glyph.Clone;
+import org.sbgn.bindings.Label;
+import org.sbgn.bindings.ObjectFactory;
 
 import de.zbit.kegg.parser.pathway.EntryType;
 
@@ -18,7 +21,18 @@ import de.zbit.kegg.parser.pathway.EntryType;
 public class KEGG2SBGNProperties {
 	
   public static final Logger log = Logger.getLogger(KEGG2SBGNProperties.class.getName());
+  private static ObjectFactory objectFactory = new ObjectFactory();
   
+  	/**
+  	 * Determines the GlyphType for a corresponding KeggType:<br>
+  	 * compound -> simple chemical<br>
+  	 * enzyme -> macromolecule<br>
+  	 * gene -> macromolecule<br>
+  	 * group -> complex<br>
+  	 * map -> submap<br>
+  	 * ortholog -> unspecified entity<br>
+  	 * other -> unspecified entity<br>
+  	 */
 	public static HashMap<String, String> determineGlyphType = new HashMap<String, String>();
 	static
 	{
@@ -29,6 +43,50 @@ public class KEGG2SBGNProperties {
 		determineGlyphType.put(EntryType.map.name(), GlyphType.submap.toString());
 		determineGlyphType.put(EntryType.ortholog.name(), GlyphType.unspecified_entity.toString());
 		determineGlyphType.put(EntryType.other.name(), GlyphType.unspecified_entity.toString());
+	}
+	
+	/**
+	 * Use it by creating a glyph with {@link KEGG2SBGN.createGlyph} and set it in the clone field
+	 * Stores Clonemarker for:<br>
+	 * - ATP<br>
+	 * - ADP<br>
+	 * - GTP<br>
+	 * - GDP<br>
+	 * - NADH<br>
+	 */
+	public static HashMap<String, Clone> cloneMarker = new HashMap<String, Clone>();
+	static
+	{
+		Clone ATP = objectFactory.createGlyphClone();
+		Label ATPlabel = objectFactory.createLabel();
+		ATPlabel.setText("ATP");
+		ATP.setLabel(ATPlabel);
+		
+		Clone ADP = objectFactory.createGlyphClone();
+		Label ADPlabel = objectFactory.createLabel();
+		ADPlabel.setText("ADP");
+		ADP.setLabel(ADPlabel);
+		
+		Clone GTP = objectFactory.createGlyphClone();
+		Label GTPlabel = objectFactory.createLabel();
+		GTPlabel.setText("GTP");
+		GTP.setLabel(GTPlabel);
+		
+		Clone GDP = objectFactory.createGlyphClone();
+		Label GDPlabel = objectFactory.createLabel();
+		GDPlabel.setText("GDP");
+		GDP.setLabel(GDPlabel);
+		
+		Clone NADH = objectFactory.createGlyphClone();
+		Label NADHlabel = objectFactory.createLabel();
+		NADHlabel.setText("NADH");
+		NADH.setLabel(NADHlabel);
+		
+		cloneMarker.put("ATP", ATP);
+		cloneMarker.put("ADP", ADP);
+		cloneMarker.put("GTP", GTP);
+		cloneMarker.put("GDP", GDP);
+		cloneMarker.put("NADH", NADH);
 	}
 
 	public static enum GlyphType
