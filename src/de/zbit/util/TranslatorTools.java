@@ -51,7 +51,7 @@ import de.zbit.graph.StackingNodeLayout;
 import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
-import de.zbit.kegg.ext.GraphMLmaps;
+import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.parser.pathway.EntryType;
 

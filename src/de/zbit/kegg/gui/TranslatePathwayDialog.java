@@ -207,7 +207,11 @@ public class TranslatePathwayDialog extends JPanel {
         TranslatorPanel<?> tp = evaluateDialog(translationResult);
         if (tp!=null) {
           addTabsHere.addTab(selector.getSelectedPathway(), tp);
-          addTabsHere.setSelectedIndex(addTabsHere.getTabCount() - 1);
+          try {
+            addTabsHere.setSelectedIndex(addTabsHere.getTabCount() - 1);
+          } catch (Throwable t) {
+            log.log(Level.WARNING, "Error while changing tab focus.", t);
+          }
         } 
       }
     };
