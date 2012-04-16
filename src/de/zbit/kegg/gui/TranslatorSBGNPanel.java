@@ -30,10 +30,12 @@ import javax.swing.filechooser.FileFilter;
 import org.sbgn.bindings.Sbgn;
 
 import y.view.Graph2D;
+import de.zbit.graph.gui.TranslatorGraphLayerPanel;
+import de.zbit.graph.io.SBGN2GraphML;
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.io.KEGG2SBGN;
+import de.zbit.kegg.io.KEGGImporter;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
-import de.zbit.kegg.io.SBGN2GraphML;
 
 /**
  * A basic panel which uses a GraphLayer to visualize SBGN documents.
@@ -63,7 +65,7 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
    */
   public TranslatorSBGNPanel(File inputFile, Format outputFormat,
     ActionListener translationResult) {
-    super(inputFile, outputFormat, translationResult);
+    super(new KEGGImporter(inputFile, outputFormat), inputFile, outputFormat.toString(), translationResult);
   }
 
   /**
@@ -74,7 +76,7 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
    */
   public TranslatorSBGNPanel(String pathwayID, Format outputFormat,
     ActionListener translationResult) {
-    super(pathwayID, outputFormat, translationResult);
+    super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
   }
   
   /**

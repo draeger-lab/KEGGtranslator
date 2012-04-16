@@ -69,6 +69,8 @@ import org.biopax.paxtools.model.level3.UnificationXref;
 import org.biopax.paxtools.model.level3.Xref;
 import org.sbml.jsbml.CVTerm.Qualifier;
 
+import de.zbit.kegg.AtomBalanceCheck;
+import de.zbit.kegg.AtomBalanceCheck.AtomCheckResult;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -643,7 +645,33 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       if (!reactionHasAtLeastOneSubstrateAndProduct(r, p)) continue;
       
       if (processedReactions.add(r.getName())) {
-        addKGMLReaction(r,p);
+        BioPAXElement reaction = addKGMLReaction(r,p);
+        
+        // Check the atom balance (only makes sense if reactions are corrected,
+        // else, they are clearly wrong).
+        if (autocompleteReactions && checkAtomBalance) {
+           AtomCheckResult defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
+           StringBuilder notes = new StringBuilder();
+          if (defects!=null && defects.hasDefects()) {
+            notes.append("There are missing atoms in this reaction. " +
+                "Values lower than zero indicate missing atoms on the " +
+                "substrate side, whereas positive values indicate missing atoms " +
+                "on the product side: ");
+            notes.append(defects.getDefects().toString());
+          } else if (defects==null) {
+            notes.append("Could not check the atom balance of this reaction.");
+          } else {
+            notes.append("There are no missing atoms in this reaction.");
+          }
+          
+          // Add comment to element
+          if (reaction instanceof Level2Element) {
+            ((Level2Element)reaction).addCOMMENT(notes.toString());
+          } else if (reaction instanceof Level3Element) {
+            ((Level3Element)reaction).addComment(notes.toString());
+          }
+          
+        }
       }
     }
     

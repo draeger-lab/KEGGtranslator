@@ -225,9 +225,9 @@ public class BatchKEGGtranslator {
     case SBML_QUAL:
       translator = new KEGG2SBMLqual(manager);
       break;
-		case LaTeX:
+		/*case LaTeX:
 			translator = new KEGG2jSBML(manager);
-			break;
+			break;*/
 		case GraphML:
 			translator = KEGG2yGraph.createKEGG2GraphML(manager);
 			break;
@@ -275,7 +275,7 @@ public class BatchKEGGtranslator {
 	public static String getFileExtension(KEGGtranslator translator) {
 		String fileExtension = ".translated";
     if (translator instanceof KEGG2yGraph) {
-      fileExtension = ((KEGG2yGraph)translator).getOutputHandler().getFileNameExtension();
+      fileExtension = ((KEGG2yGraph)translator).getWriter().getOutputHandler().getFileNameExtension();
     } else if (translator instanceof KEGG2jSBML) {
 		  fileExtension = ".sbml.xml";
     }

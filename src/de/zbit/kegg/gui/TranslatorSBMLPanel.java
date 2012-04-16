@@ -35,11 +35,15 @@ import org.sbml.tolatex.SBML2LaTeX;
 import org.sbml.tolatex.gui.LaTeXExportDialog;
 import org.sbml.tolatex.io.LaTeXOptionsIO;
 
+import de.zbit.graph.gui.TranslatorGraphLayerPanel;
+import de.zbit.graph.gui.TranslatorPanel;
+import de.zbit.graph.gui.TranslatorSBMLgraphPanel;
 import de.zbit.gui.GUITools;
 import de.zbit.io.filefilter.SBFileFilter;
-import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.KEGG2SBMLqual;
 import de.zbit.kegg.io.KEGG2jSBML;
+import de.zbit.kegg.io.KEGGImporter;
+import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.sbml.gui.SBMLModelSplitPane;
 import de.zbit.util.prefs.SBPreferences;
@@ -72,7 +76,7 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    */
   public TranslatorSBMLPanel(File inputFile, Format outputFormat,
     ActionListener translationResult) {
-    super(inputFile, outputFormat, translationResult);
+    super(new KEGGImporter(inputFile, outputFormat), inputFile, outputFormat.toString(), translationResult);
   }
 
   /**
@@ -83,7 +87,7 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    */
   public TranslatorSBMLPanel(String pathwayID, Format outputFormat,
     ActionListener translationResult) {
-    super(pathwayID, outputFormat, translationResult);
+    super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
   }
   
   /**
@@ -135,16 +139,19 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    * @return {@link TranslatorSBMLgraphPanel} wrapping some methods
    * of this panel.
    */
-  protected TranslatorPanel<SBMLDocument> createGraphPanel(boolean forQual) {
+  protected TranslatorGraphLayerPanel<SBMLDocument> createGraphPanel(boolean forQual) {
     final TranslatorSBMLPanel thiss = this;
-    TranslatorPanel<SBMLDocument> qualGraph = new TranslatorSBMLgraphPanel(inputFile, forQual?Format.SBML_QUAL: Format.SBML, translationListener, document, forQual) {
+    //super(new KEGGImporter(inputFile, outputFormat), outputFormat.toString(), translationResult);
+
+    TranslatorGraphLayerPanel<SBMLDocument> qualGraph = new TranslatorSBMLgraphPanel(getInputFile(), 
+      (forQual?Format.SBML_QUAL: Format.SBML).toString(), getUIActionListener(), getDocument(), forQual) {
       private static final long serialVersionUID = -2987555994319694097L;
 
       /* (non-Javadoc)
        * @see de.zbit.kegg.gui.TranslatorPanel#getTranslator()
        */
       @Override
-      public AbstractKEGGtranslator<?> getTranslator() {
+      public KEGGtranslator<?> getTranslator() {
         return thiss.getTranslator();
       }
       @Override
@@ -160,6 +167,10 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
         return thiss.isSaved();
       }
     };
+    
+    // Setup the background image
+    TranslatorPanelTools.setupBackgroundImage(qualGraph);
+    
     return qualGraph;
   }
 

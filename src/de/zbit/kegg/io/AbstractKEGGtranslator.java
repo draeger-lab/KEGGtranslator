@@ -55,7 +55,7 @@ import de.zbit.util.progressbar.ProgressBar;
  * @since 1.0
  * @version $Rev$
  */
-public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtranslator {
+public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtranslator <OutputFormat> {
   public static final transient Logger log = Logger.getLogger(AbstractKEGGtranslator.class.getName());
 	
 	/**
@@ -94,6 +94,12 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * REQUIRES: {@link #retrieveKeggAnnots}
    */
   protected boolean autocompleteReactions=true;
+  
+  /**
+   * Check the atom balance and write the result to
+   * the notes, if reaction is unbalanced.
+   */
+  protected boolean checkAtomBalance = false;
   
   /**
    * If true, removes all entries that are referring to other pathways.
@@ -247,6 +253,14 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   public void setAutocompleteReactions(boolean autocompleteReactions) {
     this.autocompleteReactions = autocompleteReactions;
   }
+  
+  /**
+   * See {@link #checkAtomBalance}
+   * @param b
+   */
+  public void setCheckAtomBalance(boolean b) {
+    checkAtomBalance = b;
+  }
 
   /**
    * See {@link #manager}
@@ -299,6 +313,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   	retrieveKeggAnnots = !KEGGtranslatorOptions.OFFLINE_MODE.getValue(prefs);
   	removeWhiteNodes = KEGGtranslatorOptions.REMOVE_WHITE_GENE_NODES.getValue(prefs);
   	autocompleteReactions = KEGGtranslatorOptions.AUTOCOMPLETE_REACTIONS.getValue(prefs);
+  	checkAtomBalance = KEGGtranslatorOptions.CHECK_ATOM_BALANCE.getValue(prefs);
   	nameToAssign = KEGGtranslatorOptions.GENE_NAMES.getValue(prefs);
   	showFormulaForCompounds = KEGGtranslatorOptions.SHOW_FORMULA_FOR_COMPOUNDS.getValue(prefs);
   	removePathwayReferences = KEGGtranslatorOptions.REMOVE_PATHWAY_REFERENCES.getValue(prefs);
@@ -420,11 +435,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   
   /**
    * This method converts a given KGML file into the
-   * specified OutputFormat.
+   * specified <code>OutputFormat</code>.
    * 
-   * @param f - the input file.
-   * @return the generated document in OutputFormat.
-   * @throws IOException - if the input file is not readable.
+   * @param f the input file.
+   * @return the generated document in <code>OutputFormat</code>.
+   * @throws IOException if the input file is not readable.
    */
 	public OutputFormat translate(File f) throws IOException {
 		if (f.exists() && f.isFile() && f.canRead()) {

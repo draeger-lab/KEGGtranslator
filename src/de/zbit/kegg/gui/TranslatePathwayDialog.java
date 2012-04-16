@@ -31,6 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.layout.LayoutHelper;
@@ -158,7 +159,7 @@ public class TranslatePathwayDialog extends JPanel {
       }
     }
     if (tp==null) {
-      tp = TranslatorPanel.createPanel(id, outFormat, translationResult);
+      tp = TranslatorPanelTools.createPanel(id, outFormat, translationResult);
     }
      
     

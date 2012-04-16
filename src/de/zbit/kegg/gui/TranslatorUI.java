@@ -51,6 +51,8 @@ import javax.swing.event.ChangeListener;
 
 import de.zbit.AppConf;
 import de.zbit.graph.RestrictedEditMode;
+import de.zbit.graph.gui.TranslatorGraphLayerPanel;
+import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
@@ -61,6 +63,7 @@ import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.Translator;
+import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;
 import de.zbit.kegg.io.KEGG2jSBML;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
@@ -80,6 +83,17 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  */
 public class TranslatorUI extends BaseFrame implements ActionListener,
 		KeyListener, ItemListener {
+  /**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = 6631262606716052915L;
+  
+  /**
+   * This is the path (relative to THIS CLASS PATH) where the watermark
+   * logo for this application resides.
+   */
+  public static String watermarkLogoResource = "img/Logo2.png";
+  
 
 	/**
 	 * @author Clemens Wrzodek
@@ -152,11 +166,6 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		}
 	}
 
-	/**
-	 * Generated serial version identifier.
-	 */
-	private static final long serialVersionUID = 6631262606716052915L;
-
 	static {    
 		String iconPaths[] = {"KEGGtranslatorIcon_16.png","KEGGtranslatorIcon_32.png","KEGGtranslatorIcon_48.png","KEGGtranslatorIcon_128.png","KEGGtranslatorIcon_256.png"};
 		for (String path : iconPaths) {
@@ -200,11 +209,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
   	// init preferences
 		initPreferences();
 		File file = new File(prefsIO.get(KEGGtranslatorIOOptions.INPUT));
-		openDir = file.isDirectory() ? file.getAbsolutePath() : file
-				.getParent();
+		openDir = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		file = new File(prefsIO.get(KEGGtranslatorIOOptions.OUTPUT));
-		saveDir = file.isDirectory() ? file.getAbsolutePath() : file
-				.getParent();
+		saveDir = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		
 		// Depending on the current OS, we should add the following image
 		// icons: 16x16, 32x32, 48x48, 128x128 (MAC), 256x256 (Vista).
@@ -217,6 +224,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		  }
 		}
 		setIconImages(icons);
+		
 	}
 
 	/**
@@ -224,9 +232,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	private void initPreferences() {
 		if (prefsIO == null) {
-			prefsIO = SBPreferences
-					.getPreferencesFor(KEGGtranslatorIOOptions.class);
+			prefsIO = SBPreferences.getPreferencesFor(KEGGtranslatorIOOptions.class);
 		}
+	  TranslatorGraphLayerPanel.optionClass = KEGGTranslatorPanelOptions.class;
 	}
 
 	/*
@@ -361,7 +369,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				// Tanslate and add tab.
 				try {
 					openDir = inFile.getParent();
-					addTranslatorTab(TranslatorPanel.createPanel(inFile, f, this));
+					addTranslatorTab(TranslatorPanelTools.createPanel(inFile, f, this));
 				} catch (Exception e1) {
 					GUITools.showErrorMessage(this, e1);
 				}
@@ -447,7 +455,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
         break;
       case OPEN_PATHWAY:
         try {
-          addTranslatorTab(e.getSource().toString(), TranslatorPanel.createPanel(e.getSource().toString(),Format.GraphML,this));
+          addTranslatorTab(e.getSource().toString(), TranslatorPanelTools.createPanel(e.getSource().toString(),Format.GraphML,this));
         } catch (Exception e1) {
           GUITools.showErrorMessage(this, e1);
         }
@@ -665,7 +673,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	protected Component createMainComponent() {
 	  // If you encounter an exception here PUT THE RESOURCES FOLDER ON YOUR CLASS PATH!
-	  ImageIcon logo = new ImageIcon(TranslatorUI.class.getResource("img/Logo2.png"));
+	  ImageIcon logo = new ImageIcon(getWatermarkLogoResource());
 	  
 	  // Crop animated loading bar from image.
 	  //logo.setImage(ImageTools.cropImage(logo.getImage(), 0, 0, logo.getIconWidth(), logo.getIconHeight()-30));
@@ -681,6 +689,13 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		});
 		return tabbedPane;
 	}
+
+  /**
+   * @return
+   */
+  public static URL getWatermarkLogoResource() {
+    return TranslatorUI.class.getResource(watermarkLogoResource);
+  }
 
 	/*
 	 * (non-Javadoc)

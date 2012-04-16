@@ -39,73 +39,76 @@ import de.zbit.util.prefs.Range;
  */
 public interface KEGGtranslatorIOOptions extends KeyProvider {
 
-	/**
-	 * Possible output file formats.
-	 * 
-	 * @author Andreas Dr&auml;ger
-	 * @author Clemens Wrzodek
-	 * @date 2011-01-07
-	 */
-	public static enum Format {
-		/**
-		 * 
-		 */
-		SBML,
-		/**
+  /**
+   * Possible output file formats.
+   * 
+   * @author Andreas Dr&auml;ger
+   * @author Clemens Wrzodek
+   * @date 2011-01-07
+   */
+  public enum Format {
+    /**
+     * 
+     */
+    SBML,
+    /**
      * 
      */
     SBML_QUAL,
     /**
      * 
      */
-		SBGN,
-		/**
-		 * 
-		 */
-		BioPAX_level2,
-		/**
-		 * 
-		 */
-		BioPAX_level3,
-		/**
-		 * 
-		 */
-		LaTeX,
-		/**
-		 * 
-		 */
-		GraphML,
-		/**
-		 * 
-		 */
-		GML,
-		/**
-		 * 
-		 */
-		JPG,
-		/**
-		 * 
-		 */
-		GIF,
-		/**
-		 * 
-		 */
-		TGF,
-		/**
-		 * 
-		 */
-		YGF,
-		/**
-		 * This required the corresponding ySVG extension from yFiles. It's free
-		 * but large and thus, by default not included. But the functionality is
-		 * fully included. Thus, if you want SVG, include the libraries and simply
-		 * uncomment the next item and the SVG part in 
-		 * {@link BatchKEGGtranslator#getTranslator(Format, KeggInfoManagement)}
-		 */
-		//SVG
-		;
-	}
-	
+    SBGN,
+    /**
+     * 
+     */
+    BioPAX_level2,
+    /**
+     * 
+     */
+    BioPAX_level3,
+    // Since the restructuring and moving large parts to sysbio, the 2LaTeX
+    // part is not supported anymore.
+//    /**
+//     * 
+//     */
+//    LaTeX,
+    /**
+     * 
+     */
+    GraphML,
+    /**
+     * 
+     */
+    GML,
+    /**
+     * 
+     */
+    JPG,
+    /**
+     * 
+     */
+    GIF,
+    /**
+     * 
+     */
+    TGF,
+    /**
+     * 
+     */
+    YGF,
+    /**
+     * This required the corresponding ySVG extension from yFiles. It's free
+     * but large and thus, by default not included. But the functionality is
+     * fully included. Thus, if you want SVG, include the libraries and simply
+     * uncomment the next item and the SVG part in
+     * TODO: update Javadoc link 
+     * {@link BatchKEGGtranslator#getTranslator(Format, KeggInfoManagement)}
+     */
+    //SVG
+    ;
+  }
+  
 	/*
 	 * Most important options: input, output and file format.
 	 */

@@ -27,7 +27,10 @@ import java.util.List;
 import javax.swing.filechooser.FileFilter;
 
 import y.view.Graph2D;
+import de.zbit.graph.gui.TranslatorGraphLayerPanel;
+import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.kegg.io.KEGG2yGraph;
+import de.zbit.kegg.io.KEGGImporter;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 
 /**
@@ -58,7 +61,7 @@ public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
    */
   public TranslatorGraphPanel(File inputFile, Format outputFormat,
     ActionListener translationResult) {
-    super(inputFile, outputFormat, translationResult);
+    super(new KEGGImporter(inputFile, outputFormat), inputFile, outputFormat.toString(), translationResult);
   }
 
   /**
@@ -69,7 +72,7 @@ public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
    */
   public TranslatorGraphPanel(String pathwayID, Format outputFormat,
     ActionListener translationResult) {
-    super(pathwayID, outputFormat, translationResult);
+    super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
   }
   
   /**

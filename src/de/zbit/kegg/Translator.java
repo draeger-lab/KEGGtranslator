@@ -36,7 +36,7 @@ import de.zbit.gui.GUIOptions;
 import de.zbit.io.FileTools;
 import de.zbit.kegg.api.cache.KeggFunctionManagement;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
-import de.zbit.kegg.ext.TranslatorPanelOptions;
+import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;
 import de.zbit.kegg.gui.TranslatorUI;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.BatchKEGGtranslator;
@@ -366,7 +366,7 @@ public class Translator extends Launcher {
     List<Class<? extends KeyProvider>> configList = new ArrayList<Class<? extends KeyProvider>>(3);
     configList.add(KEGGtranslatorIOOptions.class);
     configList.add(KEGGtranslatorOptions.class);
-    configList.add(TranslatorPanelOptions.class);
+    configList.add(KEGGTranslatorPanelOptions.class);
     //configList.add(GUIOptions.class);
     return configList;
 	}

@@ -20,6 +20,10 @@
  */
 package de.zbit.kegg.io;
 
+import java.io.File;
+import java.io.IOException;
+
+import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Pathway;
 
 /**
@@ -29,8 +33,18 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * @since 1.0
  * @version $Rev$
  */
-public interface KEGGtranslator {
+public interface KEGGtranslator <InternalOutputFormatDataStructure> {
   
+  
+  /**
+   * This method converts a given KGML file into the
+   * specified <code>InternalOutputFormatDataStructure</code>.
+   * 
+   * @param f the input file.
+   * @return the generated document in <code>InternalOutputFormatDataStructure</code>.
+   * @throws IOException if the input file is not readable.
+   */
+  public InternalOutputFormatDataStructure translate(File f) throws IOException;
   
 	/**
 	 * Translate a given KEGG Pathway and write it in the new format to outfile.
@@ -60,5 +74,21 @@ public interface KEGGtranslator {
 	 * @return true or false.
 	 */
 	public boolean isLastFileWasOverwritten();
+	
+	/**
+   * Returns the last pathway that has been translated. Just remembers
+   * the core {@link Pathway} object, no {@link Entry}s, Reactions,
+   * Relations, etc. included. 
+   * @return the lastTranslatedPathway
+	 */
+	public Pathway getLastTranslatedPathway();
+	
+  /**
+   * Write the translated document to the given file.
+   * @param doc the translated document
+   * @param outFile the file to write
+   * @return true if and only if everything went fine.
+   */
+  public abstract boolean writeToFile(InternalOutputFormatDataStructure doc, String outFile);
 
 }

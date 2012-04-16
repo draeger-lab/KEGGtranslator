@@ -21,7 +21,7 @@
 package de.zbit.kegg;
 
 import de.zbit.gui.actioncommand.ActionCommand;
-import de.zbit.kegg.ext.TranslatorPanelOptions;
+import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;
 import de.zbit.util.StringUtil;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
@@ -163,7 +163,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    */
   public static final Option<Boolean> CHECK_ATOM_BALANCE = new Option<Boolean>("CHECK_ATOM_BALANCE", Boolean.class,
       "Check the atom balance of metabolic reactions and write a summary to the reaction notes. Depends on autocomplete reactions.", (short) 2, "-cbal", true, 
-      AUTOCOMPLETE_REACTIONS, TranslatorPanelOptions.TRUE_RANGE);
+      AUTOCOMPLETE_REACTIONS, KEGGTranslatorPanelOptions.TRUE_RANGE);
 
   /**
    * If true, removes all entries (nodes, species, etc.) referring to other pathways.

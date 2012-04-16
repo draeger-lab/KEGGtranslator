@@ -26,15 +26,7 @@
 package de.zbit.kegg.io;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Rectangle;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -59,34 +51,25 @@ import y.io.IOHandler;
 import y.io.JPGIOHandler;
 import y.io.TGFIOHandler;
 import y.io.YGFIOHandler;
-import y.io.graphml.GraphMLHandler;
-import y.io.graphml.KeyScope;
-import y.io.graphml.KeyType;
-import y.io.graphml.graph2d.Graph2DGraphMLHandler;
 import y.view.Arrow;
 import y.view.EdgeLabel;
 import y.view.EdgeRealizer;
 import y.view.GenericEdgeRealizer;
 import y.view.GenericNodeRealizer;
 import y.view.Graph2D;
-import y.view.Graph2DView;
 import y.view.LineType;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
-import y.view.View;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.LineNodeRealizer;
+import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.kegg.KEGGtranslatorOptions;
-import de.zbit.kegg.Translator;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
-import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
-import de.zbit.kegg.gui.TranslatorGraphPanel;
-import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
-import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
@@ -158,22 +141,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * will write a graphML file, a GMLIOHandler will write a GML file.
    * 
    */
-  private IOHandler outputHandler = null;
+  private Graph2Dwriter outputHandler = null;
   
-  /**
-   * This is used internally to identify a certain dataHandler in the Graph document.
-   * The content is not important, it should just be any defined static final string.
-   */
-  public final static String mapDescription="-MAP_DESCRIPTION-";
-  
-  /**
-   * An enum of writeable output formats (identified by file extension).
-   * <p>All lowercased!
-   * @author Clemens Wrzodek
-   */
-  public static enum writeableFileExtensions {
-    gif,graphml,gml,ygf,tgf,jpg,jpeg,svg;
-  }
+
   
   /*===========================
    * CONSTRUCTORS
@@ -189,8 +159,18 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @param manager
    */
   public KEGG2yGraph(IOHandler outputHandler, KeggInfoManagement manager) {
+    this (new Graph2Dwriter(outputHandler), manager);
+    
+    loadPreferences();
+  }
+  
+  /**
+   * @param manager
+   */
+  public KEGG2yGraph(Graph2Dwriter outputHandler, KeggInfoManagement manager) {
     super(manager);
     this.outputHandler = outputHandler;
+    this.outputHandler.setTranslator(this);
     
     loadPreferences();
   }
@@ -243,6 +223,15 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   public void setGroupNodesWithSameEdges(boolean groupNodesWithSameEdges) {
     this.groupNodesWithSameEdges = groupNodesWithSameEdges;
   }
+  
+  /**
+   * 
+   * @return
+   */
+  public Graph2Dwriter getWriter() {
+    return outputHandler;
+  }
+  
   /**
    * If labels for edges are being generated or not.
    * Examples: (activation, compound, phosphorylation, etc.)
@@ -257,24 +246,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    */
   public void setCreateEdgeLabels(boolean createEdgeLabels) {
     this.createEdgeLabels = createEdgeLabels;
-  }
-  
-  /**
-   * The IOHandler determines the output format.
-   * May be GraphMLIOHandler or GMLIOHandler,...
-   * @return
-   */
-  public IOHandler getOutputHandler() {
-    return outputHandler;
-  }
-  /**
-   * Set the outputHander to use when writing the file.
-   * May be GraphMLIOHandler or GMLIOHandler,...
-   * See also: {@link #outputHandler}
-   * @param outputHandler
-   */
-  public void setOutputHandler(IOHandler outputHandler) {
-    this.outputHandler = outputHandler;
   }
   
   /**
@@ -333,58 +304,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     return "#" + Integer.toHexString(color.getRGB()).substring(2).toUpperCase();
   }
   
-  /**
-   * Configures the view that is used as rendering environment for some output
-   * formats.
-   * @param view any Graph2DView of a graph to save
-   * @param outputIsAPixelImage is the output a pixel based (jpeg, gif,...) image?
-   */
-  private static void configureView(Graph2DView view, boolean outputIsAPixelImage) {
-    Graph2D graph = view.getGraph2D();
-    Rectangle box = graph.getBoundingBox();
-    if (outputIsAPixelImage) {
-      Dimension dim = getOutputSize(box);
-      view.setSize(dim);
-    }
-    view.zoomToArea(box.getX() - 5, box.getY() - 5, box.getWidth() + 10, box.getHeight() + 10);
-    view.setPaintDetailThreshold(0.0); // paint all details
-    
-    // Set the view as active view, such that io handlers take it.
-    graph.setCurrentView(view);
-  }
-  
-  /**
-   * Ensures a minimum graph size of 1600x1200.
-   * @param inBox input bounding box of graph.
-   * @return
-   */
-  private static Dimension getOutputSize(Rectangle inBox) {
-    /*if (outputWidth > 0 && outputHeight > 0) {
-      //output completely specified. use it
-      return new Dimension((int) outputWidth, (int) outputHeight);
-    } else if (outputWidth > 0) {
-      //output width specified. determine output height
-      return new Dimension(outputWidth,
-          (int) (outputWidth * (inBox.getHeight() / inBox.getWidth())));
-    } else if (outputHeight > 0) {
-      //output height specified. determine output width
-      return new Dimension((int) (outputHeight * (inBox.getWidth() / inBox.getHeight())), outputHeight);
-    } else { //no output size specified*/
-      //no output size specified. use input size, but only if smaller than 1024
-      double width = inBox.getWidth();
-      double height = inBox.getHeight();
-      //scale down if necessary, keeping aspect ratio
-      if (width < 1600) {
-        height *= 1600 / width;
-        width = 1600;
-      }
-      if (height < 1200) {
-        width *= 1200 / height;
-        height = 1200;
-      }
-      return new Dimension((int) width, (int) height);
-    //}
-  }
   
   /**
    * Compares two edges.
@@ -1123,7 +1042,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
      * Create a data provider that stores the names of all
      * data providers (Maps).
      */    
-    GenericDataMap<DataMap, String> mapDescriptionMap = addMapDescriptionMapToGraph(graph);
+    GenericDataMap<DataMap, String> mapDescriptionMap = Graph2Dwriter.addMapDescriptionMapToGraph(graph);
     
     mapDescriptionMap.set(nodeLabel, GraphMLmaps.NODE_LABEL);
     mapDescriptionMap.set(entrezIds, GraphMLmaps.NODE_GENE_ID);
@@ -1161,25 +1080,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     }
     return null;
   }
-  
-  /**
-   * This will add the describing mapDescriptionMap to the graph.
-   * @param graph
-   * @return
-   */
-  @SuppressWarnings("unchecked")
-  public static GenericDataMap<DataMap, String> addMapDescriptionMapToGraph(Graph2D graph) {
-    GenericDataMap<DataMap, String> mapDescriptionMap = null;
-    try {
-      mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(mapDescription);
-    } catch (Throwable t) {};
-    if (mapDescriptionMap==null) {
-      // Actually it is always null ;-)
-      mapDescriptionMap = new GenericDataMap<DataMap, String>(mapDescription);
-      graph.addDataProvider(mapDescription, mapDescriptionMap);
-    }
-    return mapDescriptionMap;
-  }
+
   
   
   /**
@@ -1285,147 +1186,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       }
     }
     
-    
   }
   
-  /**
-   * Check if {@link GraphMLmaps} contains a map with the
-   * given descriptor.
-   * @param descriptor
-   * @return true if and only the the given descriptor corresponds
-   * to a registered map.
-   */
-  public static boolean GraphMLmapsContainsMap(String descriptor) {
-    try {
-      for (Field f: GraphMLmaps.class.getFields()) {
-        // Get field value (for static fields, object is null) and
-        // compare with given descriptor.
-        if (f.get(null).equals(descriptor)) {
-          return true;
-        }
-      }
-    } catch (Exception e) {}
-    return false;
-  }
-  
-  /* (non-Javadoc)
-   * @see de.zbit.kegg.io.AbstractKEGGtranslator#writeToFile(java.lang.Object, java.lang.String)
-   */
-  @SuppressWarnings("unchecked")
-  @Override
-  public boolean writeToFile(Graph2D graph, String outFile) {
-    
-    // initialize and check the IOHandler
-    if (outputHandler==null) {
-      outputHandler = new GraphMLIOHandler(); // new GMLIOHandler();
-    }
-    if (!outputHandler.canWrite()) {
-      log.warning("Can not write to given path!");
-      return false;
-    }
-    
-    // Try to set metadata annotations
-    if (outputHandler instanceof GraphMLIOHandler) {
-      Graph2DGraphMLHandler ioh = ((GraphMLIOHandler) outputHandler).getGraphMLHandler() ;
-      
-      try {
-        // Add known maps from GraphMLMapsExtended.
-        GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(mapDescription);
-        
-        EdgeMap[] eg = graph.getRegisteredEdgeMaps();
-        if (eg!=null) {
-          for (int i=0; i<eg.length;i++) {
-            String desc = mapDescriptionMap.getV(eg[i]);
-            if (desc!=null && GraphMLmapsContainsMap( desc )) {
-              addDataMap(eg[i], ioh, mapDescriptionMap.getV(eg[i]));
-            }
-          }
-        }
-        NodeMap[] nm = graph.getRegisteredNodeMaps();
-        if (nm!=null) {
-          for (int i=0; i<nm.length;i++) {
-            String desc = mapDescriptionMap.getV(nm[i]);
-            if (desc!=null && GraphMLmapsContainsMap( desc )) {            
-              addDataMap(nm[i], ioh, mapDescriptionMap.getV(nm[i]));
-            }
-          }
-        }
-        
-      } catch(Throwable e) {
-        log.warning("Can not write annotations to graph file.");
-        e.printStackTrace();
-      }
-      
-      
-      
-    }
-    // ----------------
-    
-    // Zoom by default to fit content in graphML
-    boolean isGraphOutput=false;
-    if (outputHandler instanceof GraphMLIOHandler ||
-        outputHandler instanceof GMLIOHandler ||
-        outputHandler instanceof YGFIOHandler) {
-      isGraphOutput = true;
-    }
-    
-    // Configure view and rememeber old one to restore after saving.
-    View old_v = graph.getCurrentView();
-    Graph2DView view = new Graph2DView(graph);
-    configureView(view, !isGraphOutput);
-    try {
-      TranslatorGraphPanel.addBackgroundImage(view, this, null, true);
-    } catch (Exception e) { // NullPointer or MalformedURLException
-      log.warning("Could not setup background image for output file.");
-    }
-    
-    // => Moved to a global setting.
-    //if (outputHandler instanceof JPGIOHandler) {
-      //graph = modifyNodeLabels(graph,true,true);
-    //}
-    
-    // Try to write the file.
-    int retried=0;
-    if (new File(outFile).exists()) lastFileWasOverwritten=true;
-    boolean success = false;
-    while (retried<3) {
-      try {
-      	
-        // Create a specific ouputStream, that removes all
-      	// y-Files-is-the-man--poser-strings.
-        OutputStream out = null;
-        if (outputHandler instanceof GraphMLIOHandler ||
-            outputHandler instanceof GMLIOHandler ||
-            outputHandler.getClass().getSimpleName().equals("SVGIOHandler")) {
-        	out = new YFilesWriter(new BufferedOutputStream(new FileOutputStream(outFile)));
-        }
-        
-        if (out==null)
-          outputHandler.write(graph, outFile);
-        else {
-      	  outputHandler.write(graph, out);
-      	  out.close();
-        }
-      	
-        success = true;
-        break;// Success => No more need to retry
-      } catch (IOException iex) {
-        retried++;
-        if (retried>2) {
-          System.err.println("Error while encoding file " + outFile + "\n" + iex);
-          iex.printStackTrace();
-          break;
-        }
-      } finally {
-        graph.setCurrentView(old_v);
-      }
-    }
-    
-    // Remove unused view (also saves memory, because BG-images might be stored in view).
-    graph.removeView(view);
-    
-    return success;
-  }
   
   /**
    * Convenient method to create a new KEGG2GraphML translator.
@@ -1456,28 +1218,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
    */
   public static KEGG2yGraph createKEGG2SVG(KeggInfoManagement manager) {
-    IOHandler ioh = createSVGIOHandler();
+    IOHandler ioh = Graph2Dwriter.createSVGIOHandler();
     if (ioh!=null) {      
       return new KEGG2yGraph(ioh, manager);
     } else {
       return null;
     }
-  }
-  
-  /**
-   * Requires the yFiles SVG extension libraries on the projects
-   * build path!
-   * @return new SVGIOHandler()
-   */
-  @SuppressWarnings("unchecked")
-  private static IOHandler createSVGIOHandler() {
-    try {
-      Class<? extends IOHandler> svg = (Class<? extends IOHandler>) Class.forName("yext.svg.io.SVGIOHandler");    
-      if (svg!=null) return svg.newInstance();
-    } catch (Throwable e) {
-      // Extension not installed
-    }
-    return null;
   }
   
   /**
@@ -1520,109 +1266,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     return new KEGG2yGraph(new YGFIOHandler(), manager);
   }
   
-  /**
-   * @param args
-   * @throws Exception 
-   */
-  public static void main(String[] args) throws Exception {
-    KeggInfoManagement manager;
-    if (new File(Translator.cacheFileName).exists()
-        && new File(Translator.cacheFileName).length() > 1) {
-      manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(Translator.cacheFileName);
-    } else {
-      manager = new KeggInfoManagement();
-    }
-    KEGG2yGraph k2g = createKEGG2GraphML(manager);
-    // ---
-    
-    if (args != null && args.length > 0) {
-      File f = new File(args[0]);
-      if (f.isDirectory()) {
-        // Directory mode. Convert all files in directory.
-        BatchKEGGtranslator batch = new BatchKEGGtranslator();
-        batch.setOrgOutdir(args[0]);
-        if (args.length > 1)
-          batch.setChangeOutdirTo(args[1]);
-        batch.setTranslator(k2g);
-        batch.setOutFormat(Format.GraphML);
-        batch.parseDirAndSubDir();
-        
-      } else {
-        // Single file mode.
-        String outfile = args[0].substring(0,
-            args[0].contains(".") ? args[0].lastIndexOf(".") : args[0].length())
-            + "." + k2g.getOutputHandler().getFileNameExtension();
-        if (args.length > 1) outfile = args[1];
-        
-        Pathway p = KeggParser.parse(args[0]).get(0);
-        k2g.translate(p, outfile);
-      }
-      
-      // Remember already queried objects (save cache)
-      if (AbstractKEGGtranslator.getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, AbstractKEGGtranslator.getKeggInfoManager());
-      }
-      
-      return;
-    }
-
-    // Just a few test cases here.
-    System.out.println("Demo mode.");
-    
-    long start = System.currentTimeMillis();
-    try {
-      // hsa04310 04115 hsa04010
-      k2g.translate("files/KGMLsamplefiles/hsa04010.xml", "files/KGMLsamplefiles/hsa04010." + k2g.getOutputHandler().getFileNameExtension());
-      //k2g.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010." + k2g.getOutputHandler().getFileNameExtension());
-      
-      // Remember already queried objects
-      if (AbstractKEGGtranslator.getKeggInfoManager().hasChanged()) {
-        KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, AbstractKEGGtranslator.getKeggInfoManager());
-      }
-      
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    
-    
-    System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
-  }
   
-  /**
-   * Add the given DataMap (e.g. NodeMap) to the given GraphHandler, 
-   * using the given description.
-   * Adds the map as InputDataAcceptor and OutputDataProvider.
-   * Keytype will be set to KeyType.STRING by this function.
-   * @param nm - the DataMap (NodeMap / EdgeMap)
-   * @param ioh - the GraphHandler (e.g. Graph2DGraphMLHandler)
-   * @param desc - the Description of the map
-   * @param scope - KeyScope (e.g. KeyScope.NODE)
-   */
-  private static void addDataMap(DataMap nm, GraphMLHandler ioh, String desc) {
-    KeyScope scope;
-    if (nm instanceof NodeMap)scope = KeyScope.NODE;
-    else if (nm instanceof EdgeMap)scope = KeyScope.EDGE;
-    else scope = KeyScope.ALL;
-    
-    addDataMap(nm, ioh, desc, KeyType.STRING, scope);//AttributeConstants.TYPE_STRING
-  }
-  
-  /**
-   * Add the given DataAcceptor (e.g. NodeMap) to the given GraphHandler, 
-   * using the given description.
-   * Adds the map as InputDataAcceptor and OutputDataProvider.
-   * @param nm - the DataAcceptor (NodeMap / EdgeMap)
-   * @param ioh - the GraphHandler (e.g. Graph2DGraphMLHandler)
-   * @param desc - Description
-   * @param keytype - KeyType (e.g. KeyType.STRING)
-   * @param scope - KeyScope (e.g. KeyScope.NODE)
-   */
-  private static void addDataMap(DataMap nm, GraphMLHandler ioh, String desc, KeyType keytype, KeyScope scope) {
-    ioh.addInputDataAcceptor (desc, nm, scope, keytype);
-    ioh.addOutputDataProvider(desc, nm, scope, keytype);
-    //ioh.addAttribute(nm, desc, keytype);    // <= yf 2.6
-  }
-    
   /**
    * @param document
    * @param path
@@ -1631,37 +1275,15 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @return true if everything went fine.
    */
   public boolean writeToFile(Graph2D graph, String outFile, String format) throws Exception {
-    IOHandler io;
-    writeableFileExtensions ext = writeableFileExtensions.valueOf(format.toLowerCase().trim());
-    if (ext.equals(writeableFileExtensions.gif)) {
-      io = new GIFIOHandler();
-    } else if (ext.equals(writeableFileExtensions.graphml)) {
-      io = new GraphMLIOHandler();
-    } else if (ext.equals(writeableFileExtensions.gml)) {
-      io = new GMLIOHandler();
-    } else if (ext.equals(writeableFileExtensions.ygf)) {
-      io = new YGFIOHandler();
-    } else if (ext.equals(writeableFileExtensions.tgf)) {
-      io = new TGFIOHandler();
-    } else if (ext.equals(writeableFileExtensions.jpg) || ext.equals(writeableFileExtensions.jpeg)) {
-      io = new JPGIOHandler();
-    } else if (ext.equals(writeableFileExtensions.svg)) {
-      io = createSVGIOHandler();
-      if (io==null) {
-        throw new Exception("Unknown output format (SVG extension not installed).");
-      }
-    } else {
-      throw new Exception("Unknown output format.");
-    }
-    setOutputHandler(io);
-    return writeToFile(graph, outFile);
+    return outputHandler.writeToFile(graph, outFile, format);
   }
   
-  /**
-   * @return
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.AbstractKEGGtranslator#writeToFile(java.lang.Object, java.lang.String)
    */
-  public static boolean isSVGextensionInstalled() {
-    return createSVGIOHandler()!=null;
+  @Override
+  public boolean writeToFile(Graph2D doc, String outFile) {
+    return outputHandler.writeToFile(doc, outFile);
   }
   
   @Override
@@ -1675,5 +1297,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     // Return value is important, e.g. for the "remove orphans" feature.
     return drawArrowsForReactions;
   }
+  
   
 }

@@ -33,10 +33,12 @@ import org.biopax.paxtools.model.Model;
 
 import y.view.Graph2D;
 import y.view.HitInfo;
+import de.zbit.graph.gui.TranslatorGraphLayerPanel;
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.io.AbstractKEGGtranslator;
 import de.zbit.kegg.io.KEGG2BioPAX;
 import de.zbit.kegg.io.KEGG2yGraph;
+import de.zbit.kegg.io.KEGGImporter;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
 
@@ -47,6 +49,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * @version $Rev$
  */
 public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model>{
+
   private static final long serialVersionUID = -6585611929238639630L;
 
 
@@ -58,7 +61,7 @@ public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model>{
    */
   public TranslatorBioPAXPanel(File inputFile, Format outputFormat,
     ActionListener translationResult) {
-    super(inputFile, outputFormat, translationResult);
+    super(new KEGGImporter(inputFile, outputFormat), inputFile, outputFormat.toString(), translationResult);
   }
 
   /**
@@ -69,7 +72,7 @@ public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model>{
    */
   public TranslatorBioPAXPanel(String pathwayID, Format outputFormat,
     ActionListener translationResult) {
-    super(pathwayID, outputFormat, translationResult);
+    super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
   }
 
   /* (non-Javadoc)
@@ -77,7 +80,9 @@ public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model>{
    */
   @Override
   protected Graph2D createGraphFromDocument(Model document) {
+    if (getTranslator()==null) return null;
     Pathway sourcePW = getTranslator().getLastTranslatedPathway();
+    if (sourcePW==null) return null;
     KEGG2yGraph toGraph = KEGG2yGraph.createKEGG2GraphML(AbstractKEGGtranslator.getKeggInfoManager());
     toGraph.setDrawArrowsForReactions(true);
     return toGraph.translate(sourcePW);

@@ -55,7 +55,6 @@ import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
-import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
@@ -99,12 +98,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * Add the SBML-layout extension?
    */
   protected boolean addLayoutExtension = true;
-  
-  /**
-   * Check the atom balance and write the result to
-   * the notes, if reaction is unbalanced.
-   */
-  protected boolean checkAtomBalance = false;
   
   /**
    * Default compartment size.
@@ -205,10 +198,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   public void setAddLayoutExtension(boolean b) {
     addLayoutExtension = b;
   }
-  
-  public void setCheckAtomBalance(boolean b) {
-    checkAtomBalance = b;
-  }
 
   
   
@@ -221,7 +210,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   private void loadPreferences() {
     addCellDesignerAnnots = KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
     addLayoutExtension = KEGGtranslatorOptions.ADD_LAYOUT_EXTENSION.getValue(prefs);
-    checkAtomBalance = KEGGtranslatorOptions.CHECK_ATOM_BALANCE.getValue(prefs);
   }
   
   /**
@@ -738,12 +726,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           String ko_id_uc_t = ko_id.toUpperCase().trim();
           if (ko_id_uc_t.startsWith("CPD:")) {
             // KEGG provides picture for compounds (e.g., "C00118").
-            notes.append(getCompoundPreviewPicture(ko_id_uc_t));
+            notes.append(Pathway.getCompoundPreviewPicture(ko_id_uc_t));
           }
         }
         if (entry.getType().equals(EntryType.map)) {
           // KEGG provides picture for referenced pathways (e.g., "path:hsa00620" => "map00620.gif").
-          notes.append(getPathwayPreviewPicture(ko_id));
+          notes.append(Pathway.getPathwayPreviewPicture(ko_id));
         }
         if (infos.getMass() != null)
           notes.append(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
@@ -832,24 +820,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     } else {
       CVterm.setBiologicalQualifierType(Qualifier.BQB_IS);
     }
-  }
-
-  /**
-   * @param ko_id starting with "cpd:"
-   * @return an html image tag, containing a preview picture for the given compound.
-   */
-  public static String getCompoundPreviewPicture(String ko_id) {
-    return String.format("<img src=\"http://www.kegg.jp/Fig/compound/%s.gif\"/><br/>\n", ko_id.trim().substring(4).toUpperCase() );
-  }
-
-  /** 
-   * @param ko_id starting with "path:"
-   * @return an html image tag, containing a preview picture for the given referenced pathway.
-   */
-  public static String getPathwayPreviewPicture(String ko_id) {
-    // KEGG provides picture for referenced pathways (e.g., "path:hsa00620" => "map00620.gif").
-    String mapNumber = Utils.getNumberFromStringRevAsString(ko_id.length(), ko_id);
-    return String.format("<img src=\"http://www.kegg.jp/kegg/misc/thumbnail/map%s.gif\"/><br/>\n", mapNumber );
   }
 
   /**
@@ -1114,7 +1084,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         if (args.length > 1)
           batch.setChangeOutdirTo(args[1]);
         batch.setTranslator(k2s);
-        batch.setOutFormat(Format.SBML);
+        batch.setOutFormat(KEGGtranslatorIOOptions.Format.SBML);
         batch.parseDirAndSubDir();
         
       } else {

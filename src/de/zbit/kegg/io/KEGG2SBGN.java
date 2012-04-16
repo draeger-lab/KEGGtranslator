@@ -22,50 +22,35 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
-
-import keggapi.KEGG;
 
 import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Arc.End;
-import org.sbgn.bindings.Arc.Next;
 import org.sbgn.bindings.Arc.Start;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
-import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.Glyph.Port;
 import org.sbgn.bindings.Label;
-import org.sbgn.bindings.Map;
 import org.sbgn.bindings.ObjectFactory;
 import org.sbgn.bindings.Sbgn;
 
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-
-import de.zbit.kegg.KEGGtranslatorOptions;
-import de.zbit.kegg.io.KEGG2SBGNProperties.GlyphType;
-import de.zbit.kegg.io.KEGG2SBGNProperties.GlyphOrientation;
-import de.zbit.kegg.io.KEGG2SBGNProperties.ArcType;
+import de.zbit.graph.io.def.SBGNProperties;
+import de.zbit.graph.io.def.SBGNProperties.ArcType;
+import de.zbit.graph.io.def.SBGNProperties.GlyphType;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
-import de.zbit.kegg.KeggTools;
-import de.zbit.kegg.Translator;
-import de.zbit.kegg.api.KeggInfos;
-import de.zbit.kegg.api.cache.KeggInfoManagement;
-import de.zbit.kegg.api.cache.KeggQuery;
-import de.zbit.kegg.parser.KeggParser;
 import de.zbit.kegg.parser.pathway.Entry;
-import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
-import de.zbit.kegg.parser.pathway.ReactionType;
+import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.Relation;
-import de.zbit.kegg.parser.pathway.RelationType;
-import de.zbit.kegg.parser.pathway.SubType;
 
 
 /**
@@ -87,7 +72,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	private ObjectFactory objectFactory = new ObjectFactory();
 	
 	private Sbgn sbgn = objectFactory.createSbgn();
-	private Map map = objectFactory.createMap();
+	private org.sbgn.bindings.Map map = objectFactory.createMap();
 	private HashMap<Glyph, Integer> glyphNames = new HashMap<Glyph, Integer>();
 	private int id = 0;
 	
@@ -125,13 +110,26 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	 */
 	private void handleAllEntries(Pathway p) {
 		
+	  Map<String, Entry> handlesEntries = new HashMap<String, Entry>();
+	  
 		// for every entry
 		for (Entry e : p.getEntries()) {
-			// create a glyph
-			Glyph g = objectFactory.createGlyph();
+      // create a glyph
+      Glyph g = objectFactory.createGlyph();
+      
+		  if (handlesEntries.containsKey(e.getName())) {
+		    // war schon drin
+		    g.setClone(objectFactory.createGlyphClone());
+		    Entry en = handlesEntries.get(e.getName());
+		    if (en.getCustom()!=null && ((Glyph)en.getCustom()).getClone()==null) {
+		      ((Glyph)en.getCustom()).setClone(objectFactory.createGlyphClone());
+		    }
+		  } else {
+		    handlesEntries.put(e.getName(), e);
+		  }
 			
 			// determine the sbgn clazz for the glyph
-			g.setClazz(KEGG2SBGNProperties.determineGlyphType.get(e.getType()));
+			g.setClazz(SBGNProperties.getGlyphType(e).toString());
 			
 			// create a bbox and a label
 			Bbox bb = objectFactory.createBbox();
@@ -232,7 +230,28 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	 * @param p
 	 */
 	private void handleAllReactions(Pathway p){
-//		for(Reaction reaction : p.getReactions()){
+		for(Reaction reaction : p.getReactions()){
+		  
+		  
+		  // Substrates
+		  for (ReactionComponent rc : reaction.getSubstrates()) {
+		    Entry substrate = p.getEntryForReactionComponent(rc);
+		    // TODO: Substrates
+		  }
+		  
+      // Products
+      for (ReactionComponent rc : reaction.getProducts()) {
+        Entry product = p.getEntryForReactionComponent(rc);
+         // TODO: Products
+      }
+		  
+		  
+		  // Enzymes;
+		  Collection<Entry> enzymes = p.getReactionModifiers(reaction.getName());
+		  for (Entry ec : enzymes) {
+        // TODO: Enzymes
+		  }
+		  
 //			// initiate
 //			Arc a = new Arc();
 //			Start start = new Start();
@@ -248,7 +267,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 //			
 //			// put the arc into the map
 //			sbgn.getMap().getArc().add(a);
-//		}
+		}
 	}
 	
 	/**

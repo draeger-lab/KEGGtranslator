@@ -22,7 +22,7 @@ package de.zbit.gui.prefs;
 
 import java.io.IOException;
 
-import de.zbit.kegg.ext.TranslatorPanelOptions;
+import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;
 
 /**
  * Enable an option tab for the {@link TranslatorPanelOptionPanel}.
@@ -37,7 +37,7 @@ public class TranslatorPanelOptionPanel extends PreferencesPanelForKeyProvider {
    * @throws IOException
    */
   public TranslatorPanelOptionPanel() throws IOException {
-    super("Graph options", TranslatorPanelOptions.class);
+    super("Graph options", KEGGTranslatorPanelOptions.class);
   }
   
 }

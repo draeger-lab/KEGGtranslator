@@ -72,11 +72,11 @@ import y.view.NavigationComponent;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.Overview;
+import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.gui.GUITools;
-import de.zbit.kegg.ext.GenericDataMap;
 import de.zbit.kegg.ext.GraphMLmaps;
-import de.zbit.kegg.io.KEGG2jSBML;
-import de.zbit.kegg.io.KEGG2yGraph;
+import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.StringUtil;
 import de.zbit.util.TranslatorTools;
 
@@ -197,7 +197,7 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
   @Override
   protected String getNodeTip(Node n) {
     // Show a nice ToolTipText for every node.
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) n.getGraph().getDataProvider(KEGG2yGraph.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) n.getGraph().getDataProvider(Graph2Dwriter.mapDescription);
     if (mapDescriptionMap==null) return super.getNodeTip(n);
     
     // Get nodeLabel, description and eventually an image for the ToolTipText
@@ -219,10 +219,10 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
           for (String s: c.toString().split(",")) {
             s=s.toUpperCase().trim();
             if (s.startsWith("PATH:")) {
-              image+=KEGG2jSBML.getPathwayPreviewPicture(s);
+              image+=Pathway.getPathwayPreviewPicture(s);
             } else if (s.startsWith("CPD:")) {
               // KEGG provides picture for compounds (e.g., "C00118").
-              image+=KEGG2jSBML.getCompoundPreviewPicture(s);
+              image+=Pathway.getCompoundPreviewPicture(s);
             }
           }
         }
@@ -470,7 +470,7 @@ public class RestrictedEditModeV2 extends EditMode implements Graph2DSelectionLi
   private void updatePropertiesTable(Object nodeOrEdge) {
     // Get map headings and graph
     Graph2D graph = getGraph2D();
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(KEGG2yGraph.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
     if (mapDescriptionMap==null) return;
     
     
