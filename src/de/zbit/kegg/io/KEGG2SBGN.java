@@ -532,8 +532,6 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				// add the connection to the map
 				map.getArc().add(connection);
 				
-				SbgnUtil.isValid(arg0, arg1)
-				
 			}
 				
 		}
