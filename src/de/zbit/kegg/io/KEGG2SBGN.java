@@ -460,6 +460,9 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				connectionEnd.setY(portIn.getY());
 				
 				// set the start and end points to the arc
+				connection.setSource(source);
+				connection.setTarget(portIn);
+				
 				connection.setStart(connectionStart);
 				connection.setEnd(connectionEnd);
 				
@@ -488,6 +491,9 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				connectionEnd.setY(target.getBbox().getY());
 				
 				// set the start and end points to the arc
+        connection.setSource(portOut);
+        connection.setTarget(target);
+        
 				connection.setStart(connectionStart);
 				connection.setEnd(connectionEnd);
 				
@@ -504,7 +510,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				
 				// set the type of the connection
 				/** TODO: set the class of the connection accordingly to the connection **/
-				connection.setClazz(ArcType.production.toString());
+				connection.setClazz(ArcType.catalysis.toString());
 				
 				// create a start and end point of the arc
 				Start connectionStart = objectFactory.createArcStart();
@@ -517,11 +523,16 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				connectionEnd.setY(process.getBbox().getY());
 				
 				// set the start and end points to the arc
+        connection.setSource(rm);
+        //connection.setTarget(target);// // TODO: Create a port for the modifiers.
+        
 				connection.setStart(connectionStart);
 				connection.setEnd(connectionEnd);
 				
 				// add the connection to the map
 				map.getArc().add(connection);
+				
+				SbgnUtil.isValid(arg0, arg1)
 				
 			}
 				
