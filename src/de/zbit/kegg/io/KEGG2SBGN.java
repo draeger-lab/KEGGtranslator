@@ -43,6 +43,7 @@ import org.sbgn.bindings.Glyph.State;
 import org.sbgn.bindings.Label;
 import org.sbgn.bindings.ObjectFactory;
 import org.sbgn.bindings.Sbgn;
+import org.xml.sax.SAXException;
 
 import de.zbit.graph.io.def.SBGNProperties;
 import de.zbit.graph.io.def.SBGNProperties.ArcType;
@@ -78,7 +79,8 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 
 	private Sbgn sbgn = objectFactory.createSbgn();
 	private org.sbgn.bindings.Map map = objectFactory.createMap();
-	private HashMap<Glyph, Integer> glyphNames = new HashMap<Glyph, Integer>();
+	private HashMap<Glyph, Integer> glyphNamesForPorts = new HashMap<Glyph, Integer>();
+	private HashMap<Glyph, String> glyphNamesForGlyphStates = new HashMap<Glyph, String>();
 	private int id = 0;
 
 	/**
@@ -218,12 +220,17 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				
 				// create a glyphstate
 				State state = objectFactory.createGlyphState();
+				// create a new glyph
+				Glyph StateGlyph = createStateGlypheWithID(target);
 				
 				// check the possible kegg subtypes and translate them into arcs
-				if(currentRelation.equalsIgnoreCase(SubType.GLYCOSYLATION)){
+				if(currentRelation.equalsIgnoreCase(SubType.GLYCOSYLATION)) {
 					// add "G" to the product
 					state.setValue("G");
-					target.setState(state);
+					// set the new glyph as state glyph
+					StateGlyph.setState(state);
+					// add it to the glyphlist from the target
+					target.getGlyph().add(StateGlyph);
 					// after the change set the custom again
 					two.setCustom(target);
 					// create an edge between those two entries
@@ -231,7 +238,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				} else if(currentRelation.equalsIgnoreCase(SubType.METHYLATION)){
 					// add "Me" to the product
 					state.setValue("Me");
-					target.setState(state);
+					// set the new glyph as state glyph
+					StateGlyph.setState(state);
+					// add it to the glyphlist from the target
+					target.getGlyph().add(StateGlyph);
 					// after the change set the custom again
 					two.setCustom(target);
 					// create an edge between those two entries
@@ -239,7 +249,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				} else if(currentRelation.equalsIgnoreCase(SubType.PHOSPHORYLATION)){
 					// add "P" to the product
 					state.setValue("P");
-					target.setState(state);
+					// set the new glyph as state glyph
+					StateGlyph.setState(state);
+					// add it to the glyphlist from the target
+					target.getGlyph().add(StateGlyph);
 					// after the change set the custom again
 					two.setCustom(target);
 					// create an edge between those two entries
@@ -247,7 +260,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				} else if(currentRelation.equalsIgnoreCase(SubType.UBIQUITINATION)){
 					// add "Ub" to the product
 					state.setValue("Ub");
-					target.setState(state);
+					// set the new glyph as state glyph
+					StateGlyph.setState(state);
+					// add it to the glyphlist from the target
+					target.getGlyph().add(StateGlyph);
 					// after the change set the custom again
 					two.setCustom(target);
 					// create an edge between those two entries
@@ -255,7 +271,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				} else if(currentRelation.equalsIgnoreCase(SubType.DEPHOSPHORYLATION)){
 					// add nothing to the product
 					state.setValue("");
-					target.setState(state);
+					// set the new glyph as state glyph
+					StateGlyph.setState(state);
+					// add it to the glyphlist from the target
+					target.getGlyph().add(StateGlyph);
 					// after the change set the custom again
 					two.setCustom(target);
 					// create an edge between those two entries
@@ -335,7 +354,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				// get the glyph for the entry
 				Glyph enzymeGlyph = (Glyph) ec.getCustom();
 				if(enzymeGlyph != null)
-					sources.add(enzymeGlyph);
+					reactionModifiers.add(enzymeGlyph);
 				else {
 					String[] args = {ec.getName(), String.valueOf(ec.getId())};
 					log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
@@ -359,8 +378,30 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		// name the glyph and add the id globally
 		glyph.setId("glyph" + id++);
 		// put the glyph in the hashmap with the number of the next subglyph
-		glyphNames.put(glyph, 1);
+		glyphNamesForPorts.put(glyph, 1);
+		glyphNamesForGlyphStates.put(glyph, "a");
 		return glyph;
+	}
+	
+	private Glyph createStateGlypheWithID(Glyph glyph) {
+		// create a new glyph
+		Glyph g = objectFactory.createGlyph();
+		// create an empty Bbox
+		Bbox bbox = objectFactory.createBbox();
+		// set it to the glyph
+		g.setBbox(bbox);
+		// set the clazz to state variable
+		g.setClazz(GlyphType.state_variable.toString());
+		// get the id of the parent glyph
+		String subId = glyphNamesForGlyphStates.get(glyph);
+		// set it as id
+		g.setId(glyph.getId() + subId);
+		// increment it
+		StringBuffer s = new StringBuffer(subId);
+		s.setCharAt(0, (char) (s.charAt(0)+1));
+		subId = String.valueOf(s.charAt(0));
+		glyphNamesForGlyphStates.put(glyph, subId);
+		return g;
 	}
 
 	/**
@@ -374,11 +415,11 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		// create a new port
 		Port port = objectFactory.createGlyphPort();
 		// get the number of the next subglyph from the hashmap
-		int subId = glyphNames.get(glyph);
+		int subId = glyphNamesForPorts.get(glyph);
 		// create the proper name for the port and set it
 		port.setId(glyph.getId() + "." + subId);
 		// increase the glyphs subglyphs
-		glyphNames.put(glyph, subId++);
+		glyphNamesForPorts.put(glyph, subId++);
 		return port;
 	}
 
@@ -393,22 +434,15 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		// create a connection
 		Arc connection = objectFactory.createArc();
 
-		// create start and end of the connection
-		Start connectionStart = objectFactory.createArcStart();
-		End connectionEnd = objectFactory.createArcEnd();
-
-		// set start and end coordinations accordingly to the source and target
-		// glyphs
-		connectionStart.setX(source.getBbox().getX());
-		connectionStart.setY(source.getBbox().getY());
-		connectionEnd.setX(target.getBbox().getX());
-		connectionEnd.setY(target.getBbox().getY());
-
-		// set the startand end to the connection
-		connection.setStart(connectionStart);
-		connection.setEnd(connectionEnd);
 		// clazz is needed otherwise there will be an error
 		connection.setClazz(ArcType.consumption.toString());
+		
+		// create the start and end positions of the connection
+		Start start = objectFactory.createArcStart();
+		End end = objectFactory.createArcEnd();
+		connection.setStart(start);
+		connection.setEnd(end);
+		
 		// set the glyphs as source and target within the connection
 		connection.setSource(source);
 		connection.setTarget(target);
@@ -449,22 +483,15 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				// set the type of the connection
 				connection.setClazz(ArcType.consumption.toString());
 				
-				// create a start and end point of the arc
-				Start connectionStart = objectFactory.createArcStart();
-				End connectionEnd = objectFactory.createArcEnd();
+				// create the start and end positions of the connection
+				Start start = objectFactory.createArcStart();
+				End end = objectFactory.createArcEnd();
+				connection.setStart(start);
+				connection.setEnd(end);
 				
-				// set the coordinations for the start and end points
-				connectionStart.setX(source.getBbox().getX());
-				connectionStart.setY(source.getBbox().getY());
-				connectionEnd.setX(portIn.getX());
-				connectionEnd.setY(portIn.getY());
-				
-				// set the start and end points to the arc
+				// set the start and end points for the arc
 				connection.setSource(source);
 				connection.setTarget(portIn);
-				
-				connection.setStart(connectionStart);
-				connection.setEnd(connectionEnd);
 				
 				// add the connection to the map
 				map.getArc().add(connection);
@@ -480,22 +507,15 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				// set the type of the connection
 				connection.setClazz(ArcType.production.toString());
 				
-				// create a start and end point of the arc
-				Start connectionStart = objectFactory.createArcStart();
-				End connectionEnd = objectFactory.createArcEnd();
-				
-				// set the coordinations for the start and end points
-				connectionStart.setX(portOut.getX());
-				connectionStart.setY(portOut.getY());
-				connectionEnd.setX(target.getBbox().getX());
-				connectionEnd.setY(target.getBbox().getY());
+				// create the start and end positions of the connection
+				Start start = objectFactory.createArcStart();
+				End end = objectFactory.createArcEnd();
+				connection.setStart(start);
+				connection.setEnd(end);
 				
 				// set the start and end points to the arc
-        connection.setSource(portOut);
-        connection.setTarget(target);
-        
-				connection.setStart(connectionStart);
-				connection.setEnd(connectionEnd);
+				connection.setSource(portOut);
+				connection.setTarget(target);
 				
 				// add the connection to the map
 				map.getArc().add(connection);
@@ -512,22 +532,20 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				/** TODO: set the class of the connection accordingly to the connection **/
 				connection.setClazz(ArcType.catalysis.toString());
 				
-				// create a start and end point of the arc
-				Start connectionStart = objectFactory.createArcStart();
-				End connectionEnd = objectFactory.createArcEnd();
-				
-				// set the coordinations for the start and end points
-				connectionStart.setX(rm.getBbox().getX());
-				connectionStart.setY(rm.getBbox().getY());
-				connectionEnd.setX(process.getBbox().getX());
-				connectionEnd.setY(process.getBbox().getY());
+				// create the start and end positions of the connection
+				Start start = objectFactory.createArcStart();
+				End end = objectFactory.createArcEnd();
+				connection.setStart(start);
+				connection.setEnd(end);
 				
 				// set the start and end points to the arc
-        connection.setSource(rm);
-        //connection.setTarget(target);// // TODO: Create a port for the modifiers.
-        
-				connection.setStart(connectionStart);
-				connection.setEnd(connectionEnd);
+				connection.setSource(rm);
+				connection.setTarget(process);// // TODO: Create a port for the modifiers.
+				// Its fine, because the documentation says:
+				// The source attribute can refer: 
+		        // - either to the id of a glyph,
+				// - or to the id of a >port< on a glyph.
+				// the same goes for target
 				
 				// add the connection to the map
 				map.getArc().add(connection);
@@ -535,9 +553,12 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			}
 				
 		}
+		
+		// add the process glyph to the map
+		map.getGlyph().add(process);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws JAXBException, SAXException {
 	}
 
 	@Override
