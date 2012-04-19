@@ -230,6 +230,17 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     sr.setId(NameToSId(sr.getName()));
     sr.setMetaId("meta_" + sr.getId());
     sr.setSBOTerm(SBO);
+    if (sr.getModel().getLevel() > 2) {
+      /*
+       * In order to obtain valid Level 3 models with identical properties than
+       * in Level 2, we use the default value of earlier SBML releases:
+       */
+      if (rc.isSetStoichiometry()) {
+        sr.setConstant(true);
+      } else {
+        sr.setConstant(false);
+      }
+    }
     
     // Set the stoichiometry
     Integer stoich = rc.getStoichiometry();
@@ -309,6 +320,10 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     compartment.setSize(defaultCompartmentSize);
 //    compartment.setUnits(model.getUnitDefinition("volume"));
     compartment.setSpatialDimensions(3d); // a cell has 3 dimensions
+    if (model.getLevel()>2) {
+      // Set default value from l2v4
+      compartment.setConstant(true);
+    }
 //    compartment.setConstant(true);
     // Be careful: compartment ID ant other compartment stuff are HARDCODED
     // in cellDesigner extension code generation!
@@ -523,7 +538,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     org.sbml.jsbml.Reaction sbReaction = model.createReaction();
     sbReaction.initDefaults();
-    if (sbReaction.getLevel()>=3) {
+    if (model.getLevel() > 2) {
+      sbReaction.setFast(false);
+      sbReaction.setReversible(true);
       sbReaction.setCompartment(compartment);
     }
     
@@ -850,6 +867,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       compartment.setName(entry.getGraphics().getName().substring(6).trim());
       return null;//continue;
     }
+    if (entry.getType().equals(EntryType.reaction)) {
+      // Reaction-nodes usually also occur as real reactions. They are only
+      // required to be translated to nodes, if they are used in relations.
+      if (!considerRelations()) {
+        return null;
+      }
+    }
     
     /*
      * XXX: Gruppenknoten erstellen evtl. in einer SBML version >2 moeglich?
@@ -895,10 +919,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     Species spec = model.createSpecies();
     if (model.getLevel() > 2) {
     	/*
-    	 * In order to obtain Level 3 models with identical properties than
+    	 * In order to obtain valid Level 3 models with identical properties than
     	 * in Level 2, we use the default value of earlier SBML releases:
     	 */
     	spec.setHasOnlySubstanceUnits(false);
+    	spec.setBoundaryCondition(false);
+    	spec.setConstant(false);
     }
     spec.setCompartment(compartment); // spec.setId("s_" +
     // entry.getId());
@@ -1137,6 +1163,14 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   @Override
   protected boolean considerReactions() {    
     return true;
+  }
+
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.KEGGtranslator#isGraphicalOutput()
+   */
+  public boolean isGraphicalOutput() {
+    // Convert reaction-nodes to real reactions.
+    return false;
   }
   
 }

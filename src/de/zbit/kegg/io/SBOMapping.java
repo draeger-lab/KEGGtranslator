@@ -49,23 +49,27 @@ public class SBOMapping {
   /**
    * SBO Term for EntryType "general modifier" (compound, map, other).
    */
-  public static int ET_GeneralModifier2SBO = 13; // 13=catalyst // 460="enzymatic catalyst"
+  public static int ET_GeneralModifier2SBO = 13; // 13=catalyst
+  
   /**
    * SBO Term for EntryType enzyme, gene, group, ortholog, genes.
    */
-  public static int ET_EnzymaticModifier2SBO = 460;
-  /**
-   * SBO Term for EntryType Ortholog.
-   */
-  public static int ET_Ortholog2SBO = 354; // 354="informational molecule segment"
-  /**
-   * SBO Term for EntryType Enzyme.
-   */
-  public static int ET_Enzyme2SBO = 245; // 245="macromolecule",	// 252="polypeptide chain"
+  public static int ET_EnzymaticModifier2SBO = 460;// 460="enzymatic catalyst"
+  
   /**
    * SBO Term for EntryType Gene.
    */
-  public static int ET_Gene2SBO = 354; // 354="informational molecule segment"
+  public static int ET_Gene2SBO = 252; // 252="polypeptide chain" [old: 354="informational molecule segment"]
+  
+  /**
+   * SBO Term for EntryType Enzyme.
+   */
+  public static int ET_Enzyme2SBO = ET_Gene2SBO; // 245="macromolecule",	// 252="polypeptide chain"
+  
+  /**
+   * SBO Term for EntryType Ortholog.
+   */
+  public static int ET_Ortholog2SBO = ET_Gene2SBO; // 354="informational molecule segment"
   /**
    * SBO Term for EntryType Group.
    */
@@ -95,7 +99,7 @@ public class SBOMapping {
   /**
    * SBO Term for GeneType Protein.
    */
-  public static int GT_Protein2SBO = 252; // 252="polypeptide chain"
+  public static int GT_Protein2SBO = ET_Gene2SBO; // 252="polypeptide chain"
   
   /**
    * SBO Term for GeneType DNA.
@@ -105,7 +109,7 @@ public class SBOMapping {
   /**
    * SBO Term for GeneType DNARegion.
    */
-  public static int GT_DNARegion2SBO = 251; // 251="deoxyribonucleic acid"
+  public static int GT_DNARegion2SBO = GT_DNA2SBO; // 251="deoxyribonucleic acid"
   
   /**
    * SBO Term for GeneType RNA.
@@ -115,7 +119,12 @@ public class SBOMapping {
   /**
    * SBO Term for GeneType RNARegion.
    */
-  public static int GT_RNARegion2SBO = 250; // 252="ribonucleic acid"
+  public static int GT_RNARegion2SBO = GT_RNA2SBO; // 252="ribonucleic acid"
+  
+  /**
+   * SBO Term for GeneType Gene (a real gene).
+   */
+  public static int GT_Gene2SBO = 354; // 354="informational molecule segment"
   
   
   /**
@@ -134,8 +143,7 @@ public class SBOMapping {
     subtype2SBO.put(SubType.ASSOCIATION, 177); // = non-covalent binding
     subtype2SBO.put(SubType.BINDING, 177);
     subtype2SBO.put(SubType.BINDING_ASSOCIATION, 177);
-    subtype2SBO.put(SubType.DEPHOSPHORYLATION, 330); // dephosphorylation
-    subtype2SBO.put(SubType.DISSOCIATION, 177);
+    subtype2SBO.put(SubType.DISSOCIATION, 180);
     subtype2SBO.put(SubType.EXPRESSION, 170); 
     subtype2SBO.put(SubType.GLYCOSYLATION, 217); // glycosylation
     subtype2SBO.put(SubType.INDIRECT_EFFECT, 344); // molecular interaction
@@ -143,6 +151,7 @@ public class SBOMapping {
     subtype2SBO.put(SubType.METHYLATION, 214); // methylation
     subtype2SBO.put(SubType.MISSING_INTERACTION, 396);  // uncertain process
     subtype2SBO.put(SubType.PHOSPHORYLATION, 216); // phosphorylation
+    subtype2SBO.put(SubType.DEPHOSPHORYLATION, 330); // dephosphorylation
     subtype2SBO.put(SubType.REPRESSION, 169);
     subtype2SBO.put(SubType.STATE_CHANGE, 168); // control
     subtype2SBO.put(SubType.UBIQUITINATION, 224); // ubiquitination
@@ -152,7 +161,7 @@ public class SBOMapping {
     subtype2GO.put(SubType.BINDING, 5488);
     subtype2GO.put(SubType.BINDING_ASSOCIATION, 5488);
     subtype2GO.put(SubType.DEPHOSPHORYLATION, 16311); // dephosphorylation
-    //subtype2GO.put(SubType.DISSOCIATION, 177);
+    //subtype2GO.put(SubType.DISSOCIATION, 180);
     subtype2GO.put(SubType.EXPRESSION, 10467); // = gene expression 
     subtype2GO.put(SubType.GLYCOSYLATION, 70085); // glycosylation
     //subtype2GO.put(SubType.INDIRECT_EFFECT, 344);
@@ -179,7 +188,7 @@ public class SBOMapping {
       if (type.equals(EntryTypeExtended.protein)) {
         return GT_Protein2SBO;
       } else if (type.equals(EntryTypeExtended.gene)) {
-        return ET_Gene2SBO;
+        return GT_Gene2SBO;
       } else if (type.equals(EntryTypeExtended.dna)) {
         return GT_DNA2SBO;
       } else if (type.equals(EntryTypeExtended.dna_region)) {

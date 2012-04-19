@@ -37,6 +37,7 @@ import org.sbml.jsbml.ext.layout.LayoutConstant;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
 
+import de.zbit.graph.MinAndMaxTracker;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.GraphicsType;
@@ -62,7 +63,22 @@ public class KEGG2SBMLLayoutExtension {
    */
   public static final String LAYOUT_NS_NAME = "layout";
 
-  
+
+  /**
+   * Add (translate) layout extension to the given model. Translates
+   * all {@link Graphics} objects from KEGG to the layout extension.
+   * Works with all {@link AbstractNamedSBase}s, thus with Species
+   * as well as QualitativeSpecies. 
+   * <p><i>This will erase all previous layouts!</i></p>
+   * @param p
+   * @param doc
+   * @param model
+   * @param metabolic if true, will set {@link ReactionGlyph}s instead
+   * of {@link SpeciesGlyph} whereever possible.
+   */
+  public static void addLayoutExtension(Pathway p, SBMLDocument doc, Model model, boolean metabolic) {
+    addLayoutExtension(p, doc, model, metabolic,true);
+  }
   /**
    * Add (translate) layout extension to the given model. Translates
    * all {@link Graphics} objects from KEGG to the layout extension.
@@ -73,10 +89,14 @@ public class KEGG2SBMLLayoutExtension {
    * @param model
    * @param metabolic if true, will set {@link ReactionGlyph}s instead
    * of {@link SpeciesGlyph} whereever possible.
+   * @param removeAllPreviousLayouts if <code>TRUE</code>, will call
+   * unsetListOfLayouts() and remove all previous layouts before adding
+   * the new one.
    */
-  public static void addLayoutExtension(Pathway p, SBMLDocument doc, Model model, boolean metabolic) {
+  public static void addLayoutExtension(Pathway p, SBMLDocument doc, Model model, boolean metabolic, boolean removeAllPreviousLayouts) {
    
-    // Make extension is available
+    // Make sure extension is available
+    // NOTE: this should be called every time! No need to check if it is already contained.
     doc.addNamespace(LAYOUT_NS_NAME, "xmlns", LAYOUT_NS);
     doc.getSBMLDocumentAttributes().put(LAYOUT_NS_NAME + ":required", "false");
     
@@ -87,7 +107,9 @@ public class KEGG2SBMLLayoutExtension {
       model.addExtension(LAYOUT_NS, layoutModel);
     } else {
       // Remove all previous layouts.
-      layoutModel.unsetListOfLayouts();
+      if (removeAllPreviousLayouts) {
+        layoutModel.unsetListOfLayouts();
+      }
     }
     
     // Map enzymes to reactions in metabolic models
@@ -98,10 +120,17 @@ public class KEGG2SBMLLayoutExtension {
     
     // Create Species and Reaction Glyps.
     Layout layout = layoutModel.createLayout();
+    layout.setName(String.format("Translated %s layout.", metabolic?"metabolic":"qualitative"));
+    
+    // It's stupid, but the whole "layout" requires a dimension.
+    // => track min and max values.
+    MinAndMaxTracker tracker = new MinAndMaxTracker();
+    
     for (Entry e : p.getEntries()) { // In KGML, only entries have graph objects.
       Object s = e.getCustom();
       if (s!=null && e.hasGraphics()) {
         Graphics g = e.getGraphics();
+        tracker.track(g.getX(), g.getY(), g.getWidth(), g.getHeight());
         // TODO: Are lines (also in mutliple graphics tags) possible?
         
         if (s instanceof AbstractNamedSBase) {
@@ -205,7 +234,9 @@ public class KEGG2SBMLLayoutExtension {
     }
     // TODO: other things to add?
     
-    //return;
+    // Add the total dimension
+    layout.createDimensions(tracker.getWidth(), tracker.getHeight(), 1);
+    
   }
   
   /**

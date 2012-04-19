@@ -58,6 +58,10 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
     /**
      * 
      */
+    SBML_CORE_AND_QUAL,
+    /**
+     * 
+     */
     SBGN,
     /**
      * 

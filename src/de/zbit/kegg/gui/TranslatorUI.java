@@ -32,6 +32,7 @@ import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.prefs.BackingStoreException;
@@ -265,6 +266,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 
 				// Translate
 				createNewTab(inFile, format);
+				
+				// Add to histoy
+				addToFileHistory(Collections.singleton(inFile));
 			}
 		});
 		r.add(ok);
@@ -370,6 +374,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				try {
 					openDir = inFile.getParent();
 					addTranslatorTab(TranslatorPanelTools.createPanel(inFile, f, this));
+					
 				} catch (Exception e1) {
 					GUITools.showErrorMessage(this, e1);
 				}

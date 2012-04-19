@@ -40,7 +40,6 @@ import org.biopax.paxtools.model.level2.conversion;
 import org.biopax.paxtools.model.level2.dataSource;
 import org.biopax.paxtools.model.level2.dna;
 import org.biopax.paxtools.model.level2.entity;
-import org.biopax.paxtools.model.level2.interaction;
 import org.biopax.paxtools.model.level2.openControlledVocabulary;
 import org.biopax.paxtools.model.level2.pathway;
 import org.biopax.paxtools.model.level2.physicalEntity;
@@ -246,7 +245,9 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
       } else if (entry.getType() == EntryType.ortholog) {
         instantiate = protein.class;
       } else if (entry.getType() == EntryType.reaction) {
-        instantiate = interaction.class;
+        //instantiate = interaction.class;
+        // Reaction-nodes usually also occur as real reactions.
+        return null;
       }
     }
     // Extended object is source was a non-KGMl document

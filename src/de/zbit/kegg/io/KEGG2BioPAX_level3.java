@@ -120,7 +120,9 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       } else if (entry.getType() == EntryType.ortholog) {
         instantiate = Protein.class;
       } else if (entry.getType() == EntryType.reaction) {
-        instantiate = Interaction.class;
+        //instantiate = Interaction.class;
+        // Reaction-nodes usually also occur as real reactions.
+        return null;
       }
     }
     // Extended object is source was a non-KGMl document

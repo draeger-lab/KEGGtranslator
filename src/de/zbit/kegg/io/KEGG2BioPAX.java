@@ -74,6 +74,7 @@ import de.zbit.kegg.AtomBalanceCheck.AtomCheckResult;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Entry;
+import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.Relation;
@@ -114,6 +115,13 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   protected BioPAXLevel level = BioPAXLevel.L3;
   
   /**
+   * This is for speed-improvement and saves the information if
+   * {@link Entry}s with {@link EntryType#reaction} are in the
+   * last translated pathway.
+   */
+  private boolean entriesWithTypeReactionAvailable=false;
+  
+  /**
    * @param manager
    */
   public KEGG2BioPAX(BioPAXLevel level, KeggInfoManagement manager) {
@@ -135,6 +143,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     // Initialize a progress bar.
     initProgressBar(p,false,false);
     
+    // The order of the following processes is important!
     createPathwayInstance(p);
     createPhysicalEntities(p);
     if(considerReactions()){
@@ -143,22 +152,8 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     if (considerRelations()) {
       createRelations(p);
     }
-    // TODO: ... ???
-//    pathway.addPATHWAY_COMPONENTS(pathwayComponent.class);
-    
-    // TODO: Add reactions and relations.
-    
-    /*
-     * Relations:
-     * - In doubt to PhysicalInteraction
-     * - "binding/assoc.", "dissociation", "missing interaction" ZU PhysicalInteraction 
-     * - Compound (only PPREL) to Conversion, SKIP ALL OTHERS [IF CONSIDERREACTIONS()]
-     * - All others zu Conversion
-     * 
-     * - InteractionVocabulary in L3 aufbauen
-     * 
-     * 
-     */
+    // TODO: (eventuell) ???
+    // pathway.addPATHWAY_COMPONENTS(pathwayComponent.class);
     
     return model;
   }
@@ -672,6 +667,8 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
           }
           
         }
+        
+        setReactionToReactionEntry(p, r, reaction);
       }
     }
     
@@ -680,6 +677,31 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       log.info(String.format("Pathway '%s' does not contain any reactions.", p.getName()!=null?p.getName():"Unknown"));
     }
   }
+
+  /**
+   * KGML can provide {@link Entry}s with {@link EntryType#reaction}. These
+   * are translated to real reactions. Thus, they have no custom {@link BioPAXElement}
+   * set.
+   * <br/>But these entries might be reused in relations (i.e., relations involving
+   * reactions) and thus, this method will set the custom attribute of an {@link Entry}
+   * to the BioPAX reaction given as <code>reaction</code> .
+   * @param p
+   * @param r KEGG reaction
+   * @param reaction BioPAX reaction
+   */
+  private void setReactionToReactionEntry(Pathway p, Reaction r, BioPAXElement reaction) {
+    if (!entriesWithTypeReactionAvailable) {
+      return;
+    }
+    for (Entry e: p.getEntries()) {
+      if (e.getType().equals(EntryType.reaction)) {
+        if (e.getCustom()==null && e.getName().contains(r.getName())) {
+          e.setCustom(reaction);
+        }
+      }
+    }
+  }
+
 
   /**
    * Adds all KEGG {@link Relation}s to the BioPAX {@link #model}.
@@ -713,7 +735,9 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     for (Entry entry : entries) {
       progress.DisplayBar();
       BioPAXElement spec = null;
-
+      if (entry.getType().equals(EntryType.reaction)) {
+        entriesWithTypeReactionAvailable=true;
+      }
       
       /*
        *  KEGG has pathways with duplicate entries (mostly signalling).
@@ -794,6 +818,14 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     }
     
     return voc;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.KEGGtranslator#isGraphicalOutput()
+   */
+  public boolean isGraphicalOutput() {
+    // Convert reaction-nodes to real reactions.
+    return false;
   }
   
   /**

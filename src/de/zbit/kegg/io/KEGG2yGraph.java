@@ -1298,5 +1298,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     return drawArrowsForReactions;
   }
   
-  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.KEGGtranslator#isGraphicalOutput()
+   */
+  public boolean isGraphicalOutput() {
+    // Keep reaction nodes
+    return true;
+  }
 }

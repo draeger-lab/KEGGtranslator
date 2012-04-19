@@ -215,9 +215,9 @@ public class BatchKEGGtranslator {
    * @param manager
    * @return
    */
-	public static KEGGtranslator getTranslator(Format outFormat,
+	public static KEGGtranslator<?> getTranslator(Format outFormat,
 			KeggInfoManagement manager) {
-		KEGGtranslator translator;
+		KEGGtranslator<?> translator;
 		switch (outFormat) {
 		case SBML:
 			translator = new KEGG2jSBML(manager);
@@ -225,6 +225,11 @@ public class BatchKEGGtranslator {
     case SBML_QUAL:
       translator = new KEGG2SBMLqual(manager);
       break;
+    case SBML_CORE_AND_QUAL:
+      translator = new KEGG2SBMLqual(manager);
+      ((KEGG2SBMLqual)translator).setConsiderReactions(true);
+      break;
+      
 		/*case LaTeX:
 			translator = new KEGG2jSBML(manager);
 			break;*/

@@ -54,7 +54,9 @@ import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.util.DatabaseIdentifiers;
 import de.zbit.util.Utils;
+import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 
 /**
  * KEGG2SBML with a qualitative model (SBML L3 V1, using the SBML Qual extension,
@@ -147,9 +149,12 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     Model model = doc.getModel();
     QualitativeModel qualModel = new QualitativeModel(model);
     
+    // Determine if this is a combined model (core + qual) or a pure qual model.
+    boolean isCombindedModel = considerReactions();
+    
     // Add extension and namespace to model
     doc.addNamespace(KEGG2SBMLqual.QUAL_NS_NAME, "xmlns", KEGG2SBMLqual.QUAL_NS);
-    doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", "true");
+    doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", (isCombindedModel?"false":"true"));
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     
     // Create qual species for every species
@@ -170,7 +175,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     // Update (UNSET OLD METABOLIC and create new, qual-species related) layout extension
     if (addLayoutExtension) {
-      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model, false);
+      KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model, false, !isCombindedModel);
     }
     
     return doc;
@@ -188,6 +193,8 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       if (s!=null && s instanceof Species) {
         QualitativeSpecies qs = createQualitativeSpeciesFromSpecies((Species) s, qualModel);
         e.setCustom(qs);
+      } else {
+        e.setCustom(null);
       }
     }
   }
@@ -265,6 +272,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
           cv.addResource(KeggInfos.miriam_urn_sbo + SBOMapping.formatSBOforMIRIAM(subSBO));
           SBOs.add(subSBO);
         }
+        Integer subGO = SBOMapping.getGOTerm(subType);
+        if (subGO!=null && subGO>0) {
+          cv.addResource(DatabaseIdentifiers.getMiriamURN(IdentifierDatabases.GeneOntology, Integer.toString(subGO)));
+        }
       }
       
       in.setSign(sign);
@@ -317,18 +328,19 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     QualitativeSpecies qs = qualModel.getQualitativeSpecies(id);
     if(qs == null){
       qs = qualModel.createQualitativeSpecies(id, "meta_" + id, species);
+      qs.setConstant(false);
     }
     return qs;  
   }
   
   /**
-   * Accepts values smaller than zero to unset the SBO term.
+   * Accepts values smaller than or equal to zero to unset the SBO term.
    * Else, sets the SBO term to the given value.
    * @param sbase
    * @param term
    */
   private static void setSBOTerm(AbstractSBase sbase, int term) {
-    if (term<0) sbase.unsetSBOTerm();
+    if (term<=0) sbase.unsetSBOTerm();
     else sbase.setSBOTerm(term);
   }
   
@@ -341,7 +353,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * @throws XMLStreamException
    * @throws ClassNotFoundException
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "static-access" })
   public static void main(String[] args) throws Exception {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network
     // load and heavily reduces computation time.
