@@ -62,7 +62,7 @@ public class KEGG2SBMLLayoutExtension {
   /**
    * Unique identifier to identify this Namespace/Extension.
    */
-  public static final String LAYOUT_NS_NAME = "layout";
+  public static final String LAYOUT_NS_NAME = LayoutConstant.shortLabel;
 
 
   /**
@@ -131,6 +131,10 @@ public class KEGG2SBMLLayoutExtension {
       Object s = e.getCustom();
       if (s!=null && e.hasGraphics()) {
         Graphics g = e.getGraphics();
+        if (g.getType().equals(GraphicsType.line)) {
+          // Line-graphics are nonsense.
+          continue;
+        }
         tracker.track(g.getX(), g.getY(), g.getWidth(), g.getHeight());
         // TODO: Are lines (also in mutliple graphics tags) possible?
         
@@ -159,7 +163,7 @@ public class KEGG2SBMLLayoutExtension {
             if (rct == null) {
               // No match => take first without layout
               for (Reaction r : rcts) {
-                if (layout.refersTo(r)) {
+                if (!layout.containsGlyph(r)) {
                   rct = r;
                   break;
                 }
@@ -175,10 +179,8 @@ public class KEGG2SBMLLayoutExtension {
             // Thus, we should not remove set reactions.
             //Utils.removeFromMapOfSets(enzyme2rct, rct, speciesId);
             
-            
             // Set X and Y on the reactionGlyph
-            if (!g.isDefaultPosition() && (rct != null) && (!layout.refersTo(rct) || 
-                !g.getType().equals(GraphicsType.line))) {
+            if (!g.isDefaultPosition() && (rct != null) && (!layout.containsGlyph(rct))) {
               // LINE coordinate are much worse than rectangles. So prefer rectangles!
               List<ReactionGlyph> listOfGlyphs = layout.findReactionGlyphs(rct.getId());
               ReactionGlyph glyph;
@@ -190,17 +192,16 @@ public class KEGG2SBMLLayoutExtension {
               glyph.unsetBoundingBox();
               BoundingBox box = glyph.createBoundingBox();
               box.createPosition(g.getX(), g.getY(), 0d);
-            }
-            
+            }            
             // Set width and height on the species glyph
             List<SpeciesGlyph> listOfSpecGlyphs = layout.findSpeciesGlyphs(speciesId); 
-            if ((listOfSpecGlyphs.isEmpty()) || 
+            if (listOfSpecGlyphs.isEmpty() && 
                 !g.getType().equals(GraphicsType.line)) {
               SpeciesGlyph sGlyph;
               if (listOfSpecGlyphs.isEmpty()) {
                 sGlyph = layout.createSpeciesGlyph(speciesId);
               } else {
-            	sGlyph = listOfSpecGlyphs.get(0);
+                sGlyph = listOfSpecGlyphs.get(0);
               }
               BoundingBox box = sGlyph.getBoundingBox();
               if (box == null) {

@@ -518,8 +518,8 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
         
         // Mass and Formula for small molecules
         if (element instanceof smallMolecule) {
-          if (infos.getFormula() != null) {
-            ((smallMolecule) element).setCHEMICAL_FORMULA(infos.getFormula());
+          if (infos.getFormulaDirectOrFromSynonym(manager) != null) {
+            ((smallMolecule) element).setCHEMICAL_FORMULA(infos.getFormulaDirectOrFromSynonym(manager));
           }
           if (infos.getMolecularWeight() != null) {
             ((smallMolecule) element).setMOLECULAR_WEIGHT(getNumber(infos.getMolecularWeight()));
@@ -527,15 +527,15 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
             ((smallMolecule) element).setMOLECULAR_WEIGHT(getNumber(infos.getMass()));
           }
         } else if (element instanceof SmallMolecule) {
-          if (infos.getFormula() != null || infos.getMass() != null) {
+          if (infos.getFormulaDirectOrFromSynonym(manager) != null || infos.getMass() != null) {
             SmallMoleculeReference ref = (SmallMoleculeReference) model.getByID(element.getRDFId() + "_reference");
             if (ref==null) {
               ref = model.addNew(SmallMoleculeReference.class, element.getRDFId() + "_reference");
               ((SmallMolecule) element).setEntityReference(ref);
             }
             
-            if (infos.getFormula() != null) {
-              ref.setChemicalFormula(infos.getFormula());
+            if (infos.getFormulaDirectOrFromSynonym(manager) != null) {
+              ref.setChemicalFormula(infos.getFormulaDirectOrFromSynonym(manager));
             }
             if (infos.getMolecularWeight() != null) {
               ref.setMolecularWeight((float) getNumber(infos.getMolecularWeight()));

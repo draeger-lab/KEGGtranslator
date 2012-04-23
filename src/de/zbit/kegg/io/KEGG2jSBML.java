@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,9 @@ import org.sbml.jsbml.Creator;
 import org.sbml.jsbml.History;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.UnitDefinition;
@@ -98,6 +101,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * Add the SBML-layout extension?
    */
   protected boolean addLayoutExtension = true;
+  
+  /**
+   * Add the SBML-groups extension?
+   */
+  protected boolean useGroupsExtension = true;
   
   /**
    * Default compartment size.
@@ -199,6 +207,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     addLayoutExtension = b;
   }
 
+  public void setUseGroupsExtension(boolean b) {
+    useGroupsExtension = b;
+  }
   
   
   
@@ -210,6 +221,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   private void loadPreferences() {
     addCellDesignerAnnots = KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
     addLayoutExtension = KEGGtranslatorOptions.ADD_LAYOUT_EXTENSION.getValue(prefs);
+    useGroupsExtension = KEGGtranslatorOptions.USE_GROUPS_EXTENSION.getValue(prefs);
   }
   
   /**
@@ -249,7 +261,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Get Species for ReactionComponent and assign to SpeciesReference.
     Entry rcEntry = p.getEntryForReactionComponent(rc);
     if ((rcEntry != null) && (rcEntry.getCustom() != null)) {
-      sr.setSpecies((Species) rcEntry.getCustom());
+      if (rcEntry.getCustom() instanceof Species) {
+        sr.setSpecies((Species) rcEntry.getCustom());
+      } else {
+        sr.setSpecies(((NamedSBase) rcEntry.getCustom()).getId());
+      }
     }
     
     // Do not change SBO of parent species!
@@ -299,7 +315,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // new Model with Kegg id as id.
     Model model = doc.createModel(NameToSId(p.getName().replace(":", "_")));
     model.setMetaId("meta_" + model.getId());
-    model.setName(p.getTitle());
+    model.setName(p.getTitle()); // NOTE: Name is sometimes changed later (see below)
     if (lv.getL().intValue()>2) {
       // Make consistent units for level 3 (same as in l2v4).
       UnitDefinition ud = UnitDefinition.getPredefinedUnit(UnitDefinition.TIME, 2, 4);
@@ -372,8 +388,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         model.addCVTerm(mtOrgID);
       }
       notes.append(String.format("<h1>Model of %s%s%s in %s%s%s</h1>\n", quotStart, formatTextForHTMLnotes(p.getTitle()), quotEnd, quotStart, orgInfos.getDefinition(), quotEnd));
+      model.setName(String.format("%s (%s)", p.getTitle(), orgInfos.getDefinition()));
     } else {
-      notes.append(String.format("<h1>Model of " + quotStart + "%s"+ quotEnd + "</h1>\n",formatTextForHTMLnotes(p.getTitle()) ));
+      notes.append(String.format("<h1>Model of %s%s%s</h1>\n",quotStart,formatTextForHTMLnotes(p.getTitle()),quotEnd ));
     }
     
     // Get PW infos from KEGG Api for Description and GO ids.
@@ -425,12 +442,14 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Save all reaction modifiers in a list. String = reaction id.
     List<Info<String, ModifierSpeciesReference>> reactionModifiers = new SortedArrayList<Info<String, ModifierSpeciesReference>>();
     
+    
+    
     // Create species
-    ArrayList<Entry> entries = p.getEntries();
+    List<Entry> entries = getEntriesWithGroupsAsLast(p);
     Set<String> addedEntries = new HashSet<String>(); // contains just entrys with KEGG ids (no "undefined" entries) 
     for (Entry entry : entries) {
       progress.DisplayBar();
-      Species spec = null;
+      SBase spec = null;
 
       
       /*
@@ -448,14 +467,14 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         Collection<Entry> col = p.getEntriesForName(entry.getName()); // should return at least 2 entries
         if ((col != null) && (col.size() > 0)) {
           Iterator<Entry> it = col.iterator();
-          while (it.hasNext() && (spec = (Species)it.next().getCustom())==null);
+          while (it.hasNext() && (spec = (SBase)it.next().getCustom())==null);
           entry.setCustom(spec);
         }
       }
       
       if (spec==null) {
         // Usual case if this entry is no duplicate.
-        spec = addKGMLEntry(entry, p, model, compartment, reactionModifiers);
+        spec = addKGMLEntry(entry, p, model, compartment);
       }
       
       // Track reaction modifiers
@@ -512,12 +531,44 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   }
 
   /**
+   * Returns all entries of the pathway, with all group-nodes to the end of the list.
+   * @param p
+   * @return
+   */
+  private List<Entry> getEntriesWithGroupsAsLast(Pathway p) {
+    // Move all group-nodes to the end of the list.
+    // Because, if using the groups-extension, all members should already be created!
+    Iterable<Entry> entriesArrayList = p.getEntries(); // original list
+    LinkedList<Entry> entries = new LinkedList<Entry>(); // new list
+    LinkedList<Entry> groupEntries = new LinkedList<Entry>(); // all groups
+    if (entriesArrayList==null) return entries;
+    
+    // Add all non-groups and remember groups
+    Iterator<Entry> it = entriesArrayList.iterator();
+    while (it.hasNext()) {
+      Entry e = it.next();
+      if (e.getType().equals(EntryType.group) || e.hasComponents()) {
+        groupEntries.add(e);
+      } else {
+        entries.add(e);
+      }
+    }
+    
+    // Add all groups
+    for (Entry e: groupEntries) {
+      entries.addLast(e);
+    }
+    
+    return entries;
+  }
+
+  /**
    * @return the level and version of the SBML core (2,4) if no extension
    * should be used. Else: 3,1.
    */
   protected ValuePair<Integer, Integer> getLevelAndVersion() {
     // Layout extension requires Level 3
-    if (!addLayoutExtension) {
+    if (!addLayoutExtension && !useGroupsExtension) {
       return new ValuePair<Integer, Integer>(Integer.valueOf(2), Integer.valueOf(4));
     } else {
       return new ValuePair<Integer, Integer>(Integer.valueOf(3), Integer.valueOf(1));
@@ -586,8 +637,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
             quotStart, ko_id.toUpperCase(), quotEnd, formatTextForHTMLnotes(infos.getDefinition()) ));
           // System.out.println(sbReaction.getNotesString());
           // notes="<body xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>&#8220;TEST&#8221;</b> A &lt;&#061;&gt;&#62;&#x3e;\u003E B<br/></p></body>";
-        } else
+        } else {
           notes.append(String.format("<b>%s</b><br/>\n", ko_id.toUpperCase()));
+        }
         if (infos.getEquation() != null) {
           notes.append(String.format("<b>Equation for %s%s%s:</b> %s<br/>\n",
             quotStart, ko_id.toUpperCase(), quotEnd, EscapeChars.forHTML(infos.getEquation())));
@@ -701,7 +753,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @param entry
    * @param spec
    */
-  public static void addMiriamURNs(Entry entry, Species spec) {
+  public static void addMiriamURNs(Entry entry, SBase spec) {
     // Get a map of existing identifiers or create a new one
     Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> ids = new HashMap<DatabaseIdentifiers.IdentifierDatabases, Collection<String>>();
     if (entry instanceof EntryExtended) {
@@ -738,8 +790,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           notes.append(String.format("<p><b>All given names:</b><br/>%s</p>\n",EscapeChars.forHTML(infos.getNames().replace(";", "")) ));
         if (infos.getCas() != null)
           notes.append(String.format("<p><b>CAS number:</b> %s</p>\n", infos.getCas()));
-        if (infos.getFormula() != null) {
-          notes.append(String.format("<p><b>Formula:</b> %s</p>\n", EscapeChars.forHTML(infos.getFormula())));
+        if (infos.getFormulaDirectOrFromSynonym(manager) != null) {
+          notes.append(String.format("<p><b>Formula:</b> %s</p>\n", EscapeChars.forHTML(infos.getFormulaDirectOrFromSynonym(manager))));
           String ko_id_uc_t = ko_id.toUpperCase().trim();
           if (ko_id_uc_t.startsWith("CPD:")) {
             // KEGG provides picture for compounds (e.g., "C00118").
@@ -750,8 +802,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           // KEGG provides picture for referenced pathways (e.g., "path:hsa00620" => "map00620.gif").
           notes.append(Pathway.getPathwayPreviewPicture(ko_id));
         }
-        if (infos.getMass() != null)
+        if (infos.getMass() != null) {
           notes.append(String.format("<p><b>Mass:</b> %s</p>\n", infos.getMass()));
+        }
+        if (infos.getMolecularWeight() != null) {
+          notes.append(String.format("<p><b>Molecular weight:</b> %s</p>\n", infos.getMolecularWeight()));
+        }
         notes.append(notesEndString);
         spec.appendNotes(notes.toString());
       }      
@@ -842,15 +898,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   /**
    * Translates the given entry to jSBML.
    * 
-   * @param entry - KGML entry to add.
-   * @param p - pathway of the specified entry.
-   * @param model - current model.
-   * @param compartment - current compartment.
-   * @param reactionModifiers - list of modifiers to add this species,
+   * @param entry KGML entry to add.
+   * @param p pathway of the specified entry.
+   * @param model current model.
+   * @param compartment current compartment.
    * if it is an enzyme or similar.
    */
-  private Species addKGMLEntry(Entry entry, Pathway p, Model model, Compartment compartment,
-    List<Info<String, ModifierSpeciesReference>> reactionModifiers) {
+  private SBase addKGMLEntry(Entry entry, Pathway p, Model model, Compartment compartment) {
     /*
      * <entry id="1" name="ko:K00128" type="ortholog" reaction="rn:R00710" link="http://www.genome.jp/dbget-bin/www_bget?ko+K00128">
      * <graphics name="K00128" fgcolor="#000000" bgcolor="#BFBFFF" type="rectangle" x="170" y="1018" width="45" height="17"/>
@@ -916,25 +970,33 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // ---
     
     // Initialize species object
-    Species spec = model.createSpecies();
-    if (model.getLevel() > 2) {
-    	/*
-    	 * In order to obtain valid Level 3 models with identical properties than
-    	 * in Level 2, we use the default value of earlier SBML releases:
-    	 */
-    	spec.setHasOnlySubstanceUnits(false);
-    	spec.setBoundaryCondition(false);
-    	spec.setConstant(false);
+    SBase spec;
+    if (useGroupsExtension && (entry.hasComponents() || entry.getType().equals(EntryType.group))) {
+      spec = KEGG2SBMLGroupExtension.createGroup(p, model, entry);
+    } else {
+      spec = model.createSpecies();
     }
-    spec.setCompartment(compartment); // spec.setId("s_" +
-    // entry.getId());
-    spec.setInitialAmount(speciesDefaultInitialAmount);
-//    spec.setUnits(model.getUnitDefinition("substance"));
+    if (spec instanceof Species) {
+      if (model.getLevel() > 2) {
+        /*
+         * In order to obtain valid Level 3 models with identical properties than
+         * in Level 2, we use the default value of earlier SBML releases:
+         */
+        ((Species) spec).setHasOnlySubstanceUnits(false);
+        ((Species) spec).setBoundaryCondition(false);
+        ((Species) spec).setConstant(false); // defined in org.sbml.jsbml.Variable
+      }
+      ((Species) spec).setCompartment(compartment); // ((Species) spec).setId("s_" +
+      ((Species) spec).setInitialAmount(speciesDefaultInitialAmount);
+      //((Species) spec).setUnits(model.getUnitDefinition("substance"));
+    }
     
     // ID has to be at this place, because other refer to it by id and if id is not set. refenreces go to null.
     // spec.setId(NameToSId(entry.getName().replace(' ', '_')));
-    spec.setId(NameToSId(name.replace(' ', '_')));
-    spec.setMetaId("meta_" + spec.getId());
+    if (spec instanceof NamedSBase) {
+      ((NamedSBase)spec).setId(NameToSId(name.replace(' ', '_'))); // defined in org.sbml.jsbml.NamedSBase
+      spec.setMetaId("meta_" + ((NamedSBase) spec).getId()); // defined in org.sbml.jsbml.SBase
+    }
     
     //Annotation specAnnot = new Annotation("");
     //specAnnot.setAbout("");
@@ -946,7 +1008,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     
     // Process Component information
-    if (entry.hasComponents()) {
+    if (entry.hasComponents() || entry.getType().equals(EntryType.group)) {
+      /////////////////////////////////////////////////////
+      // TODO: Globally try to replace species by AbstractSBase
+      /////////////////////////////////////////////////
+      
       StringBuilder notesAppend = new StringBuilder(
         String.format("<p>This species is a group, consisting of %s components:<br/><ul>", entry.getComponents().size()));
       CVTerm cvt = new CVTerm(Type.BIOLOGICAL_QUALIFIER,Qualifier.BQB_IS_ENCODED_BY);
@@ -983,7 +1049,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     addMiriamURNs(entry, spec);
     
     // Finally, add the fully configured species.
-    spec.setName(name);
+    ((NamedSBase) spec).setName(name);
     //specAnnot.setAbout("#" + spec.getMetaId());
     entry.setCustom(spec); // Remember node in KEGG Structure for further references.
     // NOT here, because it may depend on other entries, that are not yet processed.
@@ -1001,12 +1067,21 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @param spec
    * @param reactionModifiers
    */
-  private void addToReactionModifierList(Entry entry, Species spec, List<Info<String, ModifierSpeciesReference>> reactionModifiers) {
+  private void addToReactionModifierList(Entry entry, SBase spec, List<Info<String, ModifierSpeciesReference>> reactionModifiers) {
     if (!entry.hasReaction() || spec == null) return;
     for (String reaction: entry.getReactions()) {
       // Q: Ist es richtig, sowohl dem Modifier als auch der species eine neue id zu geben? A: Nein, ist nicht richtig.
       // spec.setSBOTerm(ET_SpecialReactionCase2SBO);
-      ModifierSpeciesReference modifier = new ModifierSpeciesReference(spec);
+      ModifierSpeciesReference modifier = null;
+      if (spec instanceof Species) {
+        modifier = new ModifierSpeciesReference((Species)spec);
+      } else if (spec instanceof NamedSBase) {
+        modifier = new ModifierSpeciesReference(((NamedSBase)spec).getId());
+      }
+      if (modifier==null) {
+        log.warning("Can not add rection modifier: " + spec);
+        return;
+      }
       
       // Annotation is empty in ModifierSpeciesReference
       //Annotation tempAnnot = new Annotation("");

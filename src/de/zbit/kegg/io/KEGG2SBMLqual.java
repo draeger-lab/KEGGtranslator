@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import org.sbml.jsbml.AbstractSBase;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Model;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.ext.SBasePlugin;
@@ -55,8 +56,8 @@ import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.util.DatabaseIdentifiers;
-import de.zbit.util.Utils;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
+import de.zbit.util.Utils;
 
 /**
  * KEGG2SBML with a qualitative model (SBML L3 V1, using the SBML Qual extension,
@@ -75,7 +76,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   /**
    * Unique identifier to identify this Namespace/Extension.
    */
-  public static final String QUAL_NS_NAME = "qual";
+  public static final String QUAL_NS_NAME = QualConstant.shortLabel;
   
   /**
    * If false, the result will contain ONLY a qual model with
@@ -193,8 +194,9 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       if (s!=null && s instanceof Species) {
         QualitativeSpecies qs = createQualitativeSpeciesFromSpecies((Species) s, qualModel);
         e.setCustom(qs);
-      } else {
-        e.setCustom(null);
+        // Sinmply KEEP non-species objects (e.g., groups when using the group extension)
+//      } else {
+//        e.setCustom(null);
       }
     }
   }
@@ -213,8 +215,8 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     Entry eOne = p.getEntryForId(r.getEntry1());
     Entry eTwo = p.getEntryForId(r.getEntry2());
     
-    QualitativeSpecies qOne = eOne==null?null:(QualitativeSpecies) eOne.getCustom();
-    QualitativeSpecies qTwo = eTwo==null?null:(QualitativeSpecies) eTwo.getCustom();
+    NamedSBase qOne = eOne==null?null:(NamedSBase) eOne.getCustom();
+    NamedSBase qTwo = eTwo==null?null:(NamedSBase) eTwo.getCustom();
     
     if (qOne==null || qTwo==null) {
       // Happens, e.g. when remove_pw_references is true and there is a
@@ -226,11 +228,11 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     Transition t = qualModel.createTransition(NameToSId("tr"));
     
     // Input
-    Input in = t.createInput(NameToSId("in"), qOne, InputTransitionEffect.none); //TODO: is this correct?
+    Input in = t.createInput(NameToSId("in"), qOne.getId(), InputTransitionEffect.none); //TODO: is this correct?
     in.setMetaId("meta_" + in.getId());
     
     // Output
-    t.createOutput(NameToSId("out"), qTwo, OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
+    t.createOutput(NameToSId("out"), qTwo.getId(), OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
     
     //XXX: "function term" is intentionally not set in KEGG2X (info not provided).
     

@@ -283,7 +283,7 @@ public class CellDesignerUtils {
     // If this is a child of a group (complex) node, reflect this here.
     if (!isGroupNode && e.getParentNode()!=null) {
       Entry parent = e.getParentNode();
-      if (parent.getCustom()!=null) {
+      if (parent.getCustom()!=null && parent.getCustom() instanceof Species) {
         target.append(" complexSpeciesAlias=\"");
         target.append("cd_sa"+((Species)parent.getCustom()).getId());
         target.append('\"');

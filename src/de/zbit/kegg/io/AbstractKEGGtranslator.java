@@ -566,8 +566,8 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
         name.append(';'); // Add gene separator
       }
     
-      if (showFormulaForCompounds && infos[i].getFormula()!=null && infos[i].getFormula().length()>0) {
-        name.append(infos[i].getFormula());
+      if (showFormulaForCompounds && infos[i].getFormulaDirectOrFromSynonym(manager)!=null) {
+        name.append(infos[i].getFormulaDirectOrFromSynonym(manager));
       } else if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.INTELLIGENT_WITH_EC_NUMBERS) &&
           (!entry.getType().equals(EntryType.map)) && infos[i].isSetECcodes()){
         // If EC codes preferred, not is no PW-reference and has ECcodes, take them.
@@ -599,7 +599,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @see #getNameForEntry(Entry, KeggInfos...)
    */
   protected String getNameForEntry(Entry entry, String names) {
-    // Please note further: kegg splits compound-synonyms by ";", not ",". 
+    // Please note further: kegg splits compound-synonyms by ";", not ",".
+    if (entry.hasComponents()) {
+      System.out.println(names);
+    }
     
     if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.FIRST_NAME_FROM_KGML)) {
       String name = entry.getName();
@@ -697,12 +700,16 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     if (names!=null&&names.length()>0) {
       // From API
       return names;
-    } else { 
+    } else {
       // From KGML
       String name = entry.getName();
       if (entry.hasGraphics() && entry.getGraphics().getName()!=null &&
           entry.getGraphics().getName().length()>1) {
         name = entry.getGraphics().getName();
+      }
+      if (name.toLowerCase().startsWith("undefined")) {
+        // Rename group-nodes to "Group".
+        name = "Group";
       }
       return firstName(name);
     }

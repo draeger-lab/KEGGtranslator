@@ -580,4 +580,12 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	protected boolean considerReactions() {
 		return true;
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.zbit.kegg.io.KEGGtranslator#isGraphicalOutput()
+	 */
+	public boolean isGraphicalOutput() {
+	  // Keep reaction nodes
+	  return true;
+	}
 }
