@@ -22,6 +22,7 @@ package de.zbit.kegg.io;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -155,10 +156,10 @@ public class KEGG2SBMLLayoutExtension {
                 }
               }
             }
-            if (rct==null) {
+            if (rct == null) {
               // No match => take first without layout
-              for (Reaction r: rcts) {
-                if (layout.getReactionGlyph(r.getId())==null) {
+              for (Reaction r : rcts) {
+                if (layout.refersTo(r)) {
                   rct = r;
                   break;
                 }
@@ -176,31 +177,37 @@ public class KEGG2SBMLLayoutExtension {
             
             
             // Set X and Y on the reactionGlyph
-            if (!g.isDefaultPosition() && rct!=null && (layout.getReactionGlyph(rct.getId())==null || 
+            if (!g.isDefaultPosition() && (rct != null) && (!layout.refersTo(rct) || 
                 !g.getType().equals(GraphicsType.line))) {
               // LINE coordinate are much worse than rectangles. So prefer rectangles!
-              ReactionGlyph glyph = layout.getReactionGlyph(rct.getId());
-              if (glyph==null) {
-                glyph = layout.createReactionGlyph(rct.getId());
+              List<ReactionGlyph> listOfGlyphs = layout.findReactionGlyphs(rct.getId());
+              ReactionGlyph glyph;
+              if ((listOfGlyphs == null) || listOfGlyphs.isEmpty()) {
+            	  glyph = layout.createReactionGlyph(rct.getId());
+              } else {
+            	  glyph = listOfGlyphs.get(0);
               }
               glyph.unsetBoundingBox();
               BoundingBox box = glyph.createBoundingBox();
-              box.createPosition(g.getX(), g.getY(), 0);
+              box.createPosition(g.getX(), g.getY(), 0d);
             }
             
             // Set width and height on the species glyph
-            if (layout.getSpeciesGlyph(speciesId)==null || 
+            List<SpeciesGlyph> listOfSpecGlyphs = layout.findSpeciesGlyphs(speciesId); 
+            if ((listOfSpecGlyphs.isEmpty()) || 
                 !g.getType().equals(GraphicsType.line)) {
-              SpeciesGlyph sGlyph = layout.getSpeciesGlyph(speciesId);
-              if (sGlyph==null) {
+              SpeciesGlyph sGlyph;
+              if (listOfSpecGlyphs.isEmpty()) {
                 sGlyph = layout.createSpeciesGlyph(speciesId);
-              } 
+              } else {
+            	sGlyph = listOfSpecGlyphs.get(0);
+              }
               BoundingBox box = sGlyph.getBoundingBox();
-              if (box==null) {
+              if (box == null) {
                 box = sGlyph.createBoundingBox(); 
               }
               box.createDimensions(g.getWidth(), g.getHeight(), 1);
-              if (rct==null) {
+              if (rct == null) {
                 // X and Y are unused
                 box.createPosition(g.getX(), g.getY(), 0);
               }
@@ -214,13 +221,16 @@ public class KEGG2SBMLLayoutExtension {
              */
             
             // Create a Glyph with x/y/width/height for the species
-            SpeciesGlyph sGlyph = layout.getSpeciesGlyph(speciesId);
-            if (sGlyph==null) {
+        	List<SpeciesGlyph> listOfSpeciesGlyphs = layout.findSpeciesGlyphs(speciesId);
+            SpeciesGlyph sGlyph;
+            if (listOfSpeciesGlyphs.isEmpty()) {
               sGlyph = layout.createSpeciesGlyph(speciesId);
+            } else {
+              sGlyph = listOfSpeciesGlyphs.get(0);
             }
             
             BoundingBox box = sGlyph.getBoundingBox();
-            if (box==null) {
+            if (box == null) {
               box = sGlyph.createBoundingBox(); 
             }
             box.createDimensions(g.getWidth(), g.getHeight(), 1);
@@ -236,7 +246,6 @@ public class KEGG2SBMLLayoutExtension {
     
     // Add the total dimension
     layout.createDimensions(tracker.getWidth(), tracker.getHeight(), 1);
-    
   }
   
   /**
