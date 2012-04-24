@@ -46,32 +46,8 @@
   month = {May},
   year = {2011},
   note = {Specification available at \url{http://sbml.org/Community/Wiki/SBML\_Level\_3\_Proposals/Qualitative\_Models}.
-	Accessed 2012 Mar 22.},
+	Accessed 2012, March 22.},
   number = {Version 2.1},
-  owner = {wrzodek},
-  timestamp = {2012.03.22}
-}
-
-@MISC{SBMLl2,
-  author = {Michael Hucka and Stefan Hoops and Sarah Keating and Nicolas Le Nov\`{e}re and Sven Sahle and Darren J Wilkinson},
-  title = {Systems Biology Markup Language (SBML) Level 2: Structures and Facilities for Model Definitions.},
-  month = {December},
-  year = {2008},
-  note = {Specification available from Nature Precedings \url{http://dx.doi.org/10.1038/npre.2008.2715.1}.
-	Accessed 2012 Mar 22.},
-  number = {Version 4},
-  owner = {wrzodek},
-  timestamp = {2012.03.22}
-}
-
-@MISC{SBMLl3,
-  author = {Michael Hucka and Frank T. Bergmann and Stefan Hoops and Sarah Keating and Sven Sahle and James C. Schaff and Lucian P. Smith and Darren J. Wilkinson},
-  title = {The Systems Biology Markup Language (SBML): Language Specification for Level 3 Version 1 Core.},
-  month = {October},
-  year = {2010},
-  note = {Specification available from Nature Precedings \url{http://dx.doi.org/10.1038/npre.2010.4959.1}.
-	Accessed 2012 Mar 22.},
-  number = {Release 1},
   owner = {wrzodek},
   timestamp = {2012.03.22}
 }
@@ -310,7 +286,7 @@
   month = {October},
   year = {2011},
   note = {Software available from \url{http://www.ebi.ac.uk/compneur-srv/sbml/converters/SBMLtoBioPax.html}.
-	Accessed 2012 Mar 22.}
+	Accessed 2012, March 22.}
 }
 
 @ARTICLE{Finney2003,
@@ -427,7 +403,7 @@
 
 @ARTICLE{Gauges2006,
   author = {Ralph Gauges and Ursula Rost and Sven Sahle and Katja Wegner},
-  title = {A model diagram layout extension for SBML.},
+  title = {A model diagram layout extension for {SBML}.},
   journal = {Bioinformatics},
   year = {2006},
   volume = {22},
@@ -480,7 +456,7 @@
   author = {Stefan Hoops and Sven Sahle and Ralph Gauges and Christine Lee and
 	Jürgen Pahle and Natalia Simus and Mudita Singhal and Liang Xu and
 	Pedro Mendes and Ursula Kummer},
-  title = {COPASI--a COmplex PAthway SImulator.},
+  title = {{COPASI--a COmplex PAthway SImulator.}},
   journal = {Bioinformatics},
   year = {2006},
   volume = {22},
@@ -514,6 +490,78 @@
   url = {http://dx.doi.org/10.1093/bioinformatics/btl485}
 }
 
+@ARTICLE{Fasimu,
+  author = {Andreas Hoppe and Sabrina Hoffmann and Andreas Gerasch and Christoph
+	Gille and Hermann-Georg Holzhütter},
+  title = {{FASIMU}: flexible software for flux-balance computation series in
+	large metabolic networks.},
+  journal = {BMC Bioinformatics},
+  year = {2011},
+  volume = {12},
+  pages = {28},
+  abstract = {Flux-balance analysis based on linear optimization is widely used
+	to compute metabolic fluxes in large metabolic networks and gains
+	increasingly importance in network curation and structural analysis.
+	Thus, a computational tool flexible enough to realize a wide variety
+	of FBA algorithms and able to handle batch series of flux-balance
+	optimizations is of great benefit.We present FASIMU, a command line
+	oriented software for the computation of flux distributions using
+	a variety of the most common FBA algorithms, including the first
+	available implementation of (i) weighted flux minimization, (ii)
+	fitness maximization for partially inhibited enzymes, and (iii) of
+	the concentration-based thermodynamic feasibility constraint. It
+	allows batch computation with varying objectives and constraints
+	suited for network pruning, leak analysis, flux-variability analysis,
+	and systematic probing of metabolic objectives for network curation.
+	Input and output supports SBML. FASIMU can work with free (lp_solve
+	and GLPK) or commercial solvers (CPLEX, LINDO). A new plugin (faBiNA)
+	for BiNA allows to conveniently visualize calculated flux distributions.
+	The platform-independent program is an open-source project, freely
+	available under GNU public license at http://www.bioinformatics.org/fasimu
+	including manual, tutorial, and plugins.We present a flux-balance
+	optimization program whose main merits are the implementation of
+	thermodynamics as a constraint, batch series of computations, free
+	availability of sources, choice on various external solvers, and
+	the flexibility on metabolic objectives and constraints.},
+  doi = {10.1186/1471-2105-12-28},
+  institution = {Institute of Biochemistry, University Medicine Charité Berlin, Seestr,
+	73, 13347 Berlin, Germany. hoppe@bioinformatics.org},
+  keywords = {Algorithms; Computational Biology, methods; Computer Simulation; Metabolic
+	Networks and Pathways; Models, Biological; Software},
+  owner = {wrzodek},
+  pii = {1471-2105-12-28},
+  pmid = {21255455},
+  timestamp = {2012.04.23},
+  url = {http://dx.doi.org/10.1186/1471-2105-12-28}
+}
+
+@MISC{SBMLgroups,
+  author = {Michael Hucka},
+  title = {Groups Proposal.},
+  month = {October},
+  year = {2009},
+  note = {Specification available from \url{http://sbml.org/Community/Wiki/SBML_Level_3_Proposals/Groups_Proposal_%282009-10%29}.
+	Accessed 2012, April 23.},
+  number = {Version 2},
+  owner = {wrzodek},
+  timestamp = {2012.03.22}
+}
+
+@MISC{SBMLl3,
+  author = {Michael Hucka and Frank T. Bergmann and Stefan Hoops and Sarah Keating
+	and Sven Sahle and James C. Schaff and Lucian P. Smith and Darren
+	J. Wilkinson},
+  title = {{The Systems Biology Markup Language (SBML): Language Specification
+	for Level 3 Version 1 Core}.},
+  month = {October},
+  year = {2010},
+  note = {Specification available from Nature Precedings \url{http://dx.doi.org/10.1038/npre.2010.4959.1}.
+	Accessed 2012, March 22.},
+  number = {Release 1},
+  owner = {wrzodek},
+  timestamp = {2012.03.22}
+}
+
 @ARTICLE{Hucka2003,
   author = {M. Hucka and A. Finney and H. M. Sauro and H. Bolouri and J. C. Doyle
 	and H. Kitano and A. P. Arkin and B. J. Bornstein and D. Bray and
@@ -526,7 +574,7 @@
 	T. Sakurada and J. C. Schaff and B. E. Shapiro and T. S. Shimizu
 	and H. D. Spence and J. Stelling and K. Takahashi and M. Tomita and
 	J. Wagner and J. Wang and S. B. M. L. Forum},
-  title = {{The systems biology markup language (SBML): a medium for representation
+  title = {{The Systems Biology Markup Language (SBML): a medium for representation
 	and exchange of biochemical network models.}},
   journal = {Bioinformatics},
   year = {2003},
@@ -553,6 +601,20 @@
   owner = {buechel},
   pmid = {12611808},
   timestamp = {2012.03.20}
+}
+
+@MISC{SBMLl2,
+  author = {Michael Hucka and Stefan Hoops and Sarah Keating and Nicolas Le Nov\`{e}re
+	and Sven Sahle and Darren J Wilkinson},
+  title = {{Systems Biology Markup Language (SBML) Level 2: Structures and Facilities
+	for Model Definitions}.},
+  month = {December},
+  year = {2008},
+  note = {Specification available from Nature Precedings \url{http://dx.doi.org/10.1038/npre.2008.2715.1}.
+	Accessed 2012, March 22.},
+  number = {Version 4},
+  owner = {wrzodek},
+  timestamp = {2012.03.22}
 }
 
 @ARTICLE{Juty2012,
@@ -678,20 +740,24 @@
 }
 
 @MANUAL{KGML,
-  title = {{KEGG Markup Language [http://www.genome.jp/kegg/xml/docs]}},
+  title = {{KEGG Markup Language}},
   author = {{KEGG team}},
   month = {April},
   year = {2010},
+  note = {Specification available from the {KEGG} homepage at \url{http://www.kegg.jp/kegg/xml/docs/}.
+	Accessed 2012, April 23.},
   owner = {wrzodek},
   timestamp = {2011.01.19},
   url = {http://www.genome.jp/kegg/xml/docs/}
 }
 
 @MANUAL{KEGGapi,
-  title = {{KEGG API} [{http://www.genome.jp/kegg/soap/}]},
+  title = {{KEGG API}},
   author = {{KEGG team}},
-  month = {AUG},
+  month = {August},
   year = {2007},
+  note = {Available from the {KEGG} homepage at \url{http://www.kegg.jp/kegg/soap/}.
+	Accessed 2012, April 23.},
   owner = {wrzodek},
   timestamp = {2011.01.19},
   url = {http://www.genome.jp/kegg/soap/}
@@ -946,7 +1012,7 @@
   url = {http://dx.doi.org/10.1093/nar/gkn653}
 }
 
-@ARTICLE{Smoot2011a,
+@ARTICLE{Cytoscape,
   author = {Michael E Smoot and Keiichiro Ono and Johannes Ruscheinski and Peng-Liang
 	Wang and Trey Ideker},
   title = {Cytoscape 2.8: new features for data integration and network visualization.},
@@ -1001,9 +1067,9 @@
 }
 
 @ARTICLE{Wrzodek2011,
-  author = {Clemens Wrzodek and Andreas Dräger and Andreas Zell},
-  title = {KEGGtranslator: visualizing and converting the KEGG PATHWAY database
-	to various formats.},
+  author = {Clemens Wrzodek and Andreas Dr\"{a}ger and Andreas Zell},
+  title = {{KEGGtranslator: visualizing and converting the KEGG PATHWAY database
+	to various formats}.},
   journal = {Bioinformatics},
   year = {2011},
   volume = {27},
