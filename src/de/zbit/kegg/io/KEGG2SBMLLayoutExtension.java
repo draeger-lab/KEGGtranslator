@@ -194,15 +194,15 @@ public class KEGG2SBMLLayoutExtension {
               box.createPosition(g.getX(), g.getY(), 0d);
             }            
             // Set width and height on the species glyph
-            List<SpeciesGlyph> listOfSpecGlyphs = layout.findSpeciesGlyphs(speciesId); 
-            if (listOfSpecGlyphs.isEmpty() && 
-                !g.getType().equals(GraphicsType.line)) {
+            // Multiple species glyphs are permitted for one species!
+//            List<SpeciesGlyph> listOfSpecGlyphs = layout.findSpeciesGlyphs(speciesId); 
+//            if (listOfSpecGlyphs.isEmpty()) {
               SpeciesGlyph sGlyph;
-              if (listOfSpecGlyphs.isEmpty()) {
+//              if (listOfSpecGlyphs.isEmpty()) {
                 sGlyph = layout.createSpeciesGlyph(speciesId);
-              } else {
-                sGlyph = listOfSpecGlyphs.get(0);
-              }
+//              } else {
+//                sGlyph = listOfSpecGlyphs.get(0);
+//              }
               BoundingBox box = sGlyph.getBoundingBox();
               if (box == null) {
                 box = sGlyph.createBoundingBox(); 
@@ -212,7 +212,7 @@ public class KEGG2SBMLLayoutExtension {
                 // X and Y are unused
                 box.createPosition(g.getX(), g.getY(), 0);
               }
-            }
+//            }
             
           } else {
             
@@ -222,13 +222,14 @@ public class KEGG2SBMLLayoutExtension {
              */
             
             // Create a Glyph with x/y/width/height for the species
-        	List<SpeciesGlyph> listOfSpeciesGlyphs = layout.findSpeciesGlyphs(speciesId);
+//            List<SpeciesGlyph> listOfSpeciesGlyphs = layout.findSpeciesGlyphs(speciesId);
+            // Multiple species glyphs are permitted for one species!
             SpeciesGlyph sGlyph;
-            if (listOfSpeciesGlyphs.isEmpty()) {
+//            if (listOfSpeciesGlyphs.isEmpty()) {
               sGlyph = layout.createSpeciesGlyph(speciesId);
-            } else {
-              sGlyph = listOfSpeciesGlyphs.get(0);
-            }
+//            } else {
+//              sGlyph = listOfSpeciesGlyphs.get(0);
+//            }
             
             BoundingBox box = sGlyph.getBoundingBox();
             if (box == null) {

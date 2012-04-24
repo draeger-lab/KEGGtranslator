@@ -35,6 +35,7 @@ import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.ext.SBasePlugin;
+import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.InputTransitionEffect;
 import org.sbml.jsbml.ext.qual.OutputTransitionEffect;
@@ -68,6 +69,12 @@ import de.zbit.util.Utils;
  * @version $Rev$
  */
 public class KEGG2SBMLqual extends KEGG2jSBML {
+  /**
+   * This prefix is prepended to all entities in the qualitative model
+   * (species, groups, etc).
+   */
+  private static final String QUAL_SPECIES_PREFIX = "qual_";
+
   /**
    * Qual Namespace definition URL.
    */
@@ -194,6 +201,9 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       if (s!=null && s instanceof Species) {
         QualitativeSpecies qs = createQualitativeSpeciesFromSpecies((Species) s, qualModel);
         e.setCustom(qs);
+      } else if (s!=null && s instanceof Group) {
+        Group updatedReferences = createQualitativeGroupFromGroup((Group) s);
+        e.setCustom(updatedReferences);
         // Sinmply KEEP non-species objects (e.g., groups when using the group extension)
 //      } else {
 //        e.setCustom(null);
@@ -326,7 +336,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * @return
    */
   private QualitativeSpecies createQualitativeSpeciesFromSpecies(Species species, QualitativeModel qualModel) {
-    String id = "qual_" + species.getId();
+    String id = QUAL_SPECIES_PREFIX + species.getId();
     QualitativeSpecies qs = qualModel.getQualitativeSpecies(id);
     if(qs == null){
       qs = qualModel.createQualitativeSpecies(id, "meta_" + id, species);
@@ -334,6 +344,25 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     }
     return qs;  
   }
+  
+  /**
+   * 
+   * @param group
+   * @return
+   */
+  private Group createQualitativeGroupFromGroup(Group group) {
+    String id = QUAL_SPECIES_PREFIX + group.getId();
+    // This will create a new separate group for qual and
+    // will later result in two groups. Unfortunately, no
+    // one knows which one to use for the quantiative and which
+    // for the qualitative model => Better append qual compoents
+    // to the exisint group!
+    //return KEGG2SBMLGroupExtension.cloneGroup(id, group, QUAL_SPECIES_PREFIX);
+    
+    KEGG2SBMLGroupExtension.cloneGroupComponents(group, QUAL_SPECIES_PREFIX);
+    return group; 
+  }
+  
   
   /**
    * Accepts values smaller than or equal to zero to unset the SBO term.

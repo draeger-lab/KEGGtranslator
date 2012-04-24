@@ -490,7 +490,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     ArrayList<Node> parentGroupNodes = new ArrayList<Node>();
     ArrayList<List<Integer>> groupNodeChildren = new ArrayList<List<Integer>>();
     HierarchyManager hm = graph.getHierarchyManager();
-    if (hm==null) hm = new HierarchyManager(graph);
+    if (hm==null) {
+      hm = new HierarchyManager(graph);
+      graph.setHierarchyManager(hm);
+    }
+    
     
     // Initialize a progress bar.
     initProgressBar(p,showProgressForRelations,false);

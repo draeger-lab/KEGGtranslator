@@ -21,14 +21,17 @@
 package de.zbit.kegg.io;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.sbml.jsbml.AbstractSBase;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.groups.GroupModel;
+import org.sbml.jsbml.ext.groups.Member;
 import org.sbml.jsbml.xml.parsers.GroupsParser;
 
 import de.zbit.kegg.parser.pathway.Entry;
@@ -62,31 +65,7 @@ public class KEGG2SBMLGroupExtension {
    * @return
    */
   public static Group createGroup(Pathway p, Model model, Entry entry) {
-    return createGroup(p, model.getParent(), model, entry);
-  }
-  
-  /**
-   * Create a group from an entry. This is only useful if
-   * {@link Entry#hasComponents()}.
-   * 
-   * @param p
-   * @param doc
-   * @param model
-   * @param entry
-   * @return
-   */
-  public static Group createGroup(Pathway p, SBMLDocument doc, Model model, Entry entry) {
-    // Make sure extension is available
-    // NOTE: this should be called every time! No need to check if it is already contained.
-    doc.addNamespace(GROUP_NS_NAME, "xmlns", GROUP_NS);
-    doc.getSBMLDocumentAttributes().put(GROUP_NS_NAME + ":required", "true");
-    
-    // Create group model
-    GroupModel groupModel = (GroupModel) model.getExtension(GROUP_NS);
-    if (groupModel==null) {
-      groupModel = new GroupModel(model);
-      model.addExtension(GROUP_NS, groupModel);
-    }
+    GroupModel groupModel = getGroupModel(model);
     
     // Get all group-members
     List<String> componentSpeciesIDs = new ArrayList<String>();
@@ -109,5 +88,90 @@ public class KEGG2SBMLGroupExtension {
     return g;
   }
   
+
+  /**
+   * Clones the given group <code>g</code>
+   * @param id the id of the new group
+   * @param g
+   * @param prefixForMembers this will be prepended to all member symbols
+   * in the new group.
+   * @return the nre {@link Group}.
+   */
+  public static Group cloneGroup(String id, Group g, String prefixForMembers) {
+    if (g==null) return null;
+    
+    GroupModel groupModel = getGroupModel(g);
+    
+    // Create group and add all members
+    Group gNew = new Group(g);
+    gNew.setId(id);
+    gNew.setMetaId("meta_" + id);
+    gNew.unsetListOfMembers();
+    
+    
+    // Add all members with new prefix
+    for (Member m: g.getListOfMembers()) {
+      String symbol = m.getSymbol();
+      if (prefixForMembers!=null) {
+        symbol = prefixForMembers + symbol;
+      }
+      gNew.createMember(symbol);
+    }
+    
+    groupModel.addGroup(gNew);
+    return gNew;
+  }
+  
+  /**
+   * Duplicates all members of the given group <code>g</code> and
+   * adds a prefix to all duplicated members.
+   * @param g
+   * @param prefixForMembers
+   */
+  public static void cloneGroupComponents(Group g, String prefixForMembers) {
+    if (g==null) return;
+    
+    // Create group and add all members
+    List<String> symobls = new LinkedList<String>();
+    for (Member m: g.getListOfMembers()) {
+      symobls.add(m.getSymbol());
+    }
+    
+    // Add all members with new prefix
+    for (String symbol: symobls) {
+      if (prefixForMembers!=null) {
+        if (!symbol.startsWith(prefixForMembers)) {
+          symbol = prefixForMembers + symbol;
+          g.createMember(symbol);
+        }
+      }
+    }
+    
+    return;
+  }
+
+  /**
+   * Get or create the {@link GroupModel}.
+   * @param g any {@link AbstractSBase}.
+   * @return
+   */
+  private static GroupModel getGroupModel(AbstractSBase g) {
+    Model model = g.getModel();
+    SBMLDocument doc = model.getParent();
+    
+    // Make sure extension is available
+    // NOTE: this should be called every time! No need to check if it is already contained.
+    doc.addNamespace(GROUP_NS_NAME, "xmlns", GROUP_NS);
+    doc.getSBMLDocumentAttributes().put(GROUP_NS_NAME + ":required", "true");
+    
+    // Create group model
+    GroupModel groupModel = (GroupModel) model.getExtension(GROUP_NS);
+    if (groupModel==null) {
+      groupModel = new GroupModel(model);
+      model.addExtension(GROUP_NS, groupModel);
+    }
+    
+    return groupModel;
+  }
   
 }

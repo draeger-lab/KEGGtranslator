@@ -600,10 +600,6 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   protected String getNameForEntry(Entry entry, String names) {
     // Please note further: kegg splits compound-synonyms by ";", not ",".
-    if (entry.hasComponents()) {
-      System.out.println(names);
-    }
-    
     if (nameToAssign.equals(KEGGtranslatorOptions.NODE_NAMING.FIRST_NAME_FROM_KGML)) {
       String name = entry.getName();
       if (entry.hasGraphics() && entry.getGraphics().getName()!=null &&
