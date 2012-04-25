@@ -56,15 +56,18 @@ colorlinks=false}
 
 
 \begin{abstract}
-\TODO{Mit dem abstract bin ich selbst sehr unzufrieden -- Bitte Verberrungsvorschläge bringen.}
+%Using KEGG pathways as models is a long-lasting desire in systems biology. Many of those pathways can be used as foundations for initial structural modeling approaches. But the KGML-formatted KEGG pathways are primarily thought for visualization and thus, incomplete and erroneous when directly converted to systems biology models. Many things have to be considered and many processing steps are required, prior to the conversion into standardized community pathway formats.
 
+%We here propose methods to convert KEGG pathways to initial structural models in SBML (level 2 and 3) and BioPAX (level 2 and 3). Further, multiple aspects of KEGG and KGML files are described, together with their implications on the resulting models. We show that correct translations to SBML without loss of information can only be done with SBML level~3, using the recently proposed qualitative models (qual) and groups extensions.
 
+The KEGG PATHWAY database provides a plethora of pathways for a diversity of organisms. 
+All pathway entries can be connected to the other KEGG databases, like KEGG ENZYME, KEGG GENE, etc.
+Subsequently, the pathways contain an enormous amount of information and can be used as foundations for initial structural modeling approaches.
+But the KGML-formatted KEGG pathways are primarily thought for visualization and thus, the direct conversion of them into systems biology models would produce incomplete and erroneous models.
 
-Using KEGG pathways as models is a long-lasting desire in systems biology. Many of those pathways can be used as foundations for initial structural modeling approaches. But the KGML-formatted KEGG pathways are primarily thought for visualization and thus, incomplete and erroneous when directly converted to systems biology models. Many things have to be considered and many processing steps are required, prior to the conversion into standardized community pathway formats.
-
-We here propose methods to convert KEGG pathways to initial structural models in SBML (level 2 and 3) and BioPAX (level 2 and 3). Further, multiple aspects of KEGG and KGML files are described, together with their implications on the resulting models. We show that correct translations to SBML without loss of information can only be done with SBML level~3, using the recently proposed qualitative models (qual) and groups extensions.
-
-
+Here, we propose a method for preprocessing and converting KEGG pathways into initial structural models in the standardized community pathway formats SBML (level 2 and 3) and BioPAX (level 2 and 3). 
+The preprocessing step comprises KGML-content fixing, atom balance check of reactions, and augmenting the pathway information content with information from various other databases, such as Entrez Gene, Omim, ChEBI, etc.
+Furthermore, we showed that the conversion from KEGG into BioPAX is very handy, while the translation into SBML can only be done without loss of information using SBML level~3 including the recently proposed qualitative models and groups extensions.
 
 % Es ist wünschenswert KEGG pathways als modelle in der systembiologie zu verwenden.
 % Hierbei gibt es viele schwierigkeiten, [andere (konnten) diese gar nicht überwinden]
