@@ -131,9 +131,11 @@ public class KEGG2SBMLLayoutExtension {
       Object s = e.getCustom();
       if (s!=null && e.hasGraphics()) {
         Graphics g = e.getGraphics();
-        if (g.getType().equals(GraphicsType.line)) {
+        boolean isLineGraphic = g.getType().equals(GraphicsType.line);
+        if (isLineGraphic) {
           // Line-graphics are nonsense.
-          continue;
+          //continue;
+          // ... but sometimes better than nothing.
         }
         tracker.track(g.getX(), g.getY(), g.getWidth(), g.getHeight());
         // TODO: Are lines (also in mutliple graphics tags) possible?
@@ -180,7 +182,9 @@ public class KEGG2SBMLLayoutExtension {
             //Utils.removeFromMapOfSets(enzyme2rct, rct, speciesId);
             
             // Set X and Y on the reactionGlyph
-            if (!g.isDefaultPosition() && (rct != null) && (!layout.containsGlyph(rct))) {
+            boolean positionAttributesUsed=false;
+            if (!g.isDefaultPosition() && (rct != null) && (!layout.containsGlyph(rct))
+                && !isLineGraphic) {
               // LINE coordinate are much worse than rectangles. So prefer rectangles!
               List<ReactionGlyph> listOfGlyphs = layout.findReactionGlyphs(rct.getId());
               ReactionGlyph glyph;
@@ -192,6 +196,7 @@ public class KEGG2SBMLLayoutExtension {
               glyph.unsetBoundingBox();
               BoundingBox box = glyph.createBoundingBox();
               box.createPosition(g.getX(), g.getY(), 0d);
+              positionAttributesUsed=true;
             }            
             // Set width and height on the species glyph
             // Multiple species glyphs are permitted for one species!
@@ -208,9 +213,12 @@ public class KEGG2SBMLLayoutExtension {
                 box = sGlyph.createBoundingBox(); 
               }
               box.createDimensions(g.getWidth(), g.getHeight(), 1);
-              if (rct == null) {
+              if (!positionAttributesUsed && !g.isDefaultPosition()) {
                 // X and Y are unused
-                box.createPosition(g.getX(), g.getY(), 0);
+                if (!box.isSetPosition() || !isLineGraphic) {
+                  // Line values are only better than nothing.
+                  box.createPosition(g.getX(), g.getY(), 0);
+                }
               }
 //            }
             
@@ -237,7 +245,10 @@ public class KEGG2SBMLLayoutExtension {
             }
             box.createDimensions(g.getWidth(), g.getHeight(), 1);
             if (!g.isDefaultPosition()) {
-              box.createPosition(g.getX(), g.getY(), 0);
+              if (!box.isSetPosition() || !isLineGraphic) {
+                // Line values are only better than nothing.
+                box.createPosition(g.getX(), g.getY(), 0);
+              }
             }
           }
 
