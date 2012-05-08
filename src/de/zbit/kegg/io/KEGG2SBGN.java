@@ -79,7 +79,6 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 
 	private Sbgn sbgn = objectFactory.createSbgn();
 	private org.sbgn.bindings.Map map = objectFactory.createMap();
-	private HashMap<Glyph, Integer> glyphNamesForPorts = new HashMap<Glyph, Integer>();
 	private HashMap<Glyph, String> glyphNamesForGlyphStates = new HashMap<Glyph, String>();
 	private int id = 0;
 
@@ -387,7 +386,6 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		// name the glyph and add the id globally
 		glyph.setId("glyph" + id++);
 		// put the glyph in the hashmap with the number of the next subglyph
-		glyphNamesForPorts.put(glyph, 1);
 		glyphNamesForGlyphStates.put(glyph, "a");
 		return glyph;
 	}
@@ -418,18 +416,16 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	 * number
 	 * 
 	 * @param glyph
+	 * @param input define if this is an input port
 	 * @return {@link Port}
 	 */
-	private Port createPortForGlyph(Glyph glyph) {
+	private Port createPortForGlyph(Glyph glyph, boolean input) {
 		// create a new port
 		// Port port = objectFactory.createGlyphPort(); ***DOESNT WORK***
 		Port port = objectFactory.createPort();
-		// get the number of the next subglyph from the hashmap
-		int subId = glyphNamesForPorts.get(glyph);
+		
 		// create the proper name for the port and set it
-		port.setId(glyph.getId() + "." + subId);
-		// increase the glyphs subglyphs
-		glyphNamesForPorts.put(glyph, subId++);
+		port.setId(glyph.getId() + "." + (input?"in":"out") + "." + (glyph.getPort().size()+1));
 		
 		glyph.getPort().add(port);
 		return port;
@@ -477,10 +473,8 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		process.setClazz(type.toString());
 		
 		// Two port elements are required for process nodes
-		Port portIn = createPortForGlyph(process);
-		Port portOut = createPortForGlyph(process);
-		process.getPort().add(portIn);
-		process.getPort().add(portOut);
+		Port portIn = createPortForGlyph(process, true);
+		Port portOut = createPortForGlyph(process, false);
 		
 		// make sure that the sources and targets contain at least 1 element
 		if(sources.size() != 0 && targets.size() != 0) {
