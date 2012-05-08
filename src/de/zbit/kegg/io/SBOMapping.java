@@ -86,7 +86,10 @@ public class SBOMapping {
    * SBO Term for EntryType Other.
    */
   public static int ET_Other2SBO = 285; // 285="material entity of unspecified nature"
-  
+  /**
+   * SBO Term for EntryType emptySet.
+   */
+  public static int ET_EmptySet2SBO = 291; // 291="empty set"
   
   
   
@@ -197,6 +200,8 @@ public class SBOMapping {
         return GT_RNA2SBO;
       } else if (type.equals(EntryTypeExtended.rna_region)) {
         return GT_RNARegion2SBO;
+      } else if (type.equals(EntryTypeExtended.emptySet)) {
+          return ET_EmptySet2SBO;
       } else {
         // GeneType is NOT mandatory and just additionally
         // to the entryType!
