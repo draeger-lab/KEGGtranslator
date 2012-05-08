@@ -37,7 +37,6 @@ import org.sbgn.bindings.Arc.End;
 import org.sbgn.bindings.Arc.Start;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
-import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.Glyph.Port;
 import org.sbgn.bindings.Glyph.State;
 import org.sbgn.bindings.Label;
@@ -108,7 +107,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		// for every reaction in the pathway
 		if (this.considerReactions())
 			handleAllReactions(p);
-
+		
 		return sbgn;
 	}
 
@@ -134,7 +133,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				g.setClone(objectFactory.createGlyphClone());
 				// get the already in use glyph
 				Entry en = handlesEntries.get(e.getName());
-				// check if the is legit
+				// check if the glyph is legit
 				if (en.getCustom() != null && ((Glyph) en.getCustom()).getClone() == null) {
 					// if so make it a clone too
 					((Glyph) en.getCustom()).setClone(objectFactory.createGlyphClone());
@@ -150,7 +149,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			// create a bbox and a label
 			Bbox bb = objectFactory.createBbox();
 			Label l = objectFactory.createLabel();
-
+			
 			List<KeggInfos> keggInfos = new LinkedList<KeggInfos>();
 
 			// call KeggInfos for the correct name and additional informations
@@ -162,12 +161,14 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			}
 
 			String name = getNameForEntry(e, keggInfos.toArray(new KeggInfos[0]));
-
-			// define the bounding box
-			bb.setX(e.getGraphics().getX());
-			bb.setY(e.getGraphics().getY());
-			bb.setW(e.getGraphics().getWidth());
-			bb.setH(e.getGraphics().getHeight());
+			
+			if(e.hasGraphics()){
+				// define the bounding box
+				bb.setX(e.getGraphics().getX());
+				bb.setY(e.getGraphics().getY());
+				bb.setW(e.getGraphics().getWidth());
+				bb.setH(e.getGraphics().getHeight());
+			}
 
 			// set the label name according to the KeggInfos fetched
 			l.setText(name);
@@ -213,93 +214,97 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			Glyph source = (Glyph) one.getCustom();
 			Glyph target = (Glyph) two.getCustom();
 
-			// for every subtype of the relation
-			for (int i = 0; i < relation.getSubtypes().size(); i++) {
-				// get the name of the relation subtype
-				String currentRelation = relation.getSubtypes().get(i).getName();
-				
-				// create a glyphstate
-				State state = objectFactory.createGlyphState();
-				// create a new glyph
-				Glyph StateGlyph = createStateGlypheWithID(target);
-				
-				// check the possible kegg subtypes and translate them into arcs
-				if(currentRelation.equalsIgnoreCase(SubType.GLYCOSYLATION)) {
-					// add "G" to the product
-					state.setValue("G");
-					// set the new glyph as state glyph
-					StateGlyph.setState(state);
-					// add it to the glyphlist from the target
-					target.getGlyph().add(StateGlyph);
-					// after the change set the custom again
-					two.setCustom(target);
-					// create an edge between those two entries
-					createLink(source, target);
-				} else if(currentRelation.equalsIgnoreCase(SubType.METHYLATION)){
-					// add "Me" to the product
-					state.setValue("Me");
-					// set the new glyph as state glyph
-					StateGlyph.setState(state);
-					// add it to the glyphlist from the target
-					target.getGlyph().add(StateGlyph);
-					// after the change set the custom again
-					two.setCustom(target);
-					// create an edge between those two entries
-					createLink(source, target);
-				} else if(currentRelation.equalsIgnoreCase(SubType.PHOSPHORYLATION)){
-					// add "P" to the product
-					state.setValue("P");
-					// set the new glyph as state glyph
-					StateGlyph.setState(state);
-					// add it to the glyphlist from the target
-					target.getGlyph().add(StateGlyph);
-					// after the change set the custom again
-					two.setCustom(target);
-					// create an edge between those two entries
-					createLink(source, target);
-				} else if(currentRelation.equalsIgnoreCase(SubType.UBIQUITINATION)){
-					// add "Ub" to the product
-					state.setValue("Ub");
-					// set the new glyph as state glyph
-					StateGlyph.setState(state);
-					// add it to the glyphlist from the target
-					target.getGlyph().add(StateGlyph);
-					// after the change set the custom again
-					two.setCustom(target);
-					// create an edge between those two entries
-					createLink(source, target);
-				} else if(currentRelation.equalsIgnoreCase(SubType.DEPHOSPHORYLATION)){
-					// add nothing to the product
-					state.setValue("");
-					// set the new glyph as state glyph
-					StateGlyph.setState(state);
-					// add it to the glyphlist from the target
-					target.getGlyph().add(StateGlyph);
-					// after the change set the custom again
-					two.setCustom(target);
-					// create an edge between those two entries
-					createLink(source, target);
-				} else if(currentRelation.equalsIgnoreCase(SubType.DISSOCIATION)){
-					ArrayList<Glyph> sources = new ArrayList<Glyph>();
-					sources.add(source);
-					ArrayList<Glyph> targets = new ArrayList<Glyph>();
-					targets.add(target);
-					ArrayList<Glyph> reactionModifiers = new ArrayList<Glyph>();
-					// create an edge with a process glyph of the type dissociation
-					createEdgeWithProcessGlyphAndPorts(sources, targets, GlyphType.dissociation, reactionModifiers);
-				} else if(currentRelation.equalsIgnoreCase(SubType.ASSOCIATION)){
-					ArrayList<Glyph> sources = new ArrayList<Glyph>();
-					sources.add(source);
-					ArrayList<Glyph> targets = new ArrayList<Glyph>();
-					targets.add(target);
-					ArrayList<Glyph> reactionModifiers = new ArrayList<Glyph>();
-					// create an edge with a process glyph of the type association
-					createEdgeWithProcessGlyphAndPorts(sources, targets, GlyphType.association, reactionModifiers);
-				} else if(currentRelation.equalsIgnoreCase(SubType.COMPOUND)){
-					/** TODO: create a triangle or something like this **/
-				} else {
-					createLink(source, target);
+			// check if the relation has subtypes
+			if(relation.isSetSubTypes() && source != null && target != null){
+				// for every subtype of the relation
+				for (int i = 0; i < relation.getSubtypes().size(); i++) {
+					// get the name of the relation subtype
+					String currentRelation = relation.getSubtypes().get(i).getName();
+					
+					// create a glyphstate
+					State state = objectFactory.createGlyphState();
+					// create a new glyph
+					Glyph StateGlyph = createStateGlypheWithID(target);
+					
+					// check the possible kegg subtypes and translate them into arcs
+					if(currentRelation.equalsIgnoreCase(SubType.GLYCOSYLATION)) {
+						// add "G" to the product
+						state.setValue("G");
+						// set the new glyph as state glyph
+						StateGlyph.setState(state);
+						// add it to the glyphlist from the target
+						target.getGlyph().add(StateGlyph);
+						// after the change set the custom again
+						two.setCustom(target);
+						// create an edge between those two entries
+						createLink(source, target);
+					} else if(currentRelation.equalsIgnoreCase(SubType.METHYLATION)){
+						// add "Me" to the product
+						state.setValue("Me");
+						// set the new glyph as state glyph
+						StateGlyph.setState(state);
+						// add it to the glyphlist from the target
+						target.getGlyph().add(StateGlyph);
+						// after the change set the custom again
+						two.setCustom(target);
+						// create an edge between those two entries
+						createLink(source, target);
+					} else if(currentRelation.equalsIgnoreCase(SubType.PHOSPHORYLATION)){
+						// add "P" to the product
+						state.setValue("P");
+						// set the new glyph as state glyph
+						StateGlyph.setState(state);
+						// add it to the glyphlist from the target
+						target.getGlyph().add(StateGlyph);
+						// after the change set the custom again
+						two.setCustom(target);
+						// create an edge between those two entries
+						createLink(source, target);
+					} else if(currentRelation.equalsIgnoreCase(SubType.UBIQUITINATION)){
+						// add "Ub" to the product
+						state.setValue("Ub");
+						// set the new glyph as state glyph
+						StateGlyph.setState(state);
+						// add it to the glyphlist from the target
+						target.getGlyph().add(StateGlyph);
+						// after the change set the custom again
+						two.setCustom(target);
+						// create an edge between those two entries
+						createLink(source, target);
+					} else if(currentRelation.equalsIgnoreCase(SubType.DEPHOSPHORYLATION)){
+						// add nothing to the product
+						state.setValue("");
+						// set the new glyph as state glyph
+						StateGlyph.setState(state);
+						// add it to the glyphlist from the target
+						target.getGlyph().add(StateGlyph);
+						// after the change set the custom again
+						two.setCustom(target);
+						// create an edge between those two entries
+						createLink(source, target);
+					} else if(currentRelation.equalsIgnoreCase(SubType.DISSOCIATION)){
+						ArrayList<Glyph> sources = new ArrayList<Glyph>();
+						sources.add(source);
+						ArrayList<Glyph> targets = new ArrayList<Glyph>();
+						targets.add(target);
+						ArrayList<Glyph> reactionModifiers = new ArrayList<Glyph>();
+						// create an edge with a process glyph of the type dissociation
+						createEdgeWithProcessGlyphAndPorts(sources, targets, GlyphType.dissociation, reactionModifiers);
+					} else if(currentRelation.equalsIgnoreCase(SubType.ASSOCIATION)){
+						ArrayList<Glyph> sources = new ArrayList<Glyph>();
+						sources.add(source);
+						ArrayList<Glyph> targets = new ArrayList<Glyph>();
+						targets.add(target);
+						ArrayList<Glyph> reactionModifiers = new ArrayList<Glyph>();
+						// create an edge with a process glyph of the type association
+						createEdgeWithProcessGlyphAndPorts(sources, targets, GlyphType.association, reactionModifiers);
+					} else if(currentRelation.equalsIgnoreCase(SubType.COMPOUND)){
+						/** TODO: create a triangle or something like this **/
+					}
 				}
+			} else {
+				// there is no subtype
+				createLink(source, target);
 			}
 		}
 	}
@@ -316,7 +321,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			ArrayList<Glyph> sources = new ArrayList<Glyph>();
 			ArrayList<Glyph> targets = new ArrayList<Glyph>();
 			ArrayList<Glyph> reactionModifiers = new ArrayList<Glyph>();
-
+			
 			// Substrates
 			for (ReactionComponent rc : reaction.getSubstrates()) {
 				// get the entry for the reactioncomponent
@@ -327,7 +332,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				if(substrateGlyph != null)
 					sources.add(substrateGlyph);
 				else {
-					String[] args = {substrate.getName(), String.valueOf(substrate.getId())};
+					Object[] args = {substrate.getName(), String.valueOf(substrate.getId())};
 					log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
 				}
 			}
@@ -342,7 +347,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				if(productGlyph != null)
 					targets.add(productGlyph);
 				else {
-					String[] args = {product.getName(), String.valueOf(product.getId())};
+					Object[] args = {product.getName(), String.valueOf(product.getId())};
 					log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
 				}
 			}
@@ -356,14 +361,13 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				if(enzymeGlyph != null)
 					reactionModifiers.add(enzymeGlyph);
 				else {
-					String[] args = {ec.getName(), String.valueOf(ec.getId())};
+					Object[] args = {ec.getName(), String.valueOf(ec.getId())};
 					log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
 				}
 			}
 			
 			// do the magic!
 			createEdgeWithProcessGlyphAndPorts(sources, targets, GlyphType.process, reactionModifiers);
-
 		}
 	}
 
@@ -413,7 +417,8 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	 */
 	private Port createPortForGlyph(Glyph glyph) {
 		// create a new port
-		Port port = objectFactory.createGlyphPort();
+		// Port port = objectFactory.createGlyphPort(); ***DOESNT WORK***
+		Port port = new Port();
 		// get the number of the next subglyph from the hashmap
 		int subId = glyphNamesForPorts.get(glyph);
 		// create the proper name for the port and set it
@@ -465,7 +470,6 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		process.setClazz(type.toString());
 		
 		// Two port elements are required for process nodes
-		/** TODO: the port elements need coordinates to connect with the arcs **/
 		Port portIn = createPortForGlyph(process);
 		Port portOut = createPortForGlyph(process);
 		process.getPort().add(portIn);
@@ -540,12 +544,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				
 				// set the start and end points to the arc
 				connection.setSource(rm);
-				connection.setTarget(process);// // TODO: Create a port for the modifiers.
-				// Its fine, because the documentation says:
-				// The source attribute can refer: 
-		        // - either to the id of a glyph,
-				// - or to the id of a >port< on a glyph.
-				// the same goes for target
+				connection.setTarget(process);
 				
 				// add the connection to the map
 				map.getArc().add(connection);
