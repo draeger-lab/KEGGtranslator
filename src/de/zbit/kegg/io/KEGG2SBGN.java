@@ -37,10 +37,10 @@ import org.sbgn.bindings.Arc.End;
 import org.sbgn.bindings.Arc.Start;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
-import org.sbgn.bindings.Glyph.Port;
 import org.sbgn.bindings.Glyph.State;
 import org.sbgn.bindings.Label;
 import org.sbgn.bindings.ObjectFactory;
+import org.sbgn.bindings.Port;
 import org.sbgn.bindings.Sbgn;
 import org.xml.sax.SAXException;
 
@@ -50,6 +50,7 @@ import de.zbit.graph.io.def.SBGNProperties.GlyphType;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.pathway.Entry;
+import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
@@ -114,8 +115,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	/**
 	 * Transform all the Entries from KEGG to SBGN {@link Glyph}s
 	 * 
-	 * @param p
-	 *            Pathway
+	 * @param p KEGG {@link Pathway}
 	 */
 	private void handleAllEntries(Pathway p) {
 
@@ -162,13 +162,18 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 
 			String name = getNameForEntry(e, keggInfos.toArray(new KeggInfos[0]));
 			
+	    // define the bounding box
+			Graphics gr = null;
 			if(e.hasGraphics()){
-				// define the bounding box
-				bb.setX(e.getGraphics().getX());
-				bb.setY(e.getGraphics().getY());
-				bb.setW(e.getGraphics().getWidth());
-				bb.setH(e.getGraphics().getHeight());
+			  gr = e.getGraphics();
+			} else {
+			  gr = new Graphics(e);
+			  gr.setDefaults(e.getType());
 			}
+			bb.setX(gr.getX());
+			bb.setY(gr.getY());
+			bb.setW(gr.getWidth());
+			bb.setH(gr.getHeight());
 
 			// set the label name according to the KeggInfos fetched
 			l.setText(name);
@@ -418,13 +423,15 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	private Port createPortForGlyph(Glyph glyph) {
 		// create a new port
 		// Port port = objectFactory.createGlyphPort(); ***DOESNT WORK***
-		Port port = new Port();
+		Port port = objectFactory.createPort();
 		// get the number of the next subglyph from the hashmap
 		int subId = glyphNamesForPorts.get(glyph);
 		// create the proper name for the port and set it
 		port.setId(glyph.getId() + "." + subId);
 		// increase the glyphs subglyphs
 		glyphNamesForPorts.put(glyph, subId++);
+		
+		glyph.getPort().add(port);
 		return port;
 	}
 
