@@ -50,6 +50,7 @@ import org.biopax.paxtools.model.level2.dataSource;
 import org.biopax.paxtools.model.level2.entity;
 import org.biopax.paxtools.model.level2.openControlledVocabulary;
 import org.biopax.paxtools.model.level2.pathway;
+import org.biopax.paxtools.model.level2.pathwayComponent;
 import org.biopax.paxtools.model.level2.publicationXref;
 import org.biopax.paxtools.model.level2.relationshipXref;
 import org.biopax.paxtools.model.level2.smallMolecule;
@@ -110,6 +111,11 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   protected Model model = null;
   
   /**
+   * The actual translated pathway (real object diverges between L3 and L2)
+   */
+  protected BioPAXElement pathway = null;
+  
+  /**
    * The {@link BioPAXLevel}.
    */
   protected BioPAXLevel level = BioPAXLevel.L3;
@@ -144,7 +150,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     initProgressBar(p,false,false);
     
     // The order of the following processes is important!
-    createPathwayInstance(p);
+    pathway = createPathwayInstance(p);
     createPhysicalEntities(p);
     if(considerReactions()){
       createReactions(p);
@@ -249,6 +255,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       }
       
       xr = model.addNew(instantiate, uri);
+      pathwayComponentCreated(xr);
       ((xref)xr).setDB(db.toString());
       ((xref)xr).setID(formattedID);
       
@@ -264,6 +271,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       }
       
       xr = model.addNew(instantiate, uri);
+      pathwayComponentCreated(xr);
       ((Xref)xr).setDb(db.toString());
       ((Xref)xr).setId(formattedID);
     } else {
@@ -331,8 +339,35 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     } else {
       log.severe(String.format("Level %s not supported.", factory.getLevel()));
     }
+    pathwayComponentCreated(biosource);
 
     return biosource;
+  }
+  
+  /**
+   * Creates a cross-reference to the KEGGtranslator publication.
+   * @return PublicationXref to the KEGGtranslator publication.
+   */
+  protected BioPAXElement getPublicationXref() {
+    BioPAXElement xr = createXRef(IdentifierDatabases.PubMed, "21700675", 3);
+    if (xr instanceof PublicationXref) {
+      ((PublicationXref) xr).setTitle("KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats");
+      ((PublicationXref) xr).setYear(2011);
+      ((PublicationXref) xr).addUrl("http://www.ncbi.nlm.nih.gov/pubmed/21700675");
+      ((PublicationXref) xr).addAuthor("Andreas Zell");
+      ((PublicationXref) xr).addAuthor("Andreas Dräger");
+      ((PublicationXref) xr).addAuthor("Clemens Wrzodek");
+      ((PublicationXref) xr).addSource("Bioinformatics 2011, 27(16), 2314-2315");
+      
+    } else if (xr instanceof publicationXref) {
+      ((publicationXref) xr).setTITLE("KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats");
+      ((publicationXref) xr).setYEAR(2011);
+      ((publicationXref) xr).addURL("http://www.ncbi.nlm.nih.gov/pubmed/21700675");
+      ((publicationXref) xr).addAUTHORS("Wrzodek C., Dräger A., Zell A.");
+      ((publicationXref) xr).addSOURCE("Bioinformatics 2011, 27(16), 2314-2315");
+    }
+   
+    return xr;
   }
   
   /**
@@ -348,11 +383,14 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     
     if (model.getLevel()==BioPAXLevel.L2) {
       dataSource ds = model.addNew(dataSource.class, NameToSId(System.getProperty("app.name"))+"_DataSource");
+      pathwayComponentCreated(ds);
       ds.setNAME(Collections.singleton(System.getProperty("app.name")));
       ds.setCOMMENT(Collections.singleton("http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/"));
+      ds.addXREF((xref) getPublicationXref());
       ret.add(ds);
       
       ds = model.addNew(dataSource.class, "KEGG_DataSource");
+      pathwayComponentCreated(ds);
       ds.setNAME(Collections.singleton("KEGG Data"));
       ds.setCOMMENT(Collections.singleton("http://www.genome.jp/kegg/"));
       ret.add(ds);
@@ -360,16 +398,20 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       if (p!=null && p.getOriginFormatName()!=null && !p.getOriginFormatName().equalsIgnoreCase("kgml") 
           && p.getOriginFormatName().length()>0) {
         ds = model.addNew(dataSource.class, NameToSId(p.getOriginFormatName())+"_DataSource");
+        pathwayComponentCreated(ds);
         ds.setNAME(Collections.singleton(p.getOriginFormatName()+" Data"));
         ret.add(ds);
       }
     } else if (model.getLevel()==BioPAXLevel.L3) {
       Provenance ds = model.addNew(Provenance.class, NameToSId(System.getProperty("app.name"))+"_DataSource");
+      pathwayComponentCreated(ds);
       ds.setName(Collections.singleton(System.getProperty("app.name")));
       ds.addComment("http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/");
+      ds.addXref((Xref) getPublicationXref());
       ret.add(ds);
       
       ds = model.addNew(Provenance.class, "KEGG_DataSource");
+      pathwayComponentCreated(ds);
       ds.setName(Collections.singleton("KEGG Data"));
       ds.addComment("http://www.genome.jp/kegg/");
       ret.add(ds);
@@ -377,6 +419,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       if (p!=null && p.getOriginFormatName()!=null && !p.getOriginFormatName().equalsIgnoreCase("kgml") 
           && p.getOriginFormatName().length()>0) {
         ds = model.addNew(Provenance.class, NameToSId(p.getOriginFormatName())+"_DataSource");
+        pathwayComponentCreated(ds);
         ds.setName(Collections.singleton(p.getOriginFormatName()+" Data"));
         ret.add(ds);
       }
@@ -531,6 +574,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
             SmallMoleculeReference ref = (SmallMoleculeReference) model.getByID(element.getRDFId() + "_reference");
             if (ref==null) {
               ref = model.addNew(SmallMoleculeReference.class, element.getRDFId() + "_reference");
+              pathwayComponentCreated(ref);
               ((SmallMolecule) element).setEntityReference(ref);
             }
             
@@ -785,9 +829,11 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     
       if (level == BioPAXLevel.L3) {
         voc = model.addNew(InteractionVocabulary.class, rfid);
+        pathwayComponentCreated(voc);
         ((InteractionVocabulary)voc).addTerm(st.getName());
       } else if (level == BioPAXLevel.L2) {
         voc = model.addNew(openControlledVocabulary.class, rfid);
+        pathwayComponentCreated(voc);
         ((openControlledVocabulary)voc).addTERM(st.getName());
       }
         
@@ -855,5 +901,18 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    */
   public abstract BioPAXElement addKGMLRelation(Relation r, Pathway p);
   
+  /**
+   * This method should be called whenever any pathway component is created.
+   * @param element
+   */
+  protected void pathwayComponentCreated(BioPAXElement element) {
+    if (element!=null) {
+      if (element instanceof pathwayComponent) {
+        ((org.biopax.paxtools.model.level2.pathway) pathway).addPATHWAY_COMPONENTS((pathwayComponent) element);
+      } else if (element instanceof org.biopax.paxtools.model.level3.Process) {
+        ((org.biopax.paxtools.model.level3.Pathway) pathway).addPathwayComponent((org.biopax.paxtools.model.level3.Process) element);
+      }
+    }
+  }
   
 }

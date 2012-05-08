@@ -48,4 +48,10 @@ public interface KEGGtranslatorCommandLineOnlyOptions extends KeyProvider {
       "Clear the cache of failed KEGG API queries (cases the application to retry those IDs).",Boolean.FALSE,
       Boolean.FALSE);
   
+  /**
+   * Causes a call to {@link InfoManagement#clearFailCache()} on startup.
+   */
+  public static final Option<Boolean> CREATE_JPG = new Option<Boolean>("CREATE_JPG",Boolean.class,
+      "Create a visualization (as JPG) of the selected format. Always creates a JPG, even for SBML and others.",Boolean.FALSE);
+  
 }

@@ -23,12 +23,19 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.util.List;
 
+import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.graph.io.Graph2Dwriter.writeableFileExtensions;
+import de.zbit.graph.io.SBGN2GraphML;
+import de.zbit.graph.io.SBML2GraphML;
 import de.zbit.io.DirectoryParser;
+import de.zbit.io.FileTools;
 import de.zbit.io.filefilter.SBFileFilter;
+import de.zbit.kegg.KEGGtranslatorCommandLineOnlyOptions;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.util.prefs.SBPreferences;
 
 
 /**
@@ -143,6 +150,7 @@ public class BatchKEGGtranslator {
    */
   private void parseDirAndSubDir(String dir) {
     KeggInfoManagement manager = Translator.getManager();
+    SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
     
     if (!dir.endsWith("/") && !dir.endsWith("\\"))
       if (dir.contains("\\")) dir+="\\"; else dir +="/";
@@ -190,7 +198,16 @@ public class BatchKEGGtranslator {
           
           // XXX: Main Part
           try {
-            translator.translate(pw.get(i), outFile);
+            if (KEGGtranslatorCommandLineOnlyOptions.CREATE_JPG.getValue(prefs)) {
+              // Translate, but create image from translated document
+              Object translateDoc = translator.translate(pw.get(i));
+              writeAsJPG(translateDoc, pw.get(i), outFile, outFormat);
+              
+            } else {
+              // Translate to output file
+              translator.translate(pw.get(i), outFile);
+            }
+            
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -207,6 +224,70 @@ public class BatchKEGGtranslator {
     
     // Remember already queried objects (save cache)
     Translator.saveCache();
+  }
+
+  /**
+   * @param translatedDoc translated pathway
+   * @param originalPW original and untranslated pathway
+   * @param outFile file to write
+   * @param outFormat user selected output format
+   * @return <code>TRUE</code> if a JPG has been successfully written.
+   * @throws Exception if something went wrong or a required library is not available.
+   */
+  private boolean writeAsJPG(Object translatedDoc, Pathway originalPW, String outFile, Format outFormat) throws Exception {
+    if (translatedDoc==null) {
+      return false;
+    }
+    
+    outFile = FileTools.removeFileExtension(outFile) + ".jpg";
+    Graph2Dwriter writer = new Graph2Dwriter(writeableFileExtensions.jpg);
+    Object myGraph = null; // actually a Graph2D object
+    
+    // NOTE: we should at all costs avoid imports from yFiles, JSBML or other
+    // libraries here!
+    
+    switch (outFormat) {
+      // BioPAX should be redirected to default:
+//      case BioPAX_level2:
+//      case BioPAX_level3:
+        
+      case GIF:
+      case GML:
+      case GraphML:
+      case JPG:
+      case TGF:
+      case YGF:
+        myGraph = (y.view.Graph2D)translatedDoc;
+        break;
+        
+      case SBGN:
+        myGraph = new SBGN2GraphML().createGraph((org.sbgn.bindings.Sbgn) translatedDoc);
+        break;
+        
+      case SBML:
+        myGraph = new SBML2GraphML().createGraph((org.sbml.jsbml.SBMLDocument) translatedDoc);
+        break;
+        
+      case SBML_QUAL:
+        myGraph = new SBML2GraphML(true).createGraph((org.sbml.jsbml.SBMLDocument) translatedDoc);
+        break;
+        
+      case SBML_CORE_AND_QUAL:
+        // Create 2 files
+        myGraph = new SBML2GraphML().createGraph((org.sbml.jsbml.SBMLDocument) translatedDoc);
+        
+        // Write qual_graph immediately
+        Object myGraph2 = new SBML2GraphML(true).createGraph((org.sbml.jsbml.SBMLDocument) translatedDoc);
+        writer.writeToFile((y.view.Graph2D)myGraph2, FileTools.removeFileExtension(outFile) + "SBML_QUAL.jpg");
+        break;
+      
+      default:
+        // Simply translate PW to graph and ignore all formats
+        myGraph = new KEGG2yGraph(writer.getOutputHandler()).translate(originalPW);
+        break;
+    }
+    
+    return writer.writeToFile((y.view.Graph2D)myGraph, outFile);
   }
 
   /**

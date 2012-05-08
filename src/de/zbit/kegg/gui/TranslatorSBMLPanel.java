@@ -193,8 +193,9 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
   protected List<FileFilter> getOutputFileFilter() {
     LinkedList<FileFilter> ff = new LinkedList<FileFilter>();
     ff.add(SBFileFilter.createSBMLFileFilter());
-    ff.add(SBFileFilter.createTeXFileFilter());
-    ff.add(SBFileFilter.createPDFFileFilter());
+    // 2LaTeX temporary removed (conflicts after moving classes to sysbio).
+    //ff.add(SBFileFilter.createTeXFileFilter());
+    //ff.add(SBFileFilter.createPDFFileFilter());
     // TODO: if graph is active also show graph file filters.
     return ff;
   }

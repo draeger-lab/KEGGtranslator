@@ -32,9 +32,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import y.base.DataMap;
 import y.base.Edge;
@@ -63,6 +65,7 @@ import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
+import de.zbit.graph.GraphTools;
 import de.zbit.graph.LineNodeRealizer;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
@@ -85,6 +88,7 @@ import de.zbit.util.ArrayUtils;
 import de.zbit.util.DatabaseIdentifiers;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 import de.zbit.util.SortedArrayList;
+import de.zbit.util.StringUtil;
 import de.zbit.util.Utils;
 
 /**
@@ -503,6 +507,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     Map<String, Node> reactionModifiers = new HashMap<String, Node>();
     
     // Add nodes for all Entries
+    Set<Node> toLayout = new HashSet<Node>();
     for (int i=0; i<p.getEntries().size(); i++) {
       progress.DisplayBar("Node " + (i+1) + "/" + p.getEntries().size());
       Entry e = p.getEntries().get(i);
@@ -521,6 +526,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       } else if (showEntriesWithoutGraphAttribute || autocompleteReactions) {
         // Create any graphics object with default attributes
         g = new Graphics(e);
+        g.setDefaults(e.getType());
       }
       
       // Handle the graphics first and then create this node.
@@ -606,6 +612,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         if (addThisNodeToGroupNodeList) {
           hm.convertToGroupNode(n);
           parentGroupNodes.add(n);
+        }
+        if (g.isDefaultPosition()) {
+          toLayout.add(n);
         }
       }
       
@@ -734,7 +743,13 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           // The new name is less meaningfull than the old one. Keep old one.
           // Actualy, this is onle the case for group nodes!
         } else {
-          graph.getRealizer(n).setLabelText(name);
+          // Set new name
+          NodeRealizer nrTemp = graph.getRealizer(n);
+          if (nrTemp.getHeight() > 30) {
+            // Height is enough to insert a second line.
+            name = StringUtil.insertLineBreaks(name,(int)(nrTemp.getWidth()/6), "\n");
+          }
+          nrTemp.setLabelText(name);
         }
         if (hideLabelsForCompounds && e.getType().equals(EntryType.compound)) {
           graph.getRealizer(n).removeLabel(graph.getRealizer(n).getLabel());
@@ -1042,6 +1057,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     // Disables: leads to very low resultions on JPG files.
     //configureView(new Graph2DView(graph));
     
+    
     /*
      * Create a data provider that stores the names of all
      * data providers (Maps).
@@ -1063,6 +1079,13 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     mapDescriptionMap.set(edgeDescription, GraphMLmaps.EDGE_DESCRIPTION);
     mapDescriptionMap.set(interactionDescription, GraphMLmaps.EDGE_TYPE);
+    
+    
+    // Layout some nodes that had no layout information
+    if (toLayout.size()>0) {
+      new GraphTools(graph).layoutNodeSubset(toLayout);
+      graph.unselectAll();
+    }
     
     return graph;
   }
@@ -1137,8 +1160,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     } else {
       // ... or a (simple) node
       if (g.getWidth()>0 || g.getHeight()>0) {
-        nr.setWidth(g.getWidth());
-        nr.setHeight(g.getHeight());
+        nr.setWidth(Math.max(1, g.getWidth()));
+        nr.setHeight(Math.max(1, g.getHeight()));
       }
       nr.setCenter(g.getX(), g.getY());
     }

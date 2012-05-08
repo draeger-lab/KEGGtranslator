@@ -158,6 +158,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     
     // Create the actual element
     BioPAXElement element = model.addNew(instantiate, '#'+NameToSId(entry.getName()));
+    pathwayComponentCreated(element);
     
     // NOTE: we can cast to Entity, as all used classes are derived from Entity
     // Get a good name for the node
@@ -272,6 +273,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     
     // Create the actual reaction or Catalysis
     BioPAXElement element = model.addNew(instantiate, '#'+NameToSId(r.getName()));
+    pathwayComponentCreated(element);
     BiochemicalReaction reaction;
     if ((element instanceof Catalysis)) {
       // setup enzymes
@@ -293,6 +295,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       
       // Create actual reaction
       reaction = model.addNew(BiochemicalReaction.class, '#'+NameToSId(r.getName()));
+      pathwayComponentCreated(reaction);
       ((Catalysis) element).addControlled(reaction);
     } else {
       reaction = (BiochemicalReaction) element;
@@ -346,6 +349,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     // Set the stoichiometry
     Integer stoich = rc.getStoichiometry();
     Stoichiometry s = model.addNew(Stoichiometry.class, '#'+NameToSId(ce.getName()+"_"+reaction.getDisplayName()+"_stoich"));
+    pathwayComponentCreated(s);
     s.setPhysicalEntity((PhysicalEntity) ceb);
     s.setStoichiometricCoefficient(stoich==null?1f:(float)stoich);
     
@@ -423,7 +427,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     
     // Create the relation
     Interaction bpe = (Interaction) model.addNew(instantiate, '#'+NameToSId("KEGGrelation"));
-    
+    pathwayComponentCreated(bpe);
     
     // Add Annotations
     addDataSources(bpe);

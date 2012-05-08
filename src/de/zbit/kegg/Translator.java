@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import de.zbit.AppConf;
 import de.zbit.Launcher;
@@ -293,6 +294,7 @@ public class Translator extends Launcher {
 			BatchKEGGtranslator batch = new BatchKEGGtranslator();
 			batch.setOrgOutdir(in.getPath());
 			batch.setTranslator(translator);
+			batch.setOutFormat(format);
 			if (output != null && output.length() > 0) {
 				batch.setChangeOutdirTo(output);
 			}
@@ -324,6 +326,17 @@ public class Translator extends Launcher {
 	 */
 	public void commandLineMode(AppConf appConf) {
 		SBProperties props = appConf.getCmdArgs();
+		
+		// Make command-line options persistent
+		SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
+		prefs.restoreDefaults();
+		try {
+		  prefs.saveContainedOptions(props);
+		} catch (BackingStoreException e) {
+		  log.log(Level.WARNING, "Could not process command-line-only options.", e);
+		}
+		
+		// Initiate translation
 		try {
 			translate(KEGGtranslatorIOOptions.FORMAT.getValue(props),
 				props.get(KEGGtranslatorIOOptions.INPUT),

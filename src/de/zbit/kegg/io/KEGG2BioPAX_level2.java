@@ -283,6 +283,7 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
     
     // Create the actual element
     BioPAXElement element = model.addNew(instantiate, '#'+NameToSId(entry.getName()));
+    pathwayComponentCreated(element);
     
     // NOTE: we can cast to entity, as all used classes are derived from entity
     // Get a good name for the node
@@ -342,6 +343,7 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
 //    if (participant==null) {
       Class<? extends physicalEntityParticipant> instantiate2 = (ceb instanceof sequenceEntity) ? sequenceParticipant.class : physicalEntityParticipant.class;
       physicalEntityParticipant participant = model.addNew(instantiate2, NameToSId(ceb.getRDFId() + "_participant"));
+      pathwayComponentCreated(participant);
       if (ceb instanceof physicalEntity) {
         participant.setPHYSICAL_ENTITY((physicalEntity) ceb);
       }
@@ -366,6 +368,7 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
     
     // Create the actual reaction or catalysis
     BioPAXElement element = model.addNew(instantiate, '#'+NameToSId(r.getName()));
+    pathwayComponentCreated(element);
     biochemicalReaction reaction;
     if ((element instanceof catalysis)) {
       // setup enzymes
@@ -391,6 +394,7 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
       
       // create actual reaction
       reaction = model.addNew(biochemicalReaction.class, '#'+NameToSId(r.getName()));
+      pathwayComponentCreated(reaction);
       ((catalysis) element).addCONTROLLED(reaction);
     } else {
       reaction = (biochemicalReaction) element;
@@ -503,7 +507,7 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
     
     // Create the relation
     physicalInteraction bpe = (physicalInteraction) model.addNew(instantiate, '#'+NameToSId("KEGGrelation"));
-    
+    pathwayComponentCreated(bpe);
     
     // Add Annotations
     bpe.setDATA_SOURCE(pathway.getDATA_SOURCE());
