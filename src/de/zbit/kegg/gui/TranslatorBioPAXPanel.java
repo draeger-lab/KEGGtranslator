@@ -102,6 +102,7 @@ public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model>{
     } else {
       ff.add(SBFileFilter.createBioPAXFileFilter());
     }
+    ff.add(SBFileFilter.createSIFFileFilter());
     
     return ff;
   }
@@ -113,7 +114,19 @@ public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model>{
   @Override
   protected boolean writeRealDocumentToFileUnchecked(File file, String format)
     throws Exception {
-    return ((KEGG2BioPAX)getTranslator()).writeToFile(document, file.getPath());
+    if (format.equalsIgnoreCase("sif")) {
+      return ((KEGG2BioPAX)getTranslator()).writeToSIFFile(document, file.getPath());
+    } else {
+      return ((KEGG2BioPAX)getTranslator()).writeToFile(document, file.getPath());
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isAllowedToSaveAsGraphFormats()
+   */
+  @Override
+  public boolean isAllowedToSaveAsGraphFormats() {
+    return false;
   }
   
   /* (non-Javadoc)

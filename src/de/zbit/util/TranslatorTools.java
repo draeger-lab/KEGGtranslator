@@ -88,12 +88,12 @@ public class TranslatorTools extends GraphTools {
   
   
   /**
-   * Highlight all given GeneIDs in RED color. And selects these nodes.
+   * Highlight all given GeneIDs in YELLOW color. And selects these nodes.
    * @param graph translated pathway with annotated geneIDs
-   * @param ncbiGeneIDs geneIDs to color in Red.
+   * @param ncbiGeneIDs geneIDs to color in YELLOW.
    */
   public void highlightGenes(Iterable<Integer> ncbiGeneIDs) {
-    highlightGenes(ncbiGeneIDs, Color.RED, Color.LIGHT_GRAY, true);
+    highlightGenes(ncbiGeneIDs, Color.YELLOW, Color.LIGHT_GRAY, true);
   }
   
   public void highlightGenes(Iterable<Integer> ncbiGeneIDs, Color highlightColor, Color forAllOthers, boolean changeSelection) {

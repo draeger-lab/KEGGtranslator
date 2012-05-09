@@ -34,19 +34,29 @@ import org.biopax.paxtools.model.level3.Controller;
 import org.biopax.paxtools.model.level3.Conversion;
 import org.biopax.paxtools.model.level3.ConversionDirectionType;
 import org.biopax.paxtools.model.level3.Dna;
+import org.biopax.paxtools.model.level3.DnaReference;
 import org.biopax.paxtools.model.level3.DnaRegion;
+import org.biopax.paxtools.model.level3.DnaRegionReference;
 import org.biopax.paxtools.model.level3.Entity;
+import org.biopax.paxtools.model.level3.EntityReference;
 import org.biopax.paxtools.model.level3.Gene;
 import org.biopax.paxtools.model.level3.Interaction;
 import org.biopax.paxtools.model.level3.InteractionVocabulary;
 import org.biopax.paxtools.model.level3.MolecularInteraction;
 import org.biopax.paxtools.model.level3.PhysicalEntity;
 import org.biopax.paxtools.model.level3.Protein;
+import org.biopax.paxtools.model.level3.ProteinReference;
 import org.biopax.paxtools.model.level3.Provenance;
 import org.biopax.paxtools.model.level3.Rna;
+import org.biopax.paxtools.model.level3.RnaReference;
 import org.biopax.paxtools.model.level3.RnaRegion;
+import org.biopax.paxtools.model.level3.RnaRegionReference;
+import org.biopax.paxtools.model.level3.SimplePhysicalEntity;
 import org.biopax.paxtools.model.level3.SmallMolecule;
+import org.biopax.paxtools.model.level3.SmallMoleculeReference;
 import org.biopax.paxtools.model.level3.Stoichiometry;
+import org.biopax.paxtools.model.level3.UnificationXref;
+import org.biopax.paxtools.model.level3.XReferrable;
 import org.biopax.paxtools.model.level3.Xref;
 
 import de.zbit.kegg.api.KeggInfos;
@@ -79,6 +89,11 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
    * The root {@link Pathway} of our BioPAX conversion.
    */
   private org.biopax.paxtools.model.level3.Pathway pathway;
+  
+  /**
+   * {@link BioSource} for the organism
+   */
+  private BioSource organism = null;
   
   /**
    * Initialize a new {@link KEGG2BioPAX} object, using a new Cache and a new KeggAdaptor.
@@ -157,7 +172,8 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     }
     
     // Create the actual element
-    BioPAXElement element = model.addNew(instantiate, '#'+NameToSId(entry.getName()));
+    String eId = '#'+NameToSId(entry.getName());
+    BioPAXElement element = model.addNew(instantiate, eId);
     pathwayComponentCreated(element);
     
     // NOTE: we can cast to Entity, as all used classes are derived from Entity
@@ -169,13 +185,14 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     }
     // Set name to real and human-readable name (from Inet data - Kegg API).
     name = getNameForEntry(entry);
-    ((Entity)element).addName(fullName!=null?fullName:name); // Graphics name (OR (if null) same as below)
-    ((Entity)element).setDisplayName(name); // Intenligent name
-    ((Entity)element).setStandardName(name);
+    if (fullName!=null) {
+      ((Entity)element).setStandardName(fullName); // Graphics name
+    }
+    ((Entity)element).setDisplayName(name); // Intelligent name
     // ---
     addDataSources(element);
     
-        
+    
     // For complex:
     if (entry.hasComponents() && (element instanceof Complex)) {
       // TODO: Create complexAssembly, add it to pathway?!?!? AND add components to left and complex to right.
@@ -200,8 +217,71 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     // Add various annotations and xrefs
     addAnnotations(entry, element);
     
+    
+    // Even though it's just "recommended", the BioPAX validator gives an
+    // error if no entityReferences are set.
+    if ((element instanceof SimplePhysicalEntity) && 
+        !(element instanceof Complex)) {
+      
+      EntityReference er = createEntityReference(element);
+      if (er!=null) {
+        ((SimplePhysicalEntity)element).setEntityReference(er);
+        
+        // We need at least 1 xref on each element to avoid errors in the validator.
+        if (((XReferrable)element).getXref()!=null) {
+          for (Xref xr : ((XReferrable)element).getXref()) {
+            er.addXref(xr);
+          }
+        }
+        //---
+      }
+    }
+    
+    
     entry.setCustom(element);
     return element;
+  }
+
+  /**
+   * Create an {@link EntityReference} for any {@link BioPAXElement}.
+   * @param element
+   * @return corresponding {@link EntityReference} or <code>NULL</code>.
+   */
+  private EntityReference createEntityReference(BioPAXElement element) {
+    String id = element.getRDFId() + ".eref";
+    EntityReference bpEr = null;
+    
+    if (element instanceof SmallMolecule){
+      bpEr = model.addNew(SmallMoleculeReference.class, id);
+      // must set to unknown, default is 0.0 which makes no sense...
+      ((SmallMoleculeReference)bpEr).setMolecularWeight(Entity.UNKNOWN_FLOAT);
+      
+    } else if (element instanceof Protein) {
+      bpEr = model.addNew(ProteinReference.class, id);
+      if (organism != null) ((ProteinReference)bpEr).setOrganism(organism);
+      
+    } else if (element instanceof Rna) {
+      bpEr = model.addNew(RnaReference.class, id);
+      
+    } else if (element instanceof Dna) {
+      bpEr = model.addNew(DnaReference.class, id);
+      
+    } else if (element instanceof RnaRegion) {
+      bpEr = model.addNew(RnaRegionReference.class, id);
+      
+    } else if (element instanceof DnaRegion) {
+      bpEr = model.addNew(DnaRegionReference.class, id);
+      
+    } else {
+      // We can't create entity references for complexes 
+      // or unknown or unspecified elements
+    }
+    
+    if (bpEr!=null) {
+      pathwayComponentCreated(bpEr);
+    }
+    
+    return bpEr;
   }
 
   /**
@@ -228,11 +308,14 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getName());
     if (isKEGGPathway) {
       Xref xr = (Xref)createXRef(IdentifierDatabases.KEGG_Pathway, p.getName());
-      pathway.addXref(xr);
+      if (xr!=null) {
+        pathway.addXref(xr);
+      }
     }
 
     // Retrieve further information via Kegg Adaptor
-    pathway.setOrganism((BioSource) createBioSource(p));
+    organism  = (BioSource) createBioSource(p);
+    pathway.setOrganism(organism);
     
     // Get PW infos from KEGG Api for Description and GO ids.
     KeggInfos pwInfos = KeggInfos.get(p.getName(), manager); // NAME, DESCRIPTION, DBLINKS verwertbar
@@ -242,7 +325,10 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       // GO IDs
       if (pwInfos.getGo_id() != null) {
         for (String goID : pwInfos.getGo_id().split("\\s")) {
-          pathway.addXref((Xref)createXRef(IdentifierDatabases.GeneOntology, goID, 2));
+          Xref xr = (Xref)createXRef(IdentifierDatabases.GeneOntology, goID, 2);
+          if (xr!=null) {
+            pathway.addXref(xr);
+          }
         }
       }
     }

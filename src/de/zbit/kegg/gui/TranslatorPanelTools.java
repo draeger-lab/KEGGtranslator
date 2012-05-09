@@ -28,6 +28,7 @@ import de.zbit.graph.gui.TranslatorGraphLayerPanel;
 import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.graph.gui.options.GraphBackgroundImageProvider;
 import de.zbit.graph.gui.options.TranslatorPanelOptions;
+import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.gui.GUITools;
 import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
@@ -62,7 +63,7 @@ public class TranslatorPanelTools {
         panel = new TranslatorSBGNPanel(inputFile, translationResult);
         break;
         
-      case BioPAX_level2: case BioPAX_level3:
+      case BioPAX_level2: case BioPAX_level3: case SIF:
         panel = new TranslatorBioPAXPanel(inputFile, outputFormat, translationResult);
         break;
         
@@ -92,7 +93,7 @@ public class TranslatorPanelTools {
         panel = new TranslatorSBGNPanel(pathwayID, translationResult);
         break;
         
-      case BioPAX_level2: case BioPAX_level3:
+      case BioPAX_level2: case BioPAX_level3: case SIF:
         panel = new TranslatorBioPAXPanel(pathwayID, outputFormat, translationResult);
         break;
         
@@ -110,11 +111,21 @@ public class TranslatorPanelTools {
   /**
    * Setup the background image as set in the preferences
    * @param pane the pane to add the background image
-   * @param translator the translator used for translation
-   * @param prefs might be null, else, prefs object for {@link TranslatorPanelOptions}
    * @throws MalformedURLException
    */
   public static void setupBackgroundImage(TranslatorGraphLayerPanel<?> panel) {
+    GraphBackgroundImageProvider provider = createBackgroundImageProvider();
+    
+    // Setup the provider
+    panel.setBackgroundImageProvider(provider);
+  }
+
+  /**
+   * Reads the background image from options and setups an 
+   * {@link GraphBackgroundImageProvider} appropriately.
+   * @return
+   */
+  private static GraphBackgroundImageProvider createBackgroundImageProvider() {
     SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGTranslatorPanelOptions.class);
     GraphBackgroundImageProvider provider = null;
     
@@ -126,9 +137,19 @@ public class TranslatorPanelTools {
         if (brighten==null || brighten<0) brighten = 0;
         provider = GraphBackgroundImageProvider.Factory.createDynamicTranslatorImageProvider(brighten);
     }
+    return provider;
+  }
+  
+  /**
+   * Setup the background image as set in the preferences
+   * @param writer the writer to add the background image
+   * @throws MalformedURLException
+   */
+  public static void setupBackgroundImage(Graph2Dwriter writer) {
+    GraphBackgroundImageProvider provider = createBackgroundImageProvider();
     
     // Setup the provider
-    panel.setBackgroundImageProvider(provider);
+    writer.setBackgroundImageProvider(provider);
   }
   
 }

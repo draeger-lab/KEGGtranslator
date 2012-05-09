@@ -73,6 +73,7 @@ import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
+import de.zbit.kegg.gui.TranslatorPanelTools;
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Graphics;
@@ -175,6 +176,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     super(manager);
     this.outputHandler = outputHandler;
     this.outputHandler.setTranslator(this);
+    TranslatorPanelTools.setupBackgroundImage(this.outputHandler);
     
     loadPreferences();
   }

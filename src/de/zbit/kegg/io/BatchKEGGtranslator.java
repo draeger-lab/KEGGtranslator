@@ -33,6 +33,7 @@ import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.KEGGtranslatorCommandLineOnlyOptions;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
+import de.zbit.kegg.gui.TranslatorPanelTools;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.prefs.SBPreferences;
@@ -241,6 +242,7 @@ public class BatchKEGGtranslator {
     
     outFile = FileTools.removeFileExtension(outFile) + ".jpg";
     Graph2Dwriter writer = new Graph2Dwriter(writeableFileExtensions.jpg);
+    TranslatorPanelTools.setupBackgroundImage(writer);
     Object myGraph = null; // actually a Graph2D object
     
     // NOTE: we should at all costs avoid imports from yFiles, JSBML or other
@@ -335,7 +337,7 @@ public class BatchKEGGtranslator {
 		case TGF:
 			translator = KEGG2yGraph.createKEGG2TGF(manager);
 			break;
-		case BioPAX_level2:
+		case BioPAX_level2: case SIF:
 		  translator = new KEGG2BioPAX_level2(manager);
       break;
     case BioPAX_level3:

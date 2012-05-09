@@ -286,7 +286,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
         }
         Integer subGO = SBOMapping.getGOTerm(subType);
         if (subGO!=null && subGO>0) {
-          cv.addResource(DatabaseIdentifiers.getMiriamURN(IdentifierDatabases.GeneOntology, Integer.toString(subGO)));
+          String go = DatabaseIdentifiers.getMiriamURN(IdentifierDatabases.GeneOntology, Integer.toString(subGO));
+          if (go!=null) {
+            cv.addResource(go);
+          }
         }
       }
       
@@ -418,7 +421,11 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
         if (args.length > 1) outfile = args[1];
         
         Pathway p = KeggParser.parse(args[0]).get(0);
-        k2s.translate(p, outfile);
+        try {
+          k2s.translate(p, outfile);
+        } catch (Throwable e) {
+          e.printStackTrace();
+        }
       }
       
       // Remember already queried objects (save cache)

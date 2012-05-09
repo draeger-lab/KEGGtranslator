@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
@@ -411,7 +412,12 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     // Since some methods really need the whole document, we now store it.
     lastTranslatedPathway = p;
     
-    OutputFormat doc = translateWithoutPreprocessing(p);
+    OutputFormat doc = null;
+    try {
+      doc = translateWithoutPreprocessing(p);
+    } catch (Throwable t) {
+      log.log(Level.SEVERE, "Unhandled exception during translation!", t);
+    }
     
     // Remember already queried objects
     // XXX: Disabled, because writing after every conversion is very time-consuming.

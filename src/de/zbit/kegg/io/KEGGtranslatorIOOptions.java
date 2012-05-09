@@ -71,6 +71,11 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
      * 
      */
     BioPAX_level3,
+    /**
+     * Some Pathway exchange format used by Cytoscape. Base
+     * is 2BioPAX and paxtools can then write SIF files. 
+     */
+    SIF,
     // Since the restructuring and moving large parts to sysbio, the 2LaTeX
     // part is not supported anymore.
 //    /**

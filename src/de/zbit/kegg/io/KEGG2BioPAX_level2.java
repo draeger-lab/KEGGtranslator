@@ -114,7 +114,9 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
     boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getName());
     if (isKEGGPathway) {
       xref xr = (xref)createXRef(IdentifierDatabases.KEGG_Pathway, p.getName());
-      pathway.addXREF(xr);
+      if (xr!=null) {
+        pathway.addXREF(xr);
+      }
     }
 
     // Retrieve further information via Kegg Adaptor
@@ -128,7 +130,10 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
       // GO IDs
       if (pwInfos.getGo_id() != null) {
         for (String goID : pwInfos.getGo_id().split("\\s")) {
-          pathway.addXREF((xref)createXRef(IdentifierDatabases.GeneOntology, goID, 2));
+          xref xr = (xref)createXRef(IdentifierDatabases.GeneOntology, goID, 2);
+          if (xr!=null) {
+            pathway.addXREF(xr);
+          }
         }
       }
     }
@@ -185,7 +190,11 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
         if (args.length > 1) outfile = args[1];
         
         Pathway p = KeggParser.parse(args[0]).get(0);
-        k2s.translate(p, outfile);
+        try {
+          k2s.translate(p, outfile);
+        } catch (Throwable e) {
+          e.printStackTrace();
+        }
       }
       
       // Remember already queried objects (save cache)

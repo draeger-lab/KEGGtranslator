@@ -1196,7 +1196,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         if (args.length > 1) outfile = args[1];
         
         Pathway p = KeggParser.parse(args[0]).get(0);
-        k2s.translate(p, outfile);
+        try {
+          k2s.translate(p, outfile);
+        } catch (Throwable e) {
+          e.printStackTrace();
+        }
       }
       
       // Remember already queried objects (save cache)
