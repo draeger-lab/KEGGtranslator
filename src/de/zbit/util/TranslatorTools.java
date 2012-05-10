@@ -144,6 +144,7 @@ public class TranslatorTools extends GraphTools {
     // Also try to somehow remember old color and thickness and restore
     // bzw. set thickness to math.max([2], currentThickness).
     containedString = containedString.toLowerCase();
+    graph.unselectAll();
     for (Node n: graph.getNodeArray()) {
       Color color = Color.BLACK;
       LineType lt = LineType.LINE_1;
@@ -152,6 +153,7 @@ public class TranslatorTools extends GraphTools {
           getNodeInfoIDs(n, GraphMLmaps.NODE_LABEL).toLowerCase().contains(containedString)) {
         color = Color.RED;
         lt = LineType.LINE_2;
+        graph.setSelected(n, true);
       }
       graph.getRealizer(n).setLineColor(color);
       graph.getRealizer(n).setLineType(lt);
