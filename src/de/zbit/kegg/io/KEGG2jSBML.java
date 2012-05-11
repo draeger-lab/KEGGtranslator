@@ -433,6 +433,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       if (p.getVersion() > 0) {
         notes.append(String.format("%s version was: %s<br/>\n", p.getOriginFormatName(), Double.toString(p.getVersion())));
       }
+      if (p.isSetAdditionalText()) {
+        notes.append(p.getAdditionalText());
+      }
       notes.append("</p>");
     }
 		// Removed this because we have already two other positions in which we write who created this file (the history and also the comment within the file).
