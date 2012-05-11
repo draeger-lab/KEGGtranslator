@@ -362,7 +362,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     }
     
     // Parse Kegg Pathway information
-    boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getName());
+    boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM());
     if (isKEGGPathway) {
       CVTerm mtPwID = new CVTerm();
       mtPwID.setQualifierType(Type.MODEL_QUALIFIER);

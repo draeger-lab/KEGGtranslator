@@ -111,9 +111,9 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
     pathway.setNAME(formatTextForHTMLnotes(p.getTitle()));
     
     // Parse Kegg Pathway information
-    boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getName());
+    boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM());
     if (isKEGGPathway) {
-      xref xr = (xref)createXRef(IdentifierDatabases.KEGG_Pathway, p.getName());
+      xref xr = (xref)createXRef(IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM());
       if (xr!=null) {
         pathway.addXREF(xr);
       }
