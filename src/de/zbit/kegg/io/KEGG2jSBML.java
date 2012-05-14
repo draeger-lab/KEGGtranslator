@@ -374,11 +374,17 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
        * KEGG2GraphML and oterhs).
        */
 
-      // next line is same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
+      // Next line is same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
       String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(p.getName());
       if (kgMiriamEntry != null) mtPwID.addResource(kgMiriamEntry);
       model.addCVTerm(mtPwID);
+      
+      // Add KEGG reference
+      model.addCVTerm(DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.PubMed, null, "9847135"));
     }
+    
+    // Add KEGGtranslator reference
+    model.addCVTerm(DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.PubMed, null, "21700675"));
 
     // Retrieve further information via Kegg Adaptor
     KeggInfos orgInfos = KeggInfos.get("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
@@ -829,7 +835,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Set a static ECO Code
     // ECO_CODE "ECO:0000313"="imported information used in automatic assertion"   
-    spec.addCVTerm(new CVTerm(Qualifier.BQB_UNKNOWN, KeggInfos.miriam_urn_eco + "ECO%3A0000313"));
+    spec.addCVTerm(new CVTerm(Qualifier.BQB_IS_DESCRIBED_BY, KeggInfos.miriam_urn_eco + "ECO%3A0000313"));
   }
   
   
