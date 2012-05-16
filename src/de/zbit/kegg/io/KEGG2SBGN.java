@@ -358,16 +358,18 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 
 			// Enzymes
 			Collection<Entry> enzymes = p.getReactionModifiers(reaction.getName());
-			for (Entry ec : enzymes) {
-				
-				// get the glyph for the entry
-				Glyph enzymeGlyph = (Glyph) ec.getCustom();
-				if(enzymeGlyph != null)
-					reactionModifiers.add(enzymeGlyph);
-				else {
-					Object[] args = {ec.getName(), String.valueOf(ec.getId())};
-					log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
-				}
+			if (enzymes!=null) {
+			  for (Entry ec : enzymes) {
+
+			    // get the glyph for the entry
+			    Glyph enzymeGlyph = (Glyph) ec.getCustom();
+			    if(enzymeGlyph != null)
+			      reactionModifiers.add(enzymeGlyph);
+			    else {
+			      Object[] args = {ec.getName(), String.valueOf(ec.getId())};
+			      log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
+			    }
+			  }
 			}
 			
 			// do the magic!
