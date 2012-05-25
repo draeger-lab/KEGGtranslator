@@ -8,6 +8,8 @@
 \usepackage{rotating} % Landscape orientation (used for tables)
 \usepackage{color} % Only required for the TODO macro.
 
+\usepackage{amssymb} % Symbols like checkmark
+
 %\usepackage{natbib}
 %
 
@@ -389,7 +391,6 @@ An \InteractionVocabulary{} is created for each interaction, that specifies the 
 \begin{figure}[tb]
 \centering \includegraphics[width=1.0\columnwidth]{figures/KGML2SBML.png}
 \caption{Class structure and mapping from KGML to SBML -- This mapping includes the SBML-qual extension package and is depicted in a simplified scheme. Most properties are encoded as attributes on the actual classes. Tables~\ref{tab:KGMLentries2X} and~\ref{tab:KGMLrelations2X} give further details about translation of entries and relations. SBML can only handle reactions, therefore SBML-qual is required to properly encode relations. This extension package requires its own model. Subsequently, the SBML-core \model{} and each \species{} have to be duplicated to obtain a \qualitativeModel{} including the translated relations.}
-\label{fig:KGML2BioPAX}
 \label{fig:KGML2SBML}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% END FIGURE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -594,6 +595,64 @@ Sometimes, KGML specifies glycans as reaction participants instead of compounds.
 % warum initiale models, warum fix nötig, etc.
 
 % SBML/qual
+
+
+
+\section{Discussion}
+
+%%%%%%%%%%%%%%%%%%%%%%%% ENTRY TABLE %%%%%%%%%%%%%%%%%%%%%%%%
+\newcolumntype{C}{>{\centering\arraybackslash}p{2cm}}
+\begin{table}[htb]
+\caption{Comparison of different KEGG conversions.}
+\label{tab:AppVergleich}
+\makebox[\textwidth]{
+\begin{tabular}{lcccccC}
+\toprule
+& \multicolumn{2}{c}{KEGGtranslator} & KEGGconverter & KEGG2SBML & BN++ & KGML2BioPAX KGML2SBML \\
+Version & 2.0 & 1.2 & n/a & 1.5.0 & 1.1 & n/a \\
+Release date & \TODO{2012-05-15} & 2011-07-04 & 2009-12-18 & 2008-07-28 & 2009-04-22 & 2010-06-03\\
+%Authors & \citeauthor{Wrzodek2011} & \citeauthor{KEGGconverter} & \citeauthor{KEGG2SBML} & \citeauthor{Kuentzer2007} & \citeauthor{KEGG2BioPAX_and_SBML} \\
+%URL & \multicolumn{2}{c}{http://tinyurl.com/crlmeeo} & http://tinyurl.com/d7npkfv & http://tinyurl.com/bpca4rd & http://tinyurl.com/cu6ze8e & http://tinyurl.com/bmgucdu \\
+\midrule
+\multicolumn{7}{l}{\textbf{Supported model formats}} \\
+%Available?
+%Stand-alone
+~~SBML & \checkmark & \checkmark & \checkmark & \checkmark & $\circ$ & \checkmark \\
+~~BioPAX & \checkmark & $\times$ & $\times$ & $\times$ & \checkmark & \checkmark \\
+
+\multicolumn{7}{l}{\textbf{Generic translation features}} \\
+~~Interpretable & \checkmark & \checkmark & $\circ$ & $\circ$ & \checkmark & \checkmark \\
+~~Signaling pathways & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+~~Complete & \checkmark & \checkmark & \checkmark & $\times$ & \checkmark & $\times$ \\
+~~No duplicate entries & \checkmark & $\times$ & \checkmark  & \checkmark & \checkmark & \checkmark \\
+~~No duplicate reactions & \checkmark & \checkmark & \checkmark  & \checkmark & $\times$ & \checkmark \\
+~~Unbundle reactions & \checkmark & $\times$ & $\times$ & \checkmark & $\times$ & $\times$ \\
+~~Reaction fixing & \checkmark & \checkmark & $\times$ & \checkmark & $\times$ & $\times$ \\
+~~Stoichiometry & \checkmark & $\times$ & $\times$ & $\times$ & $\circ$ & $\circ$ \\
+
+\multicolumn{7}{l}{\textbf{SBML}} \\
+~~Valid & \checkmark & \checkmark & $\times$ & \checkmark & n/a & \checkmark \\
+~~Level/Version & 2.4/3.1 & 2.4 & 2.1 & up to 2.3 & n/a & 2.4 \\
+~~SBO terms & \checkmark & \checkmark & $\times$ & $\times$ & n/a & $\times$ \\
+~~Notes/Annotations & \checkmark & \checkmark & $\times$ & $\times$ & n/a & $\times$ \\
+
+\multicolumn{7}{l}{\textbf{BioPAX}} \\
+~~Valid & \checkmark & n/a & n/a & n/a & $\times$ & $\times$ \\
+~~Level & 2/3 & n/a & n/a & n/a & 2 & 2 \\
+~~Appropriate classes & \checkmark & n/a & n/a & n/a & \checkmark & $\times$ \\
+~~SM annotations & \checkmark & n/a & n/a & n/a & $\times$ & $\times$ \\
+\bottomrule
+\end{tabular}
+}
+{
+Cytoscape using KGMLReader, BiNOM (Version und Date korrespondieren zu den beiden Plugins).
+
+
+}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 
 \section{Implementation and availability of the method}
