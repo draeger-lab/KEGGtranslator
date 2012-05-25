@@ -1,0 +1,781 @@
+\documentclass[a4,nocrop,onecolumn,final,center,fleqn]{GR}
+%\documentclass[a4paper, draft]{article}
+
+\usepackage{graphicx}
+\usepackage{booktabs} % allows \toprule and other table formatting utilities
+\usepackage{multirow} % merge cells vertically
+%\usepackage{lscape} % Landscape orientation (used for tables)
+\usepackage{colortbl} % Allows for alternate coloring the table
+\usepackage[table]{xcolor} % U.a. allows for defining colors in HTML models
+\usepackage{rotating} % Landscape orientation (used for tables)
+\usepackage{color} % Only required for the TODO macro.
+
+\usepackage{amssymb} % Symbols like checkmark
+
+%\usepackage{cite}
+\usepackage{natbib} % do NOT sort (e.g., SBML & BioPAX references must be printed in given order)
+
+% In-Text Citation formatting for "Genome Research"
+\bibpunct{(}{)}{,}{a}{}{,} % see http://de.wikibooks.org/wiki/LaTeX-W%C3%B6rterbuch:_bibpunct
+
+\usepackage[pdfborder={0 0 0}]{hyperref} % links, but no colored boxes
+
+\hypersetup{breaklinks=true,
+pagecolor=white,
+colorlinks=false}
+\urlstyle{rm} %so it doesn’t use a typewriter font for url’s.
+
+% Allow line breaks in texttt
+\newcommand{\origttfamily}{}% sollte noch nicht definiert sein!
+\let\origttfamily=\ttfamily % alte Definition von \ttfamily sichern
+\renewcommand{\ttfamily}{\origttfamily \hyphenchar\font=`\-}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Some macros
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\plus{\textsuperscript{+}}
+\newcommand{\TODO}[1]{\textcolor{red}{\textbf{#1}}}
+
+% B
+\newcommand{\BiochemicalReaction}{\texttt{Bio\-chemical\-Reaction}}
+\newcommand{\BiochemicalReactions}{\texttt{Bio\-chemical\-Reaction}s}
+
+% C
+\newcommand{\Catalysis}{\texttt{Cata\-lysis}}
+\newcommand{\ComplexAssembly}{\texttt{Complex\-Assembly}}
+\newcommand{\Conversion}{\texttt{Conversion}}
+\newcommand{\control}{\texttt{control}}
+\newcommand{\Control}{\texttt{Control}}
+\newcommand{\Controller}{\texttt{Controller}}
+\newcommand{\Controllers}{\texttt{Controller}s}
+\newcommand{\Controlled}{\texttt{Controlled}}
+\newcommand{\conversion}{\texttt{conversion}}
+\newcommand{\Complex}{\texttt{Complex}}
+\newcommand{\Complexes}{\texttt{Complex}es}
+
+% E
+\newcommand{\EntityReference}{\texttt{EntityReference}}
+\newcommand{\EntityReferences}{\texttt{EntityReference}s}
+\newcommand{\Entity}{\texttt{Entity}}
+
+
+% F
+\newcommand{\functionTerm}{\texttt{functionTerm}}
+\newcommand{\functionTerms}{\texttt{functionTerm}s}
+
+% I
+\newcommand{\Interaction}{\texttt{Inter\-action}}
+\newcommand{\InteractionVocabulary}{\texttt{Inter\-action\-Vo\-ca\-bu\-la\-ry}}
+
+% M
+\newcommand{\model}{\texttt{model}}
+\newcommand{\Modulation}{\texttt{Modulation}}
+\newcommand{\MolecularInteraction}{\texttt{Mo\-le\-cu\-lar\-In\-ter\-ac\-tion}}
+\newcommand{\ModifierSpeciesReference}{\texttt{Mo\-di\-fier\-Species\-Reference}}
+
+
+% P
+%\newcommand{\PhysicalEntity}{\texttt{Physical\-Entity}}
+\newcommand{\physicalInteraction}{\texttt{physical\-Inter\-action}}
+\newcommand{\protein}{\texttt{protein}}
+\newcommand{\proteins}{\texttt{protein}s}
+
+% Q
+\newcommand{\qualitativeModel}{\texttt{qualitative\-Model}}
+%\newcommand{\quantitativeModel}{\texttt{quantitative\-Model}}
+\newcommand{\qualitativeSpecies}{\texttt{qualitative\-Species}}
+
+% R
+\newcommand{\reaction}{\texttt{re\-ac\-tion}}
+\newcommand{\reactions}{\texttt{re\-ac\-tion}s}
+
+% S
+\newcommand{\species}{\texttt{species}}
+\newcommand{\smallMolecule}{\texttt{small\-Molecule}}
+\newcommand{\SmallMolecules}{\texttt{Small\-Molecule}s}
+
+
+% T
+\newcommand{\TemplateReactionRegulation}{\texttt{Template\-Reaction\-Regulation}}
+\newcommand{\TemplateReaction}{\texttt{Template\-Reaction}}
+\newcommand{\transition}{\texttt{transition}}
+\newcommand{\transitions}{\texttt{transition}s}
+\newcommand{\Transport}{\texttt{Transport}}
+\newcommand{\TransportWithBiochemicalReaction}{\texttt{Transport\-With\-Biochemical\-Reaction}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hyphenation{
+bal-ance
+con-ver-ter
+trans-la-tor
+KEGG-con-ver-ter
+KEGG-trans-la-tor
+mo-le-cule
+be-tween
+}
+
+
+
+% Enter dates of publication
+\copyrightyear{2012}
+\pubdate{31 July 2012}
+\pubyear{2012}
+%\jvolume{37}
+%\jissue{12}
+
+%\articlesubtype{Systems biology}
+
+\begin{document}
+
+\title{Precise generation of systems biology models from KEGG pathways}
+
+\author[Clemens Wrzodek \textit{et~al}]{%
+Clemens Wrzodek\,$^{1,*}$,
+Finja B\"uchel\,$^{1}$
+Andreas Dr\"ager\,$^{1}$
+Manuel Ruff\,$^{1}$
+Andreas Zell\,$^{1}$%
+%\footnote{
+%    To whom correspondence should be addressed.
+%    %Tel: +49 7071  2970436; Fax: +49 7071 295091;
+%    Email: clemens.wrzodek@uni-tuebingen.de
+%}
+}
+
+
+\address{%
+$^{1}$Center for Bioinformatics Tuebingen (ZBIT), University of Tuebingen, Sand 1, 72076 T\"ubingen, Germany
+\\$^{*}$ To whom correspondence should be addressed.
+    %Tel: +49 7071  2970436; Fax: +49 7071 295091;
+    Email: clemens.wrzodek@uni-tuebingen.de
+}
+
+%\history{%
+%Received January 1, 2012;
+%Revised February 1, 2012;
+%Accepted March 1, 2012}
+
+\maketitle
+
+\begin{abstract}
+The KEGG PATHWAY database provides a plethora of pathways for a diversity of organisms.
+All pathway components are directly linked to other KEGG databases, such as KEGG COMPOUND or KEGG REACTION.
+%Subsequently, the pathways can be used as foundations for initial structural modeling approaches, which is further eased by providing an enormous amount of information from other cross-linked KEGG databases.
+Therefore, the pathways can be extended with an enormous amount of information and provide a foundation for initial structural modeling approaches.
+%
+But the KGML-formatted KEGG pathways are primarily intended for visualization purposes and thus, a direct conversion into systems biology models would produce incomplete and erroneous models.
+
+Here, we present a method for preprocessing and precisely converting KEGG pathways into initial metabolic and signaling models in the standardized community pathway formats SBML (Levels 2 and 3) and BioPAX (Levels 2 and 3). %, including the qualitative models, groups and layout extensions,
+This method involves fixing invalid or incomplete KGML content, creating complete and valid stoichiometric reactions, translating relations to signaling models and augmenting the pathway content with various information, such as cross-references to Entrez Gene, OMIM, UniProt ChEBI, and many more.
+Furthermore, we compare several conversion tools for KEGG pathways and show that the conversion from KEGG to BioPAX does not involve a loss of information, whilst lossless translations to SBML can only be performed using SBML Level~3, including its recently proposed qualitative models and groups extension packages.
+\end{abstract}
+
+
+
+\section{Introduction}
+%Opening statement
+%    Problem: what problem are you going to solve?
+%    Relevance: why is it important to solve this problem?
+%
+%Literature review:
+%    Summarize the current state of knowledge in the area of
+%              investigation
+%    What previous research has been done on the problem?
+%    Mark the gap in the current state of knowledge:
+%    What piece of knowledge is still lacking in the area of
+%              investigation?
+%
+%Brief overview of your own study:
+%    Approach/method: how did you go about filling this gap?
+%    Results: what did you find out?
+%    Conclusion: what do these results mean (why are these
+%               results significant?
+
+% 1. KEGG ist toll weil
+% 2. Modelling
+% 3. ...und man könnte tolle Sachen machen wenn man tolle Modelle hätte.
+% 4. Deshalb gibt es Converter
+The KEGG PATHWAY database provides a valuable resource for initial modeling approaches of specific biological networks \citep{Kanehisa2000,KEGG}. The database contains pathway maps for a multitude of different organisms and most provided information is cross-linked with other KEGG databases. For many years, this database has been one of the most important sources for building initial structural models of various pathways \citep{Bauer-Mehren2009,Oberhardt2009}. All pathway information is stored in KGML formatted XML-files, which are barely supported by other applications. In systems biology, two wide-spread formats for modeling and exchanging pathways are the Systems Biology Markup Language (SBML -- \citealp{Finney2003}) and Biological Pathways eXchange (BioPAX -- \citealp{Demir2010_short}). These formats can be used with graphical modeling applications (e.g., CellDesigner -- \citealp{Funahashi2008} or Cytoscape -- \citealp{Cytoscape}), complemented with rate laws (e.g., SBMLsqueezer -- \citealp{SBMLSqueezer}), used for flux balance analysis (e.g., FASIMU -- \citealp{Fasimu}), and many more applications. Therefore, converters exist that perform mostly basic conversions from KGML to those formats \citep{KEGG2SBML,Kuentzer2007,KEGGconverter,KEGG2BioPAX_and_SBML}. The drawback of many of those conversions is that even for creating initial models, a basic translation of a KGML document to an SBML or BioPAX document is not sufficient.
+
+% 5. Wo ist das Problem mit den bisherigen Convertern?
+The KGML documents provided by KEGG are mainly for graphical representations of pathways and consist of entries (which correspond to nodes in a pathway map), relations (which correspond to edges in a pathway map) and reactions. Relations are mainly contained in signaling maps and encode information like ``A activates B". Reactions are primarily contained in metabolic pathway maps and consist of substrates, products and information about reversibility of the reaction. Given this information, it seems straightforward to derive an algorithm for viable metabolic models. But a closer look on the actual maps shows that even those reactions are mainly for visualization and not for modeling or simulation purposes. Reactions are sometimes being bundled, e.g., one reaction instance is built and multiple reaction identifiers, that point to different reactions, are assigned. There are often missing reactants for reactions, stoichiometric information is omitted and also the list of enzymes, catalyzing a reaction, is not necessarily entirely contained in the KGML document. Similar difficulties arise for the entries in a KGML document.
+For the sake of a high-quality graphical representation of the pathway, entries or other elements are sometimes duplicated.% in the KGML file
+When interpreting the information content of those files, duplications must be taken into account.
+%
+%Some pathways contain duplicate entries, which make sense for nice graphical representations but not for modeling and simulation.
+%
+%Furthermore, one entry might consist of multiple proteins/ genes, etc. which are grouped together for some reason.
+Furthermore, a KGML document may contain references to entries, which are not physically present in the actual organism and the KGML specification even allows entries to be reactions.
+All those exemplary mentioned problems show that simple one-to-one translations of KEGG pathway maps are not sufficient to build reliable and useful models.
+
+% 6. Wie sind besser und lösen alles.
+To overcome all those drawbacks we deeply investigated the KGML documents, as well as the content of all cross-linked KEGG databases, and developed strategies for building useful initial models in SBML and BioPAX. Besides automatically fixing many of the mentioned issues, the proposed method includes extensive annotation and augmentation of all provided information to ease further model building and usage of those translated pathway maps. This ranges from adding simple database cross-references (e.g., to UniProt or Entrez Gene) over annotation of chemical formulas and molecular weight of small molecules, to an automated atom balance check of all reactions. All those strategies are now included in the second release of the KEGGtranslator application \citep{Wrzodek2011} and described in detail in the following sections.
+
+
+
+% 1. KEGG ist toll weil
+% 2. Wo ist das Problem (beschreibt grafische Zusammenhänge)
+% Verschiedene Formate für versch. Sachen, nicht verlustfrei möglich
+% Man braucht (korrekte) Gleichungen, am besten noch chemische formeln, molekular gewicht, etc.
+% für graphen malen braucht man größe, position, farbe, noch entrez gene, uniprot (und kanten)
+% Inhalt ist für grafik, Reaktionen da fehlt einiges, sowie annotationen, etc.
+% Relationen zu qual
+
+
+
+\section{Preparation of pathway models from the KEGG database}
+
+Several subsequent steps are involved in the creation of initial models from KEGG pathways. All of these steps are described in detail in the following sections and depicted graphically in Figure~\ref{fig:conversionScheme}.
+
+\subsection{The KEGG Markup Language (KGML)}
+KEGG uses the KGML format to encode its pathways \citep{KGML}. For each pathway, a generic reference pathway exists that is derived for a plethora of different organisms. All nodes in those pathways correspond mainly to proteins, small molecules, other referenced pathways or complexes and are encoded as entries in KGML. These entries have a type attribute that further specifies its nature. Additionally, they may have a graphics attribute that is essential for pathway visualizations. Entries corresponding to groups contain components that reference their contained entries.
+
+Besides entries, KGML specifies reactions, which contain substrates and products that are essentially references to the corresponding entries. The only additional information that is given for reactions is a type attribute, that is either `reversible' or `irreversible'. Moreover, KEGG specifies relations, which are primarily important for the visualization of signaling pathways. Relations contain network connections between two entries, such as ``A phosphorylates B", or ``A inhibits B" but they do not provide sufficient information for conversions to biochemical reactions.
+
+
+% Among others, these entries have a type-attribute, that further specifies the object, described by this pathway, and a reaction attribute, which usually specifies one or more reactions that are catalyzed by this entry. If this entry is a group, consisting of several other entries that form a complex, the components are also annotated on this entry.
+
+% TODO: Sehr wichtig: Wo bekommt man ueberhaupt die KGML dateien her?
+
+% 1. Generell erklären, dass fast alles per optionen kontrolliert werden kann.
+% 2. KGML können "hier" (erklären) heruntergeladen werden. Oder from within the application.
+
+
+% 1. KeggTools.removePathwayEntries(p);
+% 2. autocompleteReactions
+% 2.1 split reactions, one per identifier
+% 2.2 für jede reaktion noch fehlenden reaktanten suchen,
+% 2.2.1 Ist reaktion reversibel? (Info Aus API holen, grade bei gesplitteten reaktionen manchmal fehlerhaft), wenn nein, in welcher richtung liegt sie vor
+% 2.2.2 Haben wir synonyme? ("Same as" von jeder komponente aus api holen und hinterlegen)
+% 2.2.3 fehlen reaktanten? => Fehlende zu KGML hinzufügen
+% 2.2.4 fehlen enzyme? => Alle EC Nummern aus KEGG holen und abgleichen, fehlende hinzufügen
+
+% 3. Stoichiometry aus den gleichungen parsen und merken
+% 4. Remove white nodes (EC-Enzymes without protien instances in current organism)
+
+% 5. Optionally: Remove orphans
+
+\subsection{Preprocessing and fixing issues in the input KGML}
+
+%TODO: Ersten abschnitt, einleitung spannender machen
+Prior to converting the KEGG pathways to other modeling languages, several issues need to be fixed in preprocessing steps.
+%KGML pathways are not complete and require preprocessing prior to conversion to other modeling languages.
+Operations that are not linked to SBML or to BioPAX are performed as first step directly on the input KGML. These include operations that involve adding or removing entries from the KGML document, as well as processing contained reactions. The actual conversion to models is independent of those steps and is performed after the preprocessing.
+To generate reliable models, one might want to remove links to other pathway maps from the document. These referenced pathway maps are no physical instances and thus need to be ignored for some model simulation software. However, they might be required for cross-linking pathways. Furthermore, orphans (i.e., entries that are not present in reactions or relations) might be useless for some modeling approaches and therefore may also be removed.
+%
+An important step towards building metabolic models are correct biochemical reactions. The reactions specified in the KGML require significant preprocessing in order to reliably translate these to SBML or BioPAX.
+%
+%First of all, bundled reactions need to be separated. There is no way to create balanced and correct biochemical reactions if one keeps multiple reactions that are bundled as one KGML-reaction record. Thus, one KGML-reaction is created for each actual biochemical reaction.
+%
+KEGG files often contain bundled reactions. These must be disassembled into separate KGML reactions. Otherwise, it is not possible to create balanced and correct biochemical reactions if models keep multiple reactions that are bundled into one record.
+Since the information provided in the KGML is limited, the KEGG API needs to be queried for further correction steps. From the KEGG API, information about reversibility of the reaction is retrieved, as well as the reaction equation, including all substrates, products, catalysts, and stoichiometric information. The reversibility is directly annotated on the reaction, the stoichiometric information has to be stored in separate classes, which are later translated to the desired output format. The equation is used to check for missing reaction participants. But simply comparing all KEGG identifiers that are present in the KGML with the reaction equation is not adequate. KEGG consists of many separate databases that contain information about compounds, drugs, glycans, etc. Therefore, one compound might have multiple KEGG identifiers, e.g., one in KEGG COMPOUND and another one in KEGG DRUG. The reaction equations specify just one identifier for each participant, which is any of all available identifiers for an object. Therefore, more queries to the KEGG API are necessary in order to fetch all synonyms for all identifiers. Now, it is possible to compare all reactants with the pathway components and check for missing reaction participants and eventually add those to the KGML. A similar method is required to check for missing enzymes (i.e., reaction modifiers) -- we use Enzyme Commission numbers (EC numbers) to check for missing enzymes.
+
+%At this step, the KGML document is almost ready to be translated to a model.
+One last important preprocessing step might be performed before converting the pathways to models.
+The KEGG database uses information about orthology to provide pathway maps for different organisms. Enzymes, catalyzing reactions are annotated using EC numbers, which are independent of actual organisms. In some cases, this leads to annotated enzymes or entries in the KGML, for which no physical instance in the current organism of interest is known. In other words, the entry does probably not exist in the current organism or its existence has not yet been proven. To visualize this information, KEGG changes the background color of those orthologous nodes to white. These nodes should also be removed in order to obtain organism-specific models.
+
+\subsection{Atom balance of reactions}
+
+After the described preprocessing step, the KGML document contains unbundled and complete reactions, for which the equation and stoichiometry has been annotated. Using the KEGG API, the chemical formula of each compound, participating in a reaction can be fetched. By using this information together with the stoichiometry, it is possible to count and compare all atoms on the substrate and product side. We detected some simple cases in which an H\plus{} or P\plus{} was missing, but also some other cases in which multiple atoms (e.g., 2C, 3H and 1P) were missing. Automatically fixing those issues is not recommended because the real missing components are unknown.
+%For example if a P\plus{} is missing, the possibilities include ATP, ADP, NADPH, etc.
+For example if a P\plus{} is missing on the substrate side, the possibilities of missing components on both sides include ATP~$\longrightarrow$~ADP, NADPH~$\longrightarrow$~NADH, and many others.
+Therefore, the result of each atom check is written as comment on every reaction and researchers might have to manually fix reactions with missing atoms.
+
+
+\subsection{Convert and augment the KGML document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN FLOWCHART FIGURE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}[htbp]
+\centering \includegraphics[width=.7\textwidth]{../2012-04_CMSB2012/figures/Flowchart.png}
+\caption{Generation of systems biology models from KEGG pathways -- The flowchart depicts all major steps involved in the creation of initial systems biology models from KEGG pathways. The whole method requires two sources: a KGML-formatted KEGG pathway and access to other KEGG databases, e.g., via the KEGG API. The preprocessing steps, depicted on the top, involve mainly the removal of inappropriate nodes and processing of reactions.
+An important step is the removal of duplicate entries. However, some further steps require information about these duplicates (e.g., when using the layout extension package for SBML) and thus, it is not always part of the preprocessing and may be performed at a later stage.
+Depending on the desired output format, separate processing steps are executed that involve appropriate conversion and annotation of the initial model.
+}
+\label{fig:conversionScheme}
+\end{figure*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% END FLOWCHART FIGURE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%\definecolor{tableShade}{HTML}{F1F5FA}
+%\definecolor{tableShade2}{HTML}{ECF3FE}
+\definecolor{tableShade2}{gray}{0.95}
+%\rowcolors{3}{white}{tableShade2}
+
+%%%%%%%%%%%%%%%%%%%%%%%% ENTRY TABLE %%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[t]
+%\tableparts{
+\caption{BioPAX instances and SBO terms corresponding to KGML entry types.}
+\label{tab:KGMLentries2X}
+%}
+{
+\begin{tabular*}{1.0\columnwidth}{@{\extracolsep{\fill}} lll}
+\toprule
+
+%KGML entry type          & BioPAX element & SBO term & SBO name\\
+%\midrule
+%compound & smallMolecule & SBO:0000247  & simple chemical \\
+%enzyme & protein & SBO:0000252  & polypeptide chain \\
+%gene & protein & SBO:0000252  & polypeptide chain \\
+%ortholog & protein & SBO:0000252  & polypeptide chain \\
+%% genes & complex & SBO:0000253  & non-covalent complex \\
+%group & complex & SBO:0000253  & non-covalent complex \\
+%map & pathway & SBO:0000552  & reference annotation \\
+%%reaction & interaction & SBO:0000 \\
+
+Entry type & BioPAX element & SBO term \\
+\midrule
+compound & smallMolecule & 247 (simple chemical) \\
+enzyme & protein & 252 (polypeptide chain) \\
+gene & protein & 252 (polypeptide chain) \\
+ortholog & protein & 252 (polypeptide chain) \\
+% genes & complex & 253 (non-covalent complex) \\
+group & complex & 253 (non-covalent complex) \\
+map & pathway & 552 (reference annotation) \\
+%reaction & interaction & SBO:0000 \\
+
+\bottomrule
+\end{tabular*}
+}
+\small{
+This table depicts the conversion of KGML entries to BioPAX or SBML. The conversion depends on the KGML entry type attribute. For BioPAX, different class instances are initialized. Conversions to SBML always involve the creation of a \species{} with the given SBO term for each KGML entry. The KGML specification states that an entry of type `gene' ``is a gene product (mostly a protein)". Additionally, a `group' ``is a complex of gene products (mostly a protein complex)" \citep[see][for both quotes]{KGML}. For compatibility with previous KGML versions, the deprecated type `genes' corresponds to `group' since KGML v0.6.1. Further, entries of type `reaction' are not in the table, but discussed in a separate section.
+}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+The completed and fixed KGML document can now be used to generate models. Therefore, conversions to BioPAX, SBML, SBML-qual and several other formats are required. Typically, the model instance has to be initialized and all entries need to be added to the model. Caution needs to be taken in this step, because multiple copies of an entry might be existent in one KGML document. Usually, every graphical copy catalyzes different reactions. But for systems biology models, only one element should be created for all copies, representing a union of all physically identical entries. Furthermore, KGML specifies an entry type called `reaction', which should not be converted to a physical entity in the resulting model.
+Depending on the modeling language, either the reactions or the relations or both need to be converted to the chosen format.
+
+
+Besides those conversion steps, additional steps are required in order to facilitate further modeling steps by researchers. This includes extensive annotations and comments for all elements. Hence, Gene Ontology terms, describing the elements and their function, as well as identifiers for a plethora of other databases for genes, proteins, interactions, structural information, small molecules, etc. are added to the model. In more detail, identifiers are added for Entrez Gene, OMIM, Ensembl, UniProt, ChEBI, DrugBank, Gene Ontology, HGNC, PubChem, 3DMET, NCBI Taxonomy, PDBeChem, GlycomeDB, LipidBank, EC-Numbers (enzyme nomenclature) and various KEGG databases (gene, glycan, reaction, compound, drug, pathway, orthology).
+%
+Besides those cross-references, other helpful human and machine-readable annotations are added, for example, official gene symbols, synonyms, human-readable descriptions, links to more resources or visualizations, and the chemical formula and molecular weight for small molecules.
+
+This is an important step, because simulations on real data or simple experimental data visualization tools require unique identifiers to map the experimental data on the pathway structure. If models provide a simple data structure with labels, but no reference identifiers, they are hardly usable in conjunction with experimental data.
+
+
+% Viele zusätzliche infos von kegg api
+% MIRIAM identifiers
+% ...including GO
+% Very helpful Human readable annotations such as gene symobls, descriptions, pictures for compounds, Links to Kegg db entry, etc.
+
+
+\subsection{KEGG to BioPAX}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN 2BioPAX FIGURE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}[htb]
+\centering \includegraphics[width=1.5\columnwidth]{../2012-04_CMSB2012/figures/KGML2BioPAX.png}
+\caption{Class structure and mapping from KGML to BioPAX -- The figure shows the raw mapping of KGML to BioPAX class instances. The type attribute determines how each entry is translated (see Table~\ref{tab:KGMLentries2X}). Reactions that are catalyzed by enzymes are translated to \Catalysis{}, whereas non-catalyzed reactions are translated directly to \BiochemicalReactions. Relations are either translated to \Conversion{} or to \physicalInteraction{} in BioPAX Level 2 and \MolecularInteraction{} in Level 3 (see Table~\ref{tab:KGMLrelations2X}). To keep the clarity, the figure does not include the information that in BioPAX Level 2, \control{} and \conversion{} inherit from \physicalInteraction{}.
+%Furthermore, a catalysis object contains another object that is controlled by the catalysis, which is for our purposes always a BiochemicalReaction.
+Furthermore, a \Catalysis{} consists of two elements: a \Controller{} and a \Controlled{} element. For our purposes, \Controller{} is always an enzyme and \Controlled{} is a \BiochemicalReaction.
+}
+\label{fig:KGML2BioPAX}
+\end{figure*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% END 2BioPAX FIGURE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%The preprocessed KGML document can now be translated into a BioPAX models.
+Paxtools, a Java\texttrademark{} library for working with BioPAX, provides the infrastructure for building and writing the internal BioPAX data structure (\url{http://www.biopax.org/paxtools.php}). Today, BioPAX Level 2 and Level 3 are still common and there are some data structures in Level 3 that are not available in Level 2. Therefore, separate converters for BioPAX Level 2 and for Level 3 are required. First of all, a BioPAX \model{} has to be created and a pathway object, corresponding to the input KGML, needs to be added to the \model. Then, several annotations and cross-references are defined for this pathway. This includes, for instance, the organism, cross-references to other databases, and gene ontology terms to define the pathway´s function. The next step involves mapping each KGML element to a corresponding BioPAX element. Figure~\ref{fig:KGML2BioPAX} gives an overview of these mappings.
+
+Having the initial pathway model, the next step is to create BioPAX elements for each KGML entry. This translation mainly depends on the type of the KGML entry and is listed in detail in Table~\ref{tab:KGMLentries2X}. Entries with the same identifier (graphical copies of the same element) are grouped to one instance and only one BioPAX element is created for those. Depending on the just created BioPAX element, further annotation steps are required. For \Complexes, we need to add all components. For \SmallMolecules, we add the molecular weight and chemical formula to the corresponding BioPAX fields, which facilitates further modeling steps. For each element, cross-references to other databases and more annotations, as described in the previous section, are added.
+
+KEGG reactions always correspond to biochemical reactions. Thus, a \BiochemicalReaction{} is the appropriate data structure for those reactions and one instance of this class is created for each reaction. If catalyzing enzymes are annotated, a \Catalysis{} instance is created. This \Catalysis{} has all catalyzing enzymes as \Controllers{} and the \BiochemicalReaction{} as \Controlled{} element. The reaction is annotated with the reaction direction and if it is reversible or not. Further, the stoichiometry of each participant is annotated, as well as the EC numbers of all catalyzing enzymes. Even to the reactions, human readable supporting information is added, like the reaction equation, other pathways in which this reaction also occurs, and a generic description. In addition, the result of the atom balance check is added as further comment, together with comprehensive information which atoms are on the substrate side, which are on the product side and the difference between them.
+
+%BioPAX not only supports biochemical reactions but also many other different types of interactions. This is especially useful to express KEGG relations, which have no associated chemical equations, but structural information like ``A activates B". These interactions include classes, for which one can specify a source and a target (useful, e.g., to express ``A inhibits B") but also interactions that just have a pool of components. The later is especially useful for cases in which information is missing or no direction is available.
+Next to biochemical reactions, BioPAX also supports other kinds of relationships between entities.
+BioPAX distinguishes between interactions, for which one can specify a source and a target (called \Conversion), and interactions describing a pool of interacting components (called \Interaction).
+For instance, to express KEGG relations, which have no associated chemical equation but structural information like ``A activates B", a \Conversion{} can be used.
+In contrast, an \Interaction{} is especially useful for cases in which information is missing or no direction is available.
+%
+For example, a relation of type binding with two participants -- this just allows for expressing ``A binds B", but no other conclusion can be drawn from such a relation. Therefore, all relations, from which no direction can be inferred, are converted to a \physicalInteraction{} in BioPAX Level 2 or to a \MolecularInteraction{} in BioPAX Level 3 (the Level 2 \physicalInteraction{} has been replaced by \MolecularInteraction{} in Level 3). All relations from which a direction can be inferred are converted to a BioPAX \Conversion{}.
+An \InteractionVocabulary{} is created for each interaction, that specifies the type of interaction as SBO term, GO term and human-readable string. Table~\ref{tab:KGMLrelations2X} shows in detail how each relation is converted and which SBO and GO terms are being used.
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%% RELATION TABLE %%%%%%%%%%%%%%%%%%%%%%%%
+\setlength{\tabcolsep}{8pt}
+\begin{table*}[htbp]
+%\centering
+\caption{BioPAX instances and SBO terms corresponding to KGML relation subtypes}
+\label{tab:KGMLrelations2X}
+%\rowcolors{1}{white}{tableShade2}
+\begin{tabular}{llllll}
+\toprule
+Relation subtype           & BioPAX element & SBO term & SBO name & GO term & GO name\\
+\midrule
+%\multicolumn{2}{c}{\centering \textbf{BioPAX Level~2}}\\
+%\midrule
+%compound
+%hidden compound
+\rowcolor{tableShade2}
+activation & conversion & SBO:0000170  & stimulation & \emph{none} & \\
+inhibition & conversion & SBO:0000169  & inhibition & \emph{none} & \\
+\rowcolor{tableShade2}
+expression & conversion & SBO:0000170  & stimulation & GO:0010467  & gene expression \\
+repression & conversion & SBO:0000169  & inhibition & \emph{none} &\\
+\rowcolor{tableShade2}
+indirect effect & conversion & SBO:0000344  & molecular interaction & \emph{none} & \\
+state change & conversion & SBO:0000168  & control & \emph{none} & \\
+
+\rowcolor{tableShade2}
+ & physicalInteraction/ &  & non-covalent & & non-covalent \\
+\rowcolor{tableShade2}
+\multirow{-2}{*}{binding/association} &  MolecularInteraction & \multirow{-2}{*}{SBO:0000177} & binding & \multirow{-2}{*}{GO:0005488} & binding \\
+
+ & physicalInteraction/ & &  & \\
+\multirow{-2}{*}{dissociation} &  MolecularInteraction &  \multirow{-2}{*}{SBO:0000180} & \multirow{-2}{*}{dissociation} & \multirow{-2}{*}{\emph{none}} &\\
+
+\rowcolor{tableShade2}
+ & physicalInteraction/ &  & & & \\
+\rowcolor{tableShade2}
+\multirow{-2}{*}{missing interaction} &  MolecularInteraction & \multirow{-2}{*}{SBO:0000396} & \multirow{-2}{*}{uncertain process} &  \multirow{-2}{*}{\emph{none}} & \\
+
+phosphorylation & conversion & SBO:0000216  & phosphorylation & GO:0016310  & phosphorylation \\
+\rowcolor{tableShade2}
+dephosphorylation & conversion & SBO:0000330  & dephosphorylation & GO:0016311  & dephosphorylation \\
+glycosylation & conversion & SBO:0000217  & glycosylation & GO:0070085  & glycosylation \\
+\rowcolor{tableShade2}
+ubiquitination & conversion & SBO:0000224  & ubiquitination & GO:0016567  & ubiquitination \\
+methylation & conversion & SBO:0000214  & methylation & GO:0032259  & methylation \\
+%%%%%%%%%%%%%%%% TABELLE FUER 2-ZEILIG HOCHKANT %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\multirow{2}{*}{activation} & \multirow{2}{*}{conversion} & SBO:0000170 & \emph{none} \\
+% & & (stimulation)  & \\
+%\multirow{2}{*}{inhibition} & \multirow{2}{*}{conversion} & SBO:0000169 & \emph{none} \\
+% & & (inhibition)  & \\
+%\multirow{2}{*}{expression} & \multirow{2}{*}{conversion} & SBO:0000170 & GO:0010467 \\
+% & & (stimulation) & (gene expression) \\
+%\multirow{2}{*}{repression} & \multirow{2}{*}{conversion} & SBO:0000169 & \emph{none} \\
+% & & (inhibition) & \\
+%\multirow{2}{*}{indirect effect} & \multirow{2}{*}{conversion} & SBO:0000344 & \emph{none} \\
+% & & (molecular interaction)  & \\
+%\multirow{2}{*}{state change} & \multirow{2}{*}{conversion} & SBO:0000168 & \emph{none} \\
+% & & (control) & \\
+%\multirow{2}{*}{binding/association} & physicalInteraction/ & SBO:0000177 & GO:0005488  \\
+% &  MolecularInteraction & (non-covalent binding) & (non-covalent binding) \\
+%\multirow{2}{*}{dissociation} & physicalInteraction/ & SBO:0000180 & \multirow{2}{*}{\emph{none}} \\
+% &  MolecularInteraction & (dissociation) &  \\
+%\multirow{2}{*}{missing interaction} & physicalInteraction/ &SBO:0000396 & \multirow{2}{*}{\emph{none}} \\
+% &  MolecularInteraction & (uncertain process) &  \\
+%\multirow{2}{*}{phosphorylation} & \multirow{2}{*}{conversion} & SBO:0000216 & GO:0016310 \\
+% & & (phosphorylation) & (phosphorylation) \\
+%\multirow{2}{*}{dephosphorylation} & \multirow{2}{*}{conversion} & SBO:0000330 & GO:0016311 \\
+% & & (dephosphorylation) & (dephosphorylation) \\
+%\multirow{2}{*}{glycosylation} & \multirow{2}{*}{conversion} & SBO:0000217 & GO:0070085 \\
+% & & (glycosylation) & (glycosylation) \\
+%\multirow{2}{*}{ubiquitination} & \multirow{2}{*}{conversion} & SBO:0000224 & GO:0016567 \\
+% & & (ubiquitination) & (ubiquitination) \\
+%\multirow{2}{*}{methylation} & \multirow{2}{*}{conversion} & SBO:0000214 & GO:0032259 \\
+% & & (methylation) & (methylation) \\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bottomrule
+\end{tabular}
+
+\small{
+
+This table shows how relations are handled during conversion to BioPAX or SBML. The conversion depends on the subtype of each relation. For each subtype, the corresponding BioPAX element, as well as SBO terms and GO terms are given. When converting to BioPAX, both terms are annotated as an instance of \InteractionVocabulary, whereas an SBML \transition{} has a field for the SBO term and both terms are additionally added as controlled vocabulary term on the \transition.
+Please note that \physicalInteraction{} in BioPAX level 2 corresponds to \MolecularInteraction{} in BioPAX level 3. Furthermore, relations of type `compound' are treated differently, as described in a separate section of this publication.
+
+%Erklären:
+%- l2 physicalInteraction, L3 MolecularInteraction
+%- stets werden sbo & go verwendet, in biopax i.vocabulary mit beiden terms, in SBML der term direkt auf transition + beide als cv term.
+% - compound relations
+
+}
+\end{table*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{KEGG to SBML}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% BEGIN FIGURE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure*}[htb]
+\centering \includegraphics[width=1.5\columnwidth]{../2012-04_CMSB2012/figures/KGML2SBML.png}
+\caption{Class structure and mapping from KGML to SBML -- This mapping includes the SBML-qual extension package and is depicted in a simplified scheme. Most properties are encoded as attributes on the actual classes. Tables~\ref{tab:KGMLentries2X} and~\ref{tab:KGMLrelations2X} give further details about translation of entries and relations. SBML can only handle reactions, therefore SBML-qual is required to properly encode relations. This extension package requires its own model. Subsequently, the SBML-core \model{} and each \species{} have to be duplicated to obtain a \qualitativeModel{} including the translated relations.}
+\label{fig:KGML2SBML}
+\end{figure*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% END FIGURE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% DONE: SBO terms kodieren den typ
+% keine relations => SMBL-qual
+% OPTIONAL Layout extension
+% DONE: Level 2/4; Level 3/1
+% reactions -- reversible or irreversible, Stoichiometry, enzymes as modifiers
+
+% EntryType reaction is skipped for core; only available for qual.
+
+% BiologicalQualifierType, Is/HasVersion
+
+%% QUAL:
+% relations as transitions
+
+% Viele zusätzliche infos von kegg api
+% MIRIAM identifiers
+% ...including GO
+% Very helpful Human readable annotations such as gene symobls, descriptions, pictures for compounds, Links to Kegg db entry, etc.
+
+To establish the SBML data structure, we use the Java\texttrademark{} library JSBML \citep{JSBML} and support SBML Level 2 Version 4 \citep{SBMLl2} and SBML Level 3 Version 1 \citep{SBMLl3}. The Level 3 release introduces extension packages and is required to include qualitative models (qual), groups or layout information in the document, which are essential for modeling signaling pathways.
+%
+At the first glance, conversion of KGML to SBML is simple. This is also suggested by the mapping scheme, depicted in Figure~\ref{fig:KGML2SBML}. But many properties in SBML are encoded in other fields than actual class instances, and thus are not directly visible to researchers. KEGG defines entries and an entry type, which specifies if the entry corresponds to proteins, complexes, small molecules, other pathway maps, etc. BioPAX provides different classes to distinguish between those types. SBML, similar to KGML, just has a class named \species{} to encode all those entries. The type of the \species{} should be specified by using terms from the systems biology ontology (SBO terms, \citealp[see][]{SBO}). These SBO terms are hierarchically organized and only SBO terms from the `material entity' branch should be used to encode the entities. Table~\ref{tab:KGMLentries2X} shows, which SBO terms are most appropriate to encode the different KGML entries. Furthermore, as in BioPAX translations, it is important to group graphical copies of the same entries to one element and to create only one \species{} for this entry.
+To make the model usable for further applications, extensive annotations and references to other databases are added, using standardized controlled vocabulary (CV) terms and MIRIAM identifiers \citep{Juty2012,Novere2005}. Further, a description, various synonyms, the CAS number, chemical formula, a reference picture (structural formula for compounds, image of the pathway-map for pathways), molecular weight, and mass are added as human-readable annotation, if available.
+
+Groups are not supported by SBML. In order to encode entries of type `group' in SBML Level 3, one can use the groups extension package \citep{SBMLgroups}. To encode groups in SBML prior to Level 3, the only way are annotations, for example by adding a CV term with a \texttt{BQB\_IS\_ENCODED\_BY} or \texttt{BQB\_HAS\_PART} qualifier that specifies the contents of the group. In any case, an SBO term should also be used, which marks this \species{} as a complex of multiple other \species{}.
+
+KEGG reactions are converted to SBML \reactions{} with correct SBO terms for substrates (SBO:0000015) and products (SBO:0000011). If the reaction is reversible, a generic reactant SBO term (SBO:0000010) should be applied to all reaction participants. In addition, the reversibility is annotated to the \reaction{} itself and the stoichiometry is annotated on all reaction participants. Catalyzing enzymes are included as \ModifierSpeciesReference{} and CV terms, referring to the KEGG reaction identifier and all pathways, in which this reaction occurs, are added. Human-readable annotations on \reactions{} include the reaction definition, equation, a reference to the reaction equation as HTML-image, and the result of the atom balance check (i.e., if there are missing atoms in the reaction).
+
+Relations are required to encode signaling pathways but cannot properly included into core SBML. There is no structure that encodes, e.g., ``A activates B" -- we can only add whole reactions to SBML. For SBML Level 3, the recently proposed qualitative models (qual) extension package solves this problem \citep{QualSpecification}. This extension is designed for qualitative modeling and allows for
+modeling relationships between \species{} that cannot be described in detail.
+%creating transitions, that just specify input, output and a relation between those.
+Thus, to encode the KEGG relations, we have to convert the \model{} to a \qualitativeModel{} and create a qualitative \transition{} for each relation. An SBO term, as given in Table~\ref{tab:KGMLrelations2X}, is assigned to the \transition{} to specify the type and a GO term, mentioned in the same table, is further added as CV term on the \transition{}.
+
+
+
+
+% TODO: Im Artikel auf standards pochen. Deshalb miriam, sbo, alle extensions, etc.
+
+% Species hinzufügen, [ReactionModifiers merken],
+% - Complex as human-readable annotation + Miriam BQB, BQB_IS_ENCODED_BY identifier.
+% - SBO
+% - MIRIAM (databases + reactions, description, synonyms, cas number, chemical formula, picture (for sm and pw), molecular weight, mass
+
+
+
+%DANN Reaktionen (auch hier einmalig und eine pro id mit allen enzymen).
+% -reversible
+% -stoichiometry
+% -SBO's hier 15=Substrate, 10=Reactant 11=Product, hängt von reversibility ab
+% -enzyme als ModifierSpeciesReference
+% Annotationen: KEGG reaction and pathway IDs
+% Definition, Equation, "picture", all pws
+% Check atom balance <= ADD ALSO TO BIOPAX TEXT -- result: could not check, all ok, left-right-difference
+
+%DANN optional layout, SBGN reaction knoten auf enzym stelle, anosnten alle knoten.
+
+
+
+\subsection{More KGML characteristics}
+
+\subsubsection{KGML entries that are reactions.}
+The KGML specification allows entries to have a type called `reaction'. This can be used, for example, to let a relation point to a reaction. Actually, KGML only allows entries to be targets of relations but these constructs can be used to relax the constraints. However, BioPAX naturally allows interactions to point to other interactions as sources or targets. Hence, the document structure is not invalidated if entries with type `reaction' are converted to real reactions in BioPAX and every use of this entry is replaced by using the BioPAX reaction.
+
+In SBML, these entries are also converted to real reactions. No \species{} is created for entries with type `reaction' in SBML-core. For SBML-qual, the specification has similar requirements as KGML: all \transitions{} must have \qualitativeSpecies{} as sources or targets. Therefore, for SBML-qual the translation is similar to the source KGML and a \qualitativeSpecies{} with adequate annotation is created for entries with type `reaction'.
+
+\subsubsection{Relations of subtype `compound'.}
+Some KGML documents include reactions and exclusively relations of subtype `compound'. These compound-relations are mostly relations between enzymes and compounds and KEGG states that this compound is ``shared with two successive reactions [\dots]" \citep[see][]{KGML}. In other words, these relations are copies of reactions that have been created by KEGG for a graphical visualization of the pathway. Thus, if a converter translates both, the reactions and the relations, those compound-relations contain no additional information and should be skipped.
+
+\subsubsection{Documents with glycans instead of compounds.}
+Sometimes, KGML specifies glycans as reaction participants instead of compounds. Actually, there is nothing wrong with this, except that the KEGG API often returns reaction equations with compound identifiers and attributes, such as chemical formula or molecular weight, are exclusively available for compounds. This leads to reactions that are erroneously detected as incorrect or to missing chemical formulas. Therefore, if a synonymous compound identifier is available for a KEGG glycan or another KEGG database identifier that contains synonyms in KEGG COMPOUND, it is advisable to fetch and internally work with the compound identifier. Else, it is very likely that duplicates of the same entries but with different identifiers are created in a model and some relationships are not correctly resolved.
+
+
+%\subsection{Graphical representations}
+%2GraphML (GML), 2SBGN, auch bei 2SBML wird eine visualisierung erzeugt.
+
+
+
+%% TODO: Abgrenzung zu KEGGtranslator v1 und anderen 2BioPAX tools (related KEGG2 xy work)!
+
+
+
+%\section{Results}
+%What have we found out?
+%
+%Only representative results, essential for the Discussion,
+%    should be presented
+%Add supplementary materials for data of secondary
+%    importance
+%Do not attempt to "hide" data in the hope of saving it for a
+%    later paper.
+
+
+
+\section{Discussion}
+
+We successfully established a procedure to create initial structural systems biology models from KEGG pathways. These steps aim at complete reconstruction of specific metabolic or signaling networks and hence, go far beyond simple translations.
+
+But even with all the discussed enhancements and corrections, all models derived from KEGG should only be considered as initial structural models. Many researchers are interested, e.g., in tissue-specific variants of those models. Others want to build kinetic models, constraint-based models, flux-based models, or any other specific model variant. Hence, our goal is to build a solid foundation that can quickly be used for further applications. The generation of these models is eased by providing cross-references to many databases, synonyms, descriptions and other information. This helps researchers to further process the generated models into the desired real model. With the help of annotated cross-references, it is quite easy to, e.g., map experimental data on the resulting model and perform simulations, or use the annotated reactions to identify kinetics in databases like SABIO-RK \citep{SabioRK}.
+
+The models reflect an effort to use all available information about KEGG pathways and consider the specific aspects of SBML or BioPAX to create complete and correct documents. These specific aspects include, for example, usage of SBO terms and MIRIAM URNs for metabolic SBML, as well as using \transitions{} and \qualitativeSpecies{} from the qual package to model signaling networks. For BioPAX, it is important to instantiate correct instances, use cross-references and vocabularies for annotation and fill corresponding fields, e.g., chemical formula or molecular weight of \SmallMolecules{} or the EC numbers of catalyzed \BiochemicalReactions.
+%
+But besides those properties, there are more aspects of these formats that can not be satisfied. This is owed to missing information and the aspiration to avoid creating knowledge out of nowhere.
+%
+In SBML, the signaling maps contain \transitions{} that model all relations with information like `phosphorylation' or similar. The qualitative function of \transitions{} is encoded by \functionTerms{}, that define results and conditions in MathML. The information to fill those variables is not available for the KEGG pathways and thus, can not be given.
+%
+Further, BioPAX Level 3 provides very interesting constructs to encode several instances of the same protein. For example, one protein might be contained in a pathway in multiple states: inactive (e.g., unphosphorylated), and active (phosphorylated). Since Level 3, BioPAX provides \EntityReferences{} that allow for the creation of several entities in different states for a single \Entity{} instance (i.e., protein). Unfortunately, we can not fully use these structures, because KEGG does not specify wether a protein takes part in a relation with it's phosphorylated, raw or any other form. This distinction is simply not made by the available KEGG databases.
+%
+Furthermore, a central dogma of BioPAX is to have \Controller{} and \Controlled{} elements to describe various interactions. For example, a \Controller{} could be an enzyme, controlling a reaction, which is then the \Controlled{} object. But if, e.g., KEGG annotates no enzyme on a reaction or a relation is translated without knowing who controls this relation, no \Controller{} can be specified.
+%
+%SBML metabolic and SBML qual für signaling, hierbei noch einmal auf reactions und relations eingehen
+%
+%Dann zu Kritikpunkten (Compartimente, merge (Hirarchic modeling extension), kinetiken,)
+%
+Besides this, KEGG does not provide information about compartmentalization. Some KEGG graphics do contain illustrations of compartments, but this information is hand-drawn in some pathway pictures and not encoded in any XML or referenced database. Hence, the resulting models just contain a default compartment in which all elements reside.
+
+
+
+
+\subsection{Comparison with other KEGG converters}
+
+%%%%%%%%%%%%%%%%% Converter Comparison TABLE %%%%%%%%%%%%%%%%%
+\newcolumntype{C}{>{\centering\arraybackslash}p{2cm}}
+\begin{table*}[htb]
+\caption{Comparison of different KEGG conversions.}
+\label{tab:AppVergleich}
+\makebox[\textwidth]{
+\begin{tabular}{lcccccC}
+\toprule
+& \multicolumn{2}{c}{KEGGtranslator} & KEGGconverter & KEGG2SBML & BN++ & KGML2BioPAX KGML2SBML \\
+Version & 2.0 & 1.2 & n/a & 1.5.0 & 1.1 & n/a \\
+Release date & \TODO{2012-05-15} & 2011-07-04 & 2009-12-18 & 2008-07-28 & 2009-04-22 & 2010-06-03\\
+Authors & \multicolumn{2}{c}{\citeauthor{Wrzodek2011}} & \citeauthor{KEGGconverter} & \citeauthor{KEGG2SBML} & \citeauthor{Kuentzer2007} & \citeauthor{KEGG2BioPAX_and_SBML} \\
+%Authors & \multicolumn{2}{c}{Wrzodek \emph{et al.}} & Moutselos \emph{et al.} & Funahashi \emph{et al.} & K\"untzer \emph{et al.} & Lee \emph{et al.} \\
+%URL & \multicolumn{2}{c}{http://tinyurl.com/crlmeeo} & http://tinyurl.com/d7npkfv & http://tinyurl.com/bpca4rd & http://tinyurl.com/cu6ze8e & http://tinyurl.com/bmgucdu \\
+\midrule
+\multicolumn{7}{l}{\textbf{Supported model formats}} \\
+%Available?
+%Stand-alone
+~~SBML & \checkmark & \checkmark & \checkmark & \checkmark & $\circ$ & \checkmark \\
+~~BioPAX & \checkmark & $\times$ & $\times$ & $\times$ & \checkmark & \checkmark \\
+
+\multicolumn{7}{l}{\textbf{Generic translation features}} \\
+~~Interpretable & \checkmark & \checkmark & $\circ$ & $\circ$ & \checkmark & \checkmark \\
+~~Signaling pathways & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+~~Complete & \checkmark & \checkmark & \checkmark & $\times$ & \checkmark & $\times$ \\
+~~No duplicate entries & \checkmark & $\times$ & \checkmark  & \checkmark & \checkmark & \checkmark \\
+~~No duplicate reactions & \checkmark & \checkmark & \checkmark  & \checkmark & $\times$ & \checkmark \\
+~~Unbundle reactions & \checkmark & $\times$ & $\times$ & \checkmark & $\times$ & $\times$ \\
+~~Reaction fixing & \checkmark & \checkmark & $\times$ & \checkmark & $\times$ & $\times$ \\
+~~Stoichiometry & \checkmark & $\times$ & $\times$ & $\times$ & $\circ$ & $\circ$ \\
+
+\multicolumn{7}{l}{\textbf{SBML}} \\
+~~Valid & \checkmark & \checkmark & $\times$ & \checkmark & n/a & \checkmark \\
+~~Level/Version & 2.4/3.1 & 2.4 & 2.1 & up to 2.3 & n/a & 2.4 \\
+~~SBO terms & \checkmark & \checkmark & $\times$ & $\times$ & n/a & $\times$ \\
+~~Notes/Annotations & \checkmark & \checkmark & $\times$ & $\times$ & n/a & $\times$ \\
+
+\multicolumn{7}{l}{\textbf{BioPAX}} \\
+~~Valid & \checkmark & n/a & n/a & n/a & $\times$ & $\times$ \\
+~~Level & 2/3 & n/a & n/a & n/a & 2 & 2 \\
+~~Appropriate classes & \checkmark & n/a & n/a & n/a & \checkmark & $\times$ \\
+~~SM annotations & \checkmark & n/a & n/a & n/a & $\times$ & $\times$ \\
+\bottomrule
+\end{tabular}
+}
+{
+
+This table compares various applications that can convert KEGG pathways to BioPAX or SBML models. A checkmark is given, if the corresponding converter fully fulfills all requirements, a circle states that the requirements are only met partially or incorrect and a cross indicates features, that are not contained at all.
+A model is \emph{Interpretable}, if entities in the model can automatically be mapped to a database. \emph{Signaling pathways} are supported, if the converters can read and convert KEGG models with relations. A conversion is \emph{complete}, if every relevant reaction of a KGML also occurs in any form in the translated document. For visualization purposes, KGML files often contain multiple copies of entries or reactions, these \emph{duplicates} should be removed. The contained reactions are often \emph{bundled} (multiple reactions are summarized as one) or miss some reaction participants. \emph{Reaction fixing} refers to the completion of missing reaction participants. The \emph{stoichiometry} is not contained in KGML documents and must be parsed from reaction equations in the KEGG REACTION database. To test the validity of the models, we used the corresponding validators from \href{http://sbml.org/Facilities/Validator/}{SBML.org} and \href{http://www.biopax.org/biopax-validator/}{BioPAX.org}. A model is marked as \emph{valid}, if the validator does not return any errors. For SBML, we further inspect if the models contain \emph{SBO terms} or any \emph{notes or annotations}, such as cross-references (CV terms, MIRIAM URNs, etc.). For BioPAX, it is important to use the \emph{appropriate classes} (instances of \smallMolecule{} for small molecules and instances of \protein{} for proteins) and a nice feature to fill the available BioPAX fields for chemical formula or molecular weight of small molecules (\emph{SM annotations}).
+%Cytoscape using KGMLReader, BiNOM (Version und Date korrespondieren zu den beiden Plugins).
+}
+\end{table*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+There are some other approaches to convert KGML to SBML or BioPAX. Most of these approaches perform simple one-to-one conversions and do not augment or change the content of the document. This is not necessarily a problem, e.g., there are almost no additional processing steps, despite the actual format conversion, for visualizing a pathway model. But for creating initial systems biology models, one should take care of all contained reactions and relations. Some important aspects are, for example, that one reaction really is one complete reaction, that all entities can computationally be mapped on at least one database, and that the resulting document is valid. Therefore, we created a list of features and compared different conversion tools. The result of this comparison can be viewed in Table~\ref{tab:AppVergleich}.
+
+Besides the here described method, no referenced converter is able to build signaling networks. All converters focus on metabolic networks only. Before the release of the qualitative models extension for SBML Level 3, it was not possible to appropriately describe signaling networks in SBML. And because all referenced converters focus on SBML Level 1 or Level 2, it is correct that they do not convert signaling models. This is much more plausible than creating pseudo-\reactions{} or similar constructs. Besides the SBML converters, the BioPAX converters also focus on KEGG reactions. Relations encoded in KEGG signaling maps seem to be completely ignored, which is not correct, because BioPAX provides appropriate data structures to encode those relations.
+
+KEGGconverter \citep{KEGGconverter} is implemented in Java\texttrademark{} and able to translate KGML documents to SBML L2V1. The resulting \species{} (enzymes and small molecules) contain no annotations, notes or SBO terms and are named with a human readable string containing KEGG identifiers in brackets. Thus, to computationally interpret those models and, e.g., map experimental data on them, one would need to reconstruct the KEGG identifier with a regular expression on the name. The conversion is complete (i.e., the complete KGML content is appropriately converted to SBML) and contains no duplicate entries or reactions. But reactions are converted as they are. No unbundling of grouped reactions is performed, no augmenting of missing reactants and the stoichiometry is not set. In our tests, the SBML validator complained that the generated SBML is not valid, because KEGGconverter uses spaces in identifiers which is not allowed in SBML. Besides the KGML conversion, KEGGconverter provides functionalities to add kinetics to the resulting models or merge different KGMLs to one model.
+
+KEGG2SBML \citep{KEGG2SBML} is a perl script for converting KGML documents to valid SBML, supporting all Levels and Versions up to L2V3. This script uses various flat files from KEGG databases as additional resources and is capable of generating appropriate reactions (unbundled, no missing reactants and no duplicates). Unfortunately, the converted document is not complete (some reactions that should be contained in the pathway are missing), stoichiometry is omitted, and \species{} have no notes, annotations or SBO terms. All elements are named by their respective human-readable name, which is nice for manual inspections but renders the converted models barely usable for further subsequent modeling steps. JSim \citep{JSim}, a simulation system for quantitative SBML models, provides converted KEGG pathways for download. Those pathways have been created using KEGG2SBML and thus, the same properties apply for those conversions.
+
+BN++ \citep{Kuentzer2007} is an application that is not primarily designed for KEGG translations, but offers this functionality as a side-feature. According to it's authors, the project is currently not maintained and they are working on another project that may again support the translation of KGML files. Nevertheless, the available source code offers classes to convert KGML to SBML and BioPAX but we were not able to successfully compile and run their source code. However, BN++ has been used by the KEGG team to generate official BioPAX translations which are still downloadable from the official KEGG FTP and thus, represent a wide-spread used translation from KEGG to BioPAX. These BioPAX Level 2 files are only available for metabolic reference pathways and represent complete translations using appropriate BioPAX classes (\smallMolecule{} for small molecules and \protein{} for enzymes). All entities are nicely converted with cross-references to corresponding KEGG identifiers and no duplicate entities are created. Unfortunately, the conversion contains duplicate reactions, missing reactants are not augmented and there is no option to unbundle reactions. The stoichiometry is always set to one, which is obviously wrong for many reactions. Furthermore the BioPAX fields for formula or molecular weight of small molecules are not used and the validator gives errors for `Cardinality violation' and `RDF Syntax errors'.
+
+KGML2BioPAX and KGML2SBML are two applications that are part of an ``ongoing effort to develop an ultimate KEGG-based pathway enrichment analysis system" \citep[see][]{KEGG2BioPAX_and_SBML}. Unfortunately, both, the SBML and BioPAX conversions are not complete (some elements from the source document are missing), contain no changes on the reactions, and the stoichiometry is erroneously always specified as one. But all elements use KEGG identifiers, which renders the models machine-interpretable and no reactions or entities are contained twice. The SBML Level 2 Version 4 documents are valid, but contain no notes annotations or SBO terms. The BioPAX Level 2 translations contain all KEGG entries as \proteins, which is obviously wrong, e.g., for small molecules and contain no further annotations. The validator complains about errors in the RDF syntax and usage of ``unknown (or prohibited) class[es], not defined in the BioPAX specification".
+
+Despite these converters, there are even more possibilities to create SBML documents from KEGG pathways. A popular application is Cytoscape \citep{Cytoscape}, which provides KGMLReader (freely available at \url{http://code.google.com/p/kgmlreader/}), a plugin to read KGML documents, and BiNOM \citep{Zinovyev2008}, a plugin that can write SBML documents. But the generated SBML code is not usable for further modeling steps. KGMLReader concentrates on graphical representations for Cytoscape and the resulting SBML export of BiNOM barley reflects the input file. It is obvious that the resulting SBML is merely a result of the graphical representation. Edges in the graph primarily connect metabolites with enzymes and each edge is encoded as an SBML reaction. This leads to reactions with small molecules as substrates and enzymes as products, which is clearly incorrect. No elements contain annotations and they are named with a consecutive number only. This renders those documents unusable for further modeling or simulation approaches.
+Besides Cytoscape, there are many similar tools (e.g., PathVisio -- \citealp{PathVisio}, Subio or VANTED -- \citealp{VANTED}) that mainly focus on a graphical representation of the KGML files, most of which do not have SBML or BioPAX writers. Besides the graphical focus and missing writers, comparison to those tools is not reasonable because they are not thought to act as KEGG converters.
+
+The SuBliMinaL Toolbox \citep{SuBliMinaL} provides a very interesting alternative for metabolic modeling, based on KEGG data. SuBliMinaL does not provide KGML conversion and is thus not directly comparable to other converters. But it provides methods to reconstruct, e.g., whole organism maps from the KEGG database in an appropriate SBML document, which is well-annotated and contains complete and correct reactions.
+
+% Partially DONE: PathVisio
+% DONE: KeggPWconverter (subio)
+% DONE: JSIM (uses KEGG2SBML -- PAT2Mod Konkurrenz)
+% TODO: KCPAVS
+
+
+%Dann zu Kritikpunkten (Compartimente, merge (Hirarchic modeling extension), kinetiken,)
+
+
+%Lay foundations for initial models with correct and complete base... derived from KEGG pathways. May be further processed to tissue-specific, ...
+%"No creation of knownledge" => BioPAX Level 3 phosphorylated entryType can not be correctly inferred automatically. No possible.
+%SBML metabolic and SBML qual für signaling, hierbei noch einmal auf reactions und relations eingehen
+%
+%Dann zu Kritikpunkten (Compartimente, merge (Hirarchic modeling extension), kinetiken,)
+
+
+
+
+
+% TODO: Auf KGML eingehen
+% -entries / entryType relation, genes, etc.
+% -erklären was reactions und relations sind
+% warum nicht nur reactions/ realtions, was in welchem format, etc.
+% format eigenschaften erklären (SBO terms in SBML; mol.weight, chemical foruma in BioPAX
+% warum initiale models, warum fix nötig, etc.
+
+% SBML/qual / other extensions
+
+% - Biopax l3 physicalEntities/relations (+p, controller, not-creating-knowledge) => a.Gerasch gespräch
+% - Kompartimente wären noch nötig
+% - Merge wäre auch schön, für Kinetiken gibts Squeezer, Tissue-Specific, etc. (Mail von Falk)
+% - "Dinge wie 2SBML 2BioPAX" (?)
+% - Hirarchical modeling extension könnte man für references pw-maps verwenden (=> Merge)
+%
+% Ende von "2.4 Convert and augment..." abschnitt ("This is an important step, [...]") zu Discussion verschieben
+%
+
+
+
+
+\section{Implementation and availability of the method}
+All described methods are implemented in the second release of KEGGtranslator (since version 2.0). KEGGtranslator is implemented in Java\texttrademark, provides an interactive, user-friendly and easy-to-use graphical user interface (GUI), and is freely available under the LGPL version 3 license from \url{http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/}. KGML pathways can be downloaded automatically from within KEGGtranslator. The application can convert KEGG pathways from KGML files to BioPAX Level~2, BioPAX Level~3, SBML (core), SBML (qual), or SBML-core and -qual. If desired, graphical representations can be created in SBGN, SIF, GML, GraphML, JPG and some other formats. Furthermore, many options are provided that control the described (pre-) processing of KEGG conversions and allow to customize the generated models to meet most requirements.
+
+\section{Conclusion}
+
+KEGG pathways are a valuable resource for pathway-based modeling approaches. Unfortunately, the KGML-formatted pathways are primarily for visualization purposes and not directly usable as metabolic or signaling models. Therefore, many aspects have to be fixed and considered when converting the pathways to community standards like BioPAX or SBML. This ranges from unbundling, fixing and annotating the stoichiometry on reactions, over using exclusively organism-specific and unique entities, to handling relations. With the help of additional information from multiple other KEGG databases, the resulting models provide correct and highly enriched structures that contain far more information than the original KGML.
+%
+The proposed method, including the qualitative models extension for SBML, is the first method that is able to generate signaling models in SBML or BioPAX from KEGG pathways. Currently, no other approach is able to generate complete pathway models with correct reactions, including stoichiometry and well-annotated SBML (i.e., including SBO terms or MIRIAM URNs) or valid BioPAX documents.
+
+%
+%We here propose methods and summarize important aspects about KEGG pathways, which can be used to create initial structural metabolic and non-metabolic models in SBML or BioPAX.
+All proposed methods are implemented in the KEGGtranslator application. The models, generated by KEGGtranslator with the here described method, lay the foundations for further modeling approaches, such as constraint-based models, tissue-specific models, or simply including kinetics to the models. All conversions obey the special requirements of SBML or BioPAX and include a huge amount of machine- and human-readable annotations. This facilitates the use of those models in other applications that perform further analysis, modeling or simulation steps on those.
+
+%These models provide a strong base for further modeling steps, such as adding kinetics, building tissue-specific models or performing flux-analyzes.
+%
+%
+%Previous SBML converters have been released prior to SBML Level~3 and thus, could not include SBML extension packages \cite{KEGGconverter,KEGG2SBML,KEGG2BioPAX_and_SBML}. But correctly translating relations or creating groups is not possible without the recently introduced qual \cite{QualSpecification} or groups \cite{SBMLgroups} extensions and thus, previous converters either had to skip those or create pseudo-\reactions{} or pseudo-\species{}. Until now, conversions from KEGG to BioPAX seem to be uncommon and thus, we could not find other publications or software to that we can compare our results.
+%
+%
+
+
+%\TODO{Hat noch jemand eine brennende Idee was hier noch rein muss? Ich bitte hier um Ideen was die Hauptpunkte des Papers waren, die ich hier nicht ausführlich genug oder gar nicht erwähnt habe!}
+
+
+
+\section{FUNDING}
+% Formatting and exact phrase designed according to http://www.oxfordjournals.org/our_journals/nar/for_authors/msprep_submission.html
+This work was supported by the Federal Ministry of Education and Research (BMBF, Germany) in the projects Virtual Liver [grant number 0315756]; Spher4Sys [grant number 0315384C]; and the National Genome Research Network (NGFN-PLUS Functional Genomics of Parkinson´s Disease, [grant number 01GS08134]).
+
+
+\section{ACKNOWLEDGEMENTS}
+%\TODO{Mention all persons from AppNote paper + Path2Models persons?}
+We gratefully acknowledge very fruitful discussions with Nicloas Le Nov\`{e}re, Nicolas Rodriguez, Neil Swainston, Falk Schreiber, Roland Keller, Florian Mittag, Akira Funahashi, and Toshiaki Katayama.
+ 
+%\paragraph{Funding:}
+%Federal Ministry of Education and Research (BMBF, Germany) in the projects Virtual Liver (grant number 0315756), Spher4Sys (grant number 0315384C) and the National Genome Research Network (NGFN-PLUS Functional Genomics of Parkinson´s Disease, grant number 01GS08134).
+%\paragraph{Conflict of interest:} None declared.
+
+\subsubsection{Conflict of interest:} None declared.
+%\newpage
+
+%Journal names should be abbreviated in the style of Chemical Abstracts. Where the list of authors is extensive it is acceptable to list the first 10 authors followed by et al. NOTE THAT FULL TITLES OF JOURNAL ARTICLES MUST BE PROVIDED.
+
+\bibliographystyle{genome_research}%{genres}
+\bibliography{../2012-04_CMSB2012/KEGGtranslator_v2_methods}
+
+
+\end{document}
