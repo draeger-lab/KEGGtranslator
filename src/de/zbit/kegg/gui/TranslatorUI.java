@@ -246,8 +246,14 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	protected JToolBar createJToolBar() {
 		initPreferences();
 		// final JPanel r = new JPanel(new VerticalLayout());
-		final JToolBar r = new JToolBar("Translate new file", JToolBar.HORIZONTAL);
-
+		final JToolBar r = new JToolBar("Translate new document", JToolBar.HORIZONTAL);
+		
+		// Add "Download KGML" / "pathway from KEGG" button
+    JButton download = GUITools.createJButton(this, Action.DOWNLOAD_KGML, UIManager.getIcon("ICON_GEAR_16"), 'D');
+    r.add(download);
+    r.addSeparator();
+    
+    // Add "Translate file" stuff
 		JComponent jc = PreferencesPanel.createJComponentForOption(KEGGtranslatorIOOptions.INPUT, prefsIO, this);
 		// Allow a change of Focus (important!)
 		if (jc instanceof FileSelector) ((FileSelector)jc).removeInputVerifier();

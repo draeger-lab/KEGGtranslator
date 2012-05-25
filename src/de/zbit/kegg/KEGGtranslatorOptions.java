@@ -224,7 +224,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    * If true, adds celldesigner annotations to the SBML-XML document.
    */
   public static final Option<Boolean> CELLDESIGNER_ANNOTATIONS = new Option<Boolean>("CELLDESIGNER_ANNOTATIONS",Boolean.class,
-      "If true, adds celldesigner annotations to the SBML-XML document.", (short) 2, "-cd", false);
+      "If true, adds celldesigner annotations to the SBML-XML document.", (short) 2, "-cd", false, false);
 
   /**
    * If true, adds layout information to the SBML-document.

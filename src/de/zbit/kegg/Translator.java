@@ -353,6 +353,18 @@ public class Translator extends Launcher {
 	public String getAppName() {
 		return "KEGGtranslator";
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.zbit.Launcher#getCitation(boolean)
+	 */
+	@Override
+	public String getCitation(boolean HTMLstyle) {
+	  if (HTMLstyle) {
+	    return "KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats. Wrzodek C, Dr&#228;ger A, Zell A.<i>Bioinformatics</i>. 2011, <b>27</b>:2314-2315";
+	  } else {
+	    return "KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats. Wrzodek C, Dr&#228;ger A, Zell A. Bioinformatics. 2011, 27:2314-2315";
+	  }
+	}
 
 	/*
 	 * (non-Javadoc)

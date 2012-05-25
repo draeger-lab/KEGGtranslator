@@ -21,12 +21,16 @@
 package de.zbit.kegg.io;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
+import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
 
@@ -150,10 +154,12 @@ public class CellDesignerUtils {
    * @param r
    */
   public void addCellDesignerAnnotationToReaction(
-      org.sbml.jsbml.Reaction sbReaction, Reaction r) {
-    sbReaction.getAnnotation().addAnnotationNamespace("xmlns:celldesigner",
+    org.sbml.jsbml.Reaction sbReaction, Reaction r) {
+    if (!containsCellDesignerNS(sbReaction)) {
+      sbReaction.getAnnotation().addAnnotationNamespace("xmlns:celldesigner",
         "", "http://www.sbml.org/2001/ns/celldesigner");
-    sbReaction.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+      sbReaction.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+    }
     
     // Add Reaction Annotation
     sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:extension>\n");
@@ -165,36 +171,44 @@ public class CellDesignerUtils {
     
     sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:baseReactants>\n");
     for (SpeciesReference s : sbReaction.getListOfReactants()) {
-      sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:baseReactant species=\"%s\" alias=\"%s\"/>\n",
+      if (s!=null && s.isSetSpeciesInstance()) {
+        sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:baseReactant species=\"%s\" alias=\"%s\"/>\n",
           s.getSpeciesInstance().getId(),"cd_sa"+ s.getSpeciesInstance().getId()));
-      
-      // Write annotation for SpeciesReference
-      if (!s.isSetAnnotation()) {
-        Annotation rAnnot = new Annotation("");
-        rAnnot.setAbout("");
-        s.setAnnotation(rAnnot);
-        s.getAnnotation().addAnnotationNamespace("xmlns:celldesigner","", "http://www.sbml.org/2001/ns/celldesigner");
-        s.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
-      }
-      s.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
+        
+        // Write annotation for SpeciesReference
+        if (!s.isSetAnnotation()) {
+          Annotation rAnnot = new Annotation("");
+          rAnnot.setAbout("");
+          s.setAnnotation(rAnnot);
+          if (!containsCellDesignerNS(s)) {
+            s.getAnnotation().addAnnotationNamespace("xmlns:celldesigner","", "http://www.sbml.org/2001/ns/celldesigner");
+            s.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+          }
+        }
+        s.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
           "cd_sa"+ s.getSpeciesInstance().getId()));
+      }
     }
     sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:baseReactants>\n");
     
     sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:baseProducts>\n");
     for (SpeciesReference s : sbReaction.getListOfProducts()) {
-      sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:baseProduct species=\"%s\" alias=\"%s\"/>\n",
+      if (s!=null && s.isSetSpeciesInstance()) {
+        sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:baseProduct species=\"%s\" alias=\"%s\"/>\n",
           s.getSpeciesInstance().getId(),"cd_sa"+ s.getSpeciesInstance().getId()));
-      // Write annotation for SpeciesReference
-      if (!s.isSetAnnotation()) {
-        Annotation rAnnot = new Annotation("");
-        rAnnot.setAbout("");
-        s.setAnnotation(rAnnot);
-        s.getAnnotation().addAnnotationNamespace("xmlns:celldesigner","", "http://www.sbml.org/2001/ns/celldesigner");
-        s.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
-      }
-      s.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
+        // Write annotation for SpeciesReference
+        if (!s.isSetAnnotation()) {
+          Annotation rAnnot = new Annotation("");
+          rAnnot.setAbout("");
+          s.setAnnotation(rAnnot);
+          if (!containsCellDesignerNS(s)) {
+            s.getAnnotation().addAnnotationNamespace("xmlns:celldesigner","", "http://www.sbml.org/2001/ns/celldesigner");
+            s.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+          }
+        }
+        s.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
           "cd_sa"+ s.getSpeciesInstance().getId()));
+      }
     }
     sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:baseProducts>\n");
     
@@ -260,13 +274,15 @@ public class CellDesignerUtils {
    * Uses spec.getName() ! Be careful, the species CD Extension tag is NOT
    * closed.
    */
-  private void addCellDesignerAnnotationToSpecies(Species spec, Entry e) {
+  private void addCellDesignerAnnotationToSpecies(NamedSBase spec, Entry e) {
     // TODO: Sind die defaults so richtig? was bedeutet z.B. cd:activity?
     EntryType t = e.getType();
     boolean isGroupNode = KEGG2jSBML.isGroupNode(e); // genes = group in kgml v<0.7
     
-    spec.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
-    spec.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+    if (!containsCellDesignerNS(spec)) {
+      spec.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "","http://www.sbml.org/2001/ns/celldesigner");
+      spec.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
+    }
     
     // Add to Species Annotation list
     StringBuffer target;
@@ -397,9 +413,12 @@ public class CellDesignerUtils {
    */
   public void addCellDesignerAnnotationToAllSpecies(Pathway p) {
     ArrayList<Entry> entries = p.getEntries();
+    Set<String> alreadyProcessed = new HashSet<String>();
     for (Entry entry : entries) {
       if (entry.getCustom()!=null && entry.getCustom() instanceof Species) {
-        addCellDesignerAnnotationToSpecies((Species) entry.getCustom(), entry);
+        if ( alreadyProcessed.add(((NamedSBase) entry.getCustom()).getId()) ) {
+          addCellDesignerAnnotationToSpecies((Species) entry.getCustom(), entry);
+        }
       }
     }
   }
@@ -419,9 +438,25 @@ public class CellDesignerUtils {
     // annot.addExtension("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner", cdAnnot);
     
     String cellDesignerNameSpace = "xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner";
-    model.addNamespace(cellDesignerNameSpace);
-    model.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "", "http://www.sbml.org/2001/ns/celldesigner");
-    doc.addNamespace("xmlns:celldesigner", "", "http://www.sbml.org/2001/ns/celldesigner"); // xmlns:celldesigner  }
+    if (model.getNamespaces()==null || !model.getNamespaces().contains(cellDesignerNameSpace) ) {
+      model.addNamespace(cellDesignerNameSpace);
+    }
+    if (!containsCellDesignerNS(model)) {
+      model.getAnnotation().addAnnotationNamespace("xmlns:celldesigner", "", "http://www.sbml.org/2001/ns/celldesigner");
+      doc.addNamespace("xmlns:celldesigner", "", "http://www.sbml.org/2001/ns/celldesigner"); // xmlns:celldesigner  }
+    }
+  }
+  
+  /**
+   * 
+   * @param sb
+   * @return
+   */
+  public static boolean containsCellDesignerNS(SBase sb) {
+    if (sb==null || sb.getAnnotation()==null || sb.getAnnotation().getAnnotationNamespaces()==null) {
+      return false;
+    }
+    return sb.getAnnotation().getAnnotationNamespaces().containsKey("xmlns:celldesigner");
   }
   
 }
