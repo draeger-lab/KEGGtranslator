@@ -38,6 +38,7 @@ import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.qual.Input;
 import org.sbml.jsbml.ext.qual.InputTransitionEffect;
+import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.OutputTransitionEffect;
 import org.sbml.jsbml.ext.qual.QualConstant;
 import org.sbml.jsbml.ext.qual.QualitativeModel;
@@ -92,6 +93,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * as well as qualSpecies and transitions.
    */
   private boolean considerReactions = false;
+  
+  /**
+   * All transitions that are added to the model.
+   * Identified as "inputQualitativeSpecies ouptutQualitativeSpecies [SBOterm]",
+   * used to check for duplicates.
+   */
+  private Set<String> containedTransitions = new HashSet<String>();
   
   
   /**
@@ -242,7 +250,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     in.setMetaId("meta_" + in.getId());
     
     // Output
-    t.createOutput(NameToSId("out"), qTwo.getId(), OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
+    Output out = t.createOutput(NameToSId("out"), qTwo.getId(), OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
     
     //XXX: "function term" is intentionally not set in KEGG2X (info not provided).
     
@@ -325,6 +333,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       // to be annotated as different versions ("HAS_VERSION").
       //setBiologicalQualifierISorHAS_VERSION(cv);
       t.addCVTerm(cv);
+    }
+    
+    // Don't att same relations twice
+    String transitionIdentifier = in.getQualitativeSpecies() + " " + out.getQualitativeSpecies() + " " + (t.isSetSBOTerm() ? t.getSBOTermID():"");
+    if (!containedTransitions.add(transitionIdentifier)) {
+      qualModel.getListOfTransitions().remove(t);
+      t=null;
     }
     
     return t;

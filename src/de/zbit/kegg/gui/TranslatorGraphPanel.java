@@ -108,7 +108,13 @@ public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
     throws Exception {
     return ((KEGG2yGraph)getTranslator()).writeToFile(document, file.getPath(), format);
   }
-
-
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
+   */
+  @Override
+  public boolean isDetailPanelAvailable() {
+    return false;
+  }
   
 }

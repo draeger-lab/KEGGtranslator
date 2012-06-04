@@ -118,4 +118,13 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
     throws Exception {
     return ((KEGG2SBGN)getTranslator()).writeToFile(document, file.getPath());
   }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
+   */
+  @Override
+  public boolean isDetailPanelAvailable() {
+    return false;
+  }
+  
 }

@@ -277,6 +277,9 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
         instantiate = relationshipXref.class;
       } else if (type==3) {
         instantiate = publicationXref.class;
+      } else {
+        // we can NOT instantiate xref.class
+        instantiate = relationshipXref.class;
       }
       
       xr = model.addNew(instantiate, uri);
@@ -293,6 +296,9 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
         instantiate = RelationshipXref.class;
       } else if (type==3) {
         instantiate = PublicationXref.class;
+      } else {
+        // we can NOT instantiate Xref.class
+        instantiate = RelationshipXref.class;
       }
       
       xr = model.addNew(instantiate, uri);

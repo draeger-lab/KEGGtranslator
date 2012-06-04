@@ -48,7 +48,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model>{
+public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model> {
 
   private static final long serialVersionUID = -6585611929238639630L;
 
@@ -126,6 +126,14 @@ public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model>{
    */
   @Override
   public boolean isAllowedToSaveAsGraphFormats() {
+    return false;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
+   */
+  @Override
+  public boolean isDetailPanelAvailable() {
     return false;
   }
   

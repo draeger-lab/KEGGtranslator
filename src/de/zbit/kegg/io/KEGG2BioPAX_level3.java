@@ -55,7 +55,6 @@ import org.biopax.paxtools.model.level3.SimplePhysicalEntity;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.SmallMoleculeReference;
 import org.biopax.paxtools.model.level3.Stoichiometry;
-import org.biopax.paxtools.model.level3.UnificationXref;
 import org.biopax.paxtools.model.level3.XReferrable;
 import org.biopax.paxtools.model.level3.Xref;
 
@@ -307,7 +306,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     // Parse Kegg Pathway information
     boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM());
     if (isKEGGPathway) {
-      Xref xr = (Xref)createXRef(IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM());
+      Xref xr = (Xref)createXRef(IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM(), 1);
       if (xr!=null) {
         pathway.addXref(xr);
       }
@@ -473,6 +472,16 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       log.finer("Relation with unknown or removed entry: " + r);
       return null;
     }
+    
+//    // Relations should prefarably translated, using the EntityReferences
+//    if (qOne instanceof SimplePhysicalEntity && 
+//        ((SimplePhysicalEntity)qOne).getEntityReference()!=null ) {
+//      qOne = ((SimplePhysicalEntity)qOne).getEntityReference();
+//    }
+//    if (qTwo instanceof SimplePhysicalEntity && 
+//        ((SimplePhysicalEntity)qTwo).getEntityReference()!=null ) {
+//      qTwo = ((SimplePhysicalEntity)qTwo).getEntityReference();
+//    }
     
     // Most relations have a left and right side => conversion as default
     Class<? extends BioPAXElement> instantiate = Conversion.class;

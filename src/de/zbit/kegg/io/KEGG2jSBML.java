@@ -219,7 +219,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   
   /** Load the default preferences from the SBPreferences object. */
   private void loadPreferences() {
-    addCellDesignerAnnots = KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
+    // CellDeisnger annotations are not supported anymore!
+    //addCellDesignerAnnots = KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS.getValue(prefs);
     addLayoutExtension = KEGGtranslatorOptions.ADD_LAYOUT_EXTENSION.getValue(prefs);
     useGroupsExtension = KEGGtranslatorOptions.USE_GROUPS_EXTENSION.getValue(prefs);
   }
