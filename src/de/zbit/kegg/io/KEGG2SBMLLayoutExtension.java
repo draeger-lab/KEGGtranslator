@@ -127,6 +127,8 @@ public class KEGG2SBMLLayoutExtension {
     // => track min and max values.
     MinAndMaxTracker tracker = new MinAndMaxTracker();
     
+    Map<String, Integer> idCounts = new HashMap<String, Integer>();
+    
     for (Entry e : p.getEntries()) { // In KGML, only entries have graph objects.
       Object s = e.getCustom();
       if (s!=null && e.hasGraphics()) {
@@ -182,14 +184,14 @@ public class KEGG2SBMLLayoutExtension {
             //Utils.removeFromMapOfSets(enzyme2rct, rct, speciesId);
             
             // Set X and Y on the reactionGlyph
-            boolean positionAttributesUsed=false;
+            boolean positionAttributesUsed = false;
             if (!g.isDefaultPosition() && (rct != null) && (!layout.containsGlyph(rct))
                 && !isLineGraphic) {
               // LINE coordinate are much worse than rectangles. So prefer rectangles!
               List<ReactionGlyph> listOfGlyphs = layout.findReactionGlyphs(rct.getId());
               ReactionGlyph glyph;
               if ((listOfGlyphs == null) || listOfGlyphs.isEmpty()) {
-            	  glyph = layout.createReactionGlyph(rct.getId());
+            	  glyph = layout.createReactionGlyph(createGlyphID(idCounts, rct.getId()), rct.getId());
               } else {
             	  glyph = listOfGlyphs.get(0);
               }
@@ -204,7 +206,7 @@ public class KEGG2SBMLLayoutExtension {
 //            if (listOfSpecGlyphs.isEmpty()) {
               SpeciesGlyph sGlyph;
 //              if (listOfSpecGlyphs.isEmpty()) {
-                sGlyph = layout.createSpeciesGlyph(speciesId);
+                sGlyph = layout.createSpeciesGlyph(createGlyphID(idCounts, speciesId), speciesId);
 //              } else {
 //                sGlyph = listOfSpecGlyphs.get(0);
 //              }
@@ -234,7 +236,7 @@ public class KEGG2SBMLLayoutExtension {
             // Multiple species glyphs are permitted for one species!
             SpeciesGlyph sGlyph;
 //            if (listOfSpeciesGlyphs.isEmpty()) {
-              sGlyph = layout.createSpeciesGlyph(speciesId);
+              sGlyph = layout.createSpeciesGlyph(createGlyphID(idCounts, speciesId), speciesId);
 //            } else {
 //              sGlyph = listOfSpeciesGlyphs.get(0);
 //            }
@@ -259,6 +261,24 @@ public class KEGG2SBMLLayoutExtension {
     
     // Add the total dimension
     layout.createDimensions(tracker.getWidth(), tracker.getHeight(), 1);
+  }
+  
+  /**
+   * 
+   * @param idCounts
+   * @param id
+   * @return
+   */
+  private static String createGlyphID(Map<String, Integer> idCounts,
+		  String id) {
+	  String gID = "glyph_" + id;
+	  if (idCounts.containsKey(gID)) {
+		  idCounts.put(gID, Integer.valueOf(idCounts.get(gID).intValue() + 1));
+	  } else {
+		  idCounts.put(gID, Integer.valueOf(1));
+	  }
+	  gID = gID + '_' + idCounts.get(id);
+	  return gID;
   }
   
   /**
