@@ -34,9 +34,10 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.layout.BoundingBox;
 import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
 import org.sbml.jsbml.ext.layout.Layout;
-import org.sbml.jsbml.ext.layout.LayoutConstant;
+import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
+import org.sbml.jsbml.ext.layout.TextGlyph;
 
 import de.zbit.graph.MinAndMaxTracker;
 import de.zbit.kegg.parser.pathway.Entry;
@@ -57,12 +58,12 @@ public class KEGG2SBMLLayoutExtension {
   /**
    * Layout extension namespace URL.
    */
-  public static final String LAYOUT_NS = LayoutConstant.namespaceURI;
+  public static final String LAYOUT_NS = LayoutConstants.namespaceURI;
   
   /**
    * Unique identifier to identify this Namespace/Extension.
    */
-  public static final String LAYOUT_NS_NAME = LayoutConstant.shortLabel;
+  public static final String LAYOUT_NS_NAME = LayoutConstants.shortLabel;
 
 
   /**
@@ -145,6 +146,19 @@ public class KEGG2SBMLLayoutExtension {
         if (s instanceof AbstractNamedSBase) {
           String speciesId = ((AbstractNamedSBase) s).getId();
           
+          // Multiple species glyphs are permitted for one species!
+          SpeciesGlyph sGlyph;
+//        if (listOfSpecGlyphs.isEmpty()) {
+          sGlyph = layout.createSpeciesGlyph(createGlyphID(idCounts, speciesId), speciesId);
+          TextGlyph tGlyph = layout.createTextGlyph(createGlyphID(idCounts, speciesId));
+          tGlyph.setGraphicalObject(sGlyph);
+          tGlyph.setOriginOfText(speciesId);
+          BoundingBox speciesBox = sGlyph.getBoundingBox();
+          if (speciesBox == null) {
+        	  speciesBox = sGlyph.createBoundingBox(); 
+          }
+          speciesBox.createDimensions(g.getWidth(), g.getHeight(), 0d);
+          
           /*
            * Create reaction glyph with x/y and species glyph with width/height.
            */
@@ -158,7 +172,7 @@ public class KEGG2SBMLLayoutExtension {
               // Match reactions
               for (Reaction r: rcts) {
                 int pos = ArrayUtils.indexOf(entryReactions, r.toString());
-                if (pos>=0) {
+                if (pos >= 0) {
                   rct = r;
                   break;
                 }
@@ -196,32 +210,27 @@ public class KEGG2SBMLLayoutExtension {
             	  glyph = listOfGlyphs.get(0);
               }
               glyph.unsetBoundingBox();
-              BoundingBox box = glyph.createBoundingBox();
-              box.createPosition(g.getX(), g.getY(), 0d);
-              positionAttributesUsed=true;
+              BoundingBox rbox = glyph.createBoundingBox();
+              rbox.createPosition(g.getX(), g.getY(), 0d);
+              positionAttributesUsed = true;
             }            
             // Set width and height on the species glyph
             // Multiple species glyphs are permitted for one species!
 //            List<SpeciesGlyph> listOfSpecGlyphs = layout.findSpeciesGlyphs(speciesId); 
 //            if (listOfSpecGlyphs.isEmpty()) {
-              SpeciesGlyph sGlyph;
-//              if (listOfSpecGlyphs.isEmpty()) {
-                sGlyph = layout.createSpeciesGlyph(createGlyphID(idCounts, speciesId), speciesId);
+
 //              } else {
 //                sGlyph = listOfSpecGlyphs.get(0);
 //              }
-              BoundingBox box = sGlyph.getBoundingBox();
-              if (box == null) {
-                box = sGlyph.createBoundingBox(); 
-              }
-              box.createDimensions(g.getWidth(), g.getHeight(), 1);
+
               if (!positionAttributesUsed && !g.isDefaultPosition()) {
                 // X and Y are unused
-                if (!box.isSetPosition() || !isLineGraphic) {
+                if (!speciesBox.isSetPosition() || !isLineGraphic) {
                   // Line values are only better than nothing.
-                  box.createPosition(g.getX(), g.getY(), 0);
+                  speciesBox.createPosition(g.getX(), g.getY(), 0);
                 }
               }
+
 //            }
             
           } else {
@@ -233,23 +242,11 @@ public class KEGG2SBMLLayoutExtension {
             
             // Create a Glyph with x/y/width/height for the species
 //            List<SpeciesGlyph> listOfSpeciesGlyphs = layout.findSpeciesGlyphs(speciesId);
-            // Multiple species glyphs are permitted for one species!
-            SpeciesGlyph sGlyph;
-//            if (listOfSpeciesGlyphs.isEmpty()) {
-              sGlyph = layout.createSpeciesGlyph(createGlyphID(idCounts, speciesId), speciesId);
-//            } else {
-//              sGlyph = listOfSpeciesGlyphs.get(0);
-//            }
             
-            BoundingBox box = sGlyph.getBoundingBox();
-            if (box == null) {
-              box = sGlyph.createBoundingBox(); 
-            }
-            box.createDimensions(g.getWidth(), g.getHeight(), 1);
             if (!g.isDefaultPosition()) {
-              if (!box.isSetPosition() || !isLineGraphic) {
+              if (!speciesBox.isSetPosition() || !isLineGraphic) {
                 // Line values are only better than nothing.
-                box.createPosition(g.getX(), g.getY(), 0);
+                speciesBox.createPosition(g.getX(), g.getY(), 0);
               }
             }
           }
