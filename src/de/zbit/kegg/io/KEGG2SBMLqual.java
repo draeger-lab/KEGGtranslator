@@ -173,13 +173,16 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", (isCombindedModel?"false":"true"));
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     
-    // Create qual species for every species
-    createQualSpecies(p, qualModel);
-    
     // Give a warning if we have no relations.
     if (p.getRelations().size()<1) {
       log.fine("File does not contain any relations. Graph will look quite boring...");
     } else {
+      // Qualitative species are just created if transitions are available
+      // Reason: all species are in the file as normal sbml species. Following the 
+      // qualitative species are not necessary
+
+      // Create qual species for every species 
+      createQualSpecies(p, qualModel);
       for (Relation r : p.getRelations()) {
         addKGMLRelation(r, p, qualModel);
       }
