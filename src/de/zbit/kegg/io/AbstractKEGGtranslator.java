@@ -812,12 +812,15 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     } else {
       name = name.trim();
       char c = name.charAt(0);
+      // Must start with letter or '_'.
       if (!(isLetter(c) || c == '_')) ret = "SId_"; else ret = Character.toString(c);
+      // May contain letters, digits or '_'
       for (int i = 1; i < name.length(); i++) {
         c = name.charAt(i);
         if (c==' ') c='_'; // Replace spaces with "_"
         if (isLetter(c) || Character.isDigit(c) || c == '_') ret += Character.toString(c);
       }
+      // Make unique
       if (SIds.contains(ret)) ret = incrementSIdSuffix(ret);
       SIds.add(ret);
     }

@@ -332,18 +332,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       model.setSubstanceUnits(ud);
     }
     
-    Compartment compartment = model.createCompartment("default");
-    // Create neccessary default compartment
-    compartment.setSize(defaultCompartmentSize);
-//    compartment.setUnits(model.getUnitDefinition("volume"));
-    compartment.setSpatialDimensions(3d); // a cell has 3 dimensions
-    if (model.getLevel()>2) {
-      // Set default value from l2v4
-      compartment.setConstant(true);
-    }
-//    compartment.setConstant(true);
-    // Be careful: compartment ID ant other compartment stuff are HARDCODED
-    // in cellDesigner extension code generation!
+    Compartment compartment = createCompartment(model);
     
     // Create Model History
     History hist = new History();
@@ -394,30 +383,37 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     model.addCVTerm(term);
 
     // Retrieve further information via Kegg Adaptor
-    KeggInfos orgInfos = KeggInfos.get("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
-    if (orgInfos.queryWasSuccessfull()) {
-      CVTerm mtOrgID = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.NCBI_Taxonomy, null, orgInfos.getTaxonomy().split("\\s"));
-      if (mtOrgID.getResourceCount() > 0) {
-        model.addCVTerm(mtOrgID);
+    boolean titleAdded = false;
+    if (p.isSetOrg()) {
+      KeggInfos orgInfos = KeggInfos.get("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
+      if (orgInfos.queryWasSuccessfull()) {
+        CVTerm mtOrgID = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.NCBI_Taxonomy, null, orgInfos.getTaxonomy().split("\\s"));
+        if (mtOrgID.getResourceCount() > 0) {
+          model.addCVTerm(mtOrgID);
+        }
+        notes.append(String.format("<h1>Model of %s%s%s in %s%s%s</h1>\n", quotStart, formatTextForHTMLnotes(p.getTitle()), quotEnd, quotStart, orgInfos.getDefinition(), quotEnd));
+        model.setName(String.format("%s (%s)", p.getTitle(), orgInfos.getDefinition()));
+        titleAdded = true;
       }
-      notes.append(String.format("<h1>Model of %s%s%s in %s%s%s</h1>\n", quotStart, formatTextForHTMLnotes(p.getTitle()), quotEnd, quotStart, orgInfos.getDefinition(), quotEnd));
-      model.setName(String.format("%s (%s)", p.getTitle(), orgInfos.getDefinition()));
-    } else {
+    }
+    if (!titleAdded) {
       notes.append(String.format("<h1>Model of %s%s%s</h1>\n",quotStart,formatTextForHTMLnotes(p.getTitle()),quotEnd ));
     }
     
     // Get PW infos from KEGG Api for Description and GO ids.
-    KeggInfos pwInfos = KeggInfos.get(p.getName(), manager); // NAME, DESCRIPTION, DBLINKS verwertbar
-    if (pwInfos.queryWasSuccessfull()) {
-      if (pwInfos.getDescription()!=null) {
-        notes.append(String.format("%s<br/>\n", formatTextForHTMLnotes(pwInfos.getDescription())));
-      }
-      
-      // GO IDs
-      if (pwInfos.getGo_id() != null) {
-        CVTerm mtGoID = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.GeneOntology, null, pwInfos.getGo_id().split("\\s"));
-        if (mtGoID.getResourceCount() > 0) {
-          model.addCVTerm(mtGoID);
+    if (isKEGGPathway) {
+      KeggInfos pwInfos = KeggInfos.get(p.getName(), manager); // NAME, DESCRIPTION, DBLINKS verwertbar
+      if (pwInfos.queryWasSuccessfull()) {
+        if (pwInfos.getDescription()!=null) {
+          notes.append(String.format("%s<br/>\n", formatTextForHTMLnotes(pwInfos.getDescription())));
+        }
+        
+        // GO IDs
+        if (pwInfos.getGo_id() != null) {
+          CVTerm mtGoID = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.GeneOntology, null, pwInfos.getGo_id().split("\\s"));
+          if (mtGoID.getResourceCount() > 0) {
+            model.addCVTerm(mtGoID);
+          }
         }
       }
     }
@@ -434,7 +430,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       notes.append(String.format("<a href=\"%s\"><img src=\"%s\" alt=\"%s\"/></a><br/>\n", imageURL, imageURL, p.getTitle()));
     }
     if (p.isSetLink()) {
-      notes.append(String.format("<a href=\"%s\">Original Entry</a><br/>\n", p.getLink()));
+      notes.append(String.format("<a href=\"%s\">Original entry</a><br/>\n", p.getLink()));
     }
     
     // Write model version and creation date, if available, into model notes.
@@ -557,6 +553,40 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     }
     
     return doc;
+  }
+
+  /**
+   * Create a 'default' compartment. Be careful, if called twice, will
+   * create another 'default2' compartment, etc.
+   * @see #createCompartment(Model, String)
+   * @param model
+   * @return
+   */
+  private Compartment createCompartment(Model model) {
+    return createCompartment(model, "default");
+  }
+  
+  /**
+   * Create a compartment with the given <code>name</code>.
+   * @param model
+   * @param name
+   * @return
+   */
+  private Compartment createCompartment(Model model, String name) {
+    Compartment compartment = model.createCompartment(NameToSId(name));
+    compartment.setName(name);
+    // Create neccessary default compartment
+    compartment.setSize(defaultCompartmentSize);
+//    compartment.setUnits(model.getUnitDefinition("volume"));
+    compartment.setSpatialDimensions(3d); // a cell has 3 dimensions
+    if (model.getLevel()>2) {
+      // Set default value from l2v4
+      compartment.setConstant(true);
+    }
+//    compartment.setConstant(true);
+    // Be careful: compartment ID and other compartment stuff are HARDCODED
+    // in cellDesigner extension code generation!
+    return compartment;
   }
 
   /**
@@ -1004,7 +1034,27 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       spec = KEGG2SBMLGroupExtension.createGroup(p, model, entry);
     } else {
       spec = model.createSpecies();
+      
+      // Eventually assign a different compartment
+      Compartment c = compartment;
+      if (entry instanceof EntryExtended) {
+        if (((EntryExtended) entry).isSetCompartment()) {
+          for (Compartment c1: model.getListOfCompartments()) {
+            if (c1.getName().equals(((EntryExtended) entry).getCompartment())) {
+              c = c1;
+              break;
+            }
+          }
+          // If it has some compartment assigned, which is not yet initialized, create a new instance.
+          if (c.equals(compartment)) {
+            c = createCompartment(model, ((EntryExtended) entry).getCompartment());
+          }
+        }
+      }
+      ((Species) spec).setCompartment(c);
+      
     }
+    
     if (spec instanceof Species) {
       if (model.getLevel() > 2) {
         /*
@@ -1015,7 +1065,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         ((Species) spec).setBoundaryCondition(false);
         ((Species) spec).setConstant(false); // defined in org.sbml.jsbml.Variable
       }
-      ((Species) spec).setCompartment(compartment); // ((Species) spec).setId("s_" +
       ((Species) spec).setInitialAmount(speciesDefaultInitialAmount);
       //((Species) spec).setUnits(model.getUnitDefinition("substance"));
     }
