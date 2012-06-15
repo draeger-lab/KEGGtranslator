@@ -35,6 +35,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.ImageIcon;
@@ -238,9 +240,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	  TranslatorGraphLayerPanel.optionClass = KEGGTranslatorPanelOptions.class;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#createJToolBar()
 	 */
 	protected JToolBar createJToolBar() {
@@ -413,11 +413,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
     }
   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
 		try {
@@ -490,7 +487,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 //		}
 //	}
 
-  /**
+	/**
 	 * Closes the tab at the specified index.
 	 * 
 	 * @param index
@@ -594,12 +591,10 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return ((TranslatorPanel<?>) o);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.zbit.gui.BaseFrame#saveFile()
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#saveFileAs()
 	 */
-	public File saveFile() {
+	public File saveFileAs() {
 		TranslatorPanel<?> o = getCurrentlySelectedPanel();
 		if (o != null) {
 			return o.saveToFile();
@@ -607,9 +602,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
 	 */
 	public void keyPressed(KeyEvent e) {
@@ -617,9 +610,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		PreferencesPanel.setProperty(prefsIO, e.getSource(), true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
 	 */
 	public void keyReleased(KeyEvent e) {
@@ -627,9 +618,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		PreferencesPanel.setProperty(prefsIO, e.getSource(), true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
 	 */
 	public void keyTyped(KeyEvent e) {
@@ -637,20 +626,15 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		PreferencesPanel.setProperty(prefsIO, e.getSource(), true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+	/* (non-Javadoc)
+	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	public void itemStateChanged(ItemEvent e) {
 		// Preferences for the "output format"
 		PreferencesPanel.setProperty(prefsIO, e.getSource(), true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#additionalFileMenuItems()
 	 */
 	@Override
@@ -665,9 +649,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	        };
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#closeFile()
 	 */
 	public boolean closeFile() {
@@ -677,9 +659,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return closeTab(tabbedPane.getSelectedIndex());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#createMainComponent()
 	 */
 	protected Component createMainComponent() {
@@ -701,16 +681,14 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return tabbedPane;
 	}
 
-  /**
-   * @return
-   */
-  public static URL getWatermarkLogoResource() {
-    return TranslatorUI.class.getResource(watermarkLogoResource);
-  }
+	/**
+	 * @return
+	 */
+	public static URL getWatermarkLogoResource() {
+		return TranslatorUI.class.getResource(watermarkLogoResource);
+	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#exit()
 	 */
 	public void exit() {
@@ -751,17 +729,15 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			}
 		  
 		} catch (BackingStoreException exc) {
-		  exc.printStackTrace();
+		  Logger.getLogger(getClass().getName()).log(Level.WARNING, exc.getLocalizedMessage(), exc);
 		  // Unimportant error... don't bother the user here.
 			// GUITools.showErrorMessage(this, exc);
 		}
 		dispose();
-		System.exit(0);
+		//System.exit(0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#getURLAboutMessage()
 	 */
 	public URL getURLAboutMessage() {
@@ -770,9 +746,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return Translator.class.getResource("html/about.html");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#getURLLicense()
 	 */
 	public URL getURLLicense() {
@@ -781,9 +755,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		return Translator.class.getResource("html/license.html");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#getURLOnlineHelp()
 	 */
 	public URL getURLOnlineHelp() {

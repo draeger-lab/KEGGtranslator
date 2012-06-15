@@ -269,10 +269,10 @@ public class KEGG2SBMLLayoutExtension {
   private static String createGlyphID(Map<String, Integer> idCounts,
 		  String id) {
 	  String gID = "glyph_" + id;
-	  if (idCounts.containsKey(gID)) {
-		  idCounts.put(gID, Integer.valueOf(idCounts.get(gID).intValue() + 1));
+	  if (idCounts.containsKey(id)) {
+		  idCounts.put(id, Integer.valueOf(idCounts.get(id).intValue() + 1));
 	  } else {
-		  idCounts.put(gID, Integer.valueOf(1));
+		  idCounts.put(id, Integer.valueOf(1));
 	  }
 	  gID = gID + '_' + idCounts.get(id);
 	  return gID;
