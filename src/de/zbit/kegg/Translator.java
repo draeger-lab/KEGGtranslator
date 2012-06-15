@@ -445,7 +445,7 @@ public class Translator extends Launcher {
 	 * @see de.zbit.Launcher#getVersionNumber()
 	 */
 	public String getVersionNumber() {
-		return "2.0.0";
+		return "2.1.0";
 	}
 
 	/*
@@ -453,7 +453,7 @@ public class Translator extends Launcher {
 	 * @see de.zbit.Launcher#getYearOfProgramRelease()
 	 */
 	public short getYearOfProgramRelease() {
-		return (short) 2011;
+		return (short) 2012;
 	}
 
 	/*

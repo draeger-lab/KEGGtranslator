@@ -231,7 +231,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
    */
   public static final Option<Boolean> ADD_LAYOUT_EXTENSION = new Option<Boolean>("ADD_LAYOUT_EXTENSION",Boolean.class,
       "If true, adds layout information, using the SBML layout extension to the SBML document." +
-      "As a side-effect, this will create an SBML Level 3 model.", (short) 2, "-layout", false);
+      "As a side-effect, this will create an SBML Level 3 model.", (short) 2, "-layout", true);
 
   /**
    * If true, uses the groups extension to encode groups in the SBML document.

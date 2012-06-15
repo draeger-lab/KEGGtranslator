@@ -61,6 +61,7 @@ import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
 import de.zbit.gui.JTabbedLogoPane;
+import de.zbit.gui.JTabbedPaneDraggableAndCloseable;
 import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
@@ -670,7 +671,8 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	  //logo.setImage(ImageTools.cropImage(logo.getImage(), 0, 0, logo.getIconWidth(), logo.getIconHeight()-30));
 	  
 	  // Create the tabbed pane, with the KeggTranslator logo.
-		tabbedPane = new JTabbedLogoPane(logo);
+		tabbedPane = new JTabbedPaneDraggableAndCloseable(logo);
+		((JTabbedPaneDraggableAndCloseable) tabbedPane).setShowCloseIcon(false);
 		
 		// Change active buttons, based on selection.
 		tabbedPane.addChangeListener(new ChangeListener() {

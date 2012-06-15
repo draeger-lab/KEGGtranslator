@@ -157,9 +157,9 @@ public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model> {
 // // For each property
 //    for (PropertyEditor editor : editors)
 //    {
-//    // First column is the name of the property, e.g. “Name”
+//    // First column is the name of the property, e.g. "Name"
 //    value[0][row]= editor.getProperty();
-//    // Second column is the value e.g. “p53”, note that the value is // sometimes a Set and we
+//    // Second column is the value e.g. "p53", note that the value is // sometimes a Set and we
 //    are using the Set.toString() to display // the contents of multiple cardinality properties
 //    value[1][row] = editor.getValueFromBean(bpe).toString();
 //    // increase the row index

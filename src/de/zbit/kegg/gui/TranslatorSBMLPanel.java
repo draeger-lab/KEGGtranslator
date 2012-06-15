@@ -26,19 +26,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JTabbedPane;
-import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.tolatex.LaTeXOptions;
-import org.sbml.tolatex.SBML2LaTeX;
-import org.sbml.tolatex.gui.LaTeXExportDialog;
-import org.sbml.tolatex.io.LaTeXOptionsIO;
 
 import de.zbit.graph.gui.TranslatorGraphLayerPanel;
 import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.graph.gui.TranslatorSBMLgraphPanel;
-import de.zbit.gui.GUITools;
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.io.KEGG2SBMLqual;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -231,32 +226,33 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    * @param targetFile - can be null.
    */
   public static void writeLaTeXReport(File targetFile, SBMLDocument document) {
-    if (document==null) return;
-    
-    final SBMLDocument doc = (SBMLDocument) document;
-    if ((doc != null) && LaTeXExportDialog.showDialog(null, doc, targetFile)) {
-      if (targetFile == null) {
-        SBPreferences prefsIO = SBPreferences.getPreferencesFor(LaTeXOptionsIO.class);
-        targetFile = new File(prefsIO.get(LaTeXOptionsIO.REPORT_OUTPUT_FILE));
-      }
-      
-      // Run in background
-      final File finalTargetFile = targetFile;
-      SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-        @Override
-        protected Void doInBackground() throws Exception {
-          try {
-            SBML2LaTeX.convert(doc, finalTargetFile, true);
-          } catch (Exception exc) {
-            GUITools.showErrorMessage(null, exc);
-          }
-          return null;
-        }
-      };
-      worker.execute();
-      //---
-      
-    }
+    log.severe("SBML2LaTeX support has been disabled.");
+//    if (document==null) return;
+//    
+//    final SBMLDocument doc = (SBMLDocument) document;
+//    if ((doc != null) && LaTeXExportDialog.showDialog(null, doc, targetFile)) {
+//      if (targetFile == null) {
+//        SBPreferences prefsIO = SBPreferences.getPreferencesFor(LaTeXOptionsIO.class);
+//        targetFile = new File(prefsIO.get(LaTeXOptionsIO.REPORT_OUTPUT_FILE));
+//      }
+//      
+//      // Run in background
+//      final File finalTargetFile = targetFile;
+//      SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+//        @Override
+//        protected Void doInBackground() throws Exception {
+//          try {
+//            SBML2LaTeX.convert(doc, finalTargetFile, true);
+//          } catch (Exception exc) {
+//            GUITools.showErrorMessage(null, exc);
+//          }
+//          return null;
+//        }
+//      };
+//      worker.execute();
+//      //---
+//      
+//    }
   }
   
 }

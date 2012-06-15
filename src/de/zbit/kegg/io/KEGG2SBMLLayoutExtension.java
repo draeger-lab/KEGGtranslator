@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.AbstractNamedSBase;
+import org.sbml.jsbml.Compartment;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.Reaction;
@@ -37,6 +38,8 @@ import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
 import org.sbml.jsbml.ext.layout.SpeciesGlyph;
+import org.sbml.jsbml.ext.layout.SpeciesReferenceGlyph;
+import org.sbml.jsbml.ext.layout.SpeciesReferenceRole;
 import org.sbml.jsbml.ext.layout.TextGlyph;
 
 import de.zbit.graph.MinAndMaxTracker;
@@ -44,6 +47,7 @@ import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Graphics;
 import de.zbit.kegg.parser.pathway.GraphicsType;
 import de.zbit.kegg.parser.pathway.Pathway;
+import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.Utils;
 
@@ -120,6 +124,7 @@ public class KEGG2SBMLLayoutExtension {
       enzyme2rct = getEnzyme2ReactionMap(doc);
     }
     
+    
     // Create Species and Reaction Glyps.
     Layout layout = layoutModel.createLayout();
     layout.setName(String.format("Translated %s layout.", metabolic?"metabolic":"qualitative"));
@@ -129,8 +134,36 @@ public class KEGG2SBMLLayoutExtension {
     MinAndMaxTracker tracker = new MinAndMaxTracker();
     
     Map<String, Integer> idCounts = new HashMap<String, Integer>();
+    Map<String, ReactionGlyph> keggReactionName2glyph = new HashMap<String, ReactionGlyph>();
     
-    for (Entry e : p.getEntries()) { // In KGML, only entries have graph objects.
+    // First, create a glyph for each reaction
+    if (metabolic) {
+      Map<String, Reaction> sbmlReactionName2reaction = new HashMap<String, Reaction>();
+      for (Reaction r: doc.getModel().getListOfReactions()) {
+        // I know that name must not be unique, but in KEGGtranslator, name IS unique
+        // and name IS the same as used in KGML.
+        sbmlReactionName2reaction.put(r.getName(), r);
+      }
+      for (de.zbit.kegg.parser.pathway.Reaction r: p.getReactions()) {
+        if (sbmlReactionName2reaction.containsKey(r.getName())) {
+          Reaction sbmlR = sbmlReactionName2reaction.get(r.getName());
+          ReactionGlyph glyph = layout.createReactionGlyph(createGlyphID(idCounts, sbmlR.getId()), sbmlR.getId());
+          keggReactionName2glyph.put(r.getName(), glyph);
+        }
+      }
+      sbmlReactionName2reaction=null;
+    }
+    
+    // Add compartments
+    for (Compartment c : model.getListOfCompartments()) {
+      if (!c.getId().equals("default")) {
+        String compId = c.getId();
+        layout.createCompartmentGlyph(createGlyphID(idCounts, compId), compId);
+      }
+    }
+    
+    // Create a glyph for each entry (In KGML, only entries have graph objects)
+    for (Entry e : p.getEntries()) {
       Object s = e.getCustom();
       if (s!=null && e.hasGraphics()) {
         Graphics g = e.getGraphics();
@@ -199,13 +232,13 @@ public class KEGG2SBMLLayoutExtension {
             
             // Set X and Y on the reactionGlyph
             boolean positionAttributesUsed = false;
-            if (!g.isDefaultPosition() && (rct != null) && (!layout.containsGlyph(rct))
-                && !isLineGraphic) {
+            if (!g.isDefaultPosition() && (rct != null) && !isLineGraphic) {
               // LINE coordinate are much worse than rectangles. So prefer rectangles!
               List<ReactionGlyph> listOfGlyphs = layout.findReactionGlyphs(rct.getId());
               ReactionGlyph glyph;
               if ((listOfGlyphs == null) || listOfGlyphs.isEmpty()) {
             	  glyph = layout.createReactionGlyph(createGlyphID(idCounts, rct.getId()), rct.getId());
+            	  keggReactionName2glyph.put(rct.getName(), glyph); // NOTE: The SBML reaction name must therefore be equal to the KGMLs reaction name.
               } else {
             	  glyph = listOfGlyphs.get(0);
               }
@@ -250,11 +283,55 @@ public class KEGG2SBMLLayoutExtension {
               }
             }
           }
+          
+          
+          /*
+           * At this position, the speciedGlyph is created and the coordinates may be
+           * transfered to a novel reactionGlyph. But since duplicate glyphs for a
+           * species are allowed, create rectionGlyphs and add species Glyph as reference.
+           */
+          if (metabolic) {
+            // Add to catalyzing reactions
+            if (e.isSetReaction()) {
+              for (String reaction : e.getReactions()) {
+                ReactionGlyph rg = keggReactionName2glyph.get(reaction);
+                if (rg!=null) {
+                  SpeciesReferenceGlyph srg = rg.createSpeciesReferenceGlyph(createGlyphID(idCounts, speciesId), sGlyph.getId());
+                  srg.setRole(SpeciesReferenceRole.MODIFIER);
+                }
+              }
+            }
+            
+            // If unique assignment (by id) available, add as substrate/product
+            if (e.isSetID()) {
+              for (de.zbit.kegg.parser.pathway.Reaction r : p.getReactionsForEntry(e)) {
+                ReactionGlyph rg = keggReactionName2glyph.get(r.getName());
+                if (rg!=null) {
+                  // do NOT assign by name. this does not solve the problem with clones.
+                  for (ReactionComponent rc : r.getSubstrates()) {
+                    if (rc.isSetID() && rc.getId().intValue() == e.getId()) {
+                      SpeciesReferenceGlyph srg = rg.createSpeciesReferenceGlyph(createGlyphID(idCounts, speciesId), sGlyph.getId());
+                      srg.setRole(SpeciesReferenceRole.SUBSTRATE);
+                    }
+                  }
+                  for (ReactionComponent rc : r.getProducts()) {
+                    if (rc.isSetID() && rc.getId().intValue() == e.getId()) {
+                      SpeciesReferenceGlyph srg = rg.createSpeciesReferenceGlyph(createGlyphID(idCounts, speciesId), sGlyph.getId());
+                      srg.setRole(SpeciesReferenceRole.PRODUCT);
+                    }
+                  }
+                }
+              }
+            }
+          }
+          // --- End of adding SpeciesReferenceGlyphs
+          
 
         }
       }
     }
     // TODO: other things to add?
+    
     
     // Add the total dimension
     layout.createDimensions(tracker.getWidth(), tracker.getHeight(), 1);
@@ -298,5 +375,6 @@ public class KEGG2SBMLLayoutExtension {
     }
     return enzymeSpeciesIDs;
   }
+  
   
 }
