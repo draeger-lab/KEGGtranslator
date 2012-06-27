@@ -339,7 +339,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     Creator creator = new Creator();
     creator.setOrganisation("ZBIT, University of T\u00fcbingen, WSI-CogSys");
     hist.addCreator(creator);
-    hist.addModifiedDate(Calendar.getInstance().getTime());
+    // JSBML sets a date automatically
+//    hist.addModifiedDate(Calendar.getInstance().getTime());
     Annotation annot = new Annotation();
     //annot.setAbout("#" + model.getMetaId());
     model.setAnnotation(annot);

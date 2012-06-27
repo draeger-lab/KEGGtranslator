@@ -361,6 +361,8 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     QualitativeSpecies qs = qualModel.getQualitativeSpecies(id);
     if(qs == null){
       qs = qualModel.createQualitativeSpecies(id, "meta_" + id, species);
+      // Martjin told me on 2012-04-13 that for the validator, constant must be set to false.
+      // leaving this unset results in invalid sbml.
       qs.setConstant(false);
     }
     return qs;  
