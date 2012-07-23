@@ -57,6 +57,7 @@ import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.util.DatabaseIdentifierTools;
 import de.zbit.util.DatabaseIdentifiers;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 import de.zbit.util.Utils;
@@ -262,6 +263,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     Sign sign = Sign.unknown;
     Set<Integer> SBOs = new HashSet<Integer>();
     List<SubType> subTypes = r.getSubtypes();
+    
     CVTerm cv = new CVTerm(CVTerm.Qualifier.BQB_IS);
     if (subTypes != null && subTypes.size() > 0) {
       Collection<String> subTypeNames = r.getSubtypesNames();
@@ -336,6 +338,16 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       // to be annotated as different versions ("HAS_VERSION").
       //setBiologicalQualifierISorHAS_VERSION(cv);
       t.addCVTerm(cv);
+    }
+    
+    // add additional miriam identifiers
+    if (r.isSetDatabaseIdentifiers()) {
+      List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(r.getDatabaseIdentifiers(), null);
+      if (cvTerms!=null && cvTerms.size()>0) {
+        for (CVTerm cvTerm : cvTerms) {
+          t.addCVTerm(cvTerm);
+        }
+      }
     }
     
     // Don't att same relations twice

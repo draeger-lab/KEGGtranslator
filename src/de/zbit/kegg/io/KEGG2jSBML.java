@@ -375,6 +375,19 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       term.setQualifierType(CVTerm.Type.MODEL_QUALIFIER);
       term.setModelQualifierType(Qualifier.BQM_IS_DESCRIBED_BY);
       model.addCVTerm(term);
+      
+    } else {
+      // other database references on the pathway 
+      if (p.isSetDatabaseIdentifiers()) {
+        List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(p.getDatabaseIdentifiers(), null);
+        if (cvTerms!=null && cvTerms.size()>0) {
+          for (CVTerm cvTerm : cvTerms) {
+            cvTerm.setQualifierType(Type.MODEL_QUALIFIER);
+            cvTerm.setModelQualifierType(Qualifier.BQM_IS_DESCRIBED_BY);
+            model.addCVTerm(cvTerm);
+          }
+        }
+      }
     }
     
     // Add KEGGtranslator reference
@@ -415,7 +428,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           if (mtGoID.getResourceCount() > 0) {
             model.addCVTerm(mtGoID);
           }
-        }
+        }             
       }
     }
     
@@ -680,7 +693,18 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       sbReaction.addModifier(mod);
     }
     
-    // Miriam identifier
+    // Maybe add additional Miriam identifier (from other sources than kegg)
+    if (r.isSetDatabaseIdentifiers()) {
+      List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(r.getDatabaseIdentifiers(), null);
+      if (cvTerms!=null && cvTerms.size()>0) {
+        for (CVTerm cvTerm : cvTerms) {
+          sbReaction.addCVTerm(cvTerm);
+        }
+      }
+    }
+    
+    
+    // Add KEGG miriam identifier
     CVTerm reID = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_IS);
     CVTerm rePWs = new CVTerm(); rePWs.setQualifierType(Type.BIOLOGICAL_QUALIFIER); rePWs.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
     
@@ -1161,6 +1185,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         log.warning("Can not add rection modifier: " + spec);
         return;
       }
+      modifier.setLevel(spec.getLevel());
+      modifier.setVersion(spec.getVersion());
       
       // Annotation is empty in ModifierSpeciesReference
       //Annotation tempAnnot = new Annotation("");
