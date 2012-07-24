@@ -86,12 +86,16 @@
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/keggapi.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/stax-api-1.0.1.jar"/> -->
     	
+      <zipfileset excludes="META-INF/*.SF" src="${base}/lib/paxtools-4.1.1_customJenaFix.jar"/>
+      <zipfileset excludes="META-INF/*.SF" src="${base}/lib/org.sbgn.jar"/>
+
+    	
     	      <filelist dir="${base}" files="libquaqua.jnilib,libquaqua64.jnilib"/>
 
 <!-- Uncomment for SysBio classes instead of compiled jar. -->
            <fileset dir="${SysBioPath}/bin">
-              <exclude name="de/zbit/resources/liftover/*"/>
-           	  <exclude name="de/zbit/mapper/*"/>
+              <exclude name="de/zbit/resources/liftover/**/*"/>
+           	  <exclude name="de/zbit/mapper/**/*"/>
             	<exclude name="**/package.html"/>
            	  <exclude name="overview.html"/>
            </fileset>
@@ -105,6 +109,7 @@
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/wsdl4j.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/axis.jar"/>
     	      <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
+            <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/quaqua.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/Java5/saaj.jar"/>-->
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/WSDbfetch.jar"/>-->
             <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-cli-1.1.jar"/>
@@ -124,7 +129,7 @@
             
             <fileset dir="${SBML2LaTeXPath}/bin"/>
             <zipfileset excludes="META-INF/*.SF" src="${SBML2LaTeXPath}/lib/html2latex.jar"/>
-      
+    	      
     </jar>
   </target>
 

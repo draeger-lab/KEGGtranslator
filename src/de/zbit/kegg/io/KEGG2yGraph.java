@@ -434,23 +434,34 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    */
   public static NodeRealizer setupGroupNode(NodeLabel nl, String changeCaption) {
     GroupNodeRealizer nr = new GroupNodeRealizer();
-    ((GroupNodeRealizer)nr).setGroupClosed(false);
-    nr.setTransparent(true);
+    setupGroupNode(nr);
     
-    if (changeCaption!=null) {
-      nl.setText(changeCaption);
+    if (nl!=null) {
+      if (changeCaption!=null) {
+        nl.setText(changeCaption);
+      }
+      
+      nl.setPosition(NodeLabel.TOP);
+      nl.setBackgroundColor(new Color((float)0.8,(float)0.8,(float)0.8,(float)0.5));
+      nl.setFontSize(10);
+      nl.setAutoSizePolicy(NodeLabel.AUTOSIZE_NODE_WIDTH);
+      
+      nr.setLabel(nl);
     }
+    
+    return nr;
+  }
+  
+  public static void setupGroupNode(GroupNodeRealizer nr) {
+    ((GroupNodeRealizer)nr).setGroupClosed(false);
+    // Setting the transparency influences the edges, such that they
+    // will end in the middle of the group node, instead of the border!
+    //nr.setTransparent(true);
+    nr.setFillColor(null);
+    nr.setFillColor2(null);
     
     nr.setMinimalInsets(new YInsets(5, 2, 2, 2)); // top, left, bottom, right
     nr.setAutoBoundsEnabled(true);
-    nl.setPosition(NodeLabel.TOP);
-    nl.setBackgroundColor(new Color((float)0.8,(float)0.8,(float)0.8,(float)0.5));
-    nl.setFontSize(10);
-    nl.setAutoSizePolicy(NodeLabel.AUTOSIZE_NODE_WIDTH);
-    
-    nr.setLabel(nl);
-    
-    return nr;
   }
   
   /**
@@ -610,11 +621,18 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           nl.setUserData(nodeLink);
         }
         
-        n = graph.createNode(nr);
+        // Crete the node => Either a group or normal node.
         if (addThisNodeToGroupNodeList) {
-          hm.convertToGroupNode(n);
+          n = hm.createGroupNode(graph);
+          //setupGroupNode((GroupNodeRealizer) graph.getRealizer(n));
+          graph.setRealizer(n, nr);
+          
+          //hm.convertToGroupNode(n);
           parentGroupNodes.add(n);
+        } else {
+          n = graph.createNode(nr);
         }
+        
         if (g.isDefaultPosition()) {
           toLayout.add(n);
         }
@@ -649,7 +667,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
             nl.setUserData(nodeLink);
           }
           
-          // Create a node, but don't set the reference
+          // Create a node for each graphics attribute, but don't set the reference
           graph.createNode(nr);
         }
       }
@@ -970,6 +988,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           
           //gnr.setBorderInsets(new YInsets(1, 1, 1, 1));
           
+          // Create grouped node for all same edges
           Node n = graph.createNode(gnr);
           hm.convertToGroupNode(n);
           hm.setParentNode(nl, n);
@@ -1123,6 +1142,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     if (nr==null) {
       if (g.getType().equals(GraphicsType.rectangle)) {
         nr = new ShapeNodeRealizer(ShapeNodeRealizer.RECT);
+        //nr = new ShapeNodeRealizerRespectingLabels(ShapeNodeRealizer.RECT);
       } else if (g.getType().equals(GraphicsType.circle)) {
         nr = new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE);
         nl.setFontSize(10); // looks better on small ellipses
