@@ -1214,7 +1214,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       Entry one = p.getEntryForReactionComponent(sub);
       for (ReactionComponent prod:r.getProducts()) {
         Entry two = p.getEntryForReactionComponent(prod);
-        if (one==null || two==null) continue;        
+        if (one==null || two==null) {
+          log.warning("No component for " + sub + " or " + prod);
+          continue;        
+        }
         
         // Get nodes, corresponding to entries
         Node nOne = (Node) one.getCustom();
@@ -1222,15 +1225,16 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         
         // Create edge, if not existent.
         if (nOne.getEdgeTo(nTwo)==null) {
-          graph.createEdge(nOne, nTwo, er);
+          graph.createEdge(nOne, nTwo, er.createCopy());
         }
         
         // Consider reaction modifiers
         Node modifier = reactionModifiers.get(r.getName().toLowerCase().trim());
         if (modifier!=null && modifier.getEdgeTo(nTwo)==null) {
-          er.setSourceArrow(Arrow.NONE);
-          er.setTargetArrow(Arrow.TRANSPARENT_CIRCLE);
-          graph.createEdge(modifier, nTwo, er);
+          EdgeRealizer er2 = er.createCopy();
+          er2.setSourceArrow(Arrow.NONE);
+          er2.setTargetArrow(Arrow.TRANSPARENT_CIRCLE);
+          graph.createEdge(modifier, nTwo, er2);
         }
       }
     }
