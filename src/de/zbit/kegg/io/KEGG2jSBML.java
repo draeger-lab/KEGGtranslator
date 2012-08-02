@@ -21,7 +21,6 @@ package de.zbit.kegg.io;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +33,7 @@ import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
+import org.sbml.jsbml.AbstractNamedSBase;
 import org.sbml.jsbml.Annotation;
 import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.CVTerm.Qualifier;
@@ -800,8 +800,19 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    */
   private List<ModifierSpeciesReference> getAllModifier (
     List<Info<String, ModifierSpeciesReference>> reactionModifiers, Reaction r) {
+    return getAllModifier(reactionModifiers, r.getName());
+  }
+  
+  /**
+   * 
+   * @param reactionModifiers
+   * @param r
+   * @return
+   */
+  private List<ModifierSpeciesReference> getAllModifier (
+    List<Info<String, ModifierSpeciesReference>> reactionModifiers, String reaction) {
     List<ModifierSpeciesReference> modifier = new ArrayList<ModifierSpeciesReference>();
-    String lName = r.getName().toLowerCase().trim();
+    String lName = reaction.toLowerCase().trim();
     int modifierPos = reactionModifiers.indexOf(lName);
     if (modifierPos<0) return modifier;
     
@@ -847,10 +858,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Parse every gene/object in this node.
     for (String ko_id : entry.getName().split(" ")) {
       if (ko_id.trim().equalsIgnoreCase("undefined") || entry.hasComponents()) continue; // "undefined" = group node, which contains "Components"
+
       
       // Retrieve further information via Kegg API -- Be careful: very slow! Precache all queries at top of this function!
       KeggInfos infos = KeggInfos.get(ko_id, manager);
       // Some infos can also be extracted if query was NOT succesfull
+      
       
       // Add reactions as miriam annotation
       String reactionID = concatReactionIDs(entry.getParentPathway().getReactionsForEntry(entry), ArrayUtils.merge(entry.getReactions(), infos.getReaction_id()));
@@ -1172,7 +1185,27 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    */
   private void addToReactionModifierList(Entry entry, SBase spec, List<Info<String, ModifierSpeciesReference>> reactionModifiers) {
     if (!entry.hasReaction() || spec == null) return;
+    
     for (String reaction: entry.getReactions()) {
+      
+      // Look if the element is already in out list.
+      /* If we have duplicate entries (for visualization reasons) but only create one species,
+       * then we would add 2 equal modifiers here. Thus, we need the "contains" check.
+       */
+      if (spec instanceof NamedSBase) {
+        List<ModifierSpeciesReference> existingMods = getAllModifier(reactionModifiers, reaction);
+        boolean alreadyInList = false;
+        for (ModifierSpeciesReference m:existingMods) {
+          if (m.getSpecies().equals(((NamedSBase)spec).getId())) {
+            alreadyInList = true;
+            break;
+          }
+        }
+        if (alreadyInList) {
+          continue;
+        }
+      }
+      
       // Q: Ist es richtig, sowohl dem Modifier als auch der species eine neue id zu geben? A: Nein, ist nicht richtig.
       // spec.setSBOTerm(ET_SpecialReactionCase2SBO);
       ModifierSpeciesReference modifier = null;
@@ -1198,7 +1231,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           modifier.addNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
         }
       }
-      modifier.setId(this.NameToSId("mod_" + reaction));
+      modifier.setId(this.NameToSId("mod_" + reaction)); // FIXME: This avoids duplicates!!
       modifier.setMetaId("meta_" + modifier.getId());
       modifier.setName(modifier.getId());
       if (entry.getType().equals(EntryType.enzyme)   || entry.getType().equals(EntryType.gene)
@@ -1213,13 +1246,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       }
       
       // Remember modifier for later association with reaction.
-      Info<String, ModifierSpeciesReference> info = new Info<String, ModifierSpeciesReference>(reaction.toLowerCase().trim(), modifier);
-      if (!reactionModifiers.contains(info)) { 
-        /* If we have duplicate entries (for visualization reasons) but only create one species,
-         * then we would add 2 equal modifiers here. Thus, we need the "contains" check.
-         */
-        reactionModifiers.add(new Info<String, ModifierSpeciesReference>(reaction.toLowerCase().trim(), modifier));
-      }
+      reactionModifiers.add(new Info<String, ModifierSpeciesReference>(reaction.toLowerCase().trim(), modifier));
     }
   }
 
