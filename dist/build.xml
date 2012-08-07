@@ -86,8 +86,8 @@
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/keggapi.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/stax-api-1.0.1.jar"/> -->
     	
-      <zipfileset excludes="META-INF/*.SF" src="${base}/lib/paxtools-4.1.1_customJenaFix.jar"/>
-      <zipfileset excludes="META-INF/*.SF" src="${base}/lib/org.sbgn.jar"/>
+            <zipfileset excludes="overview.html,META-INF/**/*,org/apache/commons/logging/**/*,javax/xml/namespace/QName.class,org/apache/log4j/**/*" src="${base}/lib/paxtools-4.1.1_customJenaFix.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/org.sbgn.jar"/>
 
     	
     	      <filelist dir="${base}" files="libquaqua.jnilib,libquaqua64.jnilib"/>
