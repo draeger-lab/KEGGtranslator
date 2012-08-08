@@ -30,6 +30,8 @@ import javax.xml.stream.XMLStreamException;
 
 import org.sbml.jsbml.AbstractSBase;
 import org.sbml.jsbml.CVTerm;
+import org.sbml.jsbml.CVTerm.Qualifier;
+import org.sbml.jsbml.CVTerm.Type;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
@@ -306,6 +308,8 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
         }
       }
       
+      
+      
       in.setSign(sign);
     }
     
@@ -340,7 +344,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       t.addCVTerm(cv);
     }
     
-    // add additional miriam identifiers
+    // Add additional miriam identifiers
     if (r.isSetDatabaseIdentifiers()) {
       List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(r.getDatabaseIdentifiers(), null);
       if (cvTerms!=null && cvTerms.size()>0) {
@@ -350,7 +354,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       }
     }
     
-    // Don't att same relations twice
+    // Add the source of this transition, if it was NOT from kegg
+    if (r.isSetSource()) {
+      CVTerm source = new CVTerm(Type.BIOLOGICAL_QUALIFIER, Qualifier.BQB_IS_DESCRIBED_BY, r.getSource());
+      t.addCVTerm(source);
+    }
+    
+    // Don't add same relations twice
     String transitionIdentifier = in.getQualitativeSpecies() + " " + out.getQualitativeSpecies() + " " + (t.isSetSBOTerm() ? t.getSBOTermID():"");
     if (!containedTransitions.add(transitionIdentifier)) {
       qualModel.getListOfTransitions().remove(t);
