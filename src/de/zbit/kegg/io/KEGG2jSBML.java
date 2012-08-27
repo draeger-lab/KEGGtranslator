@@ -291,8 +291,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     return true;
   }
   
-  private final static String notesStartString = "<notes><body xmlns=\"http://www.w3.org/1999/xhtml\">";
-  private final static String notesEndString = "</body></notes>";
+  protected final static String notesStartString = "<notes><body xmlns=\"http://www.w3.org/1999/xhtml\">";
+  protected final static String notesEndString = "</body></notes>";
   
   /**
    * Converts the given pathway to a jSBML document.

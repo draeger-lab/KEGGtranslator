@@ -355,8 +355,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     // Add the source of this transition, if it was NOT from kegg
     if (r.isSetSource()) {
-      CVTerm source = new CVTerm(CVTerm.Type.BIOLOGICAL_QUALIFIER, CVTerm.Qualifier.BQB_IS_DESCRIBED_BY, r.getSource());
-      t.addCVTerm(source);
+      StringBuffer notes = new StringBuffer(KEGG2jSBML.notesStartString);
+      notes.append(String.format("This transition is defined by '%s'.\n", r.getSource()));
+      notes.append(KEGG2jSBML.notesEndString);
+      t.setNotes(notes.toString());
     }
     
     // Don't add same relations twice
