@@ -140,6 +140,7 @@ public class Translator extends Launcher {
 	 * @return
 	 */
 	public synchronized static KeggInfoManagement getManager() {
+	  boolean newManangerLoadedOrInitialized = (manager==null);
 	  // Try to load from cache file
 		if ((manager == null) && new File(Translator.cacheFileName).exists() && new File(Translator.cacheFileName).length() > 1) {
 			try {
@@ -166,22 +167,24 @@ public class Translator extends Launcher {
 		}
 		
 		// Set cache size and eventually remove some items from the cache
-    int initialSize=-1;
-    try {
-      SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
-      initialSize = KEGGtranslatorCommandLineOnlyOptions.CACHE_SIZE.getValue(prefs);
-      
-      if (KEGGtranslatorCommandLineOnlyOptions.CLEAR_FAIL_CACHE.getValue(prefs)) {
-        log.info("Clearing cache of failed-to-retrieve objects.");
-        manager.clearFailCache();
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    if (initialSize<=0) {
-      initialSize = 10000;
-    }
-    manager.setCacheSize(initialSize);
+		if (newManangerLoadedOrInitialized) {
+		  int initialSize=-1;
+		  try {
+		    SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
+		    initialSize = KEGGtranslatorCommandLineOnlyOptions.CACHE_SIZE.getValue(prefs);
+		    
+		    if (KEGGtranslatorCommandLineOnlyOptions.CLEAR_FAIL_CACHE.getValue(prefs)) {
+		      log.info("Clearing cache of failed-to-retrieve objects.");
+		      manager.clearFailCache();
+		    }
+		  } catch (Exception e) {
+		    e.printStackTrace();
+		  }
+		  if (initialSize<=0) {
+		    initialSize = 10000;
+		  }
+		  manager.setCacheSize(initialSize);
+		}
 
 
 		
@@ -445,7 +448,7 @@ public class Translator extends Launcher {
 	 * @see de.zbit.Launcher#getVersionNumber()
 	 */
 	public String getVersionNumber() {
-		return "2.1.0";
+		return "2.2.0";
 	}
 
 	/*

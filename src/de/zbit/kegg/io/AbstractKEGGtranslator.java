@@ -706,7 +706,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       // From KGML
       String name = entry.getName();
       if (entry.hasGraphics() && entry.getGraphics().getName()!=null &&
-          entry.getGraphics().getName().length()>1) {
+          entry.getGraphics().getName().length()>0) {
         name = entry.getGraphics().getName();
       }
       if (name.toLowerCase().startsWith("undefined")) {

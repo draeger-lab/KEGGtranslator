@@ -70,6 +70,11 @@ public class BatchKEGGtranslator {
   private KEGGtranslator translator;
   
   /**
+   * Load preferences only once when BatchKEGGtranslator is started.
+   */
+  SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
+  
+  /**
    * 
    * @param dir
    * @return
@@ -151,10 +156,10 @@ public class BatchKEGGtranslator {
    */
   private void parseDirAndSubDir(String dir) {
     KeggInfoManagement manager = Translator.getManager();
-    SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
     
-    if (!dir.endsWith("/") && !dir.endsWith("\\"))
+    if (!dir.endsWith("/") && !dir.endsWith("\\")) {
       if (dir.contains("\\")) dir+="\\"; else dir +="/";
+    }
     System.out.println("Parsing directory " + dir);
     
     
@@ -172,6 +177,7 @@ public class BatchKEGGtranslator {
       //if (fn.equals("gml")|| fn.equals("metabolic")) continue;
       
       if (inFile.isDirectory()) {
+        inFile = null; // There are errors when parsing large dirs "too many open files".
         parseDirAndSubDir(dir + fn);
         
       } else if (SBFileFilter.isKGML(inFile)) {
@@ -298,8 +304,7 @@ public class BatchKEGGtranslator {
    * @param manager
    * @return
    */
-	public static KEGGtranslator<?> getTranslator(Format outFormat,
-			KeggInfoManagement manager) {
+	public static KEGGtranslator<?> getTranslator(Format outFormat, KeggInfoManagement manager) {
 		KEGGtranslator<?> translator;
 		switch (outFormat) {
 		case SBML:
