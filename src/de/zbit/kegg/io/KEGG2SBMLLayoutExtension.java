@@ -147,8 +147,12 @@ public class KEGG2SBMLLayoutExtension {
       for (de.zbit.kegg.parser.pathway.Reaction r: p.getReactions()) {
         if (sbmlReactionName2reaction.containsKey(r.getName())) {
           Reaction sbmlR = sbmlReactionName2reaction.get(r.getName());
-          ReactionGlyph glyph = layout.createReactionGlyph(createGlyphID(idCounts, sbmlR.getId()), sbmlR.getId());
-          keggReactionName2glyph.put(r.getName(), glyph);
+          // Reactions may also be duplicated in KGMLs => don't create duplicate reactionGlyphs
+          // for the same, single reaction!
+          if (!layout.containsGlyph(sbmlR)) {
+            ReactionGlyph glyph = layout.createReactionGlyph(createGlyphID(idCounts, sbmlR.getId()), sbmlR.getId());
+            keggReactionName2glyph.put(r.getName(), glyph);
+          }
         }
       }
       sbmlReactionName2reaction=null;
@@ -201,7 +205,7 @@ public class KEGG2SBMLLayoutExtension {
             Reaction rct = null;
             Collection<Reaction> rcts = enzyme2rct.get(speciesId);
             String[] entryReactions = e.getReactions();
-            if (entryReactions!=null && rcts.size()>1) {
+            if (entryReactions!=null && rcts.size()>0) {
               // Match reactions
               for (Reaction r: rcts) {
                 int pos = ArrayUtils.indexOf(entryReactions, r.toString());
@@ -212,9 +216,10 @@ public class KEGG2SBMLLayoutExtension {
               }
             }
             if (rct == null) {
-              // No match => take first without layout
+              // No match => take first without positions
               for (Reaction r : rcts) {
-                if (!layout.containsGlyph(r)) {
+                ReactionGlyph rg = layout.getReactionGlyph(r.getId());
+                if (rg==null || rg.getBoundingBox()==null || !rg.getBoundingBox().isSetPosition()) {
                   rct = r;
                   break;
                 }
@@ -286,7 +291,7 @@ public class KEGG2SBMLLayoutExtension {
           
           
           /*
-           * At this position, the speciedGlyph is created and the coordinates may be
+           * At this position, the speciesGlyph is created and the coordinates may be
            * transfered to a novel reactionGlyph. But since duplicate glyphs for a
            * species are allowed, create rectionGlyphs and add species Glyph as reference.
            */
