@@ -330,9 +330,19 @@ public class Translator extends Launcher {
 	public void commandLineMode(AppConf appConf) {
 		SBProperties props = appConf.getCmdArgs();
 		
-		// Make command-line options persistent
+		// Maybe adjust for path2models
 		SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
-		prefs.restoreDefaults();
+		if (KEGGtranslatorCommandLineOnlyOptions.PATH2MODELS.getValue(props)) {
+		  /*  TODO:
+		   * 1) Set the required options
+		   * 2) Uncomment code in [KEGG] Pathway.java for 'getCompoundPreviewPicture()'
+		   * 3) Activate additional KEGG COMPOUND 2 ChEBI mapping in KeggInfos.java ('getChebi()'-method)
+		   */
+		}
+		
+		
+		// Make command-line options persistent
+		prefs.restoreDefaults(); // This is just used as an empty prefs-template.
 		try {
 		  prefs.saveContainedOptions(props);
 		} catch (BackingStoreException e) {

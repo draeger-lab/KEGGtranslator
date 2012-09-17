@@ -53,5 +53,12 @@ public interface KEGGtranslatorCommandLineOnlyOptions extends KeyProvider {
    */
   public static final Option<Boolean> CREATE_JPG = new Option<Boolean>("CREATE_JPG",Boolean.class,
       "Create a visualization (as JPG) of the selected format. Always creates a JPG, even for SBML and others.",Boolean.FALSE);
+
+  /**
+   * Invisible option to adjust settings for path2models.
+   * http://code.google.com/p/path2models/
+   */
+  public static final Option<Boolean> PATH2MODELS = new Option<Boolean>("PATH2MODELS",Boolean.class,
+      "Adjust all settings to produce models for the path2models project.", Boolean.FALSE, false);
   
 }

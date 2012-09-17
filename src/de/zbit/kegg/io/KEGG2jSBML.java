@@ -589,7 +589,17 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @return
    */
   private Compartment createCompartment(Model model) {
-    return createCompartment(model, "default");
+    Compartment c = createCompartment(model, "default");
+    /*
+     * The default compartment is for species without an explicit compartment.
+     * Hence, there is an SBO term for that (SBO:0000410):
+     * 
+     * "A compartment whose existence is inferred due to the presence of known
+     * material entities which must be bounded, allowing the creation of
+     * material entity pools."
+     */
+    c.setSBOTerm(410);
+    return c;
   }
   
   /**

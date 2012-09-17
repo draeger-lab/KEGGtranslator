@@ -30,6 +30,7 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.groups.Group;
+import org.sbml.jsbml.ext.groups.GroupKind;
 import org.sbml.jsbml.ext.groups.GroupModel;
 import org.sbml.jsbml.ext.groups.Member;
 import org.sbml.jsbml.xml.parsers.GroupsParser;
@@ -84,6 +85,9 @@ public class KEGG2SBMLGroupExtension {
     for (String id: componentSpeciesIDs) {
       g.createMember(id);
     }
+    
+    // The KIND attribute is required. Possible values are listed in GroupKind
+    g.setKind(GroupKind.collection);
     
     return g;
   }
