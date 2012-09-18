@@ -121,7 +121,7 @@ public class KEGGImporter extends NotifyingWorker<Object, Void> {
       // The order in which the following events happen is important
       AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator.getTranslator(outputFormat, Translator.getManager());
       
-      // The foillowing should also trigger a new progress bar!
+      // The following should also trigger a new progress bar!
       ActionEvent event = new ActionEvent(translator, 3, null);
       fireActionEvent(event);
       
