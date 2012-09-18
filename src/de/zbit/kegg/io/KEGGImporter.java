@@ -29,6 +29,7 @@ import de.zbit.gui.GUITools;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.gui.KGMLSelectAndDownload;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
+import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.NotifyingWorker;
 
 /**
@@ -47,6 +48,10 @@ public class KEGGImporter extends NotifyingWorker<Object, Void> {
    * 
    */
   private File inputFile=null;
+  /**
+   * Alternative to {@link #inputFile}.
+   */
+  private Pathway inputPathway = null;
   /**
    * 
    */
@@ -73,13 +78,25 @@ public class KEGGImporter extends NotifyingWorker<Object, Void> {
     this.inputFile = inputFile;
     this.outputFormat = outputFormat;
   }
+  
+  /**
+   * This will only translate the given pathway.
+   * @param inputPathway
+   * @param outputFormat
+   */
+  public KEGGImporter(Pathway inputPathway, Format outputFormat) {
+    super();
+    this.inputFile = null;
+    this.inputPathway = inputPathway;
+    this.outputFormat = outputFormat;
+  }
 
   /* (non-Javadoc)
    * @see javax.swing.SwingWorker#doInBackground()
    */
   @Override
   protected Object doInBackground() throws Exception {
-    if (inputFile==null) {
+    if (inputFile==null && inputPathway==null) {
       // PART0: Notify that we are goint to download something
       ActionEvent event = new ActionEvent(this, 1, KEGGpathwayID);
       fireActionEvent(event);
@@ -100,7 +117,7 @@ public class KEGGImporter extends NotifyingWorker<Object, Void> {
     }
     
     // PART3: Translate
-    if (inputFile!=null) {
+    if (inputFile!=null || inputPathway!=null) {
       // The order in which the following events happen is important
       AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator.getTranslator(outputFormat, Translator.getManager());
       
@@ -109,7 +126,12 @@ public class KEGGImporter extends NotifyingWorker<Object, Void> {
       fireActionEvent(event);
       
       translator.setProgressBar(getProgressBar());
-      Object result = translator.translate(inputFile);
+      Object result;
+      if (inputPathway!=null) {
+        result = translator.translate(inputPathway);
+      } else {
+        result = translator.translate(inputFile);
+      }
       
       event = new ActionEvent(result, 4, null);
       fireActionEvent(event);

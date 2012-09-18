@@ -32,6 +32,7 @@ import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.kegg.io.KEGG2yGraph;
 import de.zbit.kegg.io.KEGGImporter;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
+import de.zbit.kegg.parser.pathway.Pathway;
 
 /**
  * Extension of {@link TranslatorPanel} to visualize yFiles
@@ -73,6 +74,17 @@ public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
   public TranslatorGraphPanel(String pathwayID, Format outputFormat,
     ActionListener translationResult) {
     super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
+  }
+  
+  /**
+   * Initiates a translation of the given pathway.
+   * @param pathway a given KEGG pathway
+   * @param outputFormat any GraphML compatible formats (unchecked).
+   * @param translationResult
+   */
+  public TranslatorGraphPanel(Pathway pathway, Format outputFormat,
+    ActionListener translationResult) {
+    super(new KEGGImporter(pathway, outputFormat), outputFormat.toString(), translationResult);
   }
   
   /**
