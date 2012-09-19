@@ -43,6 +43,7 @@ import y.base.Edge;
 import y.base.EdgeCursor;
 import y.base.EdgeMap;
 import y.base.Node;
+import y.base.NodeCursor;
 import y.base.NodeList;
 import y.base.NodeMap;
 import y.geom.YInsets;
@@ -67,6 +68,7 @@ import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.LineNodeRealizer;
+import de.zbit.graph.StackingNodeLayout;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
@@ -447,6 +449,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       nl.setAutoSizePolicy(NodeLabel.AUTOSIZE_NODE_WIDTH);
       
       nr.setLabel(nl);
+    } else {
+      nl = nr.getLabel();
+    }
+    
+    // Group nodes in BioPAX often contain very long names => make a different configuration here
+    //nl.setAutoSizePolicy(NodeLabel.AUTOSIZE_NONE);
+    if (nl!=null && NodeLabel.getFactory().getAvailableConfigurations().contains("CroppingLabel")) {  
+      nl.setConfiguration("CroppingLabel");  
     }
     
     return nr;
@@ -789,7 +799,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         NodeRealizer nr = graph.getRealizer(n);
         nodeColor.set(n, ColorToHTML(nr.getFillColor()) );
         nodeName.set(n, nr.getLabelText());
-        nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
+        if (!g.isDefaultPosition()) {
+          // Do not use the center here, if you do, you'll have to change it also
+          // in many other classes reading and writing this attribute.
+          nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
+        }
         nodeSize.set(n, (int) nr.getWidth() + "|" + (int) nr.getHeight());
       }
       keggOntIds.set(n, e.getName().replace(" ", ","));
@@ -971,9 +985,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           if (hm.isGroupNode(myNodes[j]) || hm.getParentNode(myNodes[j])!=null || !hm.isNormalNode(myNodes[j])) continue;
           
           // Wenn in selber (optischer) "Reihe" und selbe kanten, dann groupen.
-          if (graph.getRealizer(myNodes[i]).getX()==graph.getRealizer(myNodes[j]).getX() || graph.getRealizer(myNodes[i]).getY()==graph.getRealizer(myNodes[j]).getY())
+          if (graph.getRealizer(myNodes[i]).getCenterX()==graph.getRealizer(myNodes[j]).getCenterX() || graph.getRealizer(myNodes[i]).getCenterY()==graph.getRealizer(myNodes[j]).getCenterY() ||
+              (graph.getRealizer(myNodes[i]).getX()==graph.getRealizer(myNodes[j]).getX() || graph.getRealizer(myNodes[i]).getY()==graph.getRealizer(myNodes[j]).getY())) {
             if (nodesHaveSameEdges(myNodes[i], myNodes[j], graph))
               nl.add(myNodes[j]);
+          }
         }
         
         // Remove Outlier (More than 50px away from closest node)
@@ -1102,8 +1118,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     mapDescriptionMap.set(interactionDescription, GraphMLmaps.EDGE_TYPE);
     
     
-    // Layout some nodes that had no layout information
+    // Layout (eventually whole graph, maybe just subset).
     if (toLayout.size()>0) {
+      // Only adjust layout of a few nodes.
+      stackGroupNodeContents(graph, toLayout);
       new GraphTools(graph).layoutNodeSubset(toLayout);
       graph.unselectAll();
     }
@@ -1111,6 +1129,34 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     return graph;
   }
   
+  /**
+   * Applies {@link StackingNodeLayout} to all group nodes with less than 10
+   * components without any layout information.
+   * @param graph
+   * @param toLayout nodes without layout information
+   */
+  private void stackGroupNodeContents(Graph2D graph, Set<Node> toLayout) {
+    HierarchyManager hm = graph.getHierarchyManager();
+    for (Node n : graph.getNodeArray()) {
+      if (hm.isGroupNode(n) && hm.getChildren(n).size()<=10) {
+        // Check if no child nodes have a layout
+        boolean allWithoutLayout = true;
+        NodeCursor nc = hm.getChildren(n);
+        while (nc.ok()) {
+          if (!toLayout.contains(nc.node())) {
+            allWithoutLayout = false;
+            break;
+          }
+          nc.next();
+        }
+        
+        // Apply stacking layout
+        if (allWithoutLayout) {
+          StackingNodeLayout.doRecursiveLayout(graph, n);
+        }
+      }
+    }
+  }
   /**
    * @param ids
    * @return comma separated list of existing identifiers for the given db,
