@@ -135,7 +135,8 @@ public class TranslatorPanelTools {
     } else if (KEGGTranslatorPanelOptions.SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND.getValue(prefs)) {
         Integer brighten = (KEGGTranslatorPanelOptions.BRIGHTEN_KEGG_BACKGROUND_IMAGE.getValue(prefs));
         if (brighten==null || brighten<0) brighten = 0;
-        provider = GraphBackgroundImageProvider.Factory.createDynamicTranslatorImageProvider(brighten);
+        boolean greyscale = (KEGGTranslatorPanelOptions.GREYSCALE_KEGG_BACKGROUND_IMAGE.getValue(prefs));
+        provider = GraphBackgroundImageProvider.Factory.createDynamicTranslatorImageProvider(brighten, greyscale);
     }
     return provider;
   }

@@ -203,9 +203,9 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
       "If true, creates describing labels for each edge in the graph.", (short) 2, "-cel", false);
   public static final Option<Boolean> HIDE_LABELS_FOR_COMPOUNDS = new Option<Boolean>("HIDE_LABELS_FOR_COMPOUNDS",Boolean.class,
       "If true, hides labels for all compounds (=small molecules).", (short) 2, "-hc", false);
-  public static final Option<Boolean> DRAW_GREY_ARROWS_FOR_REACTIONS = new Option<Boolean>("DRAW_GREY_ARROWS_FOR_REACTIONS",Boolean.class,
-      "If true, creates grey arrows for reactions and arrows with transparent circles as heads for reaction modifiers. This does only " +
-      "affect reactions defined by KEGG, not the relations.", (short) 2, "-dar", false);
+  public static final Option<Boolean> INCLUDE_NODES_FOR_METABOLIC_REACTIONS = new Option<Boolean>("INCLUDE_NODES_FOR_METABOLIC_REACTIONS",Boolean.class,
+      "If true, creates separate nodes for reactions and connects all substrates, products and enzymes with them. This does only " +
+      "affect metabolic reactions defined by KEGG, not the relations.", (short) 2, "-dar", false);
   
   /**
    * Define various options that are used in yFiles based translations.
@@ -214,7 +214,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   public static final OptionGroup<Boolean> GRAPH_OPTIONS = new OptionGroup<Boolean>(
       "Translation options for graphical outputs",
       "Define various options that are used in yFiles based translations.",
-      MERGE_NODES_WITH_SAME_EDGES, CREATE_EDGE_LABELS, HIDE_LABELS_FOR_COMPOUNDS, DRAW_GREY_ARROWS_FOR_REACTIONS);
+      MERGE_NODES_WITH_SAME_EDGES, CREATE_EDGE_LABELS, HIDE_LABELS_FOR_COMPOUNDS, INCLUDE_NODES_FOR_METABOLIC_REACTIONS);
   
   /*
    * Funcional, SBML based translations

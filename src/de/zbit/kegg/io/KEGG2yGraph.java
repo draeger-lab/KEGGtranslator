@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,10 +61,12 @@ import y.view.EdgeRealizer;
 import y.view.GenericEdgeRealizer;
 import y.view.GenericNodeRealizer;
 import y.view.Graph2D;
+import y.view.Graph2DView;
 import y.view.LineType;
 import y.view.NodeLabel;
 import y.view.NodeRealizer;
 import y.view.ShapeNodeRealizer;
+import y.view.YLabel;
 import y.view.hierarchy.GroupNodeRealizer;
 import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.GraphTools;
@@ -277,7 +280,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   private void loadPreferences() {
   	groupNodesWithSameEdges = KEGGtranslatorOptions.MERGE_NODES_WITH_SAME_EDGES.getValue(prefs);
   	createEdgeLabels = KEGGtranslatorOptions.CREATE_EDGE_LABELS.getValue(prefs);
-  	drawArrowsForReactions = KEGGtranslatorOptions.DRAW_GREY_ARROWS_FOR_REACTIONS.getValue(prefs);
+  	drawArrowsForReactions = KEGGtranslatorOptions.INCLUDE_NODES_FOR_METABOLIC_REACTIONS.getValue(prefs);
   	hideLabelsForCompounds = KEGGtranslatorOptions.HIDE_LABELS_FOR_COMPOUNDS.getValue(prefs);
   	
   	// Wee need to set autocompleteReactions to false, because it does not make
@@ -527,7 +530,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     initProgressBar(p,showProgressForRelations,false);
     
     // Save all reaction modifiers in a map. String = reaction id.
-    Map<String, Node> reactionModifiers = new HashMap<String, Node>();
+    Map<String, Collection<Node>> reactionModifiers = new HashMap<String, Collection<Node>>();
     
     // Add nodes for all Entries
     Set<Node> toLayout = new HashSet<Node>();
@@ -604,6 +607,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           nl.setModel(NodeLabel.SIDES);
           nl.setPosition(NodeLabel.S);
           nl.setDistance(0);
+          // A Reviewer (of InCroMAP app note paper) wants us to
+          // implement label wrapping for compounds...
+          nl.setAutoSizePolicy(YLabel.AUTOSIZE_NONE);
+          nl.setContentSize(66, 30);
+          if (nl!=null && NodeLabel.getFactory().getAvailableConfigurations().contains("CroppingLabel")) {  
+            nl.setConfiguration("CroppingLabel");  
+          }
+          //---
         }
         
         nr.setLabel(nl);
@@ -812,7 +823,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       if (isPathwayReference) PWReferenceNodeTexts.add(graph.getRealizer(n).getLabelText());
       if (e.hasReaction()) {
         for (String reaction : e.getReactions()) {
-          reactionModifiers.put(reaction.toLowerCase().trim(), n);
+          Utils.addToMapOfSets(reactionModifiers, reaction.toLowerCase().trim(), n);
         }
       }
     }
@@ -964,7 +975,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       List<String> processedReactions = new SortedArrayList<String>();
       for (Reaction r : p.getReactions()) {
         if (!processedReactions.contains(r.getName())) {
-          addKGMLReaction(r,p,graph,reactionModifiers);
+          Node reactionNode = addKGMLReaction(r,p,graph,reactionModifiers);
+          if (reactionNode!=null) {
+            // Write some fields to our maps and apply a layout
+//            String reactionName = r.getName().toLowerCase().trim().startsWith("rn:")?r.getName():"rn:"+r.getName();
+            keggOntIds.set(reactionNode, r.getName());
+            entityType.set(reactionNode, EntryType.reaction.toString());
+            toLayout.add(reactionNode);
+          }
           processedReactions.add(r.getName());
         }
       }
@@ -1119,6 +1137,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     
     // Layout (eventually whole graph, maybe just subset).
+    // Note: toLayout may eventually also contain intermediate reaction nodes!
     if (toLayout.size()>0) {
       // Only adjust layout of a few nodes.
       stackGroupNodeContents(graph, toLayout);
@@ -1243,48 +1262,93 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @param p
    * @param graph
    * @param reactionModifiers
+   * @return the intermediate reaction node (should be layouted!) or
+   * <code>NULL</code> if the reaction wasn't drawn.
    */
-  private void addKGMLReaction(Reaction r, Pathway p, Graph2D graph, Map<String, Node> reactionModifiers) {
-    if (!reactionHasAtLeastOneSubstrateAndProduct(r, p)) return;
+  private Node addKGMLReaction(Reaction r, Pathway p, Graph2D graph, Map<String, Collection<Node>> reactionModifiers) {
+    if (!reactionHasAtLeastOneSubstrateAndProduct(r, p)) return null;
     
-    EdgeRealizer er = new GenericEdgeRealizer();
-    er.setTargetArrow(Arrow.STANDARD);
-    er.setLineColor(Color.LIGHT_GRAY);
-    if (r.getType().equals(ReactionType.reversible)) {
-      er.setSourceArrow(Arrow.STANDARD);
+    // Get a list of all products and substrates
+    List<Node> validSubstrates = new LinkedList<Node>();
+    List<Node> validProducts = new LinkedList<Node>();
+    for (ReactionComponent rc : r.getSubstrates()) {
+      Entry spec = p.getEntryForReactionComponent(rc);
+      if (spec == null || spec.getCustom() == null || !(spec.getCustom() instanceof Node)){
+        continue;
+      }
+      validSubstrates.add((Node) spec.getCustom());
     }
-    
-    
-    // yFiles only provides 1:1 relations => Create edge for every combination.
-    for (ReactionComponent sub:r.getSubstrates()) {
-      Entry one = p.getEntryForReactionComponent(sub);
-      for (ReactionComponent prod:r.getProducts()) {
-        Entry two = p.getEntryForReactionComponent(prod);
-        if (one==null || two==null) {
-          log.warning("No component for " + sub + " or " + prod);
-          continue;        
-        }
-        
-        // Get nodes, corresponding to entries
-        Node nOne = (Node) one.getCustom();
-        Node nTwo = (Node) two.getCustom();
-        
-        // Create edge, if not existent.
-        if (nOne.getEdgeTo(nTwo)==null) {
-          graph.createEdge(nOne, nTwo, er.createCopy());
-        }
-        
-        // Consider reaction modifiers
-        Node modifier = reactionModifiers.get(r.getName().toLowerCase().trim());
-        if (modifier!=null && modifier.getEdgeTo(nTwo)==null) {
-          EdgeRealizer er2 = er.createCopy();
-          er2.setSourceArrow(Arrow.NONE);
-          er2.setTargetArrow(Arrow.TRANSPARENT_CIRCLE);
-          graph.createEdge(modifier, nTwo, er2);
+    for (ReactionComponent rc : r.getProducts()) {
+      Entry spec = p.getEntryForReactionComponent(rc);
+      if (spec == null || spec.getCustom() == null || !(spec.getCustom() instanceof Node)){
+        continue;
+      }
+      validProducts.add((Node) spec.getCustom());
+    }
+    // Remove all substrates that are also products
+    // Don't paint stupid self-loops, enzymes are treated separately
+    Iterator<Node> si = validSubstrates.iterator();
+    while (si.hasNext()) {
+      Iterator<Node> pi = validProducts.iterator();
+      Node current = si.next();
+      while (pi.hasNext()) {
+        if (current.equals(pi.next())) {
+          si.remove();
+          pi.remove();
+          break;
         }
       }
     }
     
+    // The list may now be empty.
+    if (validSubstrates.size()<1 || validProducts.size()<1) {
+      return null;
+    }
+    
+    // Create template arrows    
+    EdgeRealizer subArrow = new GenericEdgeRealizer();
+    subArrow.setTargetArrow(Arrow.NONE);
+    subArrow.setLineColor(Color.LIGHT_GRAY);
+    if (r.getType().equals(ReactionType.reversible)) {
+      subArrow.setSourceArrow(Arrow.STANDARD);
+    }
+    
+    EdgeRealizer prodArrow = new GenericEdgeRealizer();
+    prodArrow.setTargetArrow(Arrow.STANDARD);
+    prodArrow.setLineColor(Color.LIGHT_GRAY);
+    prodArrow.setSourceArrow(Arrow.NONE);
+    
+    EdgeRealizer enzymeArrow = new GenericEdgeRealizer();
+    enzymeArrow.setTargetArrow(Arrow.TRANSPARENT_CIRCLE);
+    enzymeArrow.setLineColor(Color.LIGHT_GRAY);
+    enzymeArrow.setSourceArrow(Arrow.NONE);
+    
+    // Create the intermediate reaction node
+    ShapeNodeRealizer nr = new ShapeNodeRealizer(ShapeNodeRealizer.RECT);
+    nr.setSize(8, 8);
+    nr.setLayer(Graph2DView.BG_LAYER, false);
+    nr.setTransparent(false);
+    nr.setFillColor(Color.WHITE);
+    nr.setLineColor(Color.BLACK);
+    Node reaction = graph.createNode(nr);
+    
+    // All Substrates and productes should dock to the reaction node
+    for (Node n : validSubstrates) {
+      graph.createEdge(n, reaction, subArrow.createCopy());
+    }
+    for (Node n : validProducts) {
+      graph.createEdge(reaction, n, prodArrow.createCopy());
+    }
+    
+    // Consider reaction modifiers
+    Collection<Node> modifier = reactionModifiers.get(r.getName().toLowerCase().trim());
+    if (modifier!=null && modifier.size()>0) {
+      for (Node mod : modifier) {
+        graph.createEdge(mod, reaction, enzymeArrow.createCopy());
+      }
+    }
+    
+    return reaction;
   }
   
   

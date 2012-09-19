@@ -750,10 +750,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           notes.append(String.format("<b>Equation for %s%s%s:</b> %s<br/>\n",
             quotStart, ko_id.toUpperCase(), quotEnd, EscapeChars.forHTML(infos.getEquation())));
         }
-        String prefix = "http://www.genome.jp/Fig/reaction/";
-        String suffix = KeggInfos.suffix(ko_id.toUpperCase()) + ".gif";
-        notes.append(String.format("<a href=\"%s%s\">", prefix, suffix));
-        notes.append(String.format("<img src=\"%s%s\"/></a>\n", prefix, suffix));
+        String reactionImageURL = Pathway.getReactionPreviewPicture(ko_id, false);
+        notes.append(String.format("<a href=\"%s\">", reactionImageURL));
+        notes.append(String.format("<img src=\"%s\"/></a>\n", reactionImageURL));
         if (infos.getPathwayDescriptions() != null) {
           notes.append("<br/>\n<b>Occurs in:</b><br/>\n");
           notes.append("<ul>\n");

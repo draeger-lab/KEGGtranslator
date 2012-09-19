@@ -46,21 +46,28 @@ public abstract interface KEGGTranslatorPanelOptions extends de.zbit.graph.gui.o
   /**
    * If true, shows the original KEGG picture in the background layer of a translated graph.
    */
-  public static final Option<Boolean> SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND = new Option<Boolean>("SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND",Boolean.class,
+  public static final Option<Boolean> SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND = new Option<Boolean>("SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND", Boolean.class,
       "If true, shows the original KEGG picture in the background layer of a translated graph.", true, SHOW_LOGO_IN_GRAPH_BACKGROUND, FALSE_RANGE);
   
   /**
    * Select percentage for brightening the KEGG background image.
    */
-  public static final Option<Integer> BRIGHTEN_KEGG_BACKGROUND_IMAGE = new Option<Integer>("BRIGHTEN_KEGG_BACKGROUND_IMAGE",Integer.class,
-      "Select percentage for brightening the KEGG background image.", new Range<Integer>(Integer.class, "{[0,100]}"), 80, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, TRUE_RANGE);
+  public static final Option<Integer> BRIGHTEN_KEGG_BACKGROUND_IMAGE = new Option<Integer>("BRIGHTEN_KEGG_BACKGROUND_IMAGE", Integer.class,
+      "Select percentage for brightening the KEGG background image.", new Range<Integer>(Integer.class, "{[0,100]}"), 65, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, TRUE_RANGE);
+
+  /**
+   * <code>TRUE</code> if the image should be converted to a greyscale image.
+   */
+  public static final Option<Boolean> GREYSCALE_KEGG_BACKGROUND_IMAGE = new Option<Boolean>("GREYSCALE_KEGG_BACKGROUND_IMAGE", Boolean.class,
+      "If true, converts the KEGG background image to a greyscale picture.", true, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, TRUE_RANGE);
   
   
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static final OptionGroup GRAPH_BACKGROUND_OPTIONS = new OptionGroup(
       "Graph background image",
       "Control the image or logo that is shown in the graph background.",
-      SHOW_LOGO_IN_GRAPH_BACKGROUND, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, BRIGHTEN_KEGG_BACKGROUND_IMAGE
+      SHOW_LOGO_IN_GRAPH_BACKGROUND, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, BRIGHTEN_KEGG_BACKGROUND_IMAGE, 
+      GREYSCALE_KEGG_BACKGROUND_IMAGE
       //SHOW_NAVIGATION_AND_OVERVIEW_PANELS, SHOW_PROPERTIES_TABLE, LAYOUT_EDGES
       );
   
