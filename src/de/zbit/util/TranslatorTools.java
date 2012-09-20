@@ -149,8 +149,9 @@ public class TranslatorTools extends GraphTools {
       Color color = Color.BLACK;
       LineType lt = LineType.LINE_1;
       // Check actual label and "all names" (label map).
+      String infos = getNodeInfoIDs(n, GraphMLmaps.NODE_LABEL); // may be null
       if (graph.getLabelText(n).toLowerCase().contains(containedString) ||
-          getNodeInfoIDs(n, GraphMLmaps.NODE_LABEL).toLowerCase().contains(containedString)) {
+          (infos!=null && infos.toLowerCase().contains(containedString))) {
         color = Color.RED;
         lt = LineType.LINE_2;
         graph.setSelected(n, true);

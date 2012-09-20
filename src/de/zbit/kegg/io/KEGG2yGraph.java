@@ -502,6 +502,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     NodeMap nodePosition = graph.createNodeMap();
     NodeMap nodeSize = graph.createNodeMap();
     //NodeMap bindsToChemicals = graph.createNodeMap();
+    NodeMap[] nodeMaps = new NodeMap[]{nodeDescription, entityType, nodeLabel, entrezIds, keggOntIds, 
+        uniprotIds, ensemblIds, nodeURLs, nodeName, nodeColor, nodePosition, nodeSize};
+    
     
     EdgeMap edgeDescription = graph.createEdgeMap(); // = Relation.type
     EdgeMap interactionDescription = graph.createEdgeMap(); // = Subtype.name "inhibition", "activation", "interaction", "physical interaction", "catalysis", "transcriptional control", "control"
@@ -829,11 +832,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     }
     
     
+    // Maybe we need to clone nodes, such that they appear in multiple groups
+    Set<Integer> usedNodes = new HashSet<Integer>();
     // Make group node hirarchies
     for (int i=0; i<parentGroupNodes.size(); i++) {
       NodeList nl = new NodeList();
-      // Maybe we need to clone nodes, such that they appear in multiple groups
-      Set<Integer> usedNodes = new HashSet<Integer>();
       double x=Double.MAX_VALUE,y=Double.MAX_VALUE,width=0,height=0;
       for (int n2: groupNodeChildren.get(i)) {
         Entry two = p.getEntryForId(n2);
@@ -846,10 +849,13 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         if (!usedNodes.add(n2)) {
           // we already assigned this node to another group => clone it
           nr = nr.createCopy();
+          Node previousNode = twoNode;
           twoNode = twoNode.createCopy(graph);
+          copyMapEntries(nodeMaps, previousNode, twoNode);
           graph.setRealizer(twoNode, nr);
           width=Math.max(width, (nr.getWidth()));
           height=Math.max(height, (nr.getHeight()));
+          toLayout.add(twoNode);
         } else {
           x = Math.min(x, nr.getX());
           y = Math.min(y, nr.getY());
@@ -1160,6 +1166,24 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   }
   
   /**
+   * Links all information in all <code>nodeMaps</code> that are
+   * assigned to <code>oldNode</code> also to the <code>newNode</code>.
+   * @param nodeMaps
+   * @param oldNode
+   * @param newNode
+   */
+  private void copyMapEntries(NodeMap[] nodeMaps, Node oldNode,
+    Node newNode) {
+    if (nodeMaps==null) return;
+    for (NodeMap nm : nodeMaps) {
+      Object info = nm.get(oldNode);
+      if (info!=null) {
+        nm.set(newNode, info);
+      }
+    }
+  }
+  
+  /**
    * Applies {@link StackingNodeLayout} to all group nodes with less than 10
    * components without any layout information.
    * @param graph
@@ -1296,6 +1320,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       }
       validProducts.add((Node) spec.getCustom());
     }
+    
+    // Bundle edges, i.e., look if all substrates or products belong to the same group node
+    validSubstrates = bundle(graph, validSubstrates);
+    validProducts = bundle(graph, validProducts);
+    
     // Remove all substrates that are also products
     // Don't paint stupid self-loops, enzymes are treated separately
     Iterator<Node> si = validSubstrates.iterator();
@@ -1316,9 +1345,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       return null;
     }
     
-    // Bundle edges, i.e., look if all substrates or products belong to the same group node
-    validSubstrates = bundle(graph, validSubstrates);
-    validProducts = bundle(graph, validProducts);
     
     // Create template arrows    
     EdgeRealizer subArrow = new GenericEdgeRealizer();
@@ -1389,13 +1415,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     for (int i=0; i<childs.size(); i++) {
       Node assumedParent = hm.getParentNode(childs.get(i));
       if (assumedParent!=null) {
-        // Look if all childs of this parent are within this group node
+        // Look if all childs of this parent are inside the childs list
         NodeCursor gChilds = hm.getChildren(assumedParent);
         if (gChilds!=null && gChilds.size()>0) {
           NodeList gChildList = new NodeList(gChilds);
           if (childs.containsAll(gChildList)) {
             childs.removeAll(gChildList);
             childs.add(assumedParent);
+            // recurse
             return bundle(graph, childs);
           }
         }
