@@ -832,6 +832,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     // Make group node hirarchies
     for (int i=0; i<parentGroupNodes.size(); i++) {
       NodeList nl = new NodeList();
+      // Maybe we need to clone nodes, such that they appear in multiple groups
+      Set<Integer> usedNodes = new HashSet<Integer>();
       double x=Double.MAX_VALUE,y=Double.MAX_VALUE,width=0,height=0;
       for (int n2: groupNodeChildren.get(i)) {
         Entry two = p.getEntryForId(n2);
@@ -841,10 +843,19 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         }
         Node twoNode = (Node) two.getCustom();
         NodeRealizer nr = graph.getRealizer(twoNode);
-        x = Math.min(x, nr.getX());
-        y = Math.min(y, nr.getY());
-        width=Math.max(width, (nr.getWidth()+nr.getX()));
-        height=Math.max(height, (nr.getHeight()+nr.getY()));
+        if (!usedNodes.add(n2)) {
+          // we already assigned this node to another group => clone it
+          nr = nr.createCopy();
+          twoNode = twoNode.createCopy(graph);
+          graph.setRealizer(twoNode, nr);
+          width=Math.max(width, (nr.getWidth()));
+          height=Math.max(height, (nr.getHeight()));
+        } else {
+          x = Math.min(x, nr.getX());
+          y = Math.min(y, nr.getY());
+          width=Math.max(width, (nr.getWidth()+nr.getX()));
+          height=Math.max(height, (nr.getHeight()+nr.getY()));
+        }
         
         nl.add(twoNode);
       }
@@ -1305,6 +1316,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       return null;
     }
     
+    // Bundle edges, i.e., look if all substrates or products belong to the same group node
+    validSubstrates = bundle(graph, validSubstrates);
+    validProducts = bundle(graph, validProducts);
+    
     // Create template arrows    
     EdgeRealizer subArrow = new GenericEdgeRealizer();
     subArrow.setTargetArrow(Arrow.NONE);
@@ -1351,6 +1366,44 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     return reaction;
   }
   
+  
+  /**
+   * Bundles all <code>childs</code> that belong to
+   * the same group node (i.e., parent), by removing the
+   * childs from the list and adding the parent group node.
+   * Only if all childs of (any) group nodes in the graph
+   * are inside the <code>childs</code> list, this bundling
+   * is performed.
+   * If only a subset of a group node is given as childs or
+   * no given node belongs to a group node, the list is
+   * returned unmodifified.
+   * @param childs
+   * @return common group node parent or <code>NULL</code>.
+   */
+  private List<Node> bundle(Graph2D graph, List<Node> childs) {
+    if (childs==null || !childs.iterator().hasNext()) {
+      return childs;
+    }
+    
+    HierarchyManager hm = graph.getHierarchyManager();
+    for (int i=0; i<childs.size(); i++) {
+      Node assumedParent = hm.getParentNode(childs.get(i));
+      if (assumedParent!=null) {
+        // Look if all childs of this parent are within this group node
+        NodeCursor gChilds = hm.getChildren(assumedParent);
+        if (gChilds!=null && gChilds.size()>0) {
+          NodeList gChildList = new NodeList(gChilds);
+          if (childs.containsAll(gChildList)) {
+            childs.removeAll(gChildList);
+            childs.add(assumedParent);
+            return bundle(graph, childs);
+          }
+        }
+      }
+    }
+    
+    return childs;
+  }
   
   /**
    * Convenient method to create a new KEGG2GraphML translator.
