@@ -473,6 +473,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     nr.setFillColor(null);
     nr.setFillColor2(null);
     
+    // Don't show the +/- icons as they are not working anyways
+    nr.setStateLabel(new NodeLabel());
+    
     nr.setMinimalInsets(new YInsets(5, 2, 2, 2)); // top, left, bottom, right
     nr.setAutoBoundsEnabled(true);
   }
@@ -1031,10 +1034,15 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         nl = removeOutlier(nl,graph, 50);
         
         if (nl.size()>1) {
+          // Pick any child node
+          Node source = ((Node)nl.get(0));
+          
           // Create new Group node and setup hirarchies
-          
           GroupNodeRealizer gnr = (GroupNodeRealizer) setupGroupNode(new NodeLabel(), "");
-          
+          Graphics g = Graphics.createGraphicsForGroupOrComplex(null);
+          g.setX((int)graph.getRealizer(source).getCenterX());
+          g.setY((int)graph.getRealizer(source).getCenterY());
+          setupGraphics(gnr, gnr.getLabel(), g);
           //gnr.setAutoBoundsInsets(new YInsets(1, 1, 1, 1));
           
           //gnr.setBorderInsets(new YInsets(1, 1, 1, 1));
@@ -1048,8 +1056,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           //gnr.setMinimalInsets(new YInsets(1, 1, 1, 1));
           //gnr.setBorderInsets(new YInsets(1, 1, 1, 1));
           
-          // Copy edges to group node
-          Node source = ((Node)nl.get(0));
+          // Copy edges to group node (remember: all childs have the same edges)
           Edge e = source.firstInEdge();
           while (e!=null) {
             graph.createEdge(e.source(), n, graph.getRealizer(e));
