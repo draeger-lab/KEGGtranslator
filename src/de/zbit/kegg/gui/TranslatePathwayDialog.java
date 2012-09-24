@@ -61,9 +61,9 @@ public class TranslatePathwayDialog extends JPanel {
   Format outputFormat=null;
   
   /**
-   * If {@link #outputFormat} is <code>NULL</code>, this
+   * If {@link #outputFormat} is {@code null}, this
    * is the output format selector. Else, this is
-   * <code>NULL</code>.
+   * {@code null}.
    */
   JComponent oFormatSelector=null;
   

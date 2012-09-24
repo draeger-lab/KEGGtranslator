@@ -955,7 +955,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * only contains unique and non null/empty strings.
    * @param reactions
    * @param reactionIDs
-   * @return <code>NULL</code> if input did not contain valid reactionIDs.
+   * @return {@code null} if input did not contain valid reactionIDs.
    * else, a space-separated {@link String} with unique reaction ids.
    */
   public static String concatReactionIDs(Collection<Reaction> reactions, String... reactionIDs) { 

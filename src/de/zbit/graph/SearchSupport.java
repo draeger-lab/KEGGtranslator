@@ -135,8 +135,8 @@ public class SearchSupport {
   }
 
   /**
-   * Returns the current search result or <code>null</code> if there is none.
-   * @return the current search result or <code>null</code> if there is none.
+   * Returns the current search result or {@code null} if there is none.
+   * @return the current search result or {@code null} if there is none.
    */
   public SearchResult getSearchResult() {
     return searchResult;
@@ -146,10 +146,10 @@ public class SearchSupport {
    * Updates the current search result and the enabled states of the support's
    * clear, next, previous, and select all actions.
    * @param query   specifies which nodes to include in the search result.
-   * If the specified query is <code>null</code> the curren search result
-   * is reset to <code>null</code>, too.
-   * @param incremental   <code>true</code> if the current search result
-   * should be refined using the specified criterion; <code>false</code>
+   * If the specified query is {@code null} the curren search result
+   * is reset to {@code null}, too.
+   * @param incremental   {@code true} if the current search result
+   * should be refined using the specified criterion; {@code false}
    * if all nodes of the support's associated graph view's graph should be
    * checked.
    * @see #getClearAction()
@@ -328,7 +328,7 @@ public class SearchSupport {
   /**
    * Creates the support's associated <em>clear search result</em> action.
    * The default implementation resets the support's search result to
-   * <code>null</code>.
+   * {@code null}.
    * @return the support's associated <em>clear search result</em> action.
    */
   protected Action createClearAction() {
@@ -583,9 +583,9 @@ public class SearchSupport {
     }
 
     /**
-     * Returns the currently emphasized node or <code>null</code> if there is
+     * Returns the currently emphasized node or {@code null} if there is
      * none.
-     * @return the currently emphasized node or <code>null</code> if there is
+     * @return the currently emphasized node or {@code null} if there is
      * none.
      */
     public Node emphasizedNode() {
@@ -594,7 +594,7 @@ public class SearchSupport {
 
     /**
      * Resets the emphasis cursor, that is calling {@link #emphasizedNode()}
-     * afterwards will return <code>null</code>.
+     * afterwards will return {@code null}.
      */
     public void resetEmphasis() {
       current = null;
@@ -661,14 +661,14 @@ public class SearchSupport {
    */
   public static interface SearchCriterion {
     /**
-     * Returns <code>true</code> if the specified node should be included
-     * in the search result and <code>false</code> otherwise.
+     * Returns {@code true} if the specified node should be included
+     * in the search result and {@code false} otherwise.
      * @param graph   the <code>Graph2D</code> to which the specified node
      * belongs.
      * @param node   the <code>Node</code> to test for inclusion in the
      * search result.
-     * @return <code>true</code> if the specified node should be included
-     * in the search result and <code>false</code> otherwise.
+     * @return {@code true} if the specified node should be included
+     * in the search result and {@code false} otherwise.
      */
     public boolean accept( Graph2D graph, Node node );
   }

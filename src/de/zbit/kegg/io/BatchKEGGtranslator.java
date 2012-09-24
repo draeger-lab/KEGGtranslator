@@ -238,7 +238,7 @@ public class BatchKEGGtranslator {
    * @param originalPW original and untranslated pathway
    * @param outFile file to write
    * @param outFormat user selected output format
-   * @return <code>TRUE</code> if a JPG has been successfully written.
+   * @return {@code true} if a JPG has been successfully written.
    * @throws Exception if something went wrong or a required library is not available.
    */
   private boolean writeAsJPG(Object translatedDoc, Pathway originalPW, String outFile, Format outFormat) throws Exception {

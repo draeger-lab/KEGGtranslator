@@ -244,7 +244,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
   /**
    * Create an {@link EntityReference} for any {@link BioPAXElement}.
    * @param element
-   * @return corresponding {@link EntityReference} or <code>NULL</code>.
+   * @return corresponding {@link EntityReference} or {@code null}.
    */
   private EntityReference createEntityReference(BioPAXElement element) {
     String id = element.getRDFId() + ".eref";
@@ -417,7 +417,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
    * @param p
    * @param reaction 
    * @param rc
-   * @return <code>TRUE</code> if the component has been added successfully.
+   * @return {@code true} if the component has been added successfully.
    */
   private boolean configureReactionComponent(Pathway p, BiochemicalReaction reaction, ReactionComponent rc, boolean substrate) {
     if (!rc.isSetID() && !rc.isSetName()) {

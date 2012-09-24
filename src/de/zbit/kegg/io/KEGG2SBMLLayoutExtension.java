@@ -95,7 +95,7 @@ public class KEGG2SBMLLayoutExtension {
    * @param model
    * @param metabolic if true, will set {@link ReactionGlyph}s instead
    * of {@link SpeciesGlyph} whereever possible.
-   * @param removeAllPreviousLayouts if <code>TRUE</code>, will call
+   * @param removeAllPreviousLayouts if {@code true}, will call
    * unsetListOfLayouts() and remove all previous layouts before adding
    * the new one.
    */

@@ -387,9 +387,9 @@ public class TranslatorTools extends GraphTools {
   /**
    * 
    * @param n any {@link Node}
-   * @return <code>TRUE</code> if it is the title, or any
+   * @return {@code true} if it is the title, or any
    * pathway reference node. If not (or in doubt),
-   * <code>FALSE</code> is returned.
+   * {@code false} is returned.
    */
   public static boolean isPathwayReference(Node n) {
     String id = getKeggIDs(n);
@@ -580,7 +580,7 @@ public class TranslatorTools extends GraphTools {
    * @param descriptor a descriptor for a {@link NodeMap} or {@link EdgeMap} in the current
    * {@link #graph}.
    * @return true if {@link #getInfo(Object, String)} !=null and
-   * equals <code>TRUE</code>.
+   * equals {@code true}.
    */
   public boolean getBoolInfo(Object node_or_edge, String descriptor) {
     Object o = getInfo(node_or_edge, descriptor);
