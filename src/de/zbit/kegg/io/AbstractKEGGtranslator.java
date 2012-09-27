@@ -529,7 +529,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   public static boolean isGroupNode(Entry e) {
     EntryType t = e.getType();
-    return (t.equals(EntryType.group) || e.getName().toLowerCase().trim().startsWith("group:") || e.hasComponents());
+    return ((t.equals(EntryType.group) || e.getName().toLowerCase().trim().startsWith("group:")) && e.hasComponents());
   }
   
   /**

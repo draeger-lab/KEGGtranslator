@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -851,9 +852,17 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         NodeRealizer nr = graph.getRealizer(twoNode);
         if (!usedNodes.add(n2)) {
           // we already assigned this node to another group => clone it
-          nr = nr.createCopy();
           Node previousNode = twoNode;
-          twoNode = twoNode.createCopy(graph);
+          if (hm.isGroupNode(twoNode) || nr instanceof GroupNodeRealizer) {
+            // Do not copy realizers for group nodes, create simple nodes instead
+            NodeLabel newLabel = new NodeLabel(nr.getLabelText());
+            nr = setupGraphics(null, newLabel, Graphics.createGraphicsForProtein(nr.getLabelText()));
+            nr.setLabel(newLabel);
+            twoNode = graph.createNode(nr);
+          } else {
+            nr = nr.createCopy();
+            twoNode = twoNode.createCopy(graph);
+          }
           copyMapEntries(nodeMaps, previousNode, twoNode);
           graph.setRealizer(twoNode, nr);
           width=Math.max(width, (nr.getWidth()));
@@ -1196,28 +1205,97 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @param graph
    * @param toLayout nodes without layout information
    */
+  @SuppressWarnings("unchecked")
   private void stackGroupNodeContents(Graph2D graph, Set<Node> toLayout) {
     HierarchyManager hm = graph.getHierarchyManager();
+    Set<Node> processed = new HashSet<Node>();
     for (Node n : graph.getNodeArray()) {
       if (hm.isGroupNode(n) && hm.getChildren(n).size()<=10) {
-        // Check if no child nodes have a layout
-        boolean allWithoutLayout = true;
-        NodeCursor nc = hm.getChildren(n);
-        while (nc.ok()) {
-          if (!toLayout.contains(nc.node())) {
-            allWithoutLayout = false;
-            break;
-          }
-          nc.next();
+        
+        // Get topmost ancestor
+        Node parent = n; // Don't use parent as it always get's null here ;-)
+        while ((parent = hm.getParentNode(n))!=null) {
+          n = parent;
         }
         
-        // Apply stacking layout
-        if (allWithoutLayout) {
-          StackingNodeLayout.doRecursiveLayout(graph, n);
+        // Need to layout?
+        boolean success = layoutIfallChildsAreInSet(graph, n, toLayout);
+        
+        // Try to get first child group that only contains unlayouted nodes
+        // (This just refers to groups, contained in groups, that are in groups,...)
+        if (!success) {
+          NodeCursor nc = hm.getChildren(n);
+          ListIterator<Node> childs = (nc==null|| nc.size()<1) ? null : (new NodeList(nc).listIterator());
+          while (childs!=null && childs.hasNext()) {
+            Node current = childs.next();
+            if (hm.isGroupNode(current)) {
+              success = layoutIfallChildsAreInSet(graph, current, toLayout);
+              childs.remove();
+              nc = hm.getChildren(current);
+              if (nc!=null) {
+                for (Object n2: new NodeList(nc)) {
+                  childs.add((Node)n2);
+                }
+              }
+            }  
+          }
         }
+        
       }
     }
   }
+  
+  /** 
+   * Layoutes the node <code>parent</code> if all children are contained
+   * in <code>toLayout</code>. (Uses {@link StackingNodeLayout}).
+   * @param graph
+   * @param parent
+   * @param toLayout nodes without layout information
+   * @return <code>TRUE</code> if a layout has been applied,
+   */
+  @SuppressWarnings("unchecked")
+  private boolean layoutIfallChildsAreInSet(Graph2D graph, Node parent, Set<Node> toLayout) {
+    HierarchyManager hm = graph.getHierarchyManager();
+    
+    // Check if no child nodes have a layout
+    NodeCursor nc = hm.getChildren(parent);
+    if (nc==null || nc.size()<1) {
+      // Not a group or empty group
+      return false;
+    }
+    
+    // Check if all childs are without layout
+    NodeList nl = new NodeList(nc);
+    boolean allWithoutLayout = toLayout.containsAll(nl);
+    
+    // Maybe all recursive children (childs of contained groups) are in our set
+    if (!allWithoutLayout) {
+      ListIterator<Node> it = nl.listIterator();
+      while (it.hasNext()) {
+        Node current = it.next();
+        if (hm.isGroupNode(current)) {
+          it.remove();
+          nc = hm.getChildren(current);
+          if (nc!=null) {
+            for (Object n: new NodeList(nc)) {
+              it.add((Node)n);
+            }
+          }
+        }
+      }
+      if (nl.size()>0) {
+        allWithoutLayout = toLayout.containsAll(nl);
+      }
+    }
+    
+    // If all without layout, re-layout group node content
+    if (allWithoutLayout) {
+      StackingNodeLayout.doRecursiveLayout(graph, parent);
+    }
+    
+    return allWithoutLayout;
+  }
+  
   /**
    * @param ids
    * @return comma separated list of existing identifiers for the given db,
@@ -1246,13 +1324,18 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @param g
    */
   private NodeRealizer setupGraphics(NodeRealizer nr, NodeLabel nl, Graphics g) {
+    if (nl==null && nr!=null) {
+      nl = nr.getLabel(); // Might still return null
+    }
     if (nr==null) {
       if (g.getType().equals(GraphicsType.rectangle)) {
         nr = new ShapeNodeRealizer(ShapeNodeRealizer.RECT);
         //nr = new ShapeNodeRealizerRespectingLabels(ShapeNodeRealizer.RECT);
       } else if (g.getType().equals(GraphicsType.circle)) {
         nr = new ShapeNodeRealizer(ShapeNodeRealizer.ELLIPSE);
-        nl.setFontSize(10); // looks better on small ellipses
+        if (nl!=null) {
+          nl.setFontSize(10); // looks better on small ellipses
+        }
       } else if (g.getType().equals(GraphicsType.roundrectangle)) {
         nr = new ShapeNodeRealizer(ShapeNodeRealizer.ROUND_RECT);
       } else if (g.getType().equals(GraphicsType.line) && g.isSetCoords()) {
@@ -1271,7 +1354,9 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     try {
       if (g.isSetFGcolor()) {
         Color color = ColorFromHTML(g.getFgcolor());
-        nl.setTextColor(color);
+        if (nl!=null) {
+          nl.setTextColor(color);
+        }
         if (nr instanceof LineNodeRealizer) {
           nr.setFillColor(color);
         }

@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import y.base.Node;
 import y.base.NodeCursor;
+import y.base.NodeList;
 import y.view.Graph2D;
 import y.view.NodeRealizer;
 import y.view.hierarchy.HierarchyManager;
@@ -140,6 +141,7 @@ public class StackingNodeLayout {
    * @param group node to layout
    */
   private void layoutGroupNode(Node group) {
+    if (childs==null || group==null) return; // Trivial
     double cur_x = firstX;
     double cur_y = firstY;
     
@@ -197,14 +199,14 @@ public class StackingNodeLayout {
    * @param group
    * @return all children of the given <code>group</code> node.
    */
+  @SuppressWarnings("unchecked")
   public List<Node> getChildren(Node group) {
-    List<Node> childs = new ArrayList<Node>();
     NodeCursor nc = graph.getHierarchyManager().getChildren(group);
-    for (int i=1; i<=nc.size(); i++) {
-      childs.add(nc.node());
-      nc.next();
+    if (nc==null) {
+      return null;
+    } else {
+      return new NodeList(nc);
     }
-    return childs;
   }
   
   /**
@@ -223,13 +225,16 @@ public class StackingNodeLayout {
     
     HierarchyManager hm = graph.getHierarchyManager();
     NodeCursor nc = hm.getChildren(group);
-    for (int i=1; i<=nc.size(); i++) {
-      if (hm.isGroupNode(nc.node())) {
-        childsInGroups.addAll(getChildrenDeep(nc.node()));
-      } else {
-        childsSimple.add(nc.node());
+    NodeList nl = nc==null?null:new NodeList(nc);
+    if (nl!=null) {
+      for (Object c : nl) {
+        Node current = (Node) c;
+        if (hm.isGroupNode(current)) {
+          childsInGroups.addAll(getChildrenDeep(current));
+        } else {
+          childsSimple.add(current);
+        }
       }
-      nc.next();
     }
     
     List<Node> childs = new ArrayList<Node>();
