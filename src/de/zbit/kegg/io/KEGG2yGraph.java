@@ -541,6 +541,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Add nodes for all Entries
     Set<Node> toLayout = new HashSet<Node>();
+    Map<Node, Entry> node2entry = new HashMap<Node, Entry>();
     for (int i=0; i<p.getEntries().size(); i++) {
       progress.DisplayBar("Node " + (i+1) + "/" + p.getEntries().size());
       Entry e = p.getEntries().get(i);
@@ -706,6 +707,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       if (n!=null) {
         // Remember node in KEGG Structure for further references.
         e.setCustom(n);
+        node2entry.put(n, e);
         
         // Init variables
         List<KeggInfos> keggInfos = new LinkedList<KeggInfos>();
@@ -823,14 +825,14 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           nodePosition.set(n, (int) nr.getX() + "|" + (int) nr.getY());
         }
         nodeSize.set(n, (int) nr.getWidth() + "|" + (int) nr.getHeight());
-      }
-      keggOntIds.set(n, e.getName().replace(" ", ","));
-      if (e.getLink()!=null && e.getLink().length()!=0) nodeURLs.set(n, e.getLink());
-      
-      if (isPathwayReference) PWReferenceNodeTexts.add(graph.getRealizer(n).getLabelText());
-      if (e.hasReaction()) {
-        for (String reaction : e.getReactions()) {
-          Utils.addToMapOfSets(reactionModifiers, reaction.toLowerCase().trim(), n);
+        keggOntIds.set(n, e.getName().replace(" ", ","));
+        if (e.getLink()!=null && e.getLink().length()!=0) nodeURLs.set(n, e.getLink());
+        
+        if (isPathwayReference) PWReferenceNodeTexts.add(graph.getRealizer(n).getLabelText());
+        if (e.hasReaction()) {
+          for (String reaction : e.getReactions()) {
+            Utils.addToMapOfSets(reactionModifiers, reaction.toLowerCase().trim(), n);
+          }
         }
       }
     }
@@ -850,7 +852,27 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         }
         Node twoNode = (Node) two.getCustom();
         NodeRealizer nr = graph.getRealizer(twoNode);
-        if (!usedNodes.add(n2)) {
+        
+        // We maybe need to clone this node
+        /* The following example helps to understand this:
+         * Single Entry id 4
+         * Group  Entry id 5 CONTAINS 4
+         * Group  Entry id 6 CONTAINS 4
+         * Reaction 4 -> 5
+         * 
+         * We need here three instances of 4: One inside the
+         * group node with id 5, one inside group with id 6.
+         * A separate, third one is just required to avoid a
+         * self loop for the given reaction. 
+         */
+        // Components of complexes and complex istself should not directly be involved in a single reactions
+        boolean cloneThisNode = !directRelation(node2entry.get(parentGroupNodes.get(i)), two);
+        // Already contained in another complex
+        if (!cloneThisNode) {
+          cloneThisNode |= !usedNodes.add(n2);
+        }
+        
+        if (cloneThisNode) {
           // we already assigned this node to another group => clone it
           Node previousNode = twoNode;
           if (hm.isGroupNode(twoNode) || nr instanceof GroupNodeRealizer) {
@@ -1182,6 +1204,43 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   }
   
   /**
+   * Returns {@code TRUE} if a direct relation between the given
+   * entry {@code one} and {@code two} exists.
+   * @param one
+   * @param two
+   * @return
+   */
+  public static boolean directRelation(Entry one, Entry two) {
+    if (one==null || two==null) {
+      return false;
+    }
+    
+    // Check if a reaction exists that involves both entries
+    Pathway p = one.getParentPathway();
+    Collection<Reaction> rOne = p.getReactionsForEntry(one);
+    Collection<Reaction> rTwo = p.getReactionsForEntry(two);
+    rOne.retainAll(rTwo);
+    if (rOne.size()>0) {
+      return true;
+    }
+    
+    // Check if a relation exists that involves both entries
+    if (one.isSetID() && two.isSetID()) {
+      if (one.getId()==two.getId()) {
+        return true;
+      }
+      for (Relation r: p.getRelations()) {
+        if ((r.getEntry1() == one.getId()) && (r.getEntry2() == two.getId()) ||
+            (r.getEntry1() == two.getId()) && (r.getEntry2() == one.getId())) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  }
+  
+  /**
    * Links all information in all <code>nodeMaps</code> that are
    * assigned to <code>oldNode</code> also to the <code>newNode</code>.
    * @param nodeMaps
@@ -1419,6 +1478,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Remove all substrates that are also products
     // Don't paint stupid self-loops, enzymes are treated separately
+    LinkedList<Node> validSubstratesCopy = new LinkedList<Node>(validSubstrates);
     Iterator<Node> si = validSubstrates.iterator();
     while (si.hasNext()) {
       Iterator<Node> pi = validProducts.iterator();
@@ -1432,8 +1492,25 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       }
     }
     
+    // Create template enzyme arrow with circular head
+    EdgeRealizer enzymeArrow = new GenericEdgeRealizer();
+    enzymeArrow.setTargetArrow(Arrow.TRANSPARENT_CIRCLE);
+    enzymeArrow.setLineColor(Color.LIGHT_GRAY);
+    enzymeArrow.setSourceArrow(Arrow.NONE);
+    
     // The list may now be empty.
     if (validSubstrates.size()<1 || validProducts.size()<1) {
+      // But sill consider the modififers
+      Collection<Node> modifier = reactionModifiers.get(r.getName().toLowerCase().trim());
+      if (modifier!=null && modifier.size()>0) {
+        si = validSubstratesCopy.iterator();
+        while (si.hasNext()) {
+          Node selfLoopNode = si.next();
+          for (Node mod : modifier) {
+            graph.createEdge(mod, selfLoopNode, enzymeArrow.createCopy());
+          }
+        }
+      }
       return null;
     }
     
@@ -1451,10 +1528,6 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     prodArrow.setLineColor(Color.LIGHT_GRAY);
     prodArrow.setSourceArrow(Arrow.NONE);
     
-    EdgeRealizer enzymeArrow = new GenericEdgeRealizer();
-    enzymeArrow.setTargetArrow(Arrow.TRANSPARENT_CIRCLE);
-    enzymeArrow.setLineColor(Color.LIGHT_GRAY);
-    enzymeArrow.setSourceArrow(Arrow.NONE);
     
     // Create the intermediate reaction node
     ShapeNodeRealizer nr = new ShapeNodeRealizer(ShapeNodeRealizer.RECT);

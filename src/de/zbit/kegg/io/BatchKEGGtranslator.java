@@ -21,6 +21,7 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.zbit.graph.io.Graph2Dwriter;
@@ -29,6 +30,7 @@ import de.zbit.graph.io.SBGN2GraphML;
 import de.zbit.graph.io.SBML2GraphML;
 import de.zbit.io.DirectoryParser;
 import de.zbit.io.FileTools;
+import de.zbit.io.SerializableTools;
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.KEGGtranslatorCommandLineOnlyOptions;
 import de.zbit.kegg.Translator;
@@ -180,10 +182,23 @@ public class BatchKEGGtranslator {
         inFile = null; // There are errors when parsing large dirs "too many open files".
         parseDirAndSubDir(dir + fn);
         
-      } else if (SBFileFilter.isKGML(inFile)) {
+      } else {
+        
+        // Maybe we have a serialized pathway
+        // (This is just used by us...)
+        Object loaded = null;
+        try {
+          loaded = SerializableTools.loadObjectAutoDetectZIP(inFile);
+          if (!(loaded instanceof Pathway)) {
+            loaded = null;
+          }
+        } catch (Exception e1) {}
+        
+        if (loaded!=null ||
+            SBFileFilter.isKGML(inFile)) {
         // Test if outFile already exists. Assumes: 1 Pathway per file. (should be true for all files... not crucial if assumption is wrong)
         String myDir = getAndCreateOutDir(dir);
-        String outFileTemp = myDir + fn.trim().substring(0, fn.trim().length()-4) + fileExtension;
+        String outFileTemp = myDir + FileTools.removeFileExtension(fn) + fileExtension;
         if (new File(outFileTemp).exists()) {
           System.out.println("Skipping '"+inFile+"' file already exists.");
           continue; // Skip already converted files.
@@ -193,9 +208,14 @@ public class BatchKEGGtranslator {
         
         // Parse and convert all Pathways in XML file.
         List<Pathway> pw=null;
-        try {
-          pw = de.zbit.kegg.parser.KeggParser.parse(dir+fn);
-        } catch (Throwable t) {t.printStackTrace();} // Show must go on...
+        if (loaded!=null) {
+          pw = new LinkedList<Pathway>();
+          pw.add((Pathway) loaded);
+        } else {
+          try {
+            pw = de.zbit.kegg.parser.KeggParser.parse(dir+fn);
+          } catch (Throwable t) {t.printStackTrace();} // Show must go on...
+        }
         if (pw==null || pw.size()<1) continue;
         
         boolean appendNumber=(pw.size()>1);
@@ -227,6 +247,7 @@ public class BatchKEGGtranslator {
         
         
       }
+    }
     }
     
     // Remember already queried objects (save cache)
