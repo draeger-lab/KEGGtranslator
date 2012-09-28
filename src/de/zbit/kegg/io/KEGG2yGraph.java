@@ -729,7 +729,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         // Get all available annotations
         for (String ko_id:e.getName().split(" ")) {
           //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zusaetzlich: in sortedArrayList merken.
-          if (ko_id.trim().equalsIgnoreCase("undefined") || e.hasComponents()) continue;
+          if (ko_id.equalsIgnoreCase("undefined") || ko_id.equalsIgnoreCase("null") || e.hasComponents()) continue;
           
           KeggInfos infos = KeggInfos.get(ko_id, manager);
           keggInfos.add(infos);
@@ -866,7 +866,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
          * self loop for the given reaction. 
          */
         // Components of complexes and complex istself should not directly be involved in a single reactions
-        boolean cloneThisNode = !directRelation(node2entry.get(parentGroupNodes.get(i)), two);
+        boolean cloneThisNode = directRelation(node2entry.get(parentGroupNodes.get(i)), two);
         // Already contained in another complex
         if (!cloneThisNode) {
           cloneThisNode |= !usedNodes.add(n2);
@@ -1267,9 +1267,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   @SuppressWarnings("unchecked")
   private void stackGroupNodeContents(Graph2D graph, Set<Node> toLayout) {
     HierarchyManager hm = graph.getHierarchyManager();
-    Set<Node> processed = new HashSet<Node>();
     for (Node n : graph.getNodeArray()) {
-      if (hm.isGroupNode(n) && hm.getChildren(n).size()<=10) {
+      if (hm.isGroupNode(n)) {
+        /* Optionally, one could apply the stacking layout
+         * only if 'hm.getChildren(n).size()<=10' and else
+         * apply e.g., a smart organic layout.
+         */
         
         // Get topmost ancestor
         Node parent = n; // Don't use parent as it always get's null here ;-)
@@ -1327,7 +1330,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     NodeList nl = new NodeList(nc);
     boolean allWithoutLayout = toLayout.containsAll(nl);
     
-    // Maybe all recursive children (childs of contained groups) are in our set
+    // Maybe all recursive children (childs of contained groups, but not the group nodes themselves) are in our set
     if (!allWithoutLayout) {
       ListIterator<Node> it = nl.listIterator();
       while (it.hasNext()) {
