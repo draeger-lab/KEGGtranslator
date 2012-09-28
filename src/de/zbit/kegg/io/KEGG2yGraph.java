@@ -948,7 +948,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
             er.addLabel(el);
           }
           
-          if (st.getName().trim().equalsIgnoreCase("compound") && Utils.isNumber(st.getValue(),true)) {
+          if (st.getName().trim().equalsIgnoreCase("compound") && st.getValue()!=null && Utils.isNumber(st.getValue(),true)) {
             Entry compNode = p.getEntryForId(Integer.parseInt(st.getValue()));
             if (compNode==null || compNode.getCustom()==null) {System.err.println("Could not find Compound Node."); graph.createEdge(nOne, nTwo, er); continue;}
             
@@ -1047,8 +1047,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         NodeList nl = new NodeList();
         nl.add(myNodes[i]);
         
-        // Nur "Sinnvolle" zusammenfassungen vornehmen.       
-        if (hm.isGroupNode(myNodes[i]) || hm.getParentNode(myNodes[i])!=null || !hm.isNormalNode(myNodes[i]) || myNodes[i].edges().size()<1) continue;
+        // Nur "Sinnvolle" zusammenfassungen vornehmen.
+        Object type = entityType.get(myNodes[i]);
+        if (hm.isGroupNode(myNodes[i]) || hm.getParentNode(myNodes[i])!=null || !hm.isNormalNode(myNodes[i]) || 
+            myNodes[i].edges().size()<1 || (type!=null && type.equals("reaction")) ) continue;
         
         for (int j=i+1; j<myNodes.length; j++) {
           if (hm.isGroupNode(myNodes[j]) || hm.getParentNode(myNodes[j])!=null || !hm.isNormalNode(myNodes[j])) continue;
@@ -1082,6 +1084,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           Node n = graph.createNode(gnr);
           hm.convertToGroupNode(n);
           hm.setParentNode(nl, n);
+          toLayout.add(n);
           
           //gnr.setAutoBoundsInsets(new YInsets(1, 1, 1, 1));
           //gnr.setMinimalInsets(new YInsets(1, 1, 1, 1));

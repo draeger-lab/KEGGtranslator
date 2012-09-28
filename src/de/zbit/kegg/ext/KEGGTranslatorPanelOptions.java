@@ -31,7 +31,7 @@ import de.zbit.util.prefs.Range;
  * @since 1.0
  * @version $Rev$
  */
-public abstract interface KEGGTranslatorPanelOptions extends de.zbit.graph.gui.options.TranslatorPanelOptions{
+public abstract interface KEGGTranslatorPanelOptions extends de.zbit.graph.gui.options.TranslatorPanelOptions {
   
   
   /**
