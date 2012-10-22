@@ -27,7 +27,6 @@ import java.net.MalformedURLException;
 import de.zbit.graph.gui.TranslatorGraphLayerPanel;
 import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.graph.gui.options.GraphBackgroundImageProvider;
-import de.zbit.graph.gui.options.TranslatorPanelOptions;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.gui.GUITools;
 import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;

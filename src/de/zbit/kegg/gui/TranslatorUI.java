@@ -29,6 +29,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -60,7 +61,6 @@ import de.zbit.gui.BaseFrame;
 import de.zbit.gui.GUIOptions;
 import de.zbit.gui.GUITools;
 import de.zbit.gui.JLabeledComponent;
-import de.zbit.gui.JTabbedLogoPane;
 import de.zbit.gui.JTabbedPaneDraggableAndCloseable;
 import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.prefs.FileSelector;
@@ -91,6 +91,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
    * Generated serial version identifier.
    */
   private static final long serialVersionUID = 6631262606716052915L;
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(TranslatorUI.class.getName());
   
   /**
    * This is the path (relative to THIS CLASS PATH) where the watermark
@@ -764,6 +769,14 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		//return getClass().getResource("../html/help.html");
   	// "../" does not work inside a jar.
 	  return Translator.class.getResource("html/help.html");
+	}
+
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		logger.fine(evt.toString());
 	}
 	
 }
