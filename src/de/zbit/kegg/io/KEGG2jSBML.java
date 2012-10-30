@@ -915,7 +915,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           String ko_id_uc_t = ko_id.toUpperCase().trim();
           if (ko_id_uc_t.startsWith("CPD:")) {
             // KEGG and ChEBI provide picture for compounds (e.g., "C00118").
-            notes.append(Pathway.getCompoundPreviewPicture(ko_id_uc_t, infos));
+            notes.append(Pathway.getCompoundPreviewPicture(ko_id_uc_t, infos, Translator.path2models));
           }
         }
         if (entry.getType().equals(EntryType.map)) {

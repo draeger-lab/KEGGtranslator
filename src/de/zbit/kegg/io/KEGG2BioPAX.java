@@ -91,6 +91,7 @@ import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
 import de.zbit.util.EscapeChars;
 import de.zbit.util.Species;
 import de.zbit.util.Utils;
+import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * Abstract KEGG2BioPAX converter (also called KGML2BioPAX). This converter is
@@ -311,7 +312,8 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     
     return xr;
   }
-  
+
+
   /**
    * Creates a biosource, corrsponding to the organism/species of
    * the input pathway <code>p</code>.
@@ -901,7 +903,9 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * {@link openControlledVocabulary} for level 2.
    */
   protected BioPAXElement getInteractionVocuabulary(SubType st) {
-    String rfid = "#relation_subtype_" + st.getName();
+    String formattedName = st.getName().trim().replace(' ', '_').replace("/", "_or_");
+    
+    String rfid = "#relation_subtype_" + formattedName;
     BioPAXElement voc=null;
     if (level == BioPAXLevel.L3) {
       voc = (InteractionVocabulary) model.getByID(rfid);
@@ -909,49 +913,68 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       voc = (openControlledVocabulary) model.getByID(rfid);
     }
     
+    // Term is not yet available => create it.
     if (voc==null) {
+      // Convert to a term that is a child of 'MI:0190' (Molecular Interaction Ontology)
+      ValuePair<String, Integer> miTerm = SBOMapping.getMITerm(st.getName());
+      String termName = miTerm!=null?miTerm.getA():null;//formattedName;
       
       if (level == BioPAXLevel.L3) {
         voc = model.addNew(InteractionVocabulary.class, rfid);
         pathwayComponentCreated(voc);
-        ((InteractionVocabulary)voc).addTerm(st.getName());
+        if (termName!=null) {
+          ((InteractionVocabulary)voc).addTerm(termName);
+        }
+        ((InteractionVocabulary)voc).addComment(formattedName);// In all cases, add the original KEGG name
       } else if (level == BioPAXLevel.L2) {
         voc = model.addNew(openControlledVocabulary.class, rfid);
         pathwayComponentCreated(voc);
-        ((openControlledVocabulary)voc).addTERM(st.getName());
+        if (termName!=null) {
+          ((openControlledVocabulary)voc).addTERM(termName);
+        }
+        ((openControlledVocabulary)voc).addCOMMENT(formattedName);// In all cases, add the original KEGG name
       }
       
+
+      // Add additional XRefs to MI, SBO and GO
+      if (miTerm!=null && miTerm.getB()!=null && miTerm.getB()>0) {
+        BioPAXElement xr = createXRef(IdentifierDatabases.MI, Integer.toString(miTerm.getB()), 1);
+        addOntologyXRef(voc, xr, miTerm.getA());
+      }
       
       int sbo = SBOMapping.getSBOTerm(st.getName());
       if (sbo>0) {
         BioPAXElement xr = createXRef(IdentifierDatabases.SBO, Integer.toString(sbo), 1);
-        if (xr!=null) {
-          if (level == BioPAXLevel.L3) {
-            ((Xref) xr).addComment(st.getName());
-            ((org.biopax.paxtools.model.level3.XReferrable) voc).addXref((Xref) xr);
-          } else if (level == BioPAXLevel.L2) {
-            ((xref) xr).addCOMMENT(st.getName());
-            ((org.biopax.paxtools.model.level2.XReferrable) voc).addXREF((xref) xr);
-          }
-        }
+        addOntologyXRef(voc, xr, formattedName);
       }
       
       int go = SBOMapping.getGOTerm(st.getName());
       if (go>0) {
         BioPAXElement xr = createXRef(IdentifierDatabases.GeneOntology, Integer.toString(go), 1);
-        if (xr!=null) {
-          if (level == BioPAXLevel.L3) {
-            ((Xref) xr).addComment(st.getName());
-            ((org.biopax.paxtools.model.level3.XReferrable) voc).addXref((Xref) xr);
-          } else if (level == BioPAXLevel.L2) {
-            ((xref) xr).addCOMMENT(st.getName());
-            ((org.biopax.paxtools.model.level2.XReferrable) voc).addXREF((xref) xr);
-          }
-        }
+        addOntologyXRef(voc, xr, formattedName);
       }
     }
     
     return voc;
+  }
+
+
+  /**
+   * @param xReferrableBPelement
+   * @param xRef
+   * @param formattedName
+   */
+  private void addOntologyXRef(BioPAXElement xReferrableBPelement,
+    BioPAXElement xRef, String formattedName) {
+    if (xRef!=null) {
+      if (level == BioPAXLevel.L3) {
+        ((Xref) xRef).addComment(formattedName);
+        ((org.biopax.paxtools.model.level3.XReferrable) xReferrableBPelement).addXref((Xref) xRef);
+      } else if (level == BioPAXLevel.L2) {
+        ((xref) xRef).addCOMMENT(formattedName);
+        ((org.biopax.paxtools.model.level2.XReferrable) xReferrableBPelement).addXREF((xref) xRef);
+      }
+    }
   }
   
   /* (non-Javadoc)

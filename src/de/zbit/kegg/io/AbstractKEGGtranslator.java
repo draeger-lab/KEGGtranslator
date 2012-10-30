@@ -805,22 +805,36 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
      * letter ::= �a�..�z�,�A�..�Z� digit ::= �0�..�9� idChar ::= letter |
      * digit | �_� SId ::= ( letter | �_� ) idChar*
      */
-    String ret = "";
+    String ret;
     if (name == null || name.trim().length() == 0) {
       ret = incrementSIdSuffix("SId");
       SIds.add(ret);
     } else {
       name = name.trim();
+      StringBuilder ret2 = new StringBuilder(name.length()+4);
       char c = name.charAt(0);
+      
       // Must start with letter or '_'.
-      if (!(isLetter(c) || c == '_')) ret = "SId_"; else ret = Character.toString(c);
+      if (!(isLetter(c) || c == '_')) {
+        ret2.append("SId_");
+      } else {
+        ret2.append(c);
+      }
+      
       // May contain letters, digits or '_'
       for (int i = 1; i < name.length(); i++) {
         c = name.charAt(i);
-        if (c==' ') c='_'; // Replace spaces with "_"
-        if (isLetter(c) || Character.isDigit(c) || c == '_') ret += Character.toString(c);
+        if (c==' ') {
+          c='_'; // Replace spaces with "_"
+        }
+        
+        if (isLetter(c) || Character.isDigit(c) || c == '_') {
+          ret2.append(c);
+        } // else: skip invalid characters
       }
+      
       // Make unique
+      ret = ret2.toString();
       if (SIds.contains(ret)) ret = incrementSIdSuffix(ret);
       SIds.add(ret);
     }

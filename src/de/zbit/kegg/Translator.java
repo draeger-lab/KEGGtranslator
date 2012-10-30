@@ -35,6 +35,7 @@ import de.zbit.AppConf;
 import de.zbit.Launcher;
 import de.zbit.gui.GUIOptions;
 import de.zbit.io.FileTools;
+import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggFunctionManagement;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;
@@ -74,6 +75,13 @@ public class Translator extends Launcher {
 	 * like the browser cache). Must be loaded upon start and saved upon exit.
 	 */  
   public final static String cacheFunctionFileName = "keggfc.dat";
+  
+  /**
+   * Adjusts a few methods in KEGGtranslator to generate an ouput for
+   * the path2models project if true.
+   * <p><b>PLESE ALWAYS KEEP THE DEFAULT, INITIAL VALUE TO FALSE!</b>
+   */
+  public static boolean path2models = false;
 	
 	/**
 	 * The {@link Logger} for this class.
@@ -333,13 +341,8 @@ public class Translator extends Launcher {
 		// Maybe adjust for path2models
 		SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
 		if (KEGGtranslatorCommandLineOnlyOptions.PATH2MODELS.getValue(props)) {
-		  /*  TODO:
-		   * 1) Set the required options
-		   * 2) Uncomment code in [KEGG] Pathway.java for 'getCompoundPreviewPicture()'
-		   * 3) Activate additional KEGG COMPOUND 2 ChEBI mapping in KeggInfos.java ('getChebi()'-method)
-		   */
+		  adjustForPath2Models();
 		}
-		
 		
 		// Make command-line options persistent
 		prefs.restoreDefaults(); // This is just used as an empty prefs-template.
@@ -358,6 +361,47 @@ public class Translator extends Launcher {
 			log.warning(exc.getLocalizedMessage());
 		}
 	}
+
+  /**
+   * Adjusts the current KEGGtranslator instances to create an outout
+   * for the path2models project.
+   */
+  public static void adjustForPath2Models() {
+    path2models = true;
+    KeggInfos.path2models = true;
+    /* 
+     * 1) Set the required options
+     * 2) Uncomment code in [KEGG] Pathway.java for 'getCompoundPreviewPicture()'
+     * 3) Activate additional KEGG COMPOUND 2 ChEBI mapping in KeggInfos.java ('getChebi()'-method)
+     */
+    
+    KEGGtranslatorOptions.AUTOCOMPLETE_REACTIONS.setDefaultValue(Boolean.TRUE);
+    KEGGtranslatorOptions.USE_GROUPS_EXTENSION.setDefaultValue(Boolean.FALSE);
+    KEGGtranslatorOptions.REMOVE_ORPHANS.setDefaultValue(Boolean.FALSE);
+    KEGGtranslatorOptions.REMOVE_WHITE_GENE_NODES.setDefaultValue(Boolean.TRUE);
+    KEGGtranslatorOptions.SHOW_FORMULA_FOR_COMPOUNDS.setDefaultValue(Boolean.FALSE);
+    KEGGtranslatorOptions.REMOVE_PATHWAY_REFERENCES.setDefaultValue(Boolean.TRUE);
+    KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS.setDefaultValue(Boolean.FALSE);
+    KEGGtranslatorOptions.ADD_LAYOUT_EXTENSION.setDefaultValue(Boolean.TRUE);
+    KEGGtranslatorOptions.CHECK_ATOM_BALANCE.setDefaultValue(Boolean.FALSE);
+    
+    SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorOptions.class);
+    prefs.put(KEGGtranslatorOptions.AUTOCOMPLETE_REACTIONS, Boolean.TRUE);
+    prefs.put(KEGGtranslatorOptions.USE_GROUPS_EXTENSION, Boolean.FALSE);
+    prefs.put(KEGGtranslatorOptions.REMOVE_ORPHANS, Boolean.FALSE);
+    prefs.put(KEGGtranslatorOptions.REMOVE_WHITE_GENE_NODES, Boolean.TRUE);
+    prefs.put(KEGGtranslatorOptions.SHOW_FORMULA_FOR_COMPOUNDS, Boolean.FALSE);
+    prefs.put(KEGGtranslatorOptions.REMOVE_PATHWAY_REFERENCES, Boolean.TRUE);
+    prefs.put(KEGGtranslatorOptions.CELLDESIGNER_ANNOTATIONS, Boolean.FALSE);
+    prefs.put(KEGGtranslatorOptions.ADD_LAYOUT_EXTENSION, Boolean.TRUE);
+    prefs.put(KEGGtranslatorOptions.CHECK_ATOM_BALANCE, Boolean.FALSE);
+    
+    try {
+      prefs.flush();
+    } catch (BackingStoreException e) {
+      log.log(Level.SEVERE, "Could not adjust KEGGtranslator options for path2models.", e);
+    }
+  }
 
 	/*
 	 * (non-Javadoc)

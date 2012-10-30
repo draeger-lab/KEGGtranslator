@@ -30,6 +30,7 @@ import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.kegg.parser.pathway.ext.EntryExtended;
 import de.zbit.kegg.parser.pathway.ext.EntryTypeExtended;
 import de.zbit.util.StringUtil;
+import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * This static class defines how to map from certain
@@ -265,6 +266,62 @@ public class SBOMapping {
     if (ret==null) ret = -1;
     return ret;    
   }
+  
+  /**
+   * Convert to a MI-term that is a child of 'MI:0190' (Molecular Interaction (PSI-MI)).
+   * @param subtype
+   * @return {@link ValuePair} with the term name and integer id. Or <code>NULL</code> if
+   * no MI term is available that matches the given input {@link SubType}. 
+   */
+  public static ValuePair<String, Integer> getMITerm(String subtype) {
+    if (subtype.equals(SubType.ASSOCIATION)) {
+      return new ValuePair<String, Integer>("association", 914); //MI:0914
+    } else if (subtype.equals(SubType.PHOSPHORYLATION)) {
+      return new ValuePair<String, Integer>("phosphorylation reaction", 217);
+    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
+      return new ValuePair<String, Integer>("dephosphorylation reaction", 203);
+    } else if (subtype.equals(SubType.UBIQUITINATION) ||
+        subtype.equalsIgnoreCase("ubiquination")) {
+      return new ValuePair<String, Integer>("ubiquitination reaction", 220);
+    } else if (subtype.equals(SubType.GLYCOSYLATION)) {
+      return new ValuePair<String, Integer>("glycosylation reaction", 559);
+    } else if (subtype.equals(SubType.METHYLATION)) {
+      return new ValuePair<String, Integer>("methylation reaction", 213);
+    } else if (subtype.equals(SubType.BINDING)) {
+      return new ValuePair<String, Integer>("covalent binding", 195);
+    } else if (subtype.equals(SubType.BINDING_ASSOCIATION)) {
+      return new ValuePair<String, Integer>("association", 914);
+    } else if (subtype.equals(SubType.COMPOUND) ||
+        subtype.equals(SubType.HIDDEN_COMPOUND)) {
+      return new ValuePair<String, Integer>("direct interaction", 407);
+      
+//    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
+//      return new ValuePair<String, Integer>("dephosphorylation reaction", 203);
+//    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
+//      return new ValuePair<String, Integer>("dephosphorylation reaction", 203);
+//    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
+//      return new ValuePair<String, Integer>("dephosphorylation reaction", 203);
+//    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
+//      return new ValuePair<String, Integer>("dephosphorylation reaction", 203);
+//    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
+//      return new ValuePair<String, Integer>("dephosphorylation reaction", 203);
+    }
+    /* MISSING:
+     * EXPRESSION => positive genetic interaction / 935
+     * ACTIVATION => positive genetic interaction / 935
+     * REPRESSION => negative genetic interaction / 933
+     * INHIBITION => negative genetic interaction / 933
+     * 
+     * DISSOCIATION
+     * INDIRECT_EFFECT
+     * MISSING_INTERACTION
+     * STATE_CHANGE
+     * 
+     */
+    
+    return null;
+  }
+
   
 
   /**
