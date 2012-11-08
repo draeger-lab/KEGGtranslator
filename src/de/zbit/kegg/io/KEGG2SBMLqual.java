@@ -304,6 +304,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
             cv.addResource(go);
           }
         }
+        de.zbit.util.objectwrapper.ValuePair<String, Integer> subMI = SBOMapping.getMITerm(subType);
+        if (subMI!=null && subMI.getB()!=null && subMI.getB()>0) {
+          String mi = DatabaseIdentifiers.getMiriamURN(IdentifierDatabases.GeneOntology, Integer.toString(subMI.getB()));
+          if (mi!=null) {
+            cv.addResource(mi);
+          }
+        }
       }
       
       

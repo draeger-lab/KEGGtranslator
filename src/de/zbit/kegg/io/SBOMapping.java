@@ -268,7 +268,8 @@ public class SBOMapping {
   }
   
   /**
-   * Convert to a MI-term that is a child of 'MI:0190' (Molecular Interaction (PSI-MI)).
+   * Convert <code>subtype</code> to a MI-term that is a child of 'MI:0190' (Molecular Interaction (PSI-MI)).
+   * The terms are for relations/interactions.
    * @param subtype
    * @return {@link ValuePair} with the term name and integer id. Or <code>NULL</code> if
    * no MI term is available that matches the given input {@link SubType}. 
@@ -276,6 +277,11 @@ public class SBOMapping {
   public static ValuePair<String, Integer> getMITerm(String subtype) {
     if (subtype.equals(SubType.ASSOCIATION)) {
       return new ValuePair<String, Integer>("association", 914); //MI:0914
+    } else if (subtype.equals(SubType.BINDING)) {
+      return new ValuePair<String, Integer>("covalent binding", 195);
+    } else if (subtype.equals(SubType.BINDING_ASSOCIATION)) {
+      return new ValuePair<String, Integer>("association", 914);
+      
     } else if (subtype.equals(SubType.PHOSPHORYLATION)) {
       return new ValuePair<String, Integer>("phosphorylation reaction", 217);
     } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
@@ -287,16 +293,13 @@ public class SBOMapping {
       return new ValuePair<String, Integer>("glycosylation reaction", 559);
     } else if (subtype.equals(SubType.METHYLATION)) {
       return new ValuePair<String, Integer>("methylation reaction", 213);
-    } else if (subtype.equals(SubType.BINDING)) {
-      return new ValuePair<String, Integer>("covalent binding", 195);
-    } else if (subtype.equals(SubType.BINDING_ASSOCIATION)) {
-      return new ValuePair<String, Integer>("association", 914);
+
     } else if (subtype.equals(SubType.COMPOUND) ||
         subtype.equals(SubType.HIDDEN_COMPOUND)) {
       return new ValuePair<String, Integer>("direct interaction", 407);
       
-//    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
-//      return new ValuePair<String, Integer>("dephosphorylation reaction", 203);
+//    } else if (subtype.equals(SubType.REPRESSION)) {
+//      return new ValuePair<String, Integer>("suppression", 796);
 //    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
 //      return new ValuePair<String, Integer>("dephosphorylation reaction", 203);
 //    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
@@ -321,9 +324,34 @@ public class SBOMapping {
     
     return null;
   }
-
   
-
+  /**
+   * Convert <code>subtype</code> to a MOD-term (Protein Modification Ontology (PSI-MOD))
+   * that is either a child of 'MOD:01157' or 'MOD:01156'.
+   * <p>The terms are for entries that are modified as result of an relation/interaction.
+   * @param subtype
+   * @return {@link ValuePair} with the term name and integer id. Or <code>NULL</code> if
+   * no MI term is available that matches the given input {@link SubType}. 
+   */
+  public static ValuePair<String, Integer> getMODTerm(String subtype) {
+    
+    if (subtype.equals(SubType.PHOSPHORYLATION)) {
+      return new ValuePair<String, Integer>("phosphorylated residue", 696);
+//    } else if (subtype.equals(SubType.DEPHOSPHORYLATION)) {
+//      return new ValuePair<String, Integer>("5'-dephospho", 948);
+      // This term is not valid (no child of 'MOD:01157' or 'MOD:01156').
+    } else if (subtype.equals(SubType.UBIQUITINATION) ||
+        subtype.equalsIgnoreCase("ubiquination")) {
+      return new ValuePair<String, Integer>("ubiquitinylation residue", 492);
+    } else if (subtype.equals(SubType.GLYCOSYLATION)) {
+      return new ValuePair<String, Integer>("glycosylated residue", 693);
+    } else if (subtype.equals(SubType.METHYLATION)) {
+      return new ValuePair<String, Integer>("methylated residue", 427);
+    }
+    
+    return null;
+  }
+  
   /**
    * Formats an SBO term. E.g. "177" to "SBO:0000177".
    * @param sbo

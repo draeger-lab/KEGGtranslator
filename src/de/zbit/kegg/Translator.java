@@ -536,5 +536,22 @@ public class Translator extends Launcher {
 	public Window initGUI(AppConf appConf) {
 		return new TranslatorUI(appConf);
 	}
+	
+	/**
+	 * Decide whether to show the gui or not.
+	 */
+	@Override
+  public boolean showsGUI() {
+    SBProperties props = getCommandLineArgs();
+    boolean showGUI = (props.size() < 1) || props.getBooleanProperty(GUIOptions.GUI);
+    if (!showGUI) {
+      // Check if an input file is given. This is required for and will trigger the command-line mode.
+      String inputFile = props.getProperty(KEGGtranslatorIOOptions.INPUT);
+      if (inputFile==null || inputFile.length()<1) {
+        showGUI = true;
+      }
+    }
+    return showGUI;
+  }
   	
 }

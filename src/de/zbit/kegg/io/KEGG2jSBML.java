@@ -116,6 +116,19 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    */
   private double speciesDefaultInitialAmount=1d;
   
+  /**
+   * The SBML level to be initialized. <code>NULL</code> results in
+   * initializing it automatically (adjusts the level as needed (e.g.
+   *  extensions require L3)).
+   */
+  protected Integer level = null;
+  
+  /**
+   * The SBML version to be initialized. <code>NULL</code> results in
+   * initializing it automatically (adjusts it as needed).
+   */
+  protected Integer version = null;
+  
   
   /*===========================
    * PUBLIC, STATIC VARIABLES
@@ -154,6 +167,25 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * Getters and Setters
    * ===========================*/
   
+  /**
+   * @param manager
+   * @param level
+   * @param version
+   */
+  public KEGG2jSBML(KeggInfoManagement manager, int level, int version) {
+    this(manager);
+    setLevelAndVersion(new ValuePair<Integer, Integer>(level, version));
+  }
+
+  /**
+   * Set the SBML level and version that should be created.
+   * @param level
+   */
+  private void setLevelAndVersion(ValuePair<Integer, Integer> level) {
+    this.level = level.getL();
+    this.version = level.getV();
+  }
+
   /**
    * See {@link #addCellDesignerAnnots}
    * @return
@@ -658,10 +690,38 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   }
 
   /**
+   * Automatically returns an appropriate level and version. If previously
+   * a level has been set manually with {@link #setLevelAndVersion(ValuePair)},
+   * this is returned and the configuration of this class might be change
+   * to be conform with the preset level.
+   * 
    * @return the level and version of the SBML core (2,4) if no extension
    * should be used. Else: 3,1.
    */
   protected ValuePair<Integer, Integer> getLevelAndVersion() {
+    
+    // If a level is manually set, check if it supports extensions
+    if (level!=null) {
+      if (level<3) {
+        if (addLayoutExtension) {
+          log.warning("SBML supports extensions since Level 3. You've chosen to translate a document to Level 2 including the layout extension, what is not possible.\nDeavtivating the layout extension for this translation.");
+          setAddLayoutExtension(false);
+        }
+        if (useGroupsExtension) {
+          log.warning("SBML supports extensions since Level 3. You've chosen to translate a document to Level 2 including the groups extension, what is not possible.\nDeavtivating the groups extension for this translation.");
+          setUseGroupsExtension(false);
+        }
+      }
+      if (version==null) {
+        // Actually, they should only be set in combination...
+        if (level==2) version = 4;
+        else version = 1;
+      }
+      return new ValuePair<Integer, Integer>(level, version);
+    }
+    
+    // Auto-adjust level as needed
+    
     // Layout extension requires Level 3
     if (!addLayoutExtension && !useGroupsExtension) {
       return new ValuePair<Integer, Integer>(Integer.valueOf(2), Integer.valueOf(4));

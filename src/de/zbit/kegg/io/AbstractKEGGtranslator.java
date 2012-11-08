@@ -802,8 +802,8 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   protected String NameToSId(String name) {
     /*
-     * letter ::= �a�..�z�,�A�..�Z� digit ::= �0�..�9� idChar ::= letter |
-     * digit | �_� SId ::= ( letter | �_� ) idChar*
+     * letter = a-z,A-Z; digit = 0-9; idChar = (letter | digit | _ );
+     * SId = ( letter | _ ) idChar*
      */
     String ret;
     if (name == null || name.trim().length() == 0) {
@@ -848,7 +848,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @return
    */
   private static boolean isLetter(char c) {
-    // Unfortunately Character.isLetter also acceps ß, but SBML doesn't.
+    // Unfortunately Character.isLetter also accepts ß, but SBML doesn't.
     // a-z or A-Z
     return (c>=97 && c<=122) || (c>=65 && c<=90);
   }

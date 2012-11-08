@@ -20,9 +20,13 @@
  */
 package de.zbit.kegg.io;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.BioPAXLevel;
@@ -30,6 +34,9 @@ import org.biopax.paxtools.model.level3.BioSource;
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Catalysis;
 import org.biopax.paxtools.model.level3.Complex;
+import org.biopax.paxtools.model.level3.ComplexAssembly;
+import org.biopax.paxtools.model.level3.Control;
+import org.biopax.paxtools.model.level3.ControlType;
 import org.biopax.paxtools.model.level3.Controller;
 import org.biopax.paxtools.model.level3.Conversion;
 import org.biopax.paxtools.model.level3.ConversionDirectionType;
@@ -38,11 +45,16 @@ import org.biopax.paxtools.model.level3.DnaReference;
 import org.biopax.paxtools.model.level3.DnaRegion;
 import org.biopax.paxtools.model.level3.DnaRegionReference;
 import org.biopax.paxtools.model.level3.Entity;
+import org.biopax.paxtools.model.level3.EntityFeature;
 import org.biopax.paxtools.model.level3.EntityReference;
 import org.biopax.paxtools.model.level3.Gene;
 import org.biopax.paxtools.model.level3.Interaction;
 import org.biopax.paxtools.model.level3.InteractionVocabulary;
+import org.biopax.paxtools.model.level3.Level3Element;
+import org.biopax.paxtools.model.level3.ModificationFeature;
 import org.biopax.paxtools.model.level3.MolecularInteraction;
+import org.biopax.paxtools.model.level3.Named;
+import org.biopax.paxtools.model.level3.NucleicAcid;
 import org.biopax.paxtools.model.level3.PhysicalEntity;
 import org.biopax.paxtools.model.level3.Protein;
 import org.biopax.paxtools.model.level3.ProteinReference;
@@ -51,10 +63,16 @@ import org.biopax.paxtools.model.level3.Rna;
 import org.biopax.paxtools.model.level3.RnaReference;
 import org.biopax.paxtools.model.level3.RnaRegion;
 import org.biopax.paxtools.model.level3.RnaRegionReference;
+import org.biopax.paxtools.model.level3.SequenceEntityReference;
+import org.biopax.paxtools.model.level3.SequenceModificationVocabulary;
 import org.biopax.paxtools.model.level3.SimplePhysicalEntity;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.SmallMoleculeReference;
 import org.biopax.paxtools.model.level3.Stoichiometry;
+import org.biopax.paxtools.model.level3.TemplateDirectionType;
+import org.biopax.paxtools.model.level3.TemplateReaction;
+import org.biopax.paxtools.model.level3.TemplateReactionRegulation;
+import org.biopax.paxtools.model.level3.UnificationXref;
 import org.biopax.paxtools.model.level3.XReferrable;
 import org.biopax.paxtools.model.level3.Xref;
 
@@ -74,6 +92,8 @@ import de.zbit.kegg.parser.pathway.ext.EntryTypeExtended;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.DatabaseIdentifiers;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
+import de.zbit.util.StringUtil;
+import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * KEGG2BioPAX level 3 converter (also called KGML2BioPAX).
@@ -93,7 +113,17 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
    * {@link BioSource} for the organism
    */
   private BioSource organism = null;
+
+  /**
+   * A common suffix for all {@link EntityReference}s.
+   */
+  public final static String EntityReferenceSuffix = ".eref";
   
+  /**
+   * A common suffix for all entities that are being duplicated as
+   * result of a modification (may end with "_mod", BUT ALSO "_mod2",...).
+   */
+  public final static String ENTITY_MODIFICATION_SUFFIX = "_mod";
   /**
    * Initialize a new {@link KEGG2BioPAX} object, using a new Cache and a new KeggAdaptor.
    */
@@ -171,7 +201,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     }
     
     // Create the actual element
-    String eId = '#'+NameToSId(entry.getName());
+    String eId = '#'+NameToSId(entry.getName().length()>45?entry.getName().substring(0, 45):entry.getName());
     BioPAXElement element = model.addNew(instantiate, eId);
     pathwayComponentCreated(element);
     
@@ -187,10 +217,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     if (fullName!=null) {
       ((Entity)element).setStandardName(fullName); // Graphics name
     }
-    String displayName = name;
-    if (displayName.length()>20) {
-      displayName = displayName.substring(0, 16)+"...";
-    }
+    String displayName = createDisplayName(name);
     ((Entity)element).setDisplayName(displayName); // Intelligent name
     // ---
     addDataSources(element);
@@ -209,12 +236,11 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
           }
           if (ceb==null || !(ceb instanceof PhysicalEntity)) continue;
                   
-          ((Complex)element).addComponent((PhysicalEntity) ceb);
+          ((Complex) element).addComponent((PhysicalEntity) ceb);
         }
       }
     }
     
-    // XXX: Possible to set ORGANISM on COMPLEX & sequenceEntity (& Gene in L3)
     // TODO: CellularLocation from EntryExtended in L3
     
     // Add various annotations and xrefs
@@ -225,19 +251,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     // error if no entityReferences are set.
     if ((element instanceof SimplePhysicalEntity) && 
         !(element instanceof Complex)) {
-      
-      EntityReference er = createEntityReference(element);
-      if (er!=null) {
-        ((SimplePhysicalEntity)element).setEntityReference(er);
-        
-        // We need at least 1 xref on each element to avoid errors in the validator.
-        if (((XReferrable)element).getXref()!=null) {
-          for (Xref xr : ((XReferrable)element).getXref()) {
-            er.addXref(xr);
-          }
-        }
-        //---
-      }
+      setupEntityReference(element);
     }
     
     
@@ -246,12 +260,58 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
   }
 
   /**
+   * @param element
+   */
+  private void setupEntityReference(BioPAXElement element) {
+    EntityReference er = getEntityReference(element);
+    if (er==null) {
+      er = createEntityReference(element);
+    }
+    
+    if (er!=null) {
+      ((SimplePhysicalEntity) element).setEntityReference(er);
+      
+      // Actually we could also MOVE all XRefs to the reference!
+      if (((XReferrable)element).getXref()!=null) {
+        List<Xref> unifications = new LinkedList<Xref>();
+        for (Xref xr : ((XReferrable)element).getXref()) {
+          er.addXref(xr);
+          if (xr.getModelInterface().equals(UnificationXref.class)) {
+            unifications.add(xr);
+          }
+        }
+        // Unifications should relly only be used once (and this should be on the reference)
+        for (Xref xr : unifications) {
+          ((XReferrable)element).removeXref(xr);
+        }
+      }
+      //---
+      
+      // Further set Organism and names (do not set organism on h2o and similar).
+      if (er instanceof SequenceEntityReference &&
+          !er.getModelInterface().equals(SmallMoleculeReference.class)) {
+        ((SequenceEntityReference) er).setOrganism(organism);
+      }
+      if (er instanceof Named && element instanceof Named) {
+        ((Named) er).setStandardName(((Named) element).getStandardName());
+        ((Named) er).setDisplayName(((Named) element).getDisplayName());
+        ((Named) er).setName(((Named) element).getName());
+      }
+      //---
+    }
+  }
+
+  /**
    * Create an {@link EntityReference} for any {@link BioPAXElement}.
+   * 
+   * <p>Please setup organism, names and XRefs on this element.
+   * 
    * @param element
    * @return corresponding {@link EntityReference} or {@code null}.
    */
   private EntityReference createEntityReference(BioPAXElement element) {
-    String id = element.getRDFId() + ".eref";
+    String id = element.getRDFId() + EntityReferenceSuffix;
+    id = ensureUniqueRDFId(id); // we cannot use nameToSID because it would remove, e.g., the starting dash #.
     EntityReference bpEr = null;
     
     if (element instanceof SmallMolecule){
@@ -261,7 +321,6 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       
     } else if (element instanceof Protein) {
       bpEr = model.addNew(ProteinReference.class, id);
-      if (organism != null) ((ProteinReference)bpEr).setOrganism(organism);
       
     } else if (element instanceof Rna) {
       bpEr = model.addNew(RnaReference.class, id);
@@ -280,6 +339,14 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       // or unknown or unspecified elements
     }
     
+    
+    // Adjust organism, names and xrefs (ATP has no organism...)
+    if (bpEr instanceof SequenceEntityReference && 
+        !bpEr.getModelInterface().equals(SmallMoleculeReference.class)) {
+      ((SequenceEntityReference)bpEr).setOrganism(organism);
+    }
+    
+    
     if (bpEr!=null) {
       pathwayComponentCreated(bpEr);
     }
@@ -291,8 +358,10 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
    * @param element
    */
   private void addDataSources(BioPAXElement element) {
-    for (Provenance ds : pathway.getDataSource()) {
-      ((Entity)element).addDataSource(ds);
+    if (element instanceof Entity) {
+      for (Provenance ds : pathway.getDataSource()) {
+        ((Entity)element).addDataSource(ds);
+      }
     }
   }
 
@@ -303,12 +372,9 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
   protected BioPAXElement createPathwayInstance(Pathway p) {
     pathway = model.addNew(org.biopax.paxtools.model.level3.Pathway.class, p.getName());
     pathway.addAvailability(String.format("This file has been generated by %s version %s", System.getProperty("app.name"), System.getProperty("app.version")));
-    String htmlName = formatTextForHTMLnotes(p.getTitle());
+    String htmlName = (p.getTitle()); // Escaping is done automatically in Paxtools!
     pathway.addName(htmlName);
-    String displayName = htmlName;
-    if (displayName.length()>20) {
-      displayName = displayName.substring(0, 16)+"...";
-    }
+    String displayName = createDisplayName(htmlName);
     pathway.setDisplayName(displayName);
     pathway.setStandardName(htmlName);
     
@@ -322,13 +388,13 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     }
 
     // Retrieve further information via Kegg Adaptor
-    organism  = (BioSource) createBioSource(p);
+    organism = (BioSource) createBioSource(p);
     pathway.setOrganism(organism);
     
     // Get PW infos from KEGG Api for Description and GO ids.
     KeggInfos pwInfos = KeggInfos.get(p.getName(), manager); // NAME, DESCRIPTION, DBLINKS verwertbar
     if (pwInfos.queryWasSuccessfull()) {
-      pathway.addComment(formatTextForHTMLnotes(pwInfos.getDescription()));
+      pathway.addComment((pwInfos.getDescription()));
       
       // GO IDs
       if (pwInfos.getGo_id() != null) {
@@ -403,10 +469,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     
     
     reaction.addName(r.getName());
-    String displayName = r.getName();
-    if (displayName.length()>20) {
-      displayName = displayName.substring(0, 16)+"...";
-    }
+    String displayName = createDisplayName(r.getName());
     reaction.setDisplayName(displayName);
     addDataSources(reaction);
     
@@ -446,7 +509,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     
     // Set the stoichiometry
     Integer stoich = rc.getStoichiometry();
-    Stoichiometry s = model.addNew(Stoichiometry.class, '#'+NameToSId(ce.getName()+"_"+reaction.getDisplayName()+"_stoich"));
+    Stoichiometry s = model.addNew(Stoichiometry.class, '#'+NameToSId(ce.getName()+"_"+getNameForElement(reaction)+"_stoich"));
     pathwayComponentCreated(s);
     s.setPhysicalEntity((PhysicalEntity) ceb);
     s.setStoichiometricCoefficient(stoich==null?1f:(float)stoich);
@@ -486,18 +549,10 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       return null;
     }
     
-//    // Relations should prefarably translated, using the EntityReferences
-//    if (qOne instanceof SimplePhysicalEntity && 
-//        ((SimplePhysicalEntity)qOne).getEntityReference()!=null ) {
-//      qOne = ((SimplePhysicalEntity)qOne).getEntityReference();
-//    }
-//    if (qTwo instanceof SimplePhysicalEntity && 
-//        ((SimplePhysicalEntity)qTwo).getEntityReference()!=null ) {
-//      qTwo = ((SimplePhysicalEntity)qTwo).getEntityReference();
-//    }
     
     // Most relations have a left and right side => conversion as default
     Class<? extends BioPAXElement> instantiate = Conversion.class;
+    boolean createConversionAndControl = false;
     
     
     // Compound (only PPREL) to Conversion, SKIP ALL OTHERS [IF CONSIDERREACTIONS()]
@@ -513,34 +568,87 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       }
     }
     
+    // Simple A -> B
+    if (subtype.contains(SubType.STATE_CHANGE) || subtype.contains(SubType.INDIRECT_EFFECT)) {
+      createConversionAndControl = false;
+      instantiate = Conversion.class;
+    }
+    
+    // Create a controlled "B -> B' (activated)" conversion
+    if (subtype.contains(SubType.ACTIVATION) || subtype.contains(SubType.INHIBITION) ||
+        subtype.contains(SubType.EXPRESSION) || subtype.contains(SubType.REPRESSION)) {
+      createConversionAndControl = true;
+      instantiate = Conversion.class;
+      if (subtype.contains(SubType.EXPRESSION) || subtype.contains(SubType.REPRESSION)) {
+        if (qTwo instanceof PhysicalEntity) {
+          instantiate = TemplateReaction.class; // Create a Regulated template reaction
+        }
+      }
+    }
+    
     // "binding/assoc.", "dissociation", "missing interaction" and in doubt to PhysicalInteraction
     if ((subtype.contains(SubType.ASSOCIATION) || subtype.contains(SubType.BINDING) || subtype.contains(SubType.BINDING_ASSOCIATION)) ||
         (subtype.contains(SubType.DISSOCIATION)) || subtype.contains(SubType.MISSING_INTERACTION) || subtype.size()<1) {
+      // This property may get overwritten later on!
       instantiate = MolecularInteraction.class; // Interaction is same as physicalInteraction.class in L2
+    }
+    // Check if "binding/assoc." describes the formation of a complex.
+    if ((eTwo.getType().equals(EntryType.group) || eTwo.getType().equals(EntryType.genes)) && 
+        (subtype.contains(SubType.ASSOCIATION) || subtype.contains(SubType.BINDING) || subtype.contains(SubType.BINDING_ASSOCIATION))) {
+      instantiate = ComplexAssembly.class;
+    }
+    // Check if "DISSOCIATION" describes the DISASSEMBLY of a complex.
+    if ((eOne.getType().equals(EntryType.group) || eOne.getType().equals(EntryType.genes)) && 
+        (subtype.contains(SubType.DISSOCIATION))) {
+      instantiate = ComplexAssembly.class; // this is also used for DISASSEMBLY.
+    }
+    
+    // These types are controlleds relations in which A Phosphorylates B.
+    if (subtype.contains(SubType.PHOSPHORYLATION) || subtype.contains(SubType.DEPHOSPHORYLATION) ||
+        subtype.contains(SubType.GLYCOSYLATION) || subtype.contains(SubType.UBIQUITINATION) ||
+        subtype.contains(SubType.METHYLATION)) {
+      createConversionAndControl = true;
+      instantiate = BiochemicalReaction.class;
     }
     
     // Make a final check, if we are able to create a the desired class (e.g., a conversion)
-    if (!(qOne instanceof PhysicalEntity) || !(qTwo instanceof PhysicalEntity)) { 
-      if (instantiate == Conversion.class) {
+    if ((!createConversionAndControl && !(qOne instanceof PhysicalEntity)) || !(qTwo instanceof PhysicalEntity)) {
+      // Explanation: if createConversionAndControl then qOne is the controller and not involved in the conversion.
+      // else, it is translated to qOne->qTwo and it is involved in the conversion.
+      if (Conversion.class.isAssignableFrom(instantiate)) {
         log.fine("Changing from Conversion to MolecularInteraction, because Conversion requires physical entities as participants " + r);
         instantiate = MolecularInteraction.class;
       } 
-      if ((instantiate == MolecularInteraction.class) && 
-          (!(qOne instanceof PhysicalEntity) && !(qTwo instanceof PhysicalEntity))) {
+      
+      if ((MolecularInteraction.class.isAssignableFrom(instantiate)) && 
+          ((!createConversionAndControl && !(qOne instanceof PhysicalEntity)) && !(qTwo instanceof PhysicalEntity))) {
         // MolecularInteraction requires at least one PhysicalEntity (only by definition).
         log.fine("Changing from MolecularInteraction to Interaction, because MolecularInteraction requires at least one physical entity as participant " + r);
         instantiate = Interaction.class;
       }
     }
     
+    // If we do NOT create a controller/Control thing and just a simple A -> B
+    // then try to "keep reaction chains", e.g., "A -> A' -> B".
+    // Thus, look for a modified qOne (=A) here.
+    if (!createConversionAndControl) {
+      BioPAXElement qOneMod = getModifiedEntity(qOne, null);
+      if (qOneMod!=null) {
+        qOne = qOneMod;
+      }
+    }
+    
     // Create the relation
     Interaction bpe = (Interaction) model.addNew(instantiate, '#'+NameToSId("KEGGrelation"));
     pathwayComponentCreated(bpe);
+    bpe.setDisplayName(createDisplayName(ArrayUtils.implode(subtype, ", ") + " of " + getNameForElement(qTwo)));
     
     // Add Annotations
     addDataSources(bpe);
     if (subtype.size()>0) {
-      bpe.addComment("LINE-TYPE: " + r.getSubtypes().iterator().next().getValue());
+      if (!subtype.contains(SubType.COMPOUND)) {
+        bpe.addComment("LINE-TYPE: " + r.getSubtypes().iterator().next().getValue());
+      }
       bpe.addName(ArrayUtils.implode(subtype, ", "));
       
       for (SubType st: r.getSubtypes()) {
@@ -550,8 +658,18 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     
     // Add participants
     if (bpe instanceof Conversion) {
-      ((Conversion) bpe).addLeft((PhysicalEntity) qOne);
-      ((Conversion) bpe).addRight((PhysicalEntity) qTwo);
+      // if qTwo is no SimplePhysicalEntity, we cannot add any mofification feature. Hence,
+      // it does not make sense to crate a controller/controlled thing.
+      if (createConversionAndControl && (qTwo instanceof SimplePhysicalEntity)) {
+        setupControllerControlled(r, bpe, qOne, qTwo);
+        
+      } else {
+       
+        // A "default arrow" from ony -> two.
+        ((Conversion) bpe).addLeft((PhysicalEntity) qOne);
+        ((Conversion) bpe).addRight((PhysicalEntity) qTwo);
+      }
+      
     } else {
       bpe.addParticipant((Entity) qOne);
       bpe.addParticipant((Entity) qTwo);
@@ -560,4 +678,413 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     return bpe;
   }
 
+  /**
+   * Get the best possible name for a {@link BioPAXElement}.
+   * @param qTwo
+   * @return
+   */
+  private String getNameForElement(BioPAXElement qTwo) {
+    String name = null;
+    if (qTwo instanceof Named) {
+      name = ((Named) qTwo).getDisplayName();
+      if (name==null || name.length()<1) {
+        name = ((Named) qTwo).getStandardName();
+      }
+      if ((name==null || name.length()<1) && ((Named) qTwo).getName()!=null) {
+        name = ArrayUtils.implode(((Named) qTwo).getName(), ", ");
+      }
+    }
+
+    if (name==null || name.length()<1) {
+      name = qTwo.getRDFId();
+    }
+    
+    return name;
+  }
+
+  /**
+   * @param r
+   * @param subtype
+   * @param bpe
+   * @param qOne
+   * @param qTwo
+   */
+  private void setupControllerControlled(Relation r, Interaction bpe, BioPAXElement qOne, BioPAXElement qTwo) {
+    Collection<String> subtype = r.getSubtypesNames();
+    
+    // Determine the type of controller that should be created
+    Class<? extends Control> instantiate = Control.class;
+    
+    if (bpe instanceof TemplateReaction) {
+      instantiate = TemplateReactionRegulation.class;
+//    } else if (bpe instanceof BiochemicalReaction) {
+//      instantiate = Catalysis.class;
+    }
+    
+    // Create the controller
+    Control controller = (Control) model.addNew(instantiate, '#'+NameToSId("KEGGrelationController"));
+    pathwayComponentCreated(controller);
+    addDataSources(controller);
+    String name = getNameForElement(qOne);
+    name = ArrayUtils.implode(subtype, ", ") + " by " + name;
+    controller.addName(name);
+    controller.setDisplayName(createDisplayName(name));
+    controller.addControlled(bpe);
+    try {
+      controller.addController((Controller) qOne);
+      controller.addParticipant((Entity) qOne);
+    } catch (Exception e) {
+      //should actually never happen
+      log.log(Level.WARNING, "Catched an unexpected exception.", e);
+    }
+    for (SubType st: r.getSubtypes()) {
+      // Same InteractionTypes as bpe has.
+      controller.addInteractionType((InteractionVocabulary) getInteractionVocuabulary(st));
+    }
+    
+    // Setup the controlType
+    if (subtype.contains(SubType.ACTIVATION) || subtype.contains(SubType.EXPRESSION)) {
+      controller.setControlType(ControlType.ACTIVATION);
+    } else if (subtype.contains(SubType.INHIBITION) || subtype.contains(SubType.REPRESSION)) {
+      controller.setControlType(ControlType.INHIBITION);
+    }
+    
+    // Maybe we need to setup a reverse reaction (B' -> B) instead of normally B -> B' (B' is e.g. a phosphorylated entitity).
+    boolean modelReversely = (subtype.contains(SubType.DEPHOSPHORYLATION));
+    
+    
+    // Get or create the modified qTwo protein
+    BioPAXElement qThree = null;
+    if (qTwo instanceof SimplePhysicalEntity && modelReversely) {
+      // If a dephosphorylation occurs, we maybe already have a phosphorylation feature!
+      // Search for an already phosphorylated entity
+      BioPAXElement phosphoQTwo = getModifiedEntity(qTwo, SubType.PHOSPHORYLATION);
+      if (phosphoQTwo!=null) {
+        // Use the phosphorylated thing as source for the dephosphorylation.
+        qThree = qTwo;
+        qTwo = phosphoQTwo;
+      } else {
+        modelReversely = false;
+      }
+    } else {
+      modelReversely = false;
+    }
+    
+    // Create a third protein
+    if (qThree==null) {
+      if (!(bpe instanceof TemplateReaction) || !(qTwo instanceof PhysicalEntity)) {
+        // the normal case
+        qThree = createCopy(qTwo);
+      } else {
+        // we need to create some nucleicAcid
+        BioPAXElement nAcid = createCopy(qTwo, NucleicAcid.class);
+        qThree = qTwo;
+        qTwo = nAcid;
+      }
+    }
+    
+    // Setup the Features
+    for (SubType st: r.getSubtypes()) {
+      boolean isDePhospho = (st.getName().equals(SubType.DEPHOSPHORYLATION));
+      
+      String modifiedName = st.getName();
+      if (isDePhospho && modelReversely) {
+        st = new SubType(SubType.PHOSPHORYLATION);
+      }
+      if (modifiedName.endsWith("ion")) {
+        modifiedName = modifiedName.substring(0, modifiedName.length()-3)+"ed";
+      }
+      
+      // Modification types are UNIQUE for a certain [combination of] subtypes.
+      String modID = '#'+modifiedName.trim().replace(' ', '_').replace("/", "_or_");
+      ModificationFeature mod = (ModificationFeature) model.getByID(modID);
+      boolean modificationDidAlreadyExist = mod!=null;
+      if (mod==null) {
+        mod = (ModificationFeature) model.addNew(ModificationFeature.class, modID);
+        pathwayComponentCreated(mod);
+        addDataSources(mod);
+      }
+      
+      
+      // Add the modification to both proteins and the reference
+      if (qThree instanceof PhysicalEntity) {
+        if (modelReversely && isDePhospho) {
+          // This is modeled reversely by +p -> -p
+          ((PhysicalEntity) qThree).addNotFeature(mod);
+          ((PhysicalEntity) qTwo).addFeature(mod);
+        } else {
+          ((PhysicalEntity) qThree).addFeature(mod);
+          ((PhysicalEntity) qTwo).addNotFeature(mod);
+        }
+        if (qTwo instanceof SimplePhysicalEntity) {
+          EntityReference eRef = ((SimplePhysicalEntity) qTwo).getEntityReference();
+          if (eRef!=null) {
+            eRef.addEntityFeature(mod);
+          }
+        }
+        removeContradictingFeatures((PhysicalEntity) qTwo);
+        removeContradictingFeatures((PhysicalEntity) qThree);
+      }
+      
+      // Annotate the kind of modification
+      SequenceModificationVocabulary mVoc;
+      boolean addCommentToSubstrate = false;
+      mVoc = getSequenceModificationVocabulary(st);
+      if (isDePhospho) {
+        addCommentToSubstrate = true; // must not be equal to isReversePhospho !
+        controller.addComment("Dephosphorylation");
+      } else {
+        String comment = ArrayUtils.implode(mVoc.getComment(), ", ").replace("ed_", "ion_");
+        if (comment.endsWith("ed")) comment = comment.substring(0, comment.length()-2)+"ion";
+        controller.addComment(comment); // E.g. "methylation_at_unknown_residue"
+      }
+      if (!modificationDidAlreadyExist) {
+        mod.setModificationType(mVoc);
+      }
+      
+      // FACT: if (isReversePhospho) then qThree gets NOT feature.
+      // FACT: if (isReversePhospho && DEPHOSPHORYLATION) than type is now PHOSPHORYLATION.
+      //String comment = (isReversePhospho?"NOT [":"")+ArrayUtils.implode(mVoc.getComment(), ", ")+(isReversePhospho?"]":""); // E.g. "methylated_at_unknown_residue"
+      
+      if (addCommentToSubstrate) {
+        ((Level3Element) qTwo).addComment(ArrayUtils.implode(mVoc.getComment(), ", ")); // E.g. "methylated_at_unknown_residue"
+      } else { // usual case, except for dephosphorylation, what is changed to phosphorylation of the substrate.
+        ((Level3Element) qThree).addComment(ArrayUtils.implode(mVoc.getComment(), ", ")); // E.g. "methylated_at_unknown_residue"
+      }
+    }
+    
+    // Avoid duplicate entries, search if exactly this one has already been creted once
+    List<BioPAXElement> objects = new ArrayList<BioPAXElement>(model.getObjects());
+    boolean checkTwo = true, checkThree = true;
+    for (BioPAXElement e : objects) {
+      if (e == qTwo || e == qThree) {
+        // The same pointer, not only equal!
+        continue;
+      } else if (checkTwo && e.isEquivalent(qTwo)) {
+        model.remove(qTwo);
+        qTwo = e;
+        checkTwo = false;
+      } else if (checkThree && e.isEquivalent(qThree)) {
+        model.remove(qThree);
+        qThree = e;
+        checkThree = false;
+      }
+      if (!checkTwo && !checkThree) {
+        break;
+      }
+    }
+    
+    
+    // Configure the actual conversion
+    ((Conversion) bpe).addLeft((PhysicalEntity) qTwo);
+    ((Conversion) bpe).addRight((PhysicalEntity) qThree);
+    controller.addParticipant((Entity) qTwo);
+    controller.addParticipant((Entity) qThree);
+    ((Conversion) bpe).setConversionDirection(ConversionDirectionType.LEFT_TO_RIGHT);
+    
+    if (bpe instanceof TemplateReaction && qTwo instanceof NucleicAcid) {
+      ((TemplateReaction) bpe).setTemplate((NucleicAcid) qTwo);
+      ((TemplateReaction) bpe).addProduct((PhysicalEntity) qThree);
+      ((TemplateReaction) bpe).setTemplateDirection(TemplateDirectionType.FORWARD);
+    }
+  }
+
+  /**
+   * Removes features that occur as notFeatures and features.
+   * @param qTwo
+   */
+  private void removeContradictingFeatures(PhysicalEntity qTwo) {
+    List<EntityFeature> features = new ArrayList<EntityFeature>(qTwo.getFeature());
+    features.retainAll(qTwo.getNotFeature());
+    for (EntityFeature ft : features) {
+      qTwo.removeFeature(ft);
+      qTwo.removeNotFeature(ft);
+    }
+  }
+
+  /**
+   * Search an instance of {@code entity} that has a feature that has been
+   * created, based on a modification from a {@code subtype}.
+   * @param entity the BASIC, unmodified entity (e.g., does NOT end with {@link #ENTITY_MODIFICATION_SUFFIX}).
+   * @param subtype (name of modification process). If {@code null}, any modified {@code entity} will be returned.
+   * @return the already existing {@link BioPAXElement} which corresponds to {@code entity} with the given modification {@code subtype}.
+   * Or {@code null} if such an element is not yet available.
+   */
+  private BioPAXElement getModifiedEntity(BioPAXElement entity, String subtype) {
+    if (subtype!=null) {
+      subtype = subtype.trim().replace(' ', '_').replace("/", "_or_");
+    }
+    // They end with "_mod", "_mod2",... look if they share the same
+    // ent.Reference and maybe contain a phosphorylation feature.
+    
+    if (!(entity instanceof SimplePhysicalEntity)) {
+      return null;
+    }
+    
+    EntityReference eRef = ((SimplePhysicalEntity) entity).getEntityReference();
+    BioPAXElement modEntity = model.getByID(entity.getRDFId() + ENTITY_MODIFICATION_SUFFIX);
+    int i = 1;
+    while (modEntity!=null) {
+      // Are both derived from the same thing?
+      if (modEntity instanceof SimplePhysicalEntity && 
+          ((SimplePhysicalEntity)modEntity).getEntityReference().equals(eRef)) {
+        // Does it contain the specified subtype?
+        Set<EntityFeature> features = ((PhysicalEntity) modEntity).getFeature();
+        if (features!=null) {
+          if (subtype==null) return modEntity;
+          for (EntityFeature f : features) {
+            if (StringUtil.containsWord(f.getRDFId(), subtype)) {
+              return modEntity;
+            }
+          }
+        }
+        
+      }
+      i++;
+      modEntity = model.getByID(entity.getRDFId() + ENTITY_MODIFICATION_SUFFIX + i);
+    }
+    
+    return null;
+  }
+
+  
+  /**
+   * <b>ONLY FOR LEVEL 3</b><br/>
+   * Gets or creates a {@link SequenceModificationVocabulary} corresponding to the given {@link SubType}.
+   * @return  {@link SequenceModificationVocabulary} for level 3.
+   */
+  protected SequenceModificationVocabulary getSequenceModificationVocabulary(SubType st) {
+    String formattedName = st.getName().trim().replace(' ', '_').replace("/", "_or_");
+    //String rfid = "#modification_type_" + formattedName;
+    String rfid = getVocabularyID(st, true);
+    SequenceModificationVocabulary voc = (SequenceModificationVocabulary) model.getByID(rfid);
+    
+    // Term is not yet available => create it.
+    if (voc==null) {
+      // Create the object
+      voc = model.addNew(SequenceModificationVocabulary.class, rfid);
+      pathwayComponentCreated(voc);
+      
+      // For methylation, phosphorylation, etc. we have MOD terms
+      ValuePair<String, Integer> MODterm = SBOMapping.getMODTerm(st.getName());
+      
+      String termName;
+      if (MODterm!=null && MODterm.getA()!=null && MODterm.getA().length()>0) {
+        termName = MODterm.getA();
+        
+        // The term MUST be a string from MOD-ontology! Else, it is a BioPAX ERROR!
+        ((SequenceModificationVocabulary)voc).addTerm(termName);
+      } else {
+        termName = formattedName;
+        if (termName.endsWith("ion")) {
+          termName = termName.replace("ion", "ed"); // methylation -> methylated
+        }
+      }
+      
+      ((SequenceModificationVocabulary)voc).addComment(termName); // + "_at_unknown_residue"
+      
+
+      boolean addedAUnification = false;
+      // Add additional XRefs to MI, SBO and GO
+      if (MODterm!=null && MODterm.getB()>0) {
+        // It MUST BE any children of MOD:01157 or MOD:01156.
+        BioPAXElement xr = createXRef(IdentifierDatabases.MOD, Integer.toString(MODterm.getB()), 1);
+        addOntologyXRef(voc, xr, MODterm.getA());
+        addedAUnification = true;
+      }
+      
+      /*
+       * It would be nice to include SBO and GO here with RELATIONSHIP xrefs (type=2).
+       * However, BioPAX only allows unification xrefs, what is critically here, because
+       * a modification is no interaction...
+       * Therefore, I changed it now to create unifications (type=1) and exactly one xref! 
+       */
+      
+      // I know, SBO and GO are actually for interactions and not for states. But there is no other possibility to non-textually encode
+      // e.g., "protein that is methylated at any residue".
+      if (!addedAUnification) {
+        int sbo = SBOMapping.getSBOTerm(st.getName());
+        if (sbo>0) {
+          BioPAXElement xr = createXRef(IdentifierDatabases.SBO, Integer.toString(sbo), 1);
+          addOntologyXRef(voc, xr, formattedName);
+          addedAUnification = true;
+        }
+      }
+      
+      if (!addedAUnification) {
+        int go = SBOMapping.getGOTerm(st.getName());
+        if (go>0) {
+          BioPAXElement xr = createXRef(IdentifierDatabases.GeneOntology, Integer.toString(go), 1);
+          addOntologyXRef(voc, xr, formattedName);
+          addedAUnification = true;
+        }
+      }
+    }
+    
+    return voc;
+  }
+  
+  /**
+   * Creates a copy of an {@link BioPAXElement} that has been created with
+   * {@link #addEntry(Entry, Pathway)}. This is very useful, e.g., to
+   * create a second instance of the same protein with a different features
+   * (e.g., a phosphorylation).
+   * 
+   * @param element
+   * @return copy of {@code element} with the same properties and only different RFId.
+   */
+  public BioPAXElement createCopy(BioPAXElement element) {
+    return createCopy(element, element.getModelInterface());
+  }
+  public BioPAXElement createCopy(BioPAXElement element, Class<? extends BioPAXElement> typeOfCopy) {
+    String eId = ensureUniqueRDFId(element.getRDFId() + ENTITY_MODIFICATION_SUFFIX); // Make unique
+    BioPAXElement newElement = model.addNew(typeOfCopy, eId);
+    pathwayComponentCreated(newElement);
+    
+    // Names
+    if (element instanceof Named && newElement instanceof Named ) {
+      ((Named) newElement).setStandardName(((Named) element).getStandardName());
+      ((Named) newElement).setDisplayName(((Named) element).getDisplayName());
+      ((Named) newElement).setName(((Named) element).getName());
+    }
+    // ---
+    addDataSources(newElement);
+    
+    // Complex components
+    if (element instanceof Complex && newElement instanceof Complex) {
+      for (PhysicalEntity pe : ((Complex) newElement).getComponent()) {
+        ((Complex) newElement).addComponent(pe);
+      }
+    }
+    
+    
+    // Add all potential annotations that come from addAnnotations();
+    if (element instanceof XReferrable && newElement instanceof XReferrable) {
+      for (Xref xr : ((XReferrable) element).getXref()) {
+        ((XReferrable) newElement).addXref(xr);
+      }
+    }
+    if (element instanceof BiochemicalReaction && newElement instanceof BiochemicalReaction) {
+      for (String ec : ((BiochemicalReaction) element).getECNumber()) {
+        ((BiochemicalReaction) newElement).addECNumber(ec);
+      }
+    }
+    if (element instanceof Level3Element && newElement instanceof Level3Element) {
+      for (String c : ((Level3Element) element).getComment()) {
+        ((Level3Element) newElement).addComment(c);
+      }
+    }
+    
+    // TODO: So far not copied (but not important in KEGGtranslator): CellularLocations, participantOf, Features, NotFeatures
+    
+    
+    // Now comes the important part, we need to set a reference to the same entity as
+    // the oritinal biopax element
+    if (element instanceof SimplePhysicalEntity && newElement instanceof SimplePhysicalEntity) {
+      ((SimplePhysicalEntity) newElement).setEntityReference(((SimplePhysicalEntity) element).getEntityReference());
+    }
+    
+    return newElement;
+  }
+  
 }

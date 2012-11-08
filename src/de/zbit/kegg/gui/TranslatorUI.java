@@ -66,6 +66,7 @@ import de.zbit.gui.actioncommand.ActionCommand;
 import de.zbit.gui.prefs.FileSelector;
 import de.zbit.gui.prefs.PreferencesPanel;
 import de.zbit.io.filefilter.SBFileFilter;
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -275,6 +276,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				// Get selected file and format
 				File inFile = getInputFile(r);
 				String format = getOutputFileFormat(r);
+				
+				// Check if it is conform with current settings
+				if (!checkSettingsAndIssueWarning(format)) {
+				  return;
+				}
 
 				// Translate
 				createNewTab(inFile, format);
@@ -290,8 +296,38 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	}
 
 	/**
+	 * Checks if the current application preferences are conform
+	 * with the currently selected format and eventually 
+	 * issues a warning.
+   * @param format
+   * @return <code>FALSE</code> if the translation should be
+   * stopped.
+   */
+  protected boolean checkSettingsAndIssueWarning(String format) {
+    
+    Format f = Format.valueOf(format);
+    if (f==null) {
+      GUITools.showErrorMessage(this, "Unknown output format: " + format);
+      return false;
+    } else if (f == Format.SBML_L2V4) {
+      // Check if Level 2 and extensions are selected.
+      SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorOptions.class);
+      if (KEGGtranslatorOptions.ADD_LAYOUT_EXTENSION.getValue(prefs) ||
+          KEGGtranslatorOptions.USE_GROUPS_EXTENSION.getValue(prefs)) {
+        String message = "SBML supports extensions since Level 3. You've chosen to translate a document to Level 2 including the layout or groups extension, what is not possible.\nDo you want to deactivate the extensions for this translation?";
+        int ret = GUITools.showQuestionMessage(this, message, "Conflict between selected Level and extension support", JOptionPane.OK_CANCEL_OPTION);
+        if (ret == JOptionPane.CANCEL_OPTION) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
+  }
+
+  /**
 	 * Searches for any JComponent with
-	 * "TranslatorOptions.FORMAT.getOptionName()" on it and returns the selected
+	 * {@link KEGGtranslatorIOOptions#FORMAT}.getOptionName() on it and returns the selected
 	 * format. Use it e.g. with {@link #translateToolBar}.
 	 * 
 	 * @param r
@@ -774,7 +810,6 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	/* (non-Javadoc)
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
-	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		logger.fine(evt.toString());
 	}

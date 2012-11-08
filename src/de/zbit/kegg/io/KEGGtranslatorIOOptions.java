@@ -48,9 +48,17 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
    */
   public enum Format {
     /**
-     * 
+     * Automatically adjusts the level as needed (e.g., extensions require L3).
      */
     SBML,
+    /**
+     * 
+     */
+    SBML_L2V4,
+    /**
+     * 
+     */
+    SBML_L3V1,
     /**
      * 
      */
@@ -116,6 +124,10 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
      */
     //SVG
     ;
+    
+    public boolean isSBML() {
+      return toString().contains("SBML");
+    }
   }
   
 	/*

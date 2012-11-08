@@ -294,6 +294,8 @@ public class BatchKEGGtranslator {
         break;
         
       case SBML:
+      case SBML_L2V4:
+      case SBML_L3V1:
         myGraph = new SBML2GraphML().createGraph((org.sbml.jsbml.SBMLDocument) translatedDoc);
         break;
         
@@ -331,6 +333,12 @@ public class BatchKEGGtranslator {
 		case SBML:
 			translator = new KEGG2jSBML(manager);
 			break;
+	  case SBML_L2V4:
+      translator = new KEGG2jSBML(manager, 2, 4);
+      break;
+	  case SBML_L3V1:
+      translator = new KEGG2jSBML(manager, 3, 1);
+      break;
     case SBML_QUAL:
       translator = new KEGG2SBMLqual(manager);
       break;
