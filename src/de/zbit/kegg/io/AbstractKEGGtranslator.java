@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.KeggTools;
+import de.zbit.kegg.Translator;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.kegg.parser.KeggParser;
@@ -162,7 +163,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   public AbstractKEGGtranslator(KeggInfoManagement manage) {
     if (manager==null && manage==null) {
-      manager = new KeggInfoManagement();
+      Translator.getManager();
     } else if (manage!=null) {
       setKeggInfoManager(manage);
     }

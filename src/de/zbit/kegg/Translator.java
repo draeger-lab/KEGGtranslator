@@ -502,7 +502,7 @@ public class Translator extends Launcher {
 	 * @see de.zbit.Launcher#getVersionNumber()
 	 */
 	public String getVersionNumber() {
-		return "2.2.0";
+		return "2.3.0";
 	}
 
 	/*

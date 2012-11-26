@@ -48,6 +48,7 @@ import org.sbml.jsbml.ext.qual.Transition;
 import org.sbml.jsbml.util.ValuePair;
 import org.sbml.jsbml.xml.stax.SBMLWriter;
 
+import de.zbit.kegg.KEGGtranslatorOptions;
 import de.zbit.kegg.Translator;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggInfoManagement;
@@ -159,6 +160,10 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   
   @Override
   protected SBMLDocument translateWithoutPreprocessing(Pathway p) {
+    
+    // Don't forget to clear all previous caches
+    containedTransitions.clear();
+    
     // Translate to normal SBML
     SBMLDocument doc = super.translateWithoutPreprocessing(p);
     
@@ -174,16 +179,26 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", (isCombindedModel?"false":"true"));
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     
+    /* Until (INCLUDING) Verison 2.2, if there were no relations, no qual species
+     * have been created. The comment was as follows:
+     * 
+     * // Qualitative species are just created if transitions are available
+     * // Reason: all species are in the file as normal sbml species. Following the 
+     * // qualitative species are not necessary
+     */
+    
+    // Create qual species for every species
+    if (p.getRelations().size()<1 && KEGGtranslatorOptions.REMOVE_ORPHANS.getValue(prefs)) {
+      // We have no relations and REMOVE_ORPHANS is true => do nothing.
+    } else {
+      // Create the species (independent of the relations.
+      createQualSpecies(p, qualModel);
+    }
+    
     // Give a warning if we have no relations.
     if (p.getRelations().size()<1) {
       log.fine("File does not contain any relations. Graph will look quite boring...");
     } else {
-      // Qualitative species are just created if transitions are available
-      // Reason: all species are in the file as normal sbml species. Following the 
-      // qualitative species are not necessary
-
-      // Create qual species for every species 
-      createQualSpecies(p, qualModel);
       for (Relation r : p.getRelations()) {
         addKGMLRelation(r, p, qualModel);
       }
@@ -243,18 +258,18 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     if (qOne==null || qTwo==null) {
       // Happens, e.g. when remove_pw_references is true and there is a
       // relation to this (now removed) node.
-      log.finer("Relation with unknown or removed entry: " + r);
+      log.fine("Relation with unknown or removed entry: " + r);
       return null;
     }
     
     Transition t = qualModel.createTransition(NameToSId("tr"));
     
     // Input
-    Input in = t.createInput(NameToSId("in"), qOne.getId(), InputTransitionEffect.none); //TODO: is this correct?
+    Input in = t.createInput(NameToSId("in"), qOne.getId(), InputTransitionEffect.none);
     in.setMetaId("meta_" + in.getId());
     
     // Output
-    Output out = t.createOutput(NameToSId("out"), qTwo.getId(), OutputTransitionEffect.assignmentLevel); //TODO: is this correct?    
+    Output out = t.createOutput(NameToSId("out"), qTwo.getId(), OutputTransitionEffect.assignmentLevel);    
     
     //XXX: "function term" is intentionally not set in KEGG2X (info not provided).
     

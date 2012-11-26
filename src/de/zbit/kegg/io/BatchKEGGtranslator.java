@@ -194,66 +194,65 @@ public class BatchKEGGtranslator {
           }
         } catch (Exception e1) {}
         
-        if (loaded!=null ||
-            SBFileFilter.isKGML(inFile)) {
-        // Test if outFile already exists. Assumes: 1 Pathway per file. (should be true for all files... not crucial if assumption is wrong)
-        String myDir = getAndCreateOutDir(dir);
-        String outFileTemp = myDir + FileTools.removeFileExtension(fn) + fileExtension;
-        if (new File(outFileTemp).exists()) {
-          System.out.println("Skipping '"+inFile+"' file already exists.");
-          continue; // Skip already converted files.
-        } else {
-          System.out.println("Converting '"+inFile+"' ..."); 
-        }
-        
-        // Parse and convert all Pathways in XML file.
-        List<Pathway> pw=null;
-        if (loaded!=null) {
-          pw = new LinkedList<Pathway>();
-          pw.add((Pathway) loaded);
-        } else {
-          try {
-            pw = de.zbit.kegg.parser.KeggParser.parse(dir+fn);
-          } catch (Throwable t) {t.printStackTrace();} // Show must go on...
-        }
-        if (pw==null || pw.size()<1) continue;
-        
-        boolean appendNumber=(pw.size()>1);
-        for (int i=0; i<pw.size(); i++) {
-          String outFile = myDir + fn.trim().substring(0, fn.trim().length()-4) + (appendNumber?"-"+(i+1):"") + fileExtension;
-          if (new File(outFile).exists()) continue; // Skip already converted files.
+        if (loaded!=null || SBFileFilter.isKGML(inFile)) {
+          // Test if outFile already exists. Assumes: 1 Pathway per file. (should be true for all files... not crucial if assumption is wrong)
+          String myDir = getAndCreateOutDir(dir);
+          String outFileTemp = myDir + FileTools.removeFileExtension(fn) + fileExtension;
+          if (new File(outFileTemp).exists()) {
+            System.out.println("Skipping '"+inFile+"' file already exists.");
+            continue; // Skip already converted files.
+          } else {
+            System.out.println("Converting '"+inFile+"' ..."); 
+          }
           
-          // XXX: Main Part
-          try {
-            if (KEGGtranslatorCommandLineOnlyOptions.CREATE_JPG.getValue(prefs)) {
-              // Translate, but create image from translated document
-              Object translateDoc = translator.translate(pw.get(i));
-              writeAsJPG(translateDoc, pw.get(i), outFile, outFormat);
+          // Parse and convert all Pathways in XML file.
+          List<Pathway> pw=null;
+          if (loaded!=null) {
+            pw = new LinkedList<Pathway>();
+            pw.add((Pathway) loaded);
+          } else {
+            try {
+              pw = de.zbit.kegg.parser.KeggParser.parse(dir+fn);
+            } catch (Throwable t) {t.printStackTrace();} // Show must go on...
+          }
+          if (pw==null || pw.size()<1) continue;
+          
+          boolean appendNumber=(pw.size()>1);
+          for (int i=0; i<pw.size(); i++) {
+            String outFile = myDir + fn.trim().substring(0, fn.trim().length()-4) + (appendNumber?"-"+(i+1):"") + fileExtension;
+            if (new File(outFile).exists()) continue; // Skip already converted files.
+            
+            // XXX: Main Part
+            try {
+              if (KEGGtranslatorCommandLineOnlyOptions.CREATE_JPG.getValue(prefs)) {
+                // Translate, but create image from translated document
+                Object translateDoc = translator.translate(pw.get(i));
+                writeAsJPG(translateDoc, pw.get(i), outFile, outFormat);
+                
+              } else {
+                // Translate to output file
+                translator.translate(pw.get(i), outFile);
+              }
               
-            } else {
-              // Translate to output file
-              translator.translate(pw.get(i), outFile);
+            } catch (Exception e) {
+              e.printStackTrace();
             }
             
-          } catch (Exception e) {
-            e.printStackTrace();
+            if (translator.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, spaeter aber schon => ein anderer prozess macht das selbe bereits.
+              System.out.println("It looks like another instance is processing the same files. Going to next subfolder.");
+              return; // Function is recursive.
+            }
           }
           
-          if (translator.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, spaeter aber schon => ein anderer prozess macht das selbe bereits.
-            System.out.println("It looks like another instance is processing the same files. Going to next subfolder.");
-            return; // Function is recursive.
-          }
+          
         }
-        
-        
       }
-    }
     }
     
     // Remember already queried objects (save cache)
     Translator.saveCache();
   }
-
+  
   /**
    * @param translatedDoc translated pathway
    * @param originalPW original and untranslated pathway
