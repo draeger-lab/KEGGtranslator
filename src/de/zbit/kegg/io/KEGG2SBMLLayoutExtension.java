@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import org.sbml.jsbml.AbstractNamedSBase;
 import org.sbml.jsbml.Compartment;
+import org.sbml.jsbml.ListOf;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.Reaction;
@@ -128,6 +129,7 @@ public class KEGG2SBMLLayoutExtension {
     // Create Species and Reaction Glyps.
     Layout layout = layoutModel.createLayout();
     layout.setName(String.format("Translated %s layout.", metabolic?"metabolic":"qualitative"));
+    layout.setId(createUniqueLayoutId(layout, layoutModel));
     
     // It's stupid, but the whole "layout" requires a dimension.
     // => track min and max values.
@@ -342,6 +344,33 @@ public class KEGG2SBMLLayoutExtension {
     layout.createDimensions(tracker.getWidth(), tracker.getHeight(), 1);
   }
   
+  
+  /**
+   * 
+   * @param layout
+   * @param layoutModel
+   * @return
+   */
+  private static String createUniqueLayoutId(Layout layout, ExtendedLayoutModel layoutModel) {
+    String idPrefix = "layout";
+    String id = "layout";
+    
+    ListOf<Layout> lol = layoutModel.getListOfLayouts();
+    if (lol == null) {
+      return id;
+    }
+    
+    int s = 2;
+    for (int i=0; i<lol.size(); i++) {
+      if (lol.get(i).getId().equalsIgnoreCase(id)) {
+        id = idPrefix + s;
+        s++;
+        i=-1;
+      }
+    }
+    
+    return id;
+  }
   /**
    * 
    * @param idCounts
