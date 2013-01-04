@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2013 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public License

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Center for Bioinformatics of the University of Tuebingen.
+ * Copyright (c) 2011-2013 Center for Bioinformatics of the University of Tuebingen.
  * 
  * This file is part of KEGGtranslator, a program to convert KGML files from the
  * KEGG database into various other formats, e.g., SBML, GraphML, and many more.
