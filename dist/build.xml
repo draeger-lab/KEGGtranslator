@@ -83,7 +83,6 @@
             </fileset>	
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/y.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/HotEqn.jar"/> -->
-            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/keggapi.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/stax-api-1.0.1.jar"/> -->
     	
             <zipfileset excludes="overview.html,META-INF/**/*,org/apache/commons/logging/**/*,javax/xml/namespace/QName.class,org/apache/log4j/**/*" src="${base}/lib/paxtools-4.1.1_customJenaFix.jar"/>
@@ -105,7 +104,6 @@
             <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-discovery.jar"/>
             <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-logging.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/jaxrpc.jar"/>
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/keggapi.jar"/> -->
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/wsdl4j.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/axis.jar"/>
     	      <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>

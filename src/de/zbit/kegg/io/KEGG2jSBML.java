@@ -431,7 +431,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Retrieve further information via Kegg Adaptor
     boolean titleAdded = false;
     if (p.isSetOrg()) {
-      KeggInfos orgInfos = KeggInfos.get("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
+      KeggInfos orgInfos = KeggInfos.get("gn:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
       if (orgInfos.queryWasSuccessfull()) {
         CVTerm mtOrgID = DatabaseIdentifierTools.getCVTerm(IdentifierDatabases.NCBI_Taxonomy, null, orgInfos.getTaxonomy().split("\\s"));
         if (mtOrgID.getResourceCount() > 0) {

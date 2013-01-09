@@ -343,7 +343,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     String taxonID="";
     
     // Get from KEGG API
-    KeggInfos orgInfos = KeggInfos.get("GN:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
+    KeggInfos orgInfos = KeggInfos.get("gn:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
     if (orgInfos.queryWasSuccessfull()) {
       speciesString = orgInfos.getDefinition();
       taxonID = orgInfos.getTaxonomy().trim().replaceAll("\\s.*", "");

@@ -346,14 +346,15 @@ public class KEGG2SBMLLayoutExtension {
   
   
   /**
-   * 
+   * Returnes the next available (unsed) id of a layout, beginning with
+   * "layout", "layout2", "layout3",...
    * @param layout
    * @param layoutModel
-   * @return
+   * @return unused layout identifier
    */
   private static String createUniqueLayoutId(Layout layout, ExtendedLayoutModel layoutModel) {
     String idPrefix = "layout";
-    String id = "layout";
+    String id = idPrefix;
     
     ListOf<Layout> lol = layoutModel.getListOfLayouts();
     if (lol == null) {
