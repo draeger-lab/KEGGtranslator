@@ -43,6 +43,10 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * @version $Rev$
  */
 public class KEGG2SBMLGroupExtension {
+	
+  /**
+   * A {@link Logger} for this class.
+   */
   private static final transient Logger log = Logger.getLogger(KEGG2SBMLGroupExtension.class.getName());
   
   /**
@@ -161,7 +165,7 @@ public class KEGG2SBMLGroupExtension {
    */
   private static GroupModel getGroupModel(AbstractSBase g) {
     Model model = g.getModel();
-    SBMLDocument doc = model.getParent();
+    SBMLDocument doc = model.getSBMLDocument();
     
     // Make sure extension is available
     // NOTE: this should be called every time! No need to check if it is already contained.
@@ -170,7 +174,7 @@ public class KEGG2SBMLGroupExtension {
     
     // Create group model
     GroupModel groupModel = (GroupModel) model.getExtension(GROUP_NS);
-    if (groupModel==null) {
+    if (groupModel == null) {
       groupModel = new GroupModel(model);
       model.addExtension(GROUP_NS, groupModel);
     }

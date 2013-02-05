@@ -34,6 +34,7 @@ import org.sbml.tolatex.LaTeXOptions;
 import de.zbit.graph.gui.TranslatorGraphLayerPanel;
 import de.zbit.graph.gui.TranslatorPanel;
 import de.zbit.graph.gui.TranslatorSBMLgraphPanel;
+import de.zbit.io.OpenedFile;
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.kegg.io.KEGG2SBMLqual;
 import de.zbit.kegg.io.KEGG2jSBML;
@@ -41,6 +42,7 @@ import de.zbit.kegg.io.KEGGImporter;
 import de.zbit.kegg.io.KEGGtranslator;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.sbml.gui.SBMLModelSplitPane;
+import de.zbit.sbml.io.SBMLfileChangeListener;
 import de.zbit.util.prefs.SBPreferences;
 
 /**
@@ -102,7 +104,9 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
     JTabbedPane tabs = new JTabbedPane();
     
     // Create a new visualization of the model.
-    SBMLModelSplitPane treePane = new SBMLModelSplitPane(document, 
+    OpenedFile<SBMLDocument> openFile = new OpenedFile<SBMLDocument>(document);
+    openFile.getDocument().addTreeNodeChangeListener(new SBMLfileChangeListener(openFile));
+    SBMLModelSplitPane treePane = new SBMLModelSplitPane(openFile, 
       SBPreferences.getPreferencesFor(LaTeXOptions.class).getBoolean(
         LaTeXOptions.PRINT_NAMES_IF_AVAILABLE));
     
