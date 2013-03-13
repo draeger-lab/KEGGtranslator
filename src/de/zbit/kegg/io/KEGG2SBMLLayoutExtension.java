@@ -34,7 +34,7 @@ import org.sbml.jsbml.ModifierSpeciesReference;
 import org.sbml.jsbml.Reaction;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.layout.BoundingBox;
-import org.sbml.jsbml.ext.layout.ExtendedLayoutModel;
+import org.sbml.jsbml.ext.layout.LayoutModelPlugin;
 import org.sbml.jsbml.ext.layout.Layout;
 import org.sbml.jsbml.ext.layout.LayoutConstants;
 import org.sbml.jsbml.ext.layout.ReactionGlyph;
@@ -108,9 +108,9 @@ public class KEGG2SBMLLayoutExtension {
     doc.getSBMLDocumentAttributes().put(LAYOUT_NS_NAME + ":required", "false");
     
     // Create layout model
-    ExtendedLayoutModel layoutModel = (ExtendedLayoutModel) model.getExtension(LAYOUT_NS);
+    LayoutModelPlugin layoutModel = (LayoutModelPlugin) model.getExtension(LAYOUT_NS);
     if (layoutModel==null) {
-      layoutModel = new ExtendedLayoutModel(model);
+      layoutModel = new LayoutModelPlugin(model);
       model.addExtension(LAYOUT_NS, layoutModel);
     } else {
       // Remove all previous layouts.
@@ -352,7 +352,7 @@ public class KEGG2SBMLLayoutExtension {
    * @param layoutModel
    * @return unused layout identifier
    */
-  private static String createUniqueLayoutId(Layout layout, ExtendedLayoutModel layoutModel) {
+  private static String createUniqueLayoutId(Layout layout, LayoutModelPlugin layoutModel) {
     String idPrefix = "layout";
     String id = idPrefix;
     
