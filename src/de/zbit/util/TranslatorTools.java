@@ -127,7 +127,12 @@ public class TranslatorTools extends GraphTools {
       String id = getKeggIDs(n);
       id = id==null?null:id.toLowerCase().trim();
       if (id!=null && id.startsWith("path:")) continue;
-      graph.getRealizer(n).setFillColor(colorForUnaffectedNodes);
+      NodeRealizer realizer = graph.getRealizer(n);
+      
+      // Only change BGcolor if nodes have a border (KEGG BRITE nodes have no border)
+      if (realizer.getLineColor()!=null) {
+        realizer.setFillColor(colorForUnaffectedNodes);
+      }
     }
   }
   

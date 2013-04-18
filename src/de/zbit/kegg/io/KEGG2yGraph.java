@@ -313,6 +313,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @return e.g. "#FEFEFE"
    */
   public static String ColorToHTML(Color color) {
+    if (color == null) {
+      return null;
+    }
+    
     return "#" + Integer.toHexString(color.getRGB()).substring(2).toUpperCase();
   }
   
@@ -626,14 +630,17 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
         }
         
         nr.setLabel(nl);
-        if (isPathwayReference && name.toUpperCase().startsWith("TITLE:")) {
-          // Name of this pathway
-          nl.setFontStyle(Font.BOLD);
-          nl.setText(name); // name.substring("TITLE:".length()).trim()
-          nr.setFillColor(Color.GREEN);
-        } else if (isPathwayReference) {
+        if (isPathwayReference) {
           // Reference to another pathway
           nr.setFillColor(Color.LIGHT_GRAY);
+          nr.setLineColor(Color.BLACK);
+          
+          if (name.toUpperCase().startsWith("TITLE:")) {
+            // Name TAG of this pathway
+            nl.setFontStyle(Font.BOLD);
+            nl.setText(name); // name.substring("TITLE:".length()).trim()
+            nr.setFillColor(Color.GREEN);
+          }
         }
         
         
@@ -731,6 +738,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
           //Definition[] results = adap.getGenesForKO(e.getName(), retrieveKeggAnnotsForOrganism); // => GET only (und alles aus GET rausparsen). Zusaetzlich: in sortedArrayList merken.
           if (ko_id.equalsIgnoreCase("undefined") || ko_id.equalsIgnoreCase("null") || e.hasComponents()) continue;
           
+          // TODO: KEGG brite identifiers (e.g., "br:br08003") are not correctly fetched and parsed by the API.
           KeggInfos infos = KeggInfos.get(ko_id, manager);
           keggInfos.add(infos);
           
@@ -1412,8 +1420,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     // Colors
     try {
-      if (g.isSetBGcolor())
+      if (g.isSetBGcolor()) {
         nr.setFillColor(ColorFromHTML(g.getBgcolor()));
+      } else if (g.getBgcolor()!=null && g.getBgcolor().equalsIgnoreCase("none")) {
+        nr.setFillColor(null);
+        nr.setLineColor(null);
+      }
     } catch (Throwable t) {t.printStackTrace();}
     
     try {

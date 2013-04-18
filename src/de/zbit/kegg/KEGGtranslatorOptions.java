@@ -117,7 +117,7 @@ public abstract interface KEGGtranslatorOptions extends KeyProvider {
   /**  
    * If true, remove all nodes that have no edges, before translating the pathway.
    */
-  public static final Option<Boolean> REMOVE_ORPHANS = new Option<Boolean>("REMOVE_ORPHANS",Boolean.class,
+  public static final Option<Boolean> REMOVE_ORPHANS = new Option<Boolean>("REMOVE_ORPHANS", Boolean.class,
       "If true, remove all nodes that have no edges before translating the pathway.", (short) 2, "-ro", false);
 
   /**
