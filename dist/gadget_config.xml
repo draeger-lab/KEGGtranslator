@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Gadget>
+    <UUID>[GADGET_UUID]</UUID>
+    <Name>KEGGtranslator</Name>
+    <LaunchCommand>open "gadgets/[GADGET_UUID]/[JAR_NAME]</LaunchCommand>
+    <IconPaths>
+        <Icon32Path>icons/KEGGtranslatorIcon_64.png</Icon32Path>
+    </IconPaths>
+    <Snapshots/>
+    <Categories>
+        <Category>KEGG</Category>
+        <Category>Pathways</Category>
+        <Category>Pathway modeling</Category>
+        <Category>Qualitative modeling</Category>
+        <Category>Converter</Category>
+        <Category>Database</Category>
+        <Category>Visualization</Category>
+        <Category>Annotation</Category>
+    </Categories>
+    <Provider>University of Tuebingen,
+Center for Bioinformatics Tuebingen (ZBIT)</Provider>
+    <Description>KEGGtranslator is an easy-to-use stand-alone application that can visualize and convert pathway-based information from the KEGG PATHWAY database into multiple output formats. KEGGtranslator supports a plethora of output formats, is able to augment the information in translated documents (e.g., MIRIAM annotations) beyond the scope of the KGML document, and amends missing components to fragmentary reactions within the pathway to allow simulations on those. KEGGtranslator converts KEGG files (KGML-formatted XML-files) to SBML, BioPAX, SIF, SBGN, SBML-qual, GML, GraphML, JPG, GIF etc. KEGG pathways can be obtained from within the application.</Description>
+    <LoadableKeys>
+        <InputFileFormat>
+            <FileExtension>xml</FileExtension>
+            <FileFormat>KGML</FileFormat>
+        </InputFileFormat>
+        <InputFileFormat>
+            <FileExtension>kgml</FileExtension>
+            <FileFormat>KGML</FileFormat>
+        </InputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>sbml</FileExtension>
+            <FileFormat>SBML</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>xml</FileExtension>
+            <FileFormat>SBML</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>sbgn</FileExtension>
+            <FileFormat>SBGN</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>xml</FileExtension>
+            <FileFormat>SBGN</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>bp2</FileExtension>
+            <FileFormat>BioPAX</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>bp3</FileExtension>
+            <FileFormat>BioPAX</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>owl</FileExtension>
+            <FileFormat>BioPAX</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>xml</FileExtension>
+            <FileFormat>BioPAX</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>sif</FileExtension>
+            <FileFormat>SIF</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>graphml</FileExtension>
+            <FileFormat>GraphML</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>gml</FileExtension>
+            <FileFormat>GML</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>jpg</FileExtension>
+            <FileFormat>JPG</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>jpeg</FileExtension>
+            <FileFormat>JPEG</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>gif</FileExtension>
+            <FileFormat>GIF</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>tgf</FileExtension>
+            <FileFormat>TGF</FileFormat>
+        </OutputFileFormat>
+        <OutputFileFormat>
+            <FileExtension>ygf</FileExtension>
+            <FileFormat>YGF</FileFormat>
+        </OutputFileFormat>
+    </LoadableKeys>
+    <LaunchEnv>
+        <Id>f22aa6a2-beff-4487-b838-03b8275a4361</Id>
+    </LaunchEnv>
+</Gadget>

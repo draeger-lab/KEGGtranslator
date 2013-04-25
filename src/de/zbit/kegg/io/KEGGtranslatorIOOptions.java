@@ -21,6 +21,8 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import de.zbit.io.filefilter.SBFileFilter;
 import de.zbit.util.prefs.KeyProvider;
@@ -127,6 +129,29 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
     
     public boolean isSBML() {
       return toString().contains("SBML");
+    }
+    
+    /**
+     * 
+     * @return a file extension (without preceding dot) that should be as common
+     *         as possible for the given {@link Format}.
+     */
+    public Set<String> getOutputFileExtensions() {
+      if (isSBML()) {
+        return SBFileFilter.createSBMLFileFilter().getExtensions();
+      }
+      switch (this) {
+        case BioPAX_level2:
+          return SBFileFilter.createBioPAXFileFilterL2().getExtensions();
+        case BioPAX_level3:
+          return SBFileFilter.createBioPAXFileFilterL3().getExtensions();
+        case SBGN:
+          return SBFileFilter.createSBGNFileFilter().getExtensions();
+        default:
+          Set<String> extensions = new HashSet<String>();
+          extensions.add(toString().toLowerCase());
+          return extensions;
+      }
     }
   }
   

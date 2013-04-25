@@ -189,7 +189,7 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
    * @see de.zbit.kegg.gui.TranslatorPanel#getOutputFileFilter()
    */
   @Override
-  protected List<FileFilter> getOutputFileFilter() {
+  public List<FileFilter> getOutputFileFilter() {
     LinkedList<FileFilter> ff = new LinkedList<FileFilter>();
     ff.add(SBFileFilter.createSBMLFileFilter());
     // 2LaTeX temporary removed (conflicts after moving classes to sysbio).

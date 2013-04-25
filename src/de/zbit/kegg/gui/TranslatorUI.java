@@ -29,10 +29,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.beans.EventHandler;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,11 +51,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
 
 import de.zbit.AppConf;
+import de.zbit.garuda.GarudaActions;
+import de.zbit.garuda.GarudaFileSender;
+import de.zbit.garuda.GarudaGUIfactory;
+import de.zbit.garuda.GarudaOptions;
+import de.zbit.garuda.GarudaSoftwareBackend;
 import de.zbit.graph.RestrictedEditMode;
 import de.zbit.graph.gui.TranslatorGraphLayerPanel;
 import de.zbit.graph.gui.TranslatorPanel;
@@ -103,6 +112,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
    * logo for this application resides.
    */
   public static String watermarkLogoResource = "img/Logo2.png";
+
+  /**
+   * A reference to the Garuda core.
+   */
+  private GarudaSoftwareBackend garudaBackend;
   
 
 	/**
@@ -177,7 +191,14 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	}
 
 	static {    
-		String iconPaths[] = {"KEGGtranslatorIcon_16.png","KEGGtranslatorIcon_32.png","KEGGtranslatorIcon_48.png","KEGGtranslatorIcon_128.png","KEGGtranslatorIcon_256.png"};
+		String iconPaths[] = {
+			"KEGGtranslatorIcon_16.png",
+			"KEGGtranslatorIcon_32.png",
+			"KEGGtranslatorIcon_48.png",
+			"KEGGtranslatorIcon_64.png",
+			"KEGGtranslatorIcon_128.png",
+			"KEGGtranslatorIcon_256.png"
+		};
 		for (String path : iconPaths) {
 		  URL url = TranslatorUI.class.getResource("img/" + path);
 		  if (url!=null) {
@@ -272,6 +293,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		ok.setToolTipText(StringUtil
 				.toHTMLToolTip("Starts the conversion of the input file to the selected output format and displays the result on this workbench."));
 		ok.addActionListener(new ActionListener() {
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
 			public void actionPerformed(ActionEvent e) {
 				// Get selected file and format
 				File inFile = getInputFile(r);
@@ -436,7 +460,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @param tp
 	 */
 	public void addTranslatorTab(TranslatorPanel<?> tp) {
-    addTranslatorTab(null, tp);
+		addTranslatorTab(null, tp);
 	}
 	
 	/**
@@ -446,14 +470,16 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * @param tp
 	 */
 	public void addTranslatorTab(String tabName, TranslatorPanel<?> tp) {
-    try {
-      if (tabName==null) tabName = tp.getTitle();
-      tabbedPane.addTab(tabName, tp);
-      tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
-    } catch (Exception e1) {
-      GUITools.showErrorMessage(this, e1);
-    }
-  }
+		try {
+			if (tabName == null) {
+				tabName = tp.getTitle();
+			}
+			tabbedPane.addTab(tabName, tp);
+			tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+		} catch (Exception e1) {
+			GUITools.showErrorMessage(this, e1);
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
@@ -533,7 +559,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 * Closes the tab at the specified index.
 	 * 
 	 * @param index
-	 * @return true, if the tab has been closed.
+	 * @return {@code true} if the tab has been closed.
 	 */
 	private boolean closeTab(int index) {
 		if ((index < 0) || (index >= tabbedPane.getTabCount())) {
@@ -551,8 +577,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 			if ((JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(this,
 					StringUtil.toHTMLToolTip(
 							"Do you really want to close %s%s%s without saving?",
-							KEGG2jSBML.quotStart,title,KEGG2jSBML.quotEnd), "Close selected document",
-					JOptionPane.YES_NO_OPTION))) {
+							KEGG2jSBML.quotStart, title, KEGG2jSBML.quotEnd),
+							"Close selected document",
+							JOptionPane.YES_NO_OPTION))) {
 				return false;
 			}
 		}
@@ -560,6 +587,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		// Close the document.
 		tabbedPane.removeTabAt(index);
 		updateButtons();
+		if ((garudaBackend != null) && (tabbedPane.getTabCount() == 0)) {
+			GUITools.setEnabled(false, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
+		}
 		return true;
 	}
 
@@ -613,7 +643,11 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 				BaseAction.FILE_CLOSE);
 		TranslatorPanel<?> o = getCurrentlySelectedPanel();
 		if (o != null) {
-			o.updateButtons(getJMenuBar());
+		  o.updateButtons(getJMenuBar());
+		  if ((garudaBackend != null) && (tabbedPane.getTabCount() == 1)) {
+		    // TabCount check is needed to avoid that this is done again when more tabs are added.
+		    GUITools.setEnabled(true, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
+		  }
 		}
 	}
 
@@ -690,6 +724,58 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	            .getKeyStroke('D', InputEvent.CTRL_DOWN_MASK), 'D', true)
 	        };
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.zbit.gui.BaseFrame#additionalEditMenuItems()
+	 */
+	@Override
+	protected JMenuItem[] additionalEditMenuItems() {
+		List<JMenuItem> items = new ArrayList<JMenuItem>(1);
+		if (!appConf.getCmdArgs().containsKey(GarudaOptions.CONNECT_TO_GARUDA)
+				|| appConf.getCmdArgs().getBoolean(GarudaOptions.CONNECT_TO_GARUDA)) {
+			items.add(GarudaGUIfactory.createGarudaMenu(EventHandler.create(ActionListener.class, this, "sendToGaruda")));
+		}
+		return items.toArray(new JMenuItem[0]);
+	}
+	
+	/**
+	 * 
+	 */
+	public void sendToGaruda() {
+	  final TranslatorPanel<?> o = getCurrentlySelectedPanel();
+	  if (o != null) {
+	    List<FileFilter> formatList = o.getOutputFileFilter();
+	    if (formatList == null || formatList.size()<1) {
+	      return;
+	    }
+	    FileFilter selectedFilter = formatList.get(0);
+	    if (formatList.size() > 1) {
+	        selectedFilter = (FileFilter) JOptionPane.showInputDialog(this, "message", "title", JOptionPane.QUESTION_MESSAGE, null, formatList.toArray(), formatList.get(0));
+	    }
+	    if ((selectedFilter != null) && (selectedFilter instanceof SBFileFilter)) {
+	      final String outputFormat = ((SBFileFilter) selectedFilter).getExtension();
+	      final Component parent = this;
+	      logger.fine("Selected file format = " + outputFormat);
+	      new SwingWorker<Void, Void>() {
+	        /* (non-Javadoc)
+	         * @see javax.swing.SwingWorker#doInBackground()
+	         */
+	        @Override
+	        protected Void doInBackground() throws Exception {
+	          File file = File.createTempFile("kgtrans_temp_data", '.' + outputFormat);
+	          file.deleteOnExit();
+	          o.saveToFile(file, outputFormat);
+	          
+	          logger.fine("Launching Garuda sender");
+	          GarudaFileSender sender = new GarudaFileSender(parent, garudaBackend, file, outputFormat.toUpperCase());
+	          sender.execute();
+	          return null;
+	        }
+	      }.execute();
+	    }
+	  }
+	}
+
 
 	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#closeFile()
@@ -717,6 +803,9 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 		
 		// Change active buttons, based on selection.
 		tabbedPane.addChangeListener(new ChangeListener() {
+			/* (non-Javadoc)
+			 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+			 */
 			public void stateChanged(ChangeEvent e) {
 				updateButtons();
 			}
@@ -734,6 +823,7 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	/* (non-Javadoc)
 	 * @see de.zbit.gui.BaseFrame#exit()
 	 */
+	@Override
 	public void exit() {
 		// Close all tab. If user want's to save a tab first, cancel the closing
 		// process.
@@ -812,6 +902,13 @@ public class TranslatorUI extends BaseFrame implements ActionListener,
 	 */
 	public void propertyChange(PropertyChangeEvent evt) {
 		logger.fine(evt.toString());
+		String propName = evt.getPropertyName(); 
+		if (propName.equals(GarudaSoftwareBackend.GARUDA_ACTIVATED)) {
+			this.garudaBackend = (GarudaSoftwareBackend) evt.getNewValue();
+			if (tabbedPane.getTabCount() > 0) {
+				GUITools.setEnabled(true, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
+			}
+		}
 	}
 	
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<!-- 
+ * $Id$
+ * $URL$
+ *********************************************************************** 
+ * This file is part of KEGGtranslator;a program to convert KGML files
+ * from the KEGG database into various other formats;e.g.;SBML;GML,
+ * GraphML;and many more. Please visit the project homepage at
+ * http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator to
+ * obtain the latest version of KEGGtranslator.
+ *
+ * Copyright (C) 2011-2013 by the University of Tuebingen;Germany.
+ *
+ * KEGGtranslator is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
+ ***********************************************************************
+ *
+ * Version: $Rev$
+-->
+<properties>
+  <comment>
+    This configuration provides locale-dependent names for labels in
+	a (graphical) user interface. The separator ";" can be used to
+	separate actual labels from associated tool tips.
+  </comment>
+  
+  <entry key="PROGRAM_DESCRIPTION">KEGGtranslator is an easy-to-use stand-alone application that can visualize and convert pathway-based information from the KEGG PATHWAY database into multiple output formats. KEGGtranslator supports a plethora of output formats, is able to augment the information in translated documents (e.g., MIRIAM annotations) beyond the scope of the KGML document, and amends missing components to fragmentary reactions within the pathway to allow simulations on those. KEGGtranslator converts KEGG files (KGML formatted XML-files) to SBML, BioPAX, SIF, SBGN, SBML-qual, GML, GraphML, JPG, GIF, LaTeX etc. KEGG pathways can be obtained from within the application.</entry>
+  <entry key="KEYWORDS">[KEGG;Pathway modeling;Qualitative modeling;Converter;Database;Visualization;Annotation]</entry><!-- Comparison;KGML;SBML;BioPAX;Systems biology;Modeling; -->
+
+</properties>

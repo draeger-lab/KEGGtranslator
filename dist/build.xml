@@ -1,11 +1,17 @@
 <!-- ANT build script for yfiles obfuscation           -->
 <!-- The java based ANT tool is available from         -->
 <!-- http://jakarta.apache.org/ant                     -->
-
            	
-<project name="KEGGtranslator with Obfuscation" default="sign" basedir=".">
+<project
+  name="KEGGtranslator with Obfuscation"
+  default="sign"
+  basedir="."
+>
 
-  <target name="help">
+  <target
+	name="help"
+  	description="displays a help message."
+  >
     <echo>
       This is an ANT build script to build a stand-alone JAR for
 	    KEGGtranslator. In the last step, obfuscating of all yFiles
@@ -21,13 +27,17 @@
     </echo>
   </target>
 
-  <!-- define some properties that are used throughout the tasks -->
-  <target name="init">
+  <target
+  	name="init"
+  	description="define some properties that are used throughout the tasks"
+  >
   	<echo>
   	  PLESE MAKE SURE LOG LEVEL IN Translator.java MAIN METHOD IS SET TO INFO!
   	</echo>
     <!-- the base directory of the KEGGtranslator repository -->
     <property name="base" location=".."/>
+  	
+  	<property name="version" value="2.4"/>
   	
   	<!-- the path to SYSBIO -->
   	<property name="SysBioPath" location="${base}/../SysBio" />
@@ -51,20 +61,22 @@
     <property name="appJarObf" value="KEGGtranslatorObf.jar"/>
 
     <!-- the obfuscated and signed application jar file -->
-    <property name="appJarObfSgn" value="KEGGtranslatorObfSgn.jar"/>
+    <property name="appJarObfSgn" value="KEGGtranslator_v${version}.jar"/>
   	
     <!-- the yGuard jar file containing the obfuscation task -->
     <property name="yGuardJar" value="yguard.jar"/>
   	
     <!-- the log file geenrated by the obfuscation task -->
     <property name="obfuscationLog" value="obfuscation-log.xml"/>
-    	
+  	
   </target>
 
-  <!-- puts the application specific classes into application.jar. -->
-  <target name="jar" depends="init">
-    <delete file="${appJar}"/>
-    <jar jarfile="${appJar}">
+  <target
+	name="jar"
+  	depends="init"
+  	description="puts the application specific classes into application.jar."
+  >
+    <jar jarfile="${appJar}" update="false">
             <manifest>
               <attribute name="Main-Class" value="de.zbit.kegg.Translator"/>
               <attribute name="Built-By" value="Center for Bioinformatics Tuebingen (ZBIT)"/>
@@ -89,7 +101,7 @@
             <zipfileset excludes="META-INF/*.SF" src="${base}/lib/org.sbgn.jar"/>
 
     	
-    	      <filelist dir="${base}" files="libquaqua.jnilib,libquaqua64.jnilib"/>
+    	      <filelist dir="${basedir}" files="libquaqua.jnilib,libquaqua64.jnilib"/>
 
 <!-- Uncomment for SysBio classes instead of compiled jar. -->
            <fileset dir="${SysBioPath}/bin">
@@ -106,7 +118,7 @@
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/jaxrpc.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/wsdl4j.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/axis.jar"/>
-    	      <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
+    	    <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
             <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/quaqua.jar"/>
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/Java5/saaj.jar"/>-->
             <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/WSDbfetch.jar"/>-->
@@ -125,15 +137,15 @@
             <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/stax2-api-3.0.3.jar"/>
             <zipfileset excludes="META-INF/*.SF,META-INF/LICENSE*" src="${JSBMLPath}/core/lib/woodstox-core-lgpl-4.0.9.jar"/>
             
-            <fileset dir="${SBML2LaTeXPath}/bin"/>
-            <zipfileset excludes="META-INF/*.SF" src="${SBML2LaTeXPath}/lib/html2latex.jar"/>
     	      
     </jar>
   </target>
 
-  <!-- obfuscates y.jar and adjusts application.jar accordingly. -->
-  <!-- Generates the jar files yObf.jar and applicationObf.jar.  -->
-  <target name="obfuscate" depends="jar">
+  <target
+  	name="obfuscate"
+  	depends="jar"
+  	description="obfuscates y.jar and adjusts application.jar accordingly. Generates the jar files yObf.jar and applicationObf.jar."
+  >
     <taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="${yGuardJar}"/>
     <yguard>
 
@@ -206,15 +218,16 @@
     </yguard>
   </target>
 
-  <!-- signs the obfuscated application -->
-  <target name="sign" depends="obfuscate">
+  <target
+	name="sign"
+  	depends="obfuscate"
+  	description="signs the obfuscated application"
+  >
     <!-- Having an "keystore" file is required. Generate it with the "keytool" in the current directory. -->  	
 	  <signjar alias="KEGGtranslator" jar="${appJarObf}" keypass="d=dpfKEGGtranslator!" keystore="keystore" signedjar="${appJarObfSgn}" storepass="d=dpfKEGGtranslator!"/>
   </target>
 
-	
-  <!-- executes the obfuscated application -->
-  <target name="run" depends="obfuscate">
+  <target name="run" depends="obfuscate" description="executes the obfuscated application">
     <java classname="de.zbit.kegg.Translator" fork="true">
       <classpath>
         	<!-- <pathelement location="${yJarObf}"/> -->
@@ -223,22 +236,107 @@
     </java>
   </target>
 
-  <!-- opens a small browser that shows the name mapping performed by yGuard. -->
-  <target name="show" depends="obfuscate">
+  <target
+  	name="show"
+  	depends="obfuscate"
+  	description="opens a small browser that shows the name mapping performed by yGuard."
+  >
     <echo message="${obfuscationLog}"/>
     <java jar="${yGuardJar}" fork="true">
       <arg value="${obfuscationLog}"/>
     </java>
   </target>
 
-  <!-- Removes all that has been built -->
-  <target name="clean" depends="init">
+  <target
+  	name="clean"
+  	depends="init"
+  	description="Removes all that has been built"
+  >
   	<!-- <delete file="${yJarObf}"/> -->
   	<delete file="${appJar}"/>
     <delete file="${appJarObf}"/>
     <delete file="${obfuscationLog}"/>
     <delete includeemptydirs="true" dir="${classes}"/>
     <delete file="${appJarObfSgn}"/>
+  </target>
+	
+	
+  <!-- =================================================================== -->
+  <!-- Creates a ZIP file for Garuda                                       -->
+  <!-- =================================================================== -->
+  <target
+    name="garuda"
+  	depends="sign"
+    description="Creates a ZIP file for Garuda">
+    
+  	<property name="Name"          value="KEGGtranslator"/>
+  	<property name="dist"          value="${basedir}"/>
+  	<property name="dist.dir"      value="${dist}/${Name}-${version}"/>
+  	<property name="garuda.gadget" value="${dist.dir}/${appJarObfSgn}_Garuda.zip"/>
+  	<property name="resources"     value="${base}/resources"/>
+  	
+  	<property name="uuid"           value="a4978d67-f0b0-4f91-abc6-0cc7b848cd53"/>
+  	<property name="gadget.config"  value="${dist}/gadget_config.xml"/>
+  	
+  	<echo message="Updating Garuda gadget configuration..."/>
+  	<replace
+      file="${gadget.config}"
+      token="[GADGET_UUID]"
+      value="${uuid}"
+    />
+  	<replace
+      file="${gadget.config}"
+      token="[JAR_NAME]"
+      value="${appJarObfSgn}"
+  	/>
+  	
+  	<echo message="Generating ZIP archive for Garuda..."/>
+  	<zip
+      compress="true"
+      comment="Garuda Gadget ${Name}"
+      destfile="${garuda.gadget}"
+      encoding="utf-8"
+      level="9"
+      update="true"
+   	>
+      <mappedresources>
+        <fileset file="${gadget.config}"/>
+          <globmapper from="*" to="${uuid}/*"/>
+        </mappedresources>
+      <mappedresources>
+        <fileset file="${appJar}"/>
+        <globmapper from="*" to="${uuid}/*"/>
+      </mappedresources>
+      <mappedresources>
+        <fileset file="${resources}/de/zbit/kegg/gui/img/${Name}Icon_64.png"/>
+        <globmapper from="*" to="${uuid}/icons/*"/>
+      </mappedresources>
+      <mappedresources>
+        <fileset file="${dist}/Screenshot_1.png"/>
+        <globmapper from="*" to="${uuid}/snapshot/*"/>
+      </mappedresources>
+      <mappedresources>
+        <fileset file="${dist}/Screenshot_2.png"/>
+        <globmapper from="*" to="${uuid}/snapshot/*"/>
+      </mappedresources>
+      <mappedresources>
+        <fileset file="${dist}/Screenshot_3.png"/>
+        <globmapper from="*" to="${uuid}/snapshot/*"/>
+      </mappedresources>
+    </zip>
+  	
+  	<echo message="Reverting changes in Garuda gadget configuration file..."/>
+  	<replace
+      file="${gadget.config}"
+      token="${uuid}"
+      value="[GADGET_UUID]"
+  	/>
+  	<replace
+      file="${gadget.config}"
+      token="${appJarObfSgn}"
+      value="[JAR_NAME]"
+  	/>
+
   </target>
 
 </project>
