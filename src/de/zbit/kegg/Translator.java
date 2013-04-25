@@ -577,11 +577,12 @@ public class Translator extends Launcher {
 								icon,
 								bundle.getString("PROGRAM_DESCRIPTION"),
 								Arrays.asList(bundle.getStringArray("KEYWORDS")),
-								Arrays.asList(new String[] { })
-										/*folder + "Screenshot_1.png",
-										folder + "Screenshot_2.png",
-										folder + "Screenshot_3.png"})*/
-								);
+								Arrays.asList(new String[] {
+								    "snapshot/Screenshot_1.png",
+								    "snapshot/Screenshot_1.png",
+								    "snapshot/Screenshot_1.png"
+								})
+						);
 						garudaBackend.addInputFileFormat("xml", "KGML");
 						garudaBackend.addInputFileFormat("kgml", "KGML");
 						

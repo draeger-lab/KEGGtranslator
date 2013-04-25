@@ -6,7 +6,11 @@
     <IconPaths>
         <Icon32Path>icons/KEGGtranslatorIcon_64.png</Icon32Path>
     </IconPaths>
-    <Snapshots/>
+    <Snapshots>
+        <SnapshotPath>snapshot/Screenshot_1.png</SnapshotPath>
+        <SnapshotPath>snapshot/Screenshot_2.png</SnapshotPath>
+        <SnapshotPath>snapshot/Screenshot_3.png</SnapshotPath>
+    </Snapshots>
     <Categories>
         <Category>KEGG</Category>
         <Category>Pathways</Category>
