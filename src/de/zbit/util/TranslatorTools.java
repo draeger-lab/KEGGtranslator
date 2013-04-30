@@ -312,6 +312,7 @@ public class TranslatorTools extends GraphTools {
             // Add node to list.
             list.add(n);
           } catch (NumberFormatException e) {
+            // NOTE: Negative values here are references to HMDB Compound IDs (use Compound mapping and multiply -1).
             log.log(Level.WARNING, "Could not get geneID for node.", e);
           }
         }
