@@ -118,11 +118,12 @@ public class TranslatorTools extends GraphTools {
   }
   
   /**
-   * Set a unique {@link Color} to all nodes, that are no pathway references.
+   * Set a unique {@link Color} to all nodes, that are no pathway references. 
    * @param colorForUnaffectedNodes
    */
   public void setColorOfAllNodesExceptPathwayReferences(Color colorForUnaffectedNodes) {
     // Set unaffected color for all other nodes but reference nodes.
+  	//It is o.k. to recolor compounds here as they are generally recolored after gene nodes
     for (Node n: graph.getNodeArray()) {
       String id = getKeggIDs(n);
       id = id==null?null:id.toLowerCase().trim();
