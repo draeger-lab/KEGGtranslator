@@ -31,9 +31,9 @@ import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.groups.GroupKind;
-import org.sbml.jsbml.ext.groups.GroupModel;
+import org.sbml.jsbml.ext.groups.GroupsConstants;
+import org.sbml.jsbml.ext.groups.GroupsModelPlugin;
 import org.sbml.jsbml.ext.groups.Member;
-import org.sbml.jsbml.xml.parsers.GroupsParser;
 
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Pathway;
@@ -52,12 +52,12 @@ public class KEGG2SBMLGroupExtension {
   /**
    * Layout extension namespace URL.
    */
-  public static final String GROUP_NS = GroupsParser.namespaceURI;
+  public static final String GROUP_NS = GroupsConstants.namespaceURI;
   
   /**
    * Unique identifier to identify this Namespace/Extension.
    */
-  public static final String GROUP_NS_NAME = GroupsParser.shortLabel;
+  public static final String GROUP_NS_NAME = GroupsConstants.shortLabel;
 
 
   /**
@@ -70,7 +70,7 @@ public class KEGG2SBMLGroupExtension {
    * @return
    */
   public static Group createGroup(Pathway p, Model model, Entry entry) {
-    GroupModel groupModel = getGroupModel(model);
+    GroupsModelPlugin groupModel = getGroupsModelPlugin(model);
     
     // Get all group-members
     List<String> componentSpeciesIDs = new ArrayList<String>();
@@ -108,7 +108,7 @@ public class KEGG2SBMLGroupExtension {
   public static Group cloneGroup(String id, Group g, String prefixForMembers) {
     if (g==null) return null;
     
-    GroupModel groupModel = getGroupModel(g);
+    GroupsModelPlugin groupModel = getGroupsModelPlugin(g);
     
     // Create group and add all members
     Group gNew = new Group(g);
@@ -119,8 +119,8 @@ public class KEGG2SBMLGroupExtension {
     
     // Add all members with new prefix
     for (Member m: g.getListOfMembers()) {
-      String symbol = m.getSymbol();
-      if (prefixForMembers!=null) {
+      String symbol = m.getIdRef();
+      if (prefixForMembers != null) {
         symbol = prefixForMembers + symbol;
       }
       gNew.createMember(symbol);
@@ -137,12 +137,12 @@ public class KEGG2SBMLGroupExtension {
    * @param prefixForMembers
    */
   public static void cloneGroupComponents(Group g, String prefixForMembers) {
-    if (g==null) return;
+    if (g == null) return;
     
     // Create group and add all members
     List<String> symobls = new LinkedList<String>();
     for (Member m: g.getListOfMembers()) {
-      symobls.add(m.getSymbol());
+      symobls.add(m.getIdRef());
     }
     
     // Add all members with new prefix
@@ -159,11 +159,11 @@ public class KEGG2SBMLGroupExtension {
   }
 
   /**
-   * Get or create the {@link GroupModel}.
+   * Get or create the {@link GroupsModelPlugin}.
    * @param g any {@link AbstractSBase}.
    * @return
    */
-  private static GroupModel getGroupModel(AbstractSBase g) {
+  private static GroupsModelPlugin getGroupsModelPlugin(AbstractSBase g) {
     Model model = g.getModel();
     SBMLDocument doc = model.getSBMLDocument();
     
@@ -173,9 +173,9 @@ public class KEGG2SBMLGroupExtension {
     doc.getSBMLDocumentAttributes().put(GROUP_NS_NAME + ":required", "true");
     
     // Create group model
-    GroupModel groupModel = (GroupModel) model.getExtension(GROUP_NS);
+    GroupsModelPlugin groupModel = (GroupsModelPlugin) model.getExtension(GROUP_NS);
     if (groupModel == null) {
-      groupModel = new GroupModel(model);
+      groupModel = new GroupsModelPlugin(model);
       model.addExtension(GROUP_NS, groupModel);
     }
     
