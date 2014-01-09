@@ -45,14 +45,14 @@ import de.zbit.sbml.gui.ReactionPanel;
  * @version $Rev$
  */
 public class ReactionPanelTest {
-	
+
 	/**
 	 * @param args
 	 * @throws SBMLException
 	 * @throws XMLStreamException
 	 */
 	public static void main(String[] args) throws XMLStreamException,
-		SBMLException {
+	SBMLException {
 		SBMLDocument doc = createSimpleSBMLDocument(1, 2, 2, false);
 		SBMLWriter writer = new SBMLWriter();
 		writer.setIndentationCount(2);
@@ -69,14 +69,15 @@ public class ReactionPanelTest {
 		f.setLocationRelativeTo(null);
 		f.setVisible(true);
 	}
-	
+
 	/**
 	 * For testing
 	 * 
 	 * @return
+	 * @throws XMLStreamException
 	 */
 	private static SBMLDocument createSimpleSBMLDocument(int numReactants,
-		int numProducts, int numModifiers, boolean reversible) {
+			int numProducts, int numModifiers, boolean reversible) throws XMLStreamException {
 		int i;
 		SBMLDocument doc = new SBMLDocument(2, 4);
 		Model model = doc.createModel("MyModel");
@@ -115,5 +116,5 @@ public class ReactionPanelTest {
 		r.setReversible(reversible);
 		return doc;
 	}
-	
+
 }

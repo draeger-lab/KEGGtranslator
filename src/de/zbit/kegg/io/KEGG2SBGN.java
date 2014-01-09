@@ -8,9 +8,9 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2013 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -101,13 +101,15 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		handleAllEntries(p);
 
 		// for every relation in the pathway
-		if (this.considerRelations())
+		if (considerRelations()) {
 			handleAllRelations(p);
+		}
 
 		// for every reaction in the pathway
-		if (this.considerReactions())
+		if (considerReactions()) {
 			handleAllReactions(p);
-		
+		}
+
 		return sbgn;
 	}
 
@@ -148,26 +150,27 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			// create a bbox and a label
 			Bbox bb = objectFactory.createBbox();
 			Label l = objectFactory.createLabel();
-			
+
 			List<KeggInfos> keggInfos = new LinkedList<KeggInfos>();
 
 			// call KeggInfos for the correct name and additional informations
 			for (String ko_id : e.getName().split(" ")) {
-				if (ko_id.trim().equalsIgnoreCase("undefined") || e.hasComponents())
+				if (ko_id.trim().equalsIgnoreCase("undefined") || e.hasComponents()) {
 					continue;
+				}
 				KeggInfos infos = KeggInfos.get(ko_id, manager);
 				keggInfos.add(infos);
 			}
 
 			String name = getNameForEntry(e, keggInfos.toArray(new KeggInfos[0]));
-			
-	    // define the bounding box
+
+			// define the bounding box
 			Graphics gr = null;
 			if(e.hasGraphics()){
-			  gr = e.getGraphics();
+				gr = e.getGraphics();
 			} else {
-			  gr = new Graphics(e);
-			  gr.setDefaults(e.getType());
+				gr = new Graphics(e);
+				gr.setDefaults(e.getType());
 			}
 			bb.setX(gr.getX());
 			bb.setY(gr.getY());
@@ -183,7 +186,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 
 			// set the glyph as custom in the entry
 			e.setCustom(g);
-			
+
 			// put the glyph into the map
 			sbgn.getMap().getGlyph().add(g);
 		}
@@ -197,10 +200,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	 *            Pathway
 	 */
 	private void handleAllRelations(Pathway p) {
-		
+
 		// for every relation
 		for (Relation relation : p.getRelations()) {
-			
+
 			// get the relation partners
 			Entry one = p.getEntryForId(relation.getEntry1());
 			Entry two = p.getEntryForId(relation.getEntry2());
@@ -224,12 +227,12 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 				for (int i = 0; i < relation.getSubtypes().size(); i++) {
 					// get the name of the relation subtype
 					String currentRelation = relation.getSubtypes().get(i).getName();
-					
+
 					// create a glyphstate
 					State state = objectFactory.createGlyphState();
 					// create a new glyph
 					Glyph StateGlyph = createStateGlypheWithID(target);
-					
+
 					// check the possible kegg subtypes and translate them into arcs
 					if(currentRelation.equalsIgnoreCase(SubType.GLYCOSYLATION)) {
 						// add "G" to the product
@@ -320,12 +323,12 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	 */
 	private void handleAllReactions(Pathway p) {
 		for (Reaction reaction : p.getReactions()) {
-			
+
 			// create arraylists for the sources, targets and reactionModifiers
 			ArrayList<Glyph> sources = new ArrayList<Glyph>();
 			ArrayList<Glyph> targets = new ArrayList<Glyph>();
 			ArrayList<Glyph> reactionModifiers = new ArrayList<Glyph>();
-			
+
 			// Substrates
 			for (ReactionComponent rc : reaction.getSubstrates()) {
 				// get the entry for the reactioncomponent
@@ -333,9 +336,9 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 
 				// get the glyph for the entry
 				Glyph substrateGlyph = (Glyph) substrate.getCustom();
-				if(substrateGlyph != null)
+				if(substrateGlyph != null) {
 					sources.add(substrateGlyph);
-				else {
+				} else {
 					Object[] args = {substrate.getName(), String.valueOf(substrate.getId())};
 					log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
 				}
@@ -345,12 +348,12 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			for (ReactionComponent rc : reaction.getProducts()) {
 				// get the entry for the reactioncomponent
 				Entry product = p.getEntryForReactionComponent(rc);
-				
+
 				// get the glyph for the entry
 				Glyph productGlyph = (Glyph) product.getCustom();
-				if(productGlyph != null)
+				if(productGlyph != null) {
 					targets.add(productGlyph);
-				else {
+				} else {
 					Object[] args = {product.getName(), String.valueOf(product.getId())};
 					log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
 				}
@@ -359,19 +362,19 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 			// Enzymes
 			Collection<Entry> enzymes = p.getReactionModifiers(reaction.getName());
 			if (enzymes!=null) {
-			  for (Entry ec : enzymes) {
+				for (Entry ec : enzymes) {
 
-			    // get the glyph for the entry
-			    Glyph enzymeGlyph = (Glyph) ec.getCustom();
-			    if(enzymeGlyph != null)
-			      reactionModifiers.add(enzymeGlyph);
-			    else {
-			      Object[] args = {ec.getName(), String.valueOf(ec.getId())};
-			      log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
-			    }
-			  }
+					// get the glyph for the entry
+					Glyph enzymeGlyph = (Glyph) ec.getCustom();
+					if(enzymeGlyph != null) {
+						reactionModifiers.add(enzymeGlyph);
+					} else {
+						Object[] args = {ec.getName(), String.valueOf(ec.getId())};
+						log.warning(String.format("Entry %s (id: %s) has no Custom Glyph set!", args));
+					}
+				}
 			}
-			
+
 			// do the magic!
 			createEdgeWithProcessGlyphAndPorts(sources, targets, GlyphType.process, reactionModifiers);
 		}
@@ -391,7 +394,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		glyphNamesForGlyphStates.put(glyph, "a");
 		return glyph;
 	}
-	
+
 	private Glyph createStateGlypheWithID(Glyph glyph) {
 		// create a new glyph
 		Glyph g = objectFactory.createGlyph();
@@ -425,10 +428,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		// create a new port
 		// Port port = objectFactory.createGlyphPort(); ***DOESNT WORK***
 		Port port = objectFactory.createPort();
-		
+
 		// create the proper name for the port and set it
 		port.setId(glyph.getId() + "." + (input?"in":"out") + "." + (glyph.getPort().size()+1));
-		
+
 		glyph.getPort().add(port);
 		return port;
 	}
@@ -446,13 +449,13 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 
 		// clazz is needed otherwise there will be an error
 		connection.setClazz(ArcType.consumption.toString());
-		
+
 		// create the start and end positions of the connection
 		Start start = objectFactory.createArcStart();
 		End end = objectFactory.createArcEnd();
 		connection.setStart(start);
 		connection.setEnd(end);
-		
+
 		// set the glyphs as source and target within the connection
 		connection.setSource(source);
 		connection.setTarget(target);
@@ -473,89 +476,89 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 		// create a process glyph and set the type
 		Glyph process = createGlyphWithID();
 		process.setClazz(type.toString());
-		
+
 		// Two port elements are required for process nodes
 		Port portIn = createPortForGlyph(process, true);
 		Port portOut = createPortForGlyph(process, false);
-		
+
 		// make sure that the sources and targets contain at least 1 element
 		if(sources.size() != 0 && targets.size() != 0) {
-				
+
 			// for all sources
 			for(Glyph source : sources) {
-				
+
 				// create an connection arc / edge
 				Arc connection = objectFactory.createArc();
-				
+
 				// set the type of the connection
 				connection.setClazz(ArcType.consumption.toString());
-				
+
 				// create the start and end positions of the connection
 				Start start = objectFactory.createArcStart();
 				End end = objectFactory.createArcEnd();
 				connection.setStart(start);
 				connection.setEnd(end);
-				
+
 				// set the start and end points for the arc
 				connection.setSource(source);
 				connection.setTarget(portIn);
-				
+
 				// add the connection to the map
 				map.getArc().add(connection);
 			}
-			
-			
+
+
 			// for all targets
 			for(Glyph target : targets) {
 
 				// create an connection arc / edge
 				Arc connection = objectFactory.createArc();
-				
+
 				// set the type of the connection
 				connection.setClazz(ArcType.production.toString());
-				
+
 				// create the start and end positions of the connection
 				Start start = objectFactory.createArcStart();
 				End end = objectFactory.createArcEnd();
 				connection.setStart(start);
 				connection.setEnd(end);
-				
+
 				// set the start and end points to the arc
 				connection.setSource(portOut);
 				connection.setTarget(target);
-				
+
 				// add the connection to the map
 				map.getArc().add(connection);
 			}
-			
-			
+
+
 			// for all reactionModifiers
 			for(Glyph rm : reactionModifiers) {
-	
+
 				// create an connection arc / edge
 				Arc connection = objectFactory.createArc();
-				
+
 				// set the type of the connection
 				/** TODO: set the class of the connection accordingly to the connection **/
 				connection.setClazz(ArcType.catalysis.toString());
-				
+
 				// create the start and end positions of the connection
 				Start start = objectFactory.createArcStart();
 				End end = objectFactory.createArcEnd();
 				connection.setStart(start);
 				connection.setEnd(end);
-				
+
 				// set the start and end points to the arc
 				connection.setSource(rm);
 				connection.setTarget(process);
-				
+
 				// add the connection to the map
 				map.getArc().add(connection);
-				
+
 			}
-				
+
 		}
-		
+
 		// add the process glyph to the map
 		map.getGlyph().add(process);
 	}
@@ -582,12 +585,13 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
 	protected boolean considerReactions() {
 		return true;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.zbit.kegg.io.KEGGtranslator#isGraphicalOutput()
 	 */
+	@Override
 	public boolean isGraphicalOutput() {
-	  // Keep reaction nodes
-	  return true;
+		// Keep reaction nodes
+		return true;
 	}
 }

@@ -8,9 +8,9 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2013 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.zbit.io.filefilter.SBFileFilter;
+import de.zbit.kegg.api.cache.KeggInfoManagement;
 import de.zbit.util.prefs.KeyProvider;
 import de.zbit.util.prefs.Option;
 import de.zbit.util.prefs.OptionGroup;
@@ -41,124 +42,124 @@ import de.zbit.util.prefs.Range;
  */
 public interface KEGGtranslatorIOOptions extends KeyProvider {
 
-  /**
-   * Possible output file formats.
-   * 
-   * @author Andreas Dr&auml;ger
-   * @author Clemens Wrzodek
-   * @date 2011-01-07
-   */
-  public enum Format {
-    /**
-     * Automatically adjusts the level as needed (e.g., extensions require L3).
-     */
-    SBML,
-    /**
-     * 
-     */
-    SBML_L2V4,
-    /**
-     * 
-     */
-    SBML_L3V1,
-    /**
-     * 
-     */
-    SBML_QUAL,
-    /**
-     * 
-     */
-    SBML_CORE_AND_QUAL,
-    /**
-     * 
-     */
-    SBGN,
-    /**
-     * 
-     */
-    BioPAX_level2,
-    /**
-     * 
-     */
-    BioPAX_level3,
-    /**
-     * Some Pathway exchange format used by Cytoscape. Base
-     * is 2BioPAX and paxtools can then write SIF files. 
-     */
-    SIF,
-    // Since the restructuring and moving large parts to sysbio, the 2LaTeX
-    // part is not supported anymore.
-//    /**
-//     * 
-//     */
-//    LaTeX,
-    /**
-     * 
-     */
-    GraphML,
-    /**
-     * 
-     */
-    GML,
-    /**
-     * 
-     */
-    JPG,
-    /**
-     * 
-     */
-    GIF,
-    /**
-     * 
-     */
-    TGF,
-    /**
-     * 
-     */
-    YGF,
-    /**
-     * This required the corresponding ySVG extension from yFiles. It's free
-     * but large and thus, by default not included. But the functionality is
-     * fully included. Thus, if you want SVG, include the libraries and simply
-     * uncomment the next item and the SVG part in
-     * TODO: update Javadoc link 
-     * {@link BatchKEGGtranslator#getTranslator(Format, KeggInfoManagement)}
-     */
-    //SVG
-    ;
-    
-    public boolean isSBML() {
-      return toString().contains("SBML");
-    }
-    
-    /**
-     * 
-     * @return a file extension (without preceding dot) that should be as common
-     *         as possible for the given {@link Format}.
-     */
-    public Set<String> getOutputFileExtensions() {
-      if (isSBML()) {
-        return SBFileFilter.createSBMLFileFilter().getExtensions();
-      }
-      switch (this) {
-        case BioPAX_level2:
-          return SBFileFilter.createBioPAXFileFilterL2().getExtensions();
-        case BioPAX_level3:
-          return SBFileFilter.createBioPAXFileFilterL3().getExtensions();
-        case SBGN:
-          return SBFileFilter.createSBGNFileFilter().getExtensions();
-        default:
-          Set<String> extensions = new HashSet<String>();
-          extensions.add(toString().toLowerCase());
-          return extensions;
-      }
-    }
-  }
-  
+	/**
+	 * Possible output file formats.
+	 * 
+	 * @author Andreas Dr&auml;ger
+	 * @author Clemens Wrzodek
+	 * @date 2011-01-07
+	 */
+	public enum Format {
+		/**
+		 * Automatically adjusts the level as needed (e.g., extensions require L3).
+		 */
+		SBML,
+		/**
+		 * 
+		 */
+		SBML_L2V4,
+		/**
+		 * 
+		 */
+		SBML_L3V1,
+		/**
+		 * 
+		 */
+		SBML_QUAL,
+		/**
+		 * 
+		 */
+		SBML_CORE_AND_QUAL,
+		/**
+		 * 
+		 */
+		SBGN,
+		/**
+		 * 
+		 */
+		BioPAX_level2,
+		/**
+		 * 
+		 */
+		BioPAX_level3,
+		/**
+		 * Some Pathway exchange format used by Cytoscape. Base
+		 * is 2BioPAX and paxtools can then write SIF files.
+		 */
+		SIF,
+		// Since the restructuring and moving large parts to sysbio, the 2LaTeX
+		// part is not supported anymore.
+		//    /**
+		//     *
+		//     */
+		//    LaTeX,
+		/**
+		 * 
+		 */
+		GraphML,
+		/**
+		 * 
+		 */
+		GML,
+		/**
+		 * 
+		 */
+		JPG,
+		/**
+		 * 
+		 */
+		GIF,
+		/**
+		 * 
+		 */
+		TGF,
+		/**
+		 * 
+		 */
+		YGF,
+		/**
+		 * This required the corresponding ySVG extension from yFiles. It's free
+		 * but large and thus, by default not included. But the functionality is
+		 * fully included. Thus, if you want SVG, include the libraries and simply
+		 * uncomment the next item and the SVG part in
+		 * TODO: update Javadoc link
+		 * {@link BatchKEGGtranslator#getTranslator(Format, KeggInfoManagement)}
+		 */
+		//SVG
+		;
+
+		public boolean isSBML() {
+			return toString().contains("SBML");
+		}
+
+		/**
+		 * 
+		 * @return a file extension (without preceding dot) that should be as common
+		 *         as possible for the given {@link Format}.
+		 */
+		public Set<String> getOutputFileExtensions() {
+			if (isSBML()) {
+				return SBFileFilter.createSBMLFileFilter().getExtensions();
+			}
+			switch (this) {
+			case BioPAX_level2:
+				return SBFileFilter.createBioPAXFileFilterL2().getExtensions();
+			case BioPAX_level3:
+				return SBFileFilter.createBioPAXFileFilterL3().getExtensions();
+			case SBGN:
+				return SBFileFilter.createSBGNFileFilter().getExtensions();
+			default:
+				Set<String> extensions = new HashSet<String>();
+				extensions.add(toString().toLowerCase());
+				return extensions;
+			}
+		}
+	}
+
 	/*
 	 * Most important options: input, output and file format.
 	 */
-	
+
 	/**
 	 * Path and name of the source, KGML formatted, XML-file.
 	 */
@@ -166,7 +167,7 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
 			File.class,
 			"Path and name of the source, KGML formatted, XML-file.",
 			new Range<File>(File.class, SBFileFilter.createKGMLFileFilter()), (short) 2, "-i" );
-			//new File(System.getProperty("user.dir")));
+	//new File(System.getProperty("user.dir")));
 
 	/**
 	 * Path and name, where the translated file should be put.

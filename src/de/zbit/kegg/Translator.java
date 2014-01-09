@@ -8,9 +8,9 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2013 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -38,7 +38,7 @@ import java.util.prefs.BackingStoreException;
 import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import de.zbit.AppConf;
 import de.zbit.Launcher;
-import de.zbit.UserInterface;
+import de.zbit.cache.InfoManagement;
 import de.zbit.garuda.BackendNotInitializedException;
 import de.zbit.garuda.GarudaOptions;
 import de.zbit.garuda.GarudaSoftwareBackend;
@@ -84,7 +84,7 @@ public class Translator extends Launcher {
 	/**
 	 * {@link File} name of the KEGG function cache {@link File} (implemented just
 	 * like the browser cache). Must be loaded upon start and saved upon exit.
-	 */  
+	 */
 	public final static String cacheFunctionFileName = "keggfc.dat";
 
 	/**
@@ -93,7 +93,7 @@ public class Translator extends Launcher {
 	 * <p><b>PLESE ALWAYS KEEP THE DEFAULT, INITIAL VALUE TO FALSE!</b>
 	 */
 	public static boolean path2models = false;
-	
+
 	/**
 	 * If or if not Garuda should be enabled.
 	 */
@@ -137,7 +137,7 @@ public class Translator extends Launcher {
 				&& new File(Translator.cacheFunctionFileName).exists()
 				&& new File(Translator.cacheFunctionFileName).length() > 1) {
 			try {
-				managerFunction = (KeggFunctionManagement) KeggFunctionManagement
+				managerFunction = (KeggFunctionManagement) InfoManagement
 						.loadFromFilesystem(Translator.cacheFunctionFileName);
 			} catch (Throwable e) { // IOException or class cast, if class is moved.
 				e.printStackTrace();
@@ -173,7 +173,7 @@ public class Translator extends Launcher {
 		// Try to load from cache file
 		if ((manager == null) && new File(Translator.cacheFileName).exists() && new File(Translator.cacheFileName).length() > 1) {
 			try {
-				manager = (KeggInfoManagement) KeggInfoManagement.loadFromFilesystem(Translator.cacheFileName);
+				manager = (KeggInfoManagement) InfoManagement.loadFromFilesystem(Translator.cacheFileName);
 			} catch (Throwable e) { // IOException or class cast, if class is moved.
 				e.printStackTrace();
 				manager = null;
@@ -268,7 +268,7 @@ public class Translator extends Launcher {
 			KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, manager);
 		}
 		if ((managerFunction != null) && managerFunction.isCacheChangedSinceLastLoading()) {
-			KeggFunctionManagement.saveToFilesystem(Translator.cacheFunctionFileName, managerFunction);
+			InfoManagement.saveToFilesystem(Translator.cacheFunctionFileName, managerFunction);
 		}
 	}
 
@@ -285,7 +285,7 @@ public class Translator extends Launcher {
 
 		// Check and build input
 		File in = input == null ? null : new File(input);
-		if ((in == null) || !in.canRead()) { 
+		if ((in == null) || !in.canRead()) {
 			// in might also be a directory
 			logger.severe("Invalid or not-readable input file.");
 			return false;
@@ -302,7 +302,7 @@ public class Translator extends Launcher {
 
 		// Check and build output
 		File out = output == null ? null : new File(output);
-		if (!in.isDirectory()) { 
+		if (!in.isDirectory()) {
 			// else: batch-mode
 			if ((out == null) || (output.length() < 1) || out.isDirectory()) {
 				String fileExtension = BatchKEGGtranslator.getFileExtension(translator);
@@ -356,6 +356,7 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#commandLineMode(de.zbit.AppConf)
 	 */
+	@Override
 	public void commandLineMode(AppConf appConf) {
 		SBProperties props = appConf.getCmdArgs();
 
@@ -390,7 +391,7 @@ public class Translator extends Launcher {
 	public static void adjustForPath2Models() {
 		path2models = true;
 		KeggInfos.path2models = true;
-		/* 
+		/*
 		 * 1) Set the required options
 		 * 2) Uncomment code in [KEGG] Pathway.java for 'getCompoundPreviewPicture()'
 		 * 3) Activate additional KEGG COMPOUND 2 ChEBI mapping in KeggInfos.java ('getChebi()'-method)
@@ -428,6 +429,7 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#getAppName()
 	 */
+	@Override
 	public String getAppName() {
 		return "KEGGtranslator";
 	}
@@ -447,6 +449,7 @@ public class Translator extends Launcher {
 	/* (non-Javadoc)
 	 * @see de.zbit.Launcher#getCmdLineOptions()
 	 */
+	@Override
 	public List<Class<? extends KeyProvider>> getCmdLineOptions() {
 		List<Class<? extends KeyProvider>> configList = new ArrayList<Class<? extends KeyProvider>>(3);
 		configList.add(KEGGtranslatorIOOptions.class);
@@ -462,6 +465,7 @@ public class Translator extends Launcher {
 	/* (non-Javadoc)
 	 * @see de.zbit.Launcher#getInteractiveOptions()
 	 */
+	@Override
 	public List<Class<? extends KeyProvider>> getInteractiveOptions() {
 		// Return NULL here to only show options as dialog, that
 		// are defined in de.zbit.gui.prefs.PreferencePanels
@@ -479,6 +483,7 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#getLogPackages()
 	 */
+	@Override
 	public String[] getLogPackages() {
 		return new String[] {"de.zbit", "org.sbml"};
 	}
@@ -495,6 +500,7 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#getURLlicenseFile()
 	 */
+	@Override
 	public URL getURLlicenseFile() {
 		URL url = null;
 		try {
@@ -509,6 +515,7 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#getURLOnlineUpdate()
 	 */
+	@Override
 	public URL getURLOnlineUpdate() {
 		URL url = null;
 		try {
@@ -523,6 +530,7 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#getVersionNumber()
 	 */
+	@Override
 	public String getVersionNumber() {
 		return "2.4.0";
 	}
@@ -531,6 +539,7 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#getYearOfProgramRelease()
 	 */
+	@Override
 	public short getYearOfProgramRelease() {
 		return (short) 2013;
 	}
@@ -539,6 +548,7 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#getYearWhenProjectWasStarted()
 	 */
+	@Override
 	public short getYearWhenProjectWasStarted() {
 		return (short) 2010;
 	}
@@ -555,16 +565,18 @@ public class Translator extends Launcher {
 	 * (non-Javadoc)
 	 * @see de.zbit.Launcher#initGUI(de.zbit.AppConf)
 	 */
+	@Override
 	public Window initGUI(AppConf appConf) {
 		final TranslatorUI gui = new TranslatorUI(appConf);
-		if (garuda && 
-			(getCmdLineOptions().contains(GarudaOptions.class) && 
-			(!appConf.getCmdArgs().containsKey(GarudaOptions.CONNECT_TO_GARUDA) ||
-			  appConf.getCmdArgs().getBoolean(GarudaOptions.CONNECT_TO_GARUDA)))) {
+		if (garuda &&
+				(getCmdLineOptions().contains(GarudaOptions.class) &&
+						(!appConf.getCmdArgs().containsKey(GarudaOptions.CONNECT_TO_GARUDA) ||
+								appConf.getCmdArgs().getBoolean(GarudaOptions.CONNECT_TO_GARUDA)))) {
 			new Thread(new Runnable() {
 				/* (non-Javadoc)
 				 * @see java.lang.Runnable#run()
 				 */
+				@Override
 				public void run() {
 					try {
 						String localPath = Translator.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -573,31 +585,31 @@ public class Translator extends Launcher {
 
 						GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(
 								"a4978d67-f0b0-4f91-abc6-0cc7b848cd53",
-								(UserInterface) gui,
+								gui,
 								icon,
 								bundle.getString("PROGRAM_DESCRIPTION"),
 								Arrays.asList(bundle.getStringArray("KEYWORDS")),
 								Arrays.asList(new String[] {
-								    "snapshot/Screenshot_1.png",
-								    "snapshot/Screenshot_1.png",
-								    "snapshot/Screenshot_1.png"
+										"snapshot/Screenshot_1.png",
+										"snapshot/Screenshot_1.png",
+										"snapshot/Screenshot_1.png"
 								})
-						);
+								);
 						garudaBackend.addInputFileFormat("xml", "KGML");
 						garudaBackend.addInputFileFormat("kgml", "KGML");
-						
+
 						Set<String> alreadyIn = new HashSet<String>();
 						for (Format f : Format.values()) {
-						  String format = f.toString();
-						  int pos = format.indexOf('_');
-						  if (pos>0) {
-						    format = format.substring(0, pos);
-						  }
-						  if (alreadyIn.add(format)) {
-						    for (String extension : f.getOutputFileExtensions()) {
-						      garudaBackend.addOutputFileFormat(extension, format);  
-						    }
-						  }
+							String format = f.toString();
+							int pos = format.indexOf('_');
+							if (pos>0) {
+								format = format.substring(0, pos);
+							}
+							if (alreadyIn.add(format)) {
+								for (String extension : f.getOutputFileExtensions()) {
+									garudaBackend.addOutputFileFormat(extension, format);
+								}
+							}
 						}
 						garudaBackend.init();
 						garudaBackend.registedSoftwareToGaruda();

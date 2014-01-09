@@ -8,9 +8,9 @@
 // * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
 // * obtain the latest version of KEGGtranslator.
 // *
-// * Copyright (C) 2011-2013 by the University of Tuebingen, Germany.
+// * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
 // *
-// * KEGGtranslator is free software; you can redistribute it and/or 
+// * KEGGtranslator is free software; you can redistribute it and/or
 // * modify it under the terms of the GNU Lesser General Public License
 // * as published by the Free Software Foundation. A copy of the license
 // * agreement is provided in the file named "LICENSE.txt" included with
@@ -38,66 +38,66 @@
 // * <b>TODO: WORK IN PROGRESS, does not work yet.</b><p>
 // * The methods in this class can be employed to convert relations to
 // * reactions.
-// * 
+// *
 // * <p>Be careful, it is currently unused since the risk of
 // * creating invalid pathway models with automatic relation to reaction
 // * conversion is too high!
-// * 
+// *
 // * @author Clemens Wrzodek
 // */
 //@Deprecated
 //public class Relation2Reaction {
 //  public static final transient Logger log = Logger.getLogger(Relation2Reaction.class.getName());
-//  
+//
 //  /**
 //   * @param args
-//   * @throws Exception 
+//   * @throws Exception
 //   */
 //  public static void main(String[] args) throws Exception {
 //    Pathway p = KeggParser.parse("files/KGMLsamplefiles/hsa00010.xml").get(0);
-//    
+//
 //    Entry x = p.getEntryForId(34);
-//    
+//
 //    /*
 //     * - Compunds identifizieren
 //     * - Infos holen, reactions parsen
 //     * - reactions suibstrates, products& enzymes, schauen was wir haben
-//     * - wenn wir mind. 1 haben, dann reaction hinzufügen. 
+//     * - wenn wir mind. 1 haben, dann reaction hinzuf��gen.
 //     */
 //    System.out.println(x);
 //  }
 //
-//  
+//
 //  @SuppressWarnings("unused")
 //  public static void autocompleteReactions(Pathway p, KeggInfoManagement manager) {
 //    int newEntrysId = p.getMaxEntryId();
 //    /* PLEASE SEE KeggTools#autocompleteReactions(Pathway, KeggInfoManagement)
 //     * for an updated version. This method is OUTDATED!
-//     * 
+//     *
 //     */
 //    for (Reaction r : p.getReactions()) {
 //      for (String ko_id : r.getName().split(" ")) {
-//        
+//
 //        // Get the complete reaction from Kegg
 //        KeggInfos infos = new KeggInfos(ko_id, manager);
 //        if (infos.queryWasSuccessfull()) {
-//          
+//
 //          ArrayList<String> reacts = getReactants(infos);
-//          
+//
 //          /*
 //          Entry found = p.getEntryForName(reactant);
 //          if (found == null) {
 //            // Create a new entry
 //            newEntrysId++;
 //            Entry entry = new Entry(p, newEntrysId,reactant);
-//            
+//
 //            autocompleteLinkAndAddToPathway(p, entry);
-//            
+//
 //            if (isSubstrate) r.addSubstrate(new ReactionComponent(entry.getName()));
 //            else r.addProduct(new ReactionComponent(entry.getName()));
 //          }*/
-//          
-//          
+//
+//
 //          // Add missing enzymes
 //          if (infos.getEnzymes()!=null) {
 //            // Get all Enzymes, that are already contained in the pathway.
@@ -107,7 +107,7 @@
 //              contained_enzymes.addAll(KeggTools.getKeggEnzymeNames(mod, manager));
 //            }
 //            // remark: contained_enzymes contains doubles. But this doesn't matter
-//            
+//
 //            // Iterate through all enzymes in the reaction
 //            String[] enzymes = infos.getEnzymes().trim().replaceAll("\\s+", " ").split(" ");
 //            for (String enzyme: enzymes) {
@@ -117,31 +117,31 @@
 //                newEntrysId++;
 //                Entry entry = new Entry(p, newEntrysId,"EC:"+enzyme,EntryType.enzyme);
 //                entry.setReaction(r.getName());
-//                
+//
 //                KeggTools.autocompleteLinkAndAddToPathway(p, entry);
 //              }
-//              
+//
 //            }
 //          }
-//          
-//          
+//
+//
 //        }
 //      }
-//      
+//
 //    }
-//    
+//
 //  }
 //
 //
 //  private static ArrayList<String> getReactants(KeggInfos infos) {
 //    ArrayList<String> ret = new ArrayList<String>();
-//    
+//
 //    // Add missing reactants
 //    if (infos.getEquation()!=null) {
 //      String eq = infos.getEquation();
 //      int dividerPos = eq.indexOf("<=>");
 //      eq = eq.replace("<=>", " + ");
-//      
+//
 //      int curPos = eq.indexOf(" + ");
 //      int lastPos = 0;
 //      while (lastPos>=0) {
@@ -164,7 +164,7 @@
 //            reactant = "gl:" + reactant;
 //          }
 //        }
-//        
+//
 //        ret.add(reactant);
 //        /*
 //        Entry found = p.getEntryForName(reactant);
@@ -172,19 +172,19 @@
 //          // Create a new entry
 //          newEntrysId++;
 //          Entry entry = new Entry(p, newEntrysId,reactant);
-//          
+//
 //          autocompleteLinkAndAddToPathway(p, entry);
-//          
+//
 //          if (isSubstrate) r.addSubstrate(new ReactionComponent(entry.getName()));
 //          else r.addProduct(new ReactionComponent(entry.getName()));
 //        }*/
-//        
+//
 //        lastPos = curPos<0?curPos:curPos+1;
 //        curPos = eq.indexOf(" + ", curPos+1);
 //      }
 //    }
 //    return ret;
 //  }
-//  
-//  
+//
+//
 //}
