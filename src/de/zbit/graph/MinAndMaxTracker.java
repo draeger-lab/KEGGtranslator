@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2010-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -38,7 +38,7 @@ public class MinAndMaxTracker {
   public MinAndMaxTracker() {
     super();
   }
-
+  
   public void track(int x, int y) {
     track((double)x,(double)y);
   }
@@ -56,37 +56,37 @@ public class MinAndMaxTracker {
     minY = Math.min(minY, y);
     
     maxX = Math.max(maxX, x+width);
-    maxY = Math.max(maxY, y+height);    
+    maxY = Math.max(maxY, y+height);
   }
-
+  
   /**
    * @return the minX
    */
   public double getMinX() {
     return minX==Double.MAX_VALUE?0:minX;
   }
-
+  
   /**
    * @return the minY
    */
   public double getMinY() {
     return minY==Double.MAX_VALUE?0:minY;
   }
-
+  
   /**
    * @return the maxX
    */
   public double getMaxX() {
     return maxX==Double.MIN_VALUE?0:maxX;
   }
-
+  
   /**
    * @return the maxY
    */
   public double getMaxY() {
     return maxY==Double.MIN_VALUE?0:maxY;
   }
-
+  
   /**
    * Get the total width:
    * <pre>

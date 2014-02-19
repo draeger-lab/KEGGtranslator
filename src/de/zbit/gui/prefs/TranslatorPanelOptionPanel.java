@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -32,7 +32,7 @@ import de.zbit.kegg.ext.KEGGTranslatorPanelOptions;
  */
 public class TranslatorPanelOptionPanel extends PreferencesPanelForKeyProvider {
   private static final long serialVersionUID = 4932259635453073817L;
-
+  
   /**
    * @throws IOException
    */

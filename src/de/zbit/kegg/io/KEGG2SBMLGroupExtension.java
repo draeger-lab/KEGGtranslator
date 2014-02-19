@@ -43,147 +43,147 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * @version $Rev$
  */
 public class KEGG2SBMLGroupExtension {
-
-	/**
-	 * A {@link Logger} for this class.
-	 */
-	private static final transient Logger log = Logger.getLogger(KEGG2SBMLGroupExtension.class.getName());
-
-	/**
-	 * Layout extension namespace URL.
-	 */
-	public static final String GROUP_NS = GroupsConstants.namespaceURI;
-
-	/**
-	 * Unique identifier to identify this Namespace/Extension.
-	 */
-	public static final String GROUP_NS_NAME = GroupsConstants.shortLabel;
-
-
-	/**
-	 * Create a group from an entry. This is only useful if
-	 * {@link Entry#hasComponents()}.
-	 * 
-	 * @param p
-	 * @param model
-	 * @param entry
-	 * @return
-	 */
-	public static Group createGroup(Pathway p, Model model, Entry entry) {
-		GroupsModelPlugin groupModel = getGroupsModelPlugin(model);
-
-		// Get all group-members
-		List<String> componentSpeciesIDs = new ArrayList<String>();
-		if (entry.hasComponents()) {
-			for (int c:entry.getComponents()) {
-				Entry ce = p.getEntryForId(c);
-				if (ce!=null && ce.getCustom()!=null && ce.getCustom() instanceof NamedSBase) {
-					String speciesID = ((NamedSBase)ce.getCustom()).getId();
-					componentSpeciesIDs.add(speciesID);
-				}
-			}
-		}
-
-		// Create group and add all members
-		Group g = groupModel.createGroup();
-		for (String id: componentSpeciesIDs) {
-			g.createMember(id);
-		}
-
-		// The KIND attribute is required. Possible values are listed in GroupKind
-		g.setKind(GroupKind.collection);
-
-		return g;
-	}
-
-
-	/**
-	 * Clones the given group <code>g</code>
-	 * @param id the id of the new group
-	 * @param g
-	 * @param prefixForMembers this will be prepended to all member symbols
-	 * in the new group.
-	 * @return the nre {@link Group}.
-	 */
-	public static Group cloneGroup(String id, Group g, String prefixForMembers) {
-		if (g==null) {
-			return null;
-		}
-
-		GroupsModelPlugin groupModel = getGroupsModelPlugin(g);
-
-		// Create group and add all members
-		Group gNew = new Group(g);
-		gNew.setId(id);
-		gNew.setMetaId("meta_" + id);
-		gNew.unsetListOfMembers();
-
-
-		// Add all members with new prefix
-		for (Member m: g.getListOfMembers()) {
-			String symbol = m.getIdRef();
-			if (prefixForMembers != null) {
-				symbol = prefixForMembers + symbol;
-			}
-			gNew.createMember(symbol);
-		}
-
-		groupModel.addGroup(gNew);
-		return gNew;
-	}
-
-	/**
-	 * Duplicates all members of the given group <code>g</code> and
-	 * adds a prefix to all duplicated members.
-	 * @param g
-	 * @param prefixForMembers
-	 */
-	public static void cloneGroupComponents(Group g, String prefixForMembers) {
-		if (g == null) {
-			return;
-		}
-
-		// Create group and add all members
-		List<String> symobls = new LinkedList<String>();
-		for (Member m: g.getListOfMembers()) {
-			symobls.add(m.getIdRef());
-		}
-
-		// Add all members with new prefix
-		for (String symbol: symobls) {
-			if (prefixForMembers!=null) {
-				if (!symbol.startsWith(prefixForMembers)) {
-					symbol = prefixForMembers + symbol;
-					g.createMember(symbol);
-				}
-			}
-		}
-
-		return;
-	}
-
-	/**
-	 * Get or create the {@link GroupsModelPlugin}.
-	 * @param g any {@link AbstractSBase}.
-	 * @return
-	 */
-	private static GroupsModelPlugin getGroupsModelPlugin(AbstractSBase g) {
-		Model model = g.getModel();
-		SBMLDocument doc = model.getSBMLDocument();
-
-		// Make sure extension is available
-		// NOTE: this should be called every time! No need to check if it is already contained.
-		doc.addNamespace(GROUP_NS_NAME, "xmlns", GROUP_NS);
-		doc.getSBMLDocumentAttributes().put(GROUP_NS_NAME + ":required", "true");
-
-		// Create group model
-		GroupsModelPlugin groupModel = (GroupsModelPlugin) model.getExtension(GROUP_NS);
-		if (groupModel == null) {
-			groupModel = new GroupsModelPlugin(model);
-			model.addExtension(GROUP_NS, groupModel);
-		}
-
-		return groupModel;
-	}
-
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger log = Logger.getLogger(KEGG2SBMLGroupExtension.class.getName());
+  
+  /**
+   * Layout extension namespace URL.
+   */
+  public static final String GROUP_NS = GroupsConstants.namespaceURI;
+  
+  /**
+   * Unique identifier to identify this Namespace/Extension.
+   */
+  public static final String GROUP_NS_NAME = GroupsConstants.shortLabel;
+  
+  
+  /**
+   * Create a group from an entry. This is only useful if
+   * {@link Entry#hasComponents()}.
+   * 
+   * @param p
+   * @param model
+   * @param entry
+   * @return
+   */
+  public static Group createGroup(Pathway p, Model model, Entry entry) {
+    GroupsModelPlugin groupModel = getGroupsModelPlugin(model);
+    
+    // Get all group-members
+    List<String> componentSpeciesIDs = new ArrayList<String>();
+    if (entry.hasComponents()) {
+      for (int c:entry.getComponents()) {
+        Entry ce = p.getEntryForId(c);
+        if (ce!=null && ce.getCustom()!=null && ce.getCustom() instanceof NamedSBase) {
+          String speciesID = ((NamedSBase)ce.getCustom()).getId();
+          componentSpeciesIDs.add(speciesID);
+        }
+      }
+    }
+    
+    // Create group and add all members
+    Group g = groupModel.createGroup();
+    for (String id: componentSpeciesIDs) {
+      g.createMember(id);
+    }
+    
+    // The KIND attribute is required. Possible values are listed in GroupKind
+    g.setKind(GroupKind.collection);
+    
+    return g;
+  }
+  
+  
+  /**
+   * Clones the given group <code>g</code>
+   * @param id the id of the new group
+   * @param g
+   * @param prefixForMembers this will be prepended to all member symbols
+   * in the new group.
+   * @return the nre {@link Group}.
+   */
+  public static Group cloneGroup(String id, Group g, String prefixForMembers) {
+    if (g==null) {
+      return null;
+    }
+    
+    GroupsModelPlugin groupModel = getGroupsModelPlugin(g);
+    
+    // Create group and add all members
+    Group gNew = new Group(g);
+    gNew.setId(id);
+    gNew.setMetaId("meta_" + id);
+    gNew.unsetListOfMembers();
+    
+    
+    // Add all members with new prefix
+    for (Member m: g.getListOfMembers()) {
+      String symbol = m.getIdRef();
+      if (prefixForMembers != null) {
+        symbol = prefixForMembers + symbol;
+      }
+      gNew.createMember(symbol);
+    }
+    
+    groupModel.addGroup(gNew);
+    return gNew;
+  }
+  
+  /**
+   * Duplicates all members of the given group <code>g</code> and
+   * adds a prefix to all duplicated members.
+   * @param g
+   * @param prefixForMembers
+   */
+  public static void cloneGroupComponents(Group g, String prefixForMembers) {
+    if (g == null) {
+      return;
+    }
+    
+    // Create group and add all members
+    List<String> symobls = new LinkedList<String>();
+    for (Member m: g.getListOfMembers()) {
+      symobls.add(m.getIdRef());
+    }
+    
+    // Add all members with new prefix
+    for (String symbol: symobls) {
+      if (prefixForMembers!=null) {
+        if (!symbol.startsWith(prefixForMembers)) {
+          symbol = prefixForMembers + symbol;
+          g.createMember(symbol);
+        }
+      }
+    }
+    
+    return;
+  }
+  
+  /**
+   * Get or create the {@link GroupsModelPlugin}.
+   * @param g any {@link AbstractSBase}.
+   * @return
+   */
+  private static GroupsModelPlugin getGroupsModelPlugin(AbstractSBase g) {
+    Model model = g.getModel();
+    SBMLDocument doc = model.getSBMLDocument();
+    
+    // Make sure extension is available
+    // NOTE: this should be called every time! No need to check if it is already contained.
+    doc.addNamespace(GROUP_NS_NAME, "xmlns", GROUP_NS);
+    doc.getSBMLDocumentAttributes().put(GROUP_NS_NAME + ":required", "true");
+    
+    // Create group model
+    GroupsModelPlugin groupModel = (GroupsModelPlugin) model.getExtension(GROUP_NS);
+    if (groupModel == null) {
+      groupModel = new GroupsModelPlugin(model);
+      model.addExtension(GROUP_NS, groupModel);
+    }
+    
+    return groupModel;
+  }
+  
 }

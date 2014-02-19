@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013 Center for Bioinformatics of the University of Tuebingen.
+ * Copyright (c) 2011-2014 Center for Bioinformatics of the University of Tuebingen.
  * 
  * This file is part of KEGGtranslator, a program to convert KGML files from the
  * KEGG database into various other formats, e.g., SBML, GraphML, and many more.
@@ -22,19 +22,18 @@
  */
 package de.zbit.kegg.test;
 
-
 /**
  * @author Andreas Dr&auml;ger
  * @since 1.0
  * @version $Rev$
  */
 public class BatchKEGGtranslatorTest {
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO
-	}
-
+  
+  /**
+   * @param args
+   */
+  public static void main(String[] args) {
+    // TODO
+  }
+  
 }

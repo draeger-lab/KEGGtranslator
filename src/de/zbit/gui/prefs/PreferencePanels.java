@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -19,7 +19,6 @@
  * ---------------------------------------------------------------------
  */
 package de.zbit.gui.prefs;
-
 
 /**
  * This class contains a collection of all preferences (classes
@@ -31,11 +30,16 @@ package de.zbit.gui.prefs;
  * @version $Rev$
  */
 public class PreferencePanels {
+  
+  /**
+   * 
+   * @return
+   */
   public static Class<?>[] getPreferencesClasses() {
     return new Class<?>[]{
         de.zbit.gui.prefs.GeneralOptionPanel.class,
-        de.zbit.gui.prefs.MultiplePreferencesPanel.class, 
-        de.zbit.gui.prefs.PreferencesPanelForKeyProvider.class, 
+        de.zbit.gui.prefs.MultiplePreferencesPanel.class,
+        de.zbit.gui.prefs.PreferencesPanelForKeyProvider.class,
         de.zbit.gui.prefs.TranslatorPanelOptionPanel.class
     };
   }

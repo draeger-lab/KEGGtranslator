@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -57,19 +57,20 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
   public LineNodeRealizer() {
     super();
     shape = new Polygon();
-    this.setLineType(defaultStroke);
+    setLineType(defaultStroke);
   }
   
   public LineNodeRealizer(NodeRealizer nr) {
     super(nr);
-    // If the given node realizer is of this type, then apply copy semantics. 
+    // If the given node realizer is of this type, then apply copy semantics.
     if (nr instanceof LineNodeRealizer) {
       LineNodeRealizer fnr = (LineNodeRealizer) nr;
-      // Copy the values of custom attributes. 
+      // Copy the values of custom attributes.
       setCoordLists((Polygon)fnr.shape);
     }
   }
   
+  @Override
   public NodeRealizer createCopy(NodeRealizer nr) {
     return new LineNodeRealizer(nr);
   }
@@ -81,7 +82,7 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
    * @param clonedBounds already cloned other list.
    */
   private void setCoordLists(Polygon other) {
-    this.shape = new Polygon(); // clear
+    shape = new Polygon(); // clear
     for (int i=0; i<other.npoints; i++) {
       ((Polygon)shape).addPoint(other.xpoints[i], other.ypoints[i]);
     }
@@ -167,13 +168,14 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
   /**
    * Paints the spline-node.
    */
+  @Override
   public void paintNode(Graphics2D gfx) {
     gfx.setStroke(getLineType());
     Color c = getFillColor();
     if (c!=null) {
       gfx.setColor(c);
-   // since it is a line, don't fill it.
-//      gfx.fillPolygon(((Polygon)shape));
+      // since it is a line, don't fill it.
+      //      gfx.fillPolygon(((Polygon)shape));
     }
     Polygon p = (Polygon)shape;
     for (int i=1; i<p.npoints; i++) {
@@ -197,7 +199,7 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
     return new Rectangle2D.Double(b.getX(), b.getY(), b.getWidth(), b.getHeight());
   }
   
-       
+  
   /* (non-Javadoc)
    * @see y.view.ShapeNodeRealizer#calcUnionRect(java.awt.geom.Rectangle2D)
    */
@@ -206,7 +208,7 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
     super.calcUnionRect(arg0);
     // should be same as "shape.getBounds2D().createUnion(rect);"
   }
-
+  
   /**
    * Avoid connecting the last added coordinates and the next
    * added ones.
@@ -214,9 +216,11 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
   public void startNewLine() {
     Integer np = ((Polygon)shape).npoints;
     if (np!=null && np>0) {
-      if (doNotConnectIndex==null) doNotConnectIndex = new HashSet<Integer>();
+      if (doNotConnectIndex==null) {
+        doNotConnectIndex = new HashSet<Integer>();
+      }
       doNotConnectIndex.add(np);
     }
-  } 
+  }
   
 }

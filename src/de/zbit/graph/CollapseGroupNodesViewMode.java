@@ -70,6 +70,10 @@ public class CollapseGroupNodesViewMode extends ViewMode {
     hierarchy = graph.getHierarchyManager();
   }
   
+  /* (non-Javadoc)
+   * @see y.view.ViewMode#mouseClicked(java.awt.event.MouseEvent)
+   */
+  @Override
   public void mouseClicked(MouseEvent e) {
     
     if (e.getClickCount() == 2) {
@@ -84,7 +88,7 @@ public class CollapseGroupNodesViewMode extends ViewMode {
       if (v != null && !hierarchy.isNormalNode(v)) {
         double x = translateX(e.getX());
         double y = translateY(e.getY());
-        Graph2D graph = this.view.getGraph2D();
+        Graph2D graph = view.getGraph2D();
         NodeRealizer r = graph.getRealizer(v);
         GroupNodeRealizer gnr = null;
         if (r instanceof GroupNodeRealizer) {
@@ -92,7 +96,7 @@ public class CollapseGroupNodesViewMode extends ViewMode {
         } else if (r instanceof ProxyShapeNodeRealizer
             && ((ProxyShapeNodeRealizer) r).getRealizerDelegate() instanceof GroupNodeRealizer) {
           gnr = (GroupNodeRealizer) ((ProxyShapeNodeRealizer) r)
-          .getRealizerDelegate();
+              .getRealizerDelegate();
         }
         if (gnr != null) {
           NodeLabel handle = gnr.getStateLabel();
@@ -243,6 +247,7 @@ public class CollapseGroupNodesViewMode extends ViewMode {
       this.groupNode = groupNode;
     }
     
+    @Override
     public void actionPerformed(ActionEvent e) {
       closeGroup(groupNode);
     }

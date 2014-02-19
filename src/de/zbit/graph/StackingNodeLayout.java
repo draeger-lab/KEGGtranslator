@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -141,7 +141,10 @@ public class StackingNodeLayout {
    * @param group node to layout
    */
   private void layoutGroupNode(Node group) {
-    if (childs==null || group==null) return; // Trivial
+    if (childs==null || group==null)
+     {
+      return; // Trivial
+    }
     double cur_x = firstX;
     double cur_y = firstY;
     
@@ -155,7 +158,9 @@ public class StackingNodeLayout {
       // Do we have to consider space for another group node header?
       Node parent = graph.getHierarchyManager().getParentNode(child);
       if (!parent.equals(parents.get(parents.size()-1))) {
-        if (parents.size()>1) parents.remove(parents.size()-1);
+        if (parents.size()>1) {
+          parents.remove(parents.size()-1);
+        }
         // NextRow, add Header.
         if (cur_x!=firstX) {
           cur_x=firstX;
@@ -186,7 +191,7 @@ public class StackingNodeLayout {
       
       // Test if we need to jump to next line
       maxHeightInRow = Math.max(maxHeightInRow, getNodeHeight(cr)+inset);
-      int usedSlotsInCurrentRow = (int) Math.ceil( ((double)(cur_x-firstX)) / (averageNodeWidth+inset));
+      int usedSlotsInCurrentRow = (int) Math.ceil( (cur_x-firstX) / (averageNodeWidth+inset));
       if (usedSlotsInCurrentRow>=cols) {
         cur_x=firstX;
         cur_y+=maxHeightInRow;
@@ -215,7 +220,7 @@ public class StackingNodeLayout {
    * The order of the returned list is fixed: First grouped nodes
    * than ungrouped nodes!
    * @param group
-   * @return all children of the given <code>group</code> 
+   * @return all children of the given <code>group</code>
    * node and all group nodes in this group node.
    */
   public List<Node> getChildrenDeep(Node group) {
@@ -251,7 +256,9 @@ public class StackingNodeLayout {
    * @param group node to layout
    */
   private void prepareVariables(Node group) {
-    if (group==null) return;
+    if (group==null) {
+      return;
+    }
     
     // Get size of all children
     childs = recursive?getChildrenDeep(group):getChildren(group);
@@ -276,7 +283,7 @@ public class StackingNodeLayout {
     firstX = minX;
     firstY = minY;
   }
-
+  
   /**
    * @param nr
    * @return node width

@@ -10,7 +10,7 @@
  *
  * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
  *
- * KEGGtranslator is free software; you can redistribute it and/or 
+ * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * as published by the Free Software Foundation. A copy of the license
  * agreement is provided in the file named "LICENSE.txt" included with
@@ -73,7 +73,7 @@ public class TranslatePathwayDialog extends JPanel {
   PathwaySelector selector=null;
   
   /**
-   * Allows to initialize a {@link TranslatorPanel} of a certain type. 
+   * Allows to initialize a {@link TranslatorPanel} of a certain type.
    */
   Class<? extends TranslatorPanel<?>> transPanelType = null;
   
@@ -85,7 +85,7 @@ public class TranslatePathwayDialog extends JPanel {
   
   public TranslatePathwayDialog(Format preSelectedOutputFormat) {
     super();
-    this.outputFormat = preSelectedOutputFormat;
+    outputFormat = preSelectedOutputFormat;
     LayoutHelper lh = new LayoutHelper(this);
     showDownloadPanel(lh);
   }
@@ -100,7 +100,7 @@ public class TranslatePathwayDialog extends JPanel {
     Class<? extends TranslatorPanel<?>> transPanelType) {
     this.transPanelType = transPanelType;
   }
-
+  
   
   /**
    * Adds selectors to select organism, pathway and output format to this panel.
@@ -111,13 +111,13 @@ public class TranslatePathwayDialog extends JPanel {
       selector = PathwaySelector.createPathwaySelectorPanel(Translator.getFunctionManager(), lh);
       JComponent oFormat=null;
       if ((outputFormat == null) || (outputFormat == null)) {
-				oFormat = PreferencesPanel.createJComponentForOption(
-					KEGGtranslatorIOOptions.FORMAT, (SBProperties) null, null);
-				oFormat =((JLabeledComponent) oFormat).getColumnChooser(); // Trim
+        oFormat = PreferencesPanel.createJComponentForOption(
+          KEGGtranslatorIOOptions.FORMAT, (SBProperties) null, null);
+        oFormat =((JLabeledComponent) oFormat).getColumnChooser(); // Trim
         lh.add("Please select the output format", oFormat, false);
       }
       oFormatSelector = oFormat;
-
+      
     } catch (Throwable exc) {
       GUITools.showErrorMessage(lh.getContainer(), exc);
     }
@@ -133,7 +133,7 @@ public class TranslatePathwayDialog extends JPanel {
   public TranslatorPanel<?> evaluateDialog(ActionListener translationResult) {
     // Check user selection
     String id = selector.getSelectedPathwayID();
-    if (id==null || id.length()<1) {
+    if ((id == null) || (id.length() < 1)) {
       GUITools.showErrorMessage(null, "No valid pathway selected.");
       return null;
     }
@@ -144,24 +144,23 @@ public class TranslatePathwayDialog extends JPanel {
     
     // Get the output format
     Format outFormat = outputFormat;
-    if (oFormatSelector!=null) {
+    if (oFormatSelector != null) {
       outFormat = Format.valueOf(Reflect.invokeIfContains(oFormatSelector, "getSelectedItem").toString());
     }
     
     // Create the panel and initiate the translation
-    TranslatorPanel<?> tp=null;
-    if (transPanelType!=null) {
+    TranslatorPanel<?> tp = null;
+    if (transPanelType != null) {
       try {
         tp = transPanelType.getConstructor(String.class, Format.class, ActionListener.class)
-        .newInstance(id, outFormat, translationResult);
+            .newInstance(id, outFormat, translationResult);
       } catch (Exception e ){
         log.log(Level.WARNING, "Could not instantiate given translator panel.", e);
       }
     }
-    if (tp==null) {
+    if (tp == null) {
       tp = TranslatorPanelTools.createPanel(id, outFormat, translationResult);
     }
-     
     
     return tp;
   }
@@ -183,6 +182,7 @@ public class TranslatePathwayDialog extends JPanel {
     
     // Action
     okButton.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(ActionEvent e) {
         createOkButtonAction(addTabsHere, translationResult).run();
       }
@@ -203,6 +203,10 @@ public class TranslatePathwayDialog extends JPanel {
    */
   private Runnable createOkButtonAction(final JTabbedPane addTabsHere, final ActionListener translationResult) {
     return new Runnable() {
+      /* (non-Javadoc)
+       * @see java.lang.Runnable#run()
+       */
+      @Override
       public void run() {
         TranslatorPanel<?> tp = evaluateDialog(translationResult);
         if (tp!=null) {
@@ -212,7 +216,7 @@ public class TranslatePathwayDialog extends JPanel {
           } catch (Throwable t) {
             log.log(Level.WARNING, "Error while changing tab focus.", t);
           }
-        } 
+        }
       }
     };
   }
@@ -225,7 +229,6 @@ public class TranslatePathwayDialog extends JPanel {
    */
   public static void showAndEvaluateDialog(final JTabbedPane addTabsHere, final ActionListener translationResult, Format optionalPreSelectedFormat) {
     TranslatePathwayDialog d = new TranslatePathwayDialog(optionalPreSelectedFormat);
-    
     showAndEvaluateDialog(addTabsHere, translationResult, d);
   }
   
@@ -236,7 +239,6 @@ public class TranslatePathwayDialog extends JPanel {
    * @param optionalPreSelectedFormat an optional pre-selection of desired output format
    */
   public static void showAndEvaluateDialog(final JTabbedPane addTabsHere, final ActionListener translationResult, TranslatePathwayDialog d) {
-    
     GUITools.showOkCancelDialogInNewThread(d, "Download pathway", d.createOkButtonAction(addTabsHere, translationResult), null);
     d.selector.autoActivateOkButton(d);
   }

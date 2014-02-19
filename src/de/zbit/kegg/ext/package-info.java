@@ -23,5 +23,7 @@
  * Provides classes that are <b>extensions of other classes</b> (mainly from
  * other projects or jars) that are required for the translation or
  * visualization of KEGG to other formats.
+ * 
+ * @version $Rev$
  */
 package de.zbit.kegg.ext;

@@ -49,127 +49,126 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * @version $Rev$
  */
 public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model> {
-
-	private static final long serialVersionUID = -6585611929238639630L;
-
-
-	/**
-	 * Create a new translator-panel and initiates the translation.
-	 * @param inputFile
-	 * @param outputFormat
-	 * @param translationResult
-	 */
-	public TranslatorBioPAXPanel(File inputFile, Format outputFormat,
-			ActionListener translationResult) {
-		super(new KEGGImporter(inputFile, outputFormat), inputFile, outputFormat.toString(), translationResult);
-	}
-
-	/**
-	 * Initiates a download and translation of the given pathway.
-	 * @param pathwayID pathway identifier (e.g., "mmu00010")
-	 * @param outputFormat
-	 * @param translationResult
-	 */
-	public TranslatorBioPAXPanel(String pathwayID, Format outputFormat,
-			ActionListener translationResult) {
-		super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#createGraphFromDocument(java.lang.Object)
-	 */
-	@Override
-	protected Graph2D createGraphFromDocument(Model document) {
-		if (getTranslator()==null) {
-			return null;
-		}
-		Pathway sourcePW = getTranslator().getLastTranslatedPathway();
-		if (sourcePW==null) {
-			return null;
-		}
-		KEGG2yGraph toGraph = KEGG2yGraph.createKEGG2GraphML(AbstractKEGGtranslator.getKeggInfoManager());
-		toGraph.setDrawArrowsForReactions(true);
-		return toGraph.translate(sourcePW);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()
-	 */
-	@Override
-	protected List<FileFilter> getOutputFileFilterForRealDocument() {
-		List<FileFilter> ff = new LinkedList<FileFilter>();
-		if (document!=null && document.getLevel()==BioPAXLevel.L2) {
-			ff.add(SBFileFilter.createBioPAXFileFilterL2());
-		} else if (document!=null && document.getLevel()==BioPAXLevel.L3) {
-			ff.add(SBFileFilter.createBioPAXFileFilterL3());
-		} else {
-			ff.add(SBFileFilter.createBioPAXFileFilter());
-		}
-		ff.add(SBFileFilter.createSIFFileFilter());
-
-		return ff;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#writeRealDocumentToFileUnchecked(java.io.File, java.lang.String)
-	 */
-	@Override
-	protected boolean writeRealDocumentToFileUnchecked(File file, String format)
-			throws Exception {
-		if (format.equalsIgnoreCase("sif")) {
-			return ((KEGG2BioPAX)getTranslator()).writeToSIFFile(document, file.getPath());
-		} else {
-			return ((KEGG2BioPAX)getTranslator()).writeToFile(document, file.getPath());
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isAllowedToSaveAsGraphFormats()
-	 */
-	@Override
-	public boolean isAllowedToSaveAsGraphFormats() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
-	 */
-	@Override
-	public boolean isDetailPanelAvailable() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#updateDetailPanel(javax.swing.JScrollPane, y.view.HitInfo)
-	 */
-	@Override
-	protected void updateDetailPanel(JScrollPane detailPanel, HitInfo clickedObjects) {
-
-		// TODO: Make a table, showing BioPAX properties of selected objects.
-
-		//    BioPAXElement bpe=null;
-		//    // In order to use properties you first need to get an EditorMap
-		//    EditorMap editorMap = new SimpleEditorMap(BioPAXLevel.L3);
-		//    // And then get all the editors for our biopax element
-		//    Set<PropertyEditor> editors = editorMap.getEditorsOf(bpe);
-		//    // Let's prepare a table to return values
-		//    String value[][] = new String[2][editors.size()];
-		//    int row =0;
-		//
-		// // For each property
-		//    for (PropertyEditor editor : editors)
-		//    {
-		//    // First column is the name of the property, e.g. "Name"
-		//    value[0][row]= editor.getProperty();
-		//    // Second column is the value e.g. "p53", note that the value is // sometimes a Set and we
-		//    are using the Set.toString() to display // the contents of multiple cardinality properties
-		//    value[1][row] = editor.getValueFromBean(bpe).toString();
-		//    // increase the row index
-		//    row++;
-		//    }
-
-
-	}
+  
+  /**
+   * Generated serial version identifier.
+   */
+  private static final long serialVersionUID = -6585611929238639630L;
+  
+  /**
+   * Create a new translator-panel and initiates the translation.
+   * @param inputFile
+   * @param outputFormat
+   * @param translationResult
+   */
+  public TranslatorBioPAXPanel(File inputFile, Format outputFormat,
+    ActionListener translationResult) {
+    super(new KEGGImporter(inputFile, outputFormat), inputFile, outputFormat.toString(), translationResult);
+  }
+  
+  /**
+   * Initiates a download and translation of the given pathway.
+   * @param pathwayID pathway identifier (e.g., "mmu00010")
+   * @param outputFormat
+   * @param translationResult
+   */
+  public TranslatorBioPAXPanel(String pathwayID, Format outputFormat,
+    ActionListener translationResult) {
+    super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#createGraphFromDocument(java.lang.Object)
+   */
+  @Override
+  protected Graph2D createGraphFromDocument(Model document) {
+    if (getTranslator() == null) {
+      return null;
+    }
+    Pathway sourcePW = getTranslator().getLastTranslatedPathway();
+    if (sourcePW == null) {
+      return null;
+    }
+    KEGG2yGraph toGraph = KEGG2yGraph.createKEGG2GraphML(AbstractKEGGtranslator.getKeggInfoManager());
+    toGraph.setDrawArrowsForReactions(true);
+    return toGraph.translate(sourcePW);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()
+   */
+  @Override
+  protected List<FileFilter> getOutputFileFilterForRealDocument() {
+    List<FileFilter> ff = new LinkedList<FileFilter>();
+    if ((document != null) && (document.getLevel() == BioPAXLevel.L2)) {
+      ff.add(SBFileFilter.createBioPAXFileFilterL2());
+    } else if ((document != null) && (document.getLevel() == BioPAXLevel.L3)) {
+      ff.add(SBFileFilter.createBioPAXFileFilterL3());
+    } else {
+      ff.add(SBFileFilter.createBioPAXFileFilter());
+    }
+    ff.add(SBFileFilter.createSIFFileFilter());
+    
+    return ff;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#writeRealDocumentToFileUnchecked(java.io.File, java.lang.String)
+   */
+  @Override
+  protected boolean writeRealDocumentToFileUnchecked(File file, String format)
+      throws Exception {
+    if (format.equalsIgnoreCase("sif")) {
+      return ((KEGG2BioPAX)getTranslator()).writeToSIFFile(document, file.getPath());
+    } else {
+      return ((KEGG2BioPAX)getTranslator()).writeToFile(document, file.getPath());
+    }
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isAllowedToSaveAsGraphFormats()
+   */
+  @Override
+  public boolean isAllowedToSaveAsGraphFormats() {
+    return false;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
+   */
+  @Override
+  public boolean isDetailPanelAvailable() {
+    return false;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#updateDetailPanel(javax.swing.JScrollPane, y.view.HitInfo)
+   */
+  @Override
+  protected void updateDetailPanel(JScrollPane detailPanel, HitInfo clickedObjects) {
+    
+    // TODO: Make a table, showing BioPAX properties of selected objects.
+    
+    //    BioPAXElement bpe=null;
+    //    // In order to use properties you first need to get an EditorMap
+    //    EditorMap editorMap = new SimpleEditorMap(BioPAXLevel.L3);
+    //    // And then get all the editors for our biopax element
+    //    Set<PropertyEditor> editors = editorMap.getEditorsOf(bpe);
+    //    // Let's prepare a table to return values
+    //    String value[][] = new String[2][editors.size()];
+    //    int row =0;
+    //
+    // // For each property
+    //    for (PropertyEditor editor : editors)
+    //    {
+    //    // First column is the name of the property, e.g. "Name"
+    //    value[0][row]= editor.getProperty();
+    //    // Second column is the value e.g. "p53", note that the value is // sometimes a Set and we
+    //    are using the Set.toString() to display // the contents of multiple cardinality properties
+    //    value[1][row] = editor.getValueFromBean(bpe).toString();
+    //    // increase the row index
+    //    row++;
+    //    }
+  }
+  
 }

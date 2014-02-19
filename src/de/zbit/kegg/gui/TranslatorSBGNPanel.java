@@ -44,87 +44,87 @@ import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
  * @version $Rev$
  */
 public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
-	private static final long serialVersionUID = -6585611929238639630L;
-
-
-	/**
-	 * Create a new translator-panel and initiates the translation.
-	 * @param inputFile
-	 * @param outputFormat
-	 * @param translationResult
-	 */
-	public TranslatorSBGNPanel(File inputFile, ActionListener translationResult) {
-		this(inputFile, Format.SBGN, translationResult);
-	}
-
-	/**
-	 * Create a new translator-panel and initiates the translation.
-	 * @param inputFile
-	 * @param outputFormat
-	 * @param translationResult
-	 */
-	public TranslatorSBGNPanel(File inputFile, Format outputFormat,
-			ActionListener translationResult) {
-		super(new KEGGImporter(inputFile, outputFormat), inputFile, outputFormat.toString(), translationResult);
-	}
-
-	/**
-	 * Initiates a download and translation of the given pathway.
-	 * @param pathwayID pathway identifier (e.g., "mmu00010")
-	 * @param outputFormat
-	 * @param translationResult
-	 */
-	public TranslatorSBGNPanel(String pathwayID, Format outputFormat,
-			ActionListener translationResult) {
-		super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
-	}
-
-	/**
-	 * Initiates a download and translation of the given pathway.
-	 * @param pathwayID pathway identifier (e.g., "mmu00010")
-	 * @param translationResult
-	 */
-	public TranslatorSBGNPanel(String pathwayID, ActionListener translationResult) {
-		this(pathwayID, Format.SBGN, translationResult);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#createGraphFromDocument(java.lang.Object)
-	 */
-	@Override
-	protected Graph2D createGraphFromDocument(Sbgn document) {
-		SBGN2GraphML converter = new SBGN2GraphML();
-		return converter.createGraph(document);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()
-	 */
-	@Override
-	protected List<FileFilter> getOutputFileFilterForRealDocument() {
-		List<FileFilter> ff = new LinkedList<FileFilter>();
-		ff.add(SBFileFilter.createSBGNFileFilter());
-		return ff;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#writeRealDocumentToFileUnchecked(java.io.File, java.lang.String)
-	 */
-	@Override
-	protected boolean writeRealDocumentToFileUnchecked(File file, String format)
-			throws Exception {
-		return ((KEGG2SBGN)getTranslator()).writeToFile(document, file.getPath());
-	}
-
-	/* (non-Javadoc)
-	 * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
-	 */
-	@Override
-	public boolean isDetailPanelAvailable() {
-		return false;
-	}
-
+  private static final long serialVersionUID = -6585611929238639630L;
+  
+  
+  /**
+   * Create a new translator-panel and initiates the translation.
+   * @param inputFile
+   * @param outputFormat
+   * @param translationResult
+   */
+  public TranslatorSBGNPanel(File inputFile, ActionListener translationResult) {
+    this(inputFile, Format.SBGN, translationResult);
+  }
+  
+  /**
+   * Create a new translator-panel and initiates the translation.
+   * @param inputFile
+   * @param outputFormat
+   * @param translationResult
+   */
+  public TranslatorSBGNPanel(File inputFile, Format outputFormat,
+    ActionListener translationResult) {
+    super(new KEGGImporter(inputFile, outputFormat), inputFile, outputFormat.toString(), translationResult);
+  }
+  
+  /**
+   * Initiates a download and translation of the given pathway.
+   * @param pathwayID pathway identifier (e.g., "mmu00010")
+   * @param outputFormat
+   * @param translationResult
+   */
+  public TranslatorSBGNPanel(String pathwayID, Format outputFormat,
+    ActionListener translationResult) {
+    super(new KEGGImporter(pathwayID, outputFormat), outputFormat.toString(), translationResult);
+  }
+  
+  /**
+   * Initiates a download and translation of the given pathway.
+   * @param pathwayID pathway identifier (e.g., "mmu00010")
+   * @param translationResult
+   */
+  public TranslatorSBGNPanel(String pathwayID, ActionListener translationResult) {
+    this(pathwayID, Format.SBGN, translationResult);
+  }
+  
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#createGraphFromDocument(java.lang.Object)
+   */
+  @Override
+  protected Graph2D createGraphFromDocument(Sbgn document) {
+    SBGN2GraphML converter = new SBGN2GraphML();
+    return converter.createGraph(document);
+  }
+  
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#getOutputFileFilterForRealDocument()
+   */
+  @Override
+  protected List<FileFilter> getOutputFileFilterForRealDocument() {
+    List<FileFilter> ff = new LinkedList<FileFilter>();
+    ff.add(SBFileFilter.createSBGNFileFilter());
+    return ff;
+  }
+  
+  
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.gui.TranslatorGraphLayerPanel#writeRealDocumentToFileUnchecked(java.io.File, java.lang.String)
+   */
+  @Override
+  protected boolean writeRealDocumentToFileUnchecked(File file, String format)
+      throws Exception {
+    return ((KEGG2SBGN)getTranslator()).writeToFile(document, file.getPath());
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.graph.gui.TranslatorGraphLayerPanel#isDetailPanelAvailable()
+   */
+  @Override
+  public boolean isDetailPanelAvailable() {
+    return false;
+  }
+  
 }

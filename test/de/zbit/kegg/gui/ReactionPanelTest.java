@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013 Center for Bioinformatics of the University of Tuebingen.
+ * Copyright (c) 2011-2014 Center for Bioinformatics of the University of Tuebingen.
  * 
  * This file is part of KEGGtranslator, a program to convert KGML files from the
  * KEGG database into various other formats, e.g., SBML, GraphML, and many more.
@@ -45,76 +45,76 @@ import de.zbit.sbml.gui.ReactionPanel;
  * @version $Rev$
  */
 public class ReactionPanelTest {
-
-	/**
-	 * @param args
-	 * @throws SBMLException
-	 * @throws XMLStreamException
-	 */
-	public static void main(String[] args) throws XMLStreamException,
-	SBMLException {
-		SBMLDocument doc = createSimpleSBMLDocument(1, 2, 2, false);
-		SBMLWriter writer = new SBMLWriter();
-		writer.setIndentationCount(2);
-		writer.setIndentationChar(' ');
-		System.out.println(writer.writeSBMLToString(doc));
-		JFrame f = new JFrame("Reaction test");
-		JPanel panel = new ReactionPanel(doc.getModel().getReaction(0), false);
-		panel.setBackground(Color.WHITE);
-		f.getContentPane().add(panel);
-		f.setBackground(Color.WHITE);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.pack();
-		//    f.setMinimumSize(new Dimension(200, 200));
-		f.setLocationRelativeTo(null);
-		f.setVisible(true);
-	}
-
-	/**
-	 * For testing
-	 * 
-	 * @return
-	 * @throws XMLStreamException
-	 */
-	private static SBMLDocument createSimpleSBMLDocument(int numReactants,
-			int numProducts, int numModifiers, boolean reversible) throws XMLStreamException {
-		int i;
-		SBMLDocument doc = new SBMLDocument(2, 4);
-		Model model = doc.createModel("MyModel");
-		model.setNotes("<notes><body xmlns=\"http://www.w3.org/1999/xhtml\">Bla bla</body></notes>");
-		model.appendNotes("<notes><body xmlns=\"http://www.w3.org/1999/xhtml\"> foo bar</body></notes>");
-		Compartment c = model.createCompartment("default");
-		Species substrates[] = new Species[numReactants];
-		Species products[] = new Species[numProducts];
-		Species modifiers[] = new Species[numModifiers];
-		for (i = 0; i < substrates.length; i++) {
-			substrates[i] = model.createSpecies("s" + model.getNumSpecies(), c);
-		}
-		for (i = 0; i < products.length; i++) {
-			products[i] = model.createSpecies("s" + model.getNumSpecies(), c);
-		}
-		for (i = 0; i < modifiers.length; i++) {
-			modifiers[i] = model.createSpecies("s" + model.getNumSpecies(), c);
-		}
-		Reaction r = model.createReaction("R1");
-		SpeciesReference specRef;
-		for (Species s : substrates) {
-			specRef = r.createReactant(s);
-			if (Math.random() > .5) {
-				specRef.setStoichiometry(Math.round(Math.random() * 10));
-			}
-		}
-		for (Species s : products) {
-			specRef = r.createProduct(s);
-			if (Math.random() > .5) {
-				specRef.setStoichiometry(Math.round(Math.random() * 10));
-			}
-		}
-		for (Species s : modifiers) {
-			r.createModifier(s);
-		}
-		r.setReversible(reversible);
-		return doc;
-	}
-
+  
+  /**
+   * @param args
+   * @throws SBMLException
+   * @throws XMLStreamException
+   */
+  public static void main(String[] args) throws XMLStreamException,
+  SBMLException {
+    SBMLDocument doc = createSimpleSBMLDocument(1, 2, 2, false);
+    SBMLWriter writer = new SBMLWriter();
+    writer.setIndentationCount(2);
+    writer.setIndentationChar(' ');
+    System.out.println(writer.writeSBMLToString(doc));
+    JFrame f = new JFrame("Reaction test");
+    JPanel panel = new ReactionPanel(doc.getModel().getReaction(0), false);
+    panel.setBackground(Color.WHITE);
+    f.getContentPane().add(panel);
+    f.setBackground(Color.WHITE);
+    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    f.pack();
+    //    f.setMinimumSize(new Dimension(200, 200));
+    f.setLocationRelativeTo(null);
+    f.setVisible(true);
+  }
+  
+  /**
+   * For testing
+   * 
+   * @return
+   * @throws XMLStreamException
+   */
+  private static SBMLDocument createSimpleSBMLDocument(int numReactants,
+    int numProducts, int numModifiers, boolean reversible) throws XMLStreamException {
+    int i;
+    SBMLDocument doc = new SBMLDocument(2, 4);
+    Model model = doc.createModel("MyModel");
+    model.setNotes("<notes><body xmlns=\"http://www.w3.org/1999/xhtml\">Bla bla</body></notes>");
+    model.appendNotes("<notes><body xmlns=\"http://www.w3.org/1999/xhtml\"> foo bar</body></notes>");
+    Compartment c = model.createCompartment("default");
+    Species substrates[] = new Species[numReactants];
+    Species products[] = new Species[numProducts];
+    Species modifiers[] = new Species[numModifiers];
+    for (i = 0; i < substrates.length; i++) {
+      substrates[i] = model.createSpecies("s" + model.getNumSpecies(), c);
+    }
+    for (i = 0; i < products.length; i++) {
+      products[i] = model.createSpecies("s" + model.getNumSpecies(), c);
+    }
+    for (i = 0; i < modifiers.length; i++) {
+      modifiers[i] = model.createSpecies("s" + model.getNumSpecies(), c);
+    }
+    Reaction r = model.createReaction("R1");
+    SpeciesReference specRef;
+    for (Species s : substrates) {
+      specRef = r.createReactant(s);
+      if (Math.random() > .5) {
+        specRef.setStoichiometry(Math.round(Math.random() * 10));
+      }
+    }
+    for (Species s : products) {
+      specRef = r.createProduct(s);
+      if (Math.random() > .5) {
+        specRef.setStoichiometry(Math.round(Math.random() * 10));
+      }
+    }
+    for (Species s : modifiers) {
+      r.createModifier(s);
+    }
+    r.setReversible(reversible);
+    return doc;
+  }
+  
 }
