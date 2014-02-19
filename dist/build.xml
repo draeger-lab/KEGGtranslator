@@ -37,7 +37,7 @@
     <!-- the base directory of the KEGGtranslator repository -->
     <property name="base" location=".."/>
   	
-  	<property name="version" value="2.4"/>
+  	<property name="version" value="2.5"/>
   	
   	<!-- the path to SYSBIO -->
   	<property name="SysBioPath" location="${base}/../SysBio" />
@@ -139,7 +139,6 @@
             <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/stax2-api-3.0.3.jar"/>
             <zipfileset excludes="META-INF/*.SF,META-INF/LICENSE*" src="${JSBMLPath}/core/lib/woodstox-core-lgpl-4.0.9.jar"/>
             
-    	      
     </jar>
   </target>
 
@@ -453,9 +452,10 @@
         <include name="de/zbit/gui/wizard/**.class"/>
         <include name="de/zbit/gui/**.class"/>
         <include name="de/zbit/io/**.class"/>
+      	<include name="de/zbit/io/bzip2/**.class"/>
       	<include name="de/zbit/io/csv/**.class"/>
       	<include name="de/zbit/io/filefilter/**.class"/>
-      	<include name="de/zbit/io/bzip2/**.class"/>
+      	<include name="de/zbit/io/fileformat/**.class"/>
       	<include name="de/zbit/io/tar/**.class"/>
       	<include name="de/zbit/kegg/**.class"/>
       	<include name="de/zbit/kegg/api/**.class"/>

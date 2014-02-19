@@ -100,7 +100,7 @@ public class TranslatorPanelTools {
         return null;
     }
     
-    if (panel!=null && (panel instanceof TranslatorGraphLayerPanel)) {
+    if ((panel != null) && (panel instanceof TranslatorGraphLayerPanel)) {
       setupBackgroundImage((TranslatorGraphLayerPanel<?>) panel);
     }
     return panel;

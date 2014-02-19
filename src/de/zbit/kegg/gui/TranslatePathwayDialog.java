@@ -209,7 +209,7 @@ public class TranslatePathwayDialog extends JPanel {
       @Override
       public void run() {
         TranslatorPanel<?> tp = evaluateDialog(translationResult);
-        if (tp!=null) {
+        if (tp != null) {
           addTabsHere.addTab(selector.getSelectedPathway(), tp);
           try {
             addTabsHere.setSelectedIndex(addTabsHere.getTabCount() - 1);
