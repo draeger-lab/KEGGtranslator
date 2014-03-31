@@ -23,6 +23,8 @@ package de.zbit.kegg.gui;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -182,6 +184,9 @@ public class TranslatePathwayDialog extends JPanel {
     
     // Action
     okButton.addActionListener(new ActionListener() {
+      /* (non-Javadoc)
+       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+       */
       @Override
       public void actionPerformed(ActionEvent e) {
         createOkButtonAction(addTabsHere, translationResult).run();
@@ -238,9 +243,16 @@ public class TranslatePathwayDialog extends JPanel {
    * @param translationResult an optional action listener
    * @param optionalPreSelectedFormat an optional pre-selection of desired output format
    */
-  public static void showAndEvaluateDialog(final JTabbedPane addTabsHere, final ActionListener translationResult, TranslatePathwayDialog d) {
-    GUITools.showOkCancelDialogInNewThread(d, "Download pathway", d.createOkButtonAction(addTabsHere, translationResult), null);
-    d.selector.autoActivateOkButton(d);
+  public static void showAndEvaluateDialog(final JTabbedPane addTabsHere, final ActionListener translationResult, final TranslatePathwayDialog d) {
+    GUITools.showOkCancelDialogInNewThread(d, "Download pathway", d.createOkButtonAction(addTabsHere, translationResult), null, new PropertyChangeListener() {
+      /* (non-Javadoc)
+       * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+       */
+      @Override
+      public void propertyChange(PropertyChangeEvent arg0) {
+        d.selector.autoActivateOkButton(d);
+      }
+    });
   }
   
 }

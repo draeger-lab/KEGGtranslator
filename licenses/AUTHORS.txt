@@ -1,20 +1,22 @@
+% File-encoding: UTF-8
+
 ###################
 # Core Developers #
 ###################
 
 Clemens Wrzodek (1)
-  clemens.wrzodek@uni-tuebingen.de, University of Tuebingen
-Andreas Dräger (1)
-  andreas.draeger@uni-tuebingen.de, University of Tuebingen
+  clemens.wrzodek@uni-tuebingen.de
+Andreas Dräger (1,2)
+  andraeger@eng.ucsd.edu
   
 ###################
 #  Contributors   #
 ###################
 
-Martijn van Iersel
-  mvaniersel@gmail.com, Netherlands Consortium for Systems Biology
+Martijn van Iersel (3)
+  mvaniersel@gmail.com
 Andreas Zell (1)
-  andreas.zell@uni-tuebingen.de, University of Tuebingen
+  andreas.zell@uni-tuebingen.de
 
 ###################
 #     Alumni      #
@@ -26,3 +28,5 @@ Andreas Zell (1)
 ###################
 
 (1) University of Tübingen, Germany
+(2) University of California, San Diego, La Jolla, CA, USA
+(3) Netherlands Consortium for Systems Biology

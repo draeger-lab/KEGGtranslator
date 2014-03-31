@@ -1,7 +1,30 @@
-<!-- ANT build script for yfiles obfuscation           -->
-<!-- The java based ANT tool is available from         -->
-<!-- http://jakarta.apache.org/ant                     -->
-   	
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * $Id$
+ * $URL$
+ * =================================================================== 
+ * This file is part of KEGGtranslator, a program to convert KGML files
+ * from the KEGG database into various other formats, e.g., SBML, GML,
+ * GraphML, and many more. Please visit the project homepage at
+ * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
+ * obtain the latest version of KEGGtranslator.
+ *
+ * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ *
+ * KEGGtranslator is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
+ * ===================================================================
+ *
+ * ANT build script for yfiles obfuscation
+ * The java based ANT tool is available from
+ * http://jakarta.apache.org/ant
+ *
+ * Version: $Rev$
+-->
 <project
   name="KEGGtranslator with Obfuscation"
   default="sign"
@@ -27,121 +50,286 @@
     </echo>
   </target>
 
+  <!-- =================================================================== -->
+  <!-- Initialization target                                               -->
+  <!-- =================================================================== -->
   <target
   	name="init"
   	description="define some properties that are used throughout the tasks"
   >
-  	<echo>
+    <tstamp>
+      <format property="YEAR" pattern="yyyy"/>
+    </tstamp>
+    
+    <echo>
   	  PLESE MAKE SURE LOG LEVEL IN Translator.java MAIN METHOD IS SET TO INFO!
-  	</echo>
+    </echo>
     <!-- the base directory of the KEGGtranslator repository -->
-    <property name="base" location=".."/>
+    <property name="base" location="${basedir}/.."/>
   	
-  	<property name="version" value="2.5"/>
+    <!-- Properties required for building and compiling the project -->
+  	<filter token="date"            value="${TODAY}"/>
+  	
+    <property name="Name"           value="KEGGtranslator"/>
+  	<property name="version"        value="2.4"/>
+    <property name="build.number"   value="${DSTAMP}-${TSTAMP}"/>
+    <property name="build.name"     value="${version} (build ${build.number})"/>
+    <property name="build.dir"      value="${base}/build"/>
+    <property name="build.src"      value="${base}/build/src"/>
+    <property name="build.dest"     value="${base}/build/classes"/>
+    <property name="lib"            value="${base}/lib"/>
+  	<property name="verbose"        value="true"/>
+    <property name="build.compiler" value="modern"/>
+  	<property name="dist"           value="${basedir}"/>
+  	<property name="dist.dir"       value="${dist}/${Name}-${version}"/>
+  	<property name="src" location="${base}/src"/>
+  	<property name="test"           location="${base}/test"/>
+  	<property name="resources"      location="${base}/resources"/>
+  	<property name="deprecation"    value="false"/>
+  	<property name="optimize"       value="on"/>
+  	<property name="uuid"           value="a4978d67-f0b0-4f91-abc6-0cc7b848cd53"/>
+  	<property name="vendor"         value="Center for Bioinformatics Tuebingen (ZBIT)"/>
+  	<property name="impl.vendor"    value="University of Tuebingen"/>
+    <!-- add everything needed to the classpath -->
+    <!-- adjust the settings to your local environment -->
+    <path id="classpath">
+      <fileset dir="${lib}"         includes="*.jar, *.zip"/>
+      <fileset dir="${lib}/garuda"  includes="*.jar, *.zip"/>
+    </path>
+	<path id="sourcepath">
+	  <fileset dir="${src}"/>
+	  <fileset dir="${test}"/>
+	  <fileset dir="${resources}"/>
+    </path>
   	
   	<!-- the path to SYSBIO -->
   	<property name="SysBioPath" location="${base}/../SysBio" />
 
     <!-- the path to JSBML -->
-     <property name="JSBMLPath" location="${base}/../jSBML" />
+    <property name="JSBMLPath" location="${base}/../JSBML" />
   	
     <!-- the path to SBML2LaTeX -->
      <property name="SBML2LaTeXPath" location="${base}/../SBML2LaTeX" />
-  	
-    <!-- the path to the KEGGtranslator sources -->
-  	<property name="src" location="${base}/src"/>
+
   	
     <!-- the path to the KEGGtranslator binaries -->
     <property name="classes" location="${base}/bin"/>
     
     <!-- the unobfuscated application jar file -->
-    <property name="appJar" value="KEGGtranslator.jar"/>
+    <property name="appJar" value="${dist.dir}/${Name}.jar"/>
 
     <!-- the obfuscated application jar file -->
-    <property name="appJarObf" value="KEGGtranslatorObf.jar"/>
+    <property name="appJarObf" value="${dist.dir}/${Name}Obf_v${version}.jar"/>
 
     <!-- the obfuscated and signed application jar file -->
-    <property name="appJarObfSgn" value="KEGGtranslator_v${version}.jar"/>
+  	<property name="final.jar" value="${Name}_v${version}.jar"/>
+    <property name="appJarObfSgn" value="${dist.dir}/${final.jar}"/>
   	
     <!-- the yGuard jar file containing the obfuscation task -->
     <property name="yGuardJar" value="yguard.jar"/>
   	
     <!-- the log file geenrated by the obfuscation task -->
-    <property name="obfuscationLog" value="obfuscation-log.xml"/>
+    <property name="obfuscationLog" value="${Name}_obfuscation-log.xml"/>
+  	<property name="shrinkLog" value="${Name}_shrink-log.xml"/>
   	
-  	<property name="build.compiler" value="modern"/>
+  	<echo message="----------- ${Name} ${version} [${YEAR}] ------------"/>
+  	<echo message="-----------     ${TODAY}       ------------"/>
+  	<echo message="-----------     ${DSTAMP} ${TSTAMP}       ------------"/>
   	
   </target>
 
+  <!-- =================================================================== -->
+  <!-- Determines the current SVN revision number of the project           -->
+  <!-- =================================================================== -->
+  <target
+  	name="svnrevision"
+  	depends="init"
+  	description="Determines the current SVN revions number of KEGGtranslator and stores it in a variable."
+  >
+  	<exec executable="svn" outputproperty="${base}/svninfo.xml">
+  	  <arg line="info --xml ${base}/"/>
+  	</exec>
+  	<xmlproperty collapseAttributes="true">
+  	  <propertyresource name="${base}/svninfo.xml"/>
+  	</xmlproperty>
+  	<property name="repository.revision" value="${info.entry.revision}"/>
+  	<echo message="Current revision is ${repository.revision}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Prepares the build directory                                        -->
+  <!-- =================================================================== -->
+  <target
+   name="prepare"
+   depends="init"
+   description="Prepares the build directory"
+  >
+    <mkdir dir="${build.dir}"/>
+    <echo message="Done"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Prepares the source code                                            -->
+  <!-- =================================================================== -->
+  <target
+   name="prepare-src"
+   depends="prepare"
+   description="Prepares the source code"
+  >
+  	<echo message="Removing existing directories"/>
+    <delete dir="${build.dest}"/>
+  	
+    <echo message="Creating target directories"/>
+    <mkdir dir="${build.src}"/>
+    <mkdir dir="${build.dest}"/>
+    <mkdir dir="${build.dest}/META-INF"/>
+    <mkdir dir="${dist}"/>
+    <mkdir dir="${dist.dir}"/>
+
+    <!-- copy src files -->
+    <copy todir="${build.src}" overwrite="yes" verbose="${verbose}">
+      <fileset 
+        dir="${src}"
+        excludes="**/.svn*, **/*.class, **/*~, **/*.tgz, **/*.zip"
+      />
+      <fileset
+     	dir="${test}"
+     	excludes="**/.svn*, **/*.class, **/*~, **/*.tgz, **/*.zip"
+      />
+    </copy>
+  	<copy todir="${build.src}" overwrite="yes" verbose="${verbose}">
+      <fileset 
+        dir="${resources}"
+        excludes="**/.svn*, **/*~, **/*.tgz, **/*.zip"
+      />
+    </copy>
+    
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Compiles the entire project                                         -->
+  <!-- =================================================================== -->
+  <target
+  	name="compile"
+  	depends="svnrevision, prepare-src"
+  	description="Compiles the entire project"
+  >
+  	<echo message="Compiling the entire ${Name} project"/>
+  	<javac
+      classpathref="classpath"
+      compiler="${build.compiler}"
+      debug="${debug}"
+      deprecation="${deprecation}"
+      destdir="${build.dest}"
+      fork="true"
+  	  includeantruntime="true"
+      listfiles="yes"
+      memoryMaximumSize="512M"
+      nowarn="no"
+      optimize="${optimize}"
+      source="1.6"
+      sourcepathref="sourcepath"
+      target="1.6"
+      verbose="${verbose}"
+    >
+      <src path="${build.src}"/>
+  	</javac>
+  	
+    <manifest file="${build.dest}/META-INF/MANIFEST.MF">
+      <attribute name="Main-Class"             value="de.zbit.kegg.Translator"/>
+      <attribute name="SplashScreen-Image"     value="de/zbit/kegg/gui/img/Logo.gif"/>
+      <attribute name="Built-By"               value="${user.name}"/><!-- ${vendor} -->
+      <attribute name="Built-Date"             value="${TODAY}"/>
+      <!-- Unfortunately, the follwoing two attributes are no valid manifest attributes: -->
+      <!--<attribute name="Xdock:name" value="${Name}"/>-->
+      <!--<attribute name="Xdock:icon" value="de/zbit/kegg/gui/img/KEGGtranslatorIcon_256.png"/>-->
+      <section name="${Name}">
+	    <attribute name="Implementation-Title"   value="${Name}"/>
+	    <attribute name="Implementation-Vendor"  value="${impl.vendor}"/>
+	    <attribute name="Implementation-Version" value="Revision ${repository.revision} (Build ${build.number})"/>
+        <attribute name="Implementation-URL"     value="http://www.cogsys.cs.uni-tuebingen.de/software/${Name}/"/>
+        <attribute name="Specification-Title"    value="${Name}"/>
+        <attribute name="Specification-Version"  value="${version}"/>
+        <attribute name="Specification-Vendor"   value="${vendor}"/>
+      </section>
+      <attribute name="Bundle-Name"            value="${Name}"/> 
+      <attribute name="Bundle-SymbolicName"    value="${uuid}"/>
+      <attribute name="Bundle-Revision"        value="${repository.revision}"/>
+      <attribute name="Bundle-Vendor"          value="${vendor}"/>
+      <attribute name="Bundle-RequiredExecutionEnvironment" value="JavaSE-1.6"/>
+      <attribute name="Bundle-Version"         value="${version}"/>
+    </manifest>
+  	
+  	<copy todir="${build.dest}/META-INF/" verbose="${verbose}">
+  	  <fileset dir="${base}/licenses"/>
+  	</copy>
+  	
+  </target>
+	
+  <!-- =================================================================== -->
+  <!-- Puts the application specific classes into application.jar          -->
+  <!-- =================================================================== -->
   <target
 	name="jar"
-  	depends="init"
+  	depends="compile"
   	description="puts the application specific classes into application.jar."
   >
-    <jar jarfile="${appJar}" update="false">
-            <manifest>
-              <attribute name="Main-Class" value="de.zbit.kegg.Translator"/>
-              <attribute name="Built-By" value="Center for Bioinformatics Tuebingen (ZBIT)"/>
-              <attribute name="SplashScreen-Image" value="de/zbit/kegg/gui/img/Logo.gif"/>
-            	<!-- Die folgenden 2 Attribute sind leider keine gültigen manifest attribute. -->
-            	<!--<attribute name="Xdock:name" value="KEGGtranslator"/>-->
-              <!--<attribute name="Xdock:icon" value="de/zbit/kegg/gui/img/KEGGtranslatorIcon_256.png"/>-->
-            </manifest>
+  	<property name="EXCL" value="META-INF/**, COPYING.txt, licenses/**, package.html, package-info.class, overview.html, AUTHORS.txt"/>
+  	
+    <jar
+      compress="true"
+      duplicate="preserve"
+      filesetmanifest="mergewithoutmain"
+      index="true"
+      indexMetaInf="true"
+      jarfile="${appJar}"
+      level="9"
+      manifest="${build.dest}/META-INF/MANIFEST.MF"
+      manifestencoding="utf-8"
+      strict="warn"
+      update="false"
+    >
       <!-- INCLUDE/ EXCLUDE DEMO-->
       <!--<fileset dir="${src}">-->
       <!--  <include name="demo/view/**/*.properties"/>-->
       <!--  <exclude name="demo/view/**/resource/**"/>-->
       <!--</fileset>-->
-            <fileset dir="${classes}">
-            	<exclude name="**/package.html"/>
-            </fileset>	
-            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/y.jar"/>
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/HotEqn.jar"/> -->
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${base}/lib/stax-api-1.0.1.jar"/> -->
+        <fileset
+          dir="${build.dest}"
+          includes="**/*.class"
+          excludes="**/package.html **/package-info.class"
+        />
+        <fileset 
+          dir="${build.src}"
+          includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo, **/*.html, **.html, **/*.htm, **.htm, **/*.png, **.png, **/*.gif, **.gif, **/*.jpg, **.jpg"
+          excludes="**.java, overview.html"
+        />
+        <zipfileset dir="${build.dest}/META-INF/" prefix="META-INF/">
+          <exclude name="MANIFEST.MF"/>
+        </zipfileset>
     	
-            <zipfileset excludes="overview.html,META-INF/**/*,org/apache/commons/logging/**/*,javax/xml/namespace/QName.class,org/apache/log4j/**/*" src="${base}/lib/paxtools-4.1.1_customJenaFix.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${base}/lib/org.sbgn.jar"/>
-
-    	
-    	      <filelist dir="${basedir}" files="libquaqua.jnilib,libquaqua64.jnilib"/>
-
-<!-- Uncomment for SysBio classes instead of compiled jar. -->
-           <fileset dir="${SysBioPath}/bin">
-              <exclude name="de/zbit/resources/liftover/**/*"/>
-           	  <exclude name="de/zbit/mapper/**/*"/>
-            	<exclude name="**/package.html"/>
-           	  <exclude name="overview.html"/>
-           </fileset>
-<!-- Achtung, im ersten SysBio release befinden sich bugs in KeggInfos.java ! -->
-<!--    	      <zipfileset excludes="META-INF/*,de/zbit/resources/liftover/*,**/package.html" src="${base}/lib/sysbio_v1_light.jar"/> -->
-    	
-            <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-discovery.jar"/>
-            <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-logging.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/jaxrpc.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/wsdl4j.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/axis.jar"/>
-    	    <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
-            <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/quaqua.jar"/>
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/Java5/saaj.jar"/>-->
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${SysBioPath}/lib/WSDbfetch.jar"/>-->
-            <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/commons-cli-1.1.jar"/>
-            
-            <fileset dir="${JSBMLPath}/bin">
-              <exclude name="log4j.properties"/> <!-- log4j.properties is in SBML2Latex and jSBML -->
-            </fileset>
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/biojava-1.7-ontology.jar"/>
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/junit-4.8.jar"/>-->
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/log4j-1.2.8.jar"/>
-            <!-- <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/lib/stax-api-1.0.1.jar"/> -->
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/staxmate-2.0.0.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/xstream-1.3.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/jigsaw-dateParser.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="${JSBMLPath}/core/lib/stax2-api-3.0.3.jar"/>
-            <zipfileset excludes="META-INF/*.SF,META-INF/LICENSE*" src="${JSBMLPath}/core/lib/woodstox-core-lgpl-4.0.9.jar"/>
-            
+        <zipfileset excludes="META-INF/*.SF" src="${lib}/y.jar"/>
+        <zipfileset excludes="overview.html,META-INF/**/*,org/apache/commons/logging/**/*,javax/xml/namespace/QName.class,org/apache/log4j/**/*" src="${lib}/paxtools-4.1.1_customJenaFix.jar"/>
+        <zipfileset excludes="META-INF/*.SF" src="${lib}/org.sbgn.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/axis.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/commons-discovery.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/commons-cli-1.1.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/commons-logging.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/wsdl4j.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/jaxrpc.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/SBML2LaTeX_v1.0_slim.jar"/>
+        <zipfileset excludes="META-INF/INDEX.LIST META-INF/MANIFEST.MF, COPYING.txt, package.html, package-info.class, licenses/**, overview.html, AUTHORS.txt" src="${lib}/jsbml-1.0-b1-incl-libs.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/SysBio.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/quaqua-filechooser-only.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/garuda/GarudaBackend.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/garuda/garuda-csr.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/garuda/jsonic-1.2.10.jar"/>
     </jar>
   </target>
 
+  <!-- =================================================================== -->
+  <!-- Obfuscates y.jar and adjusts application.jar accordingly            -->
+  <!-- =================================================================== -->
   <target
   	name="obfuscate"
   	depends="jar"
@@ -160,8 +348,28 @@
       <attribute name="LineNumberTable,LocalVariableTable,SourceFile">
         <patternset>
           <include name="de.zbit.**"/>
+          <include name="org.**.*"/>
+          <include name="com.**.*"/>
+          <include name="javax.**.*"/>
+          <include name="ch.**.*"/>
+          <include name="cz.**.*"/>
         </patternset>
       </attribute>
+
+      <shrink logfile="${shrinkLog}">
+      	<keep>
+      	  <class classes="protected" methods="protected" fields="protected">
+      		<patternset>
+      		  <include name="de.zbit.**"/>
+      		  <include name="org.**.*"/>
+      		  <include name="com.**.*"/>
+      	      <include name="javax.**.*"/>
+      		  <include name="ch.**.*"/>
+      		  <include name="cz.**.*"/>
+      		</patternset>
+      	  </class>
+      	</keep>
+      </shrink>
 
       <rename logfile="${obfuscationLog}" replaceClassNameStrings="true" mainclass="de.zbit.kegg.Translator">
         <!-- conservemanifest="true" -->
@@ -173,7 +381,12 @@
         
         	<package>
         		<patternset>
-          	  <include name="de.**.*"/>
+          	      <include name="de.**.*"/>
+        		  <include name="org.**.*"/>
+        		  <include name="com.**.*"/>
+        		  <include name="javax.**.*"/>
+        		  <include name="ch.**.*"/>
+        		  <include name="cz.**.*"/>
         		</patternset>
         	</package>
 
@@ -203,8 +416,8 @@
               	<exclude name="de.zbit.graph.SearchSupport"/>
               	<exclude name="de.zbit.graph.StackingNodeLayout"/>
               	
-               <!-- Obfuscate the included y.jar -->
-               <exclude name="y.**.*"/>
+                <!-- Obfuscate the included y.jar -->
+                <exclude name="y.**.*"/>
               </patternset>
              </class>
         		
@@ -219,13 +432,16 @@
     </yguard>
   </target>
 
+  <!-- =================================================================== -->
+  <!-- Signs the obfuscated application                                    -->
+  <!-- =================================================================== -->
   <target
 	name="sign"
   	depends="obfuscate"
   	description="signs the obfuscated application"
   >
     <!-- Having an "keystore" file is required. Generate it with the "keytool" in the current directory. -->  	
-	  <signjar alias="KEGGtranslator" jar="${appJarObf}" keypass="d=dpfKEGGtranslator!" keystore="keystore" signedjar="${appJarObfSgn}" storepass="d=dpfKEGGtranslator!"/>
+	  <signjar alias="${Name}" jar="${appJarObf}" keypass="d=dpfKEGGtranslator!" keystore="keystore" signedjar="${appJarObfSgn}" storepass="d=dpfKEGGtranslator!"/>
   </target>
 
   <target name="run" depends="obfuscate" description="executes the obfuscated application">
@@ -248,6 +464,9 @@
     </java>
   </target>
 
+  <!-- =================================================================== -->
+  <!-- Cleans up the workspace                                             -->
+  <!-- =================================================================== -->
   <target
   	name="clean"
   	depends="init"
@@ -259,6 +478,9 @@
     <delete file="${obfuscationLog}"/>
     <delete includeemptydirs="true" dir="${classes}"/>
     <delete file="${appJarObfSgn}"/>
+    <delete includeEmptyDirs="true" quiet="yes">
+      <fileset dir="${build.dir}" includes="**/*"/>
+    </delete>
   </target>
 	
 	
@@ -270,25 +492,51 @@
   	depends="init"
     description="Creates a ZIP file for Garuda">
     
-  	<property name="Name"          value="KEGGtranslator"/>
-  	<property name="dist"          value="${basedir}"/>
-  	<property name="dist.dir"      value="${dist}/${Name}-${version}"/>
-  	<property name="garuda.gadget" value="${dist.dir}/${appJarObfSgn}_Garuda.zip"/>
-  	<property name="resources"     value="${base}/resources"/>
+  	<property name="garuda.gadget"  value="${dist.dir}/${Name}_v${version}_Garuda.zip"/>
+  	<property name="gadget.config"  value="gadget_config.xml"/>
   	
-  	<property name="uuid"           value="a4978d67-f0b0-4f91-abc6-0cc7b848cd53"/>
-  	<property name="gadget.config"  value="${dist}/gadget_config.xml"/>
+  	<!-- Launch command is platform dependent -> Determine command for platform -->
+  	<!-- Windows: cmd /c start javaw.exe -jar gadgets/[GADGET_UUID]/[JAR_NAME] -->
+  	<!-- Linux:   java -jar gadgets/[GADGET_UUID]/[JAR_NAME] -->
+  	<!-- Mac OS:  open gadgets/[GADGET_UUID]/[JAR_NAME] -->
+  	<condition property="jar.executor" value="open">
+  	  <os family="mac"/>
+  	</condition>
+  	<condition property="jar.executor" value="cmd /c start javaw.exe -jar">
+  	  <os family="windows"/>
+  	</condition>
+  	<condition property="jar.executor" value="java -jar">
+    <and>
+  	  	<os family="unix"/>
+  	  	<not>
+  	      <os family="mac"/>
+  	    </not>
+  	  </and>
+  	</condition>
+  	
+  	<copy file="${dist}/${gadget.config}" todir="${dist.dir}/" verbose="${verbose}"/>
+  	<property name="keggtranslator.config" value="${dist.dir}/${gadget.config}"/>
   	
   	<echo message="Updating Garuda gadget configuration..."/>
   	<replace
-      file="${gadget.config}"
-      token="[GADGET_UUID]"
-      value="${uuid}"
-    />
+  	  file="${keggtranslator.config}"
+  	  token="[LAUNCH_COMMAND]"
+  	  value="${jar.executor}"
+  	/>
   	<replace
-      file="${gadget.config}"
-      token="[JAR_NAME]"
-      value="${appJarObfSgn}"
+  	  file="${keggtranslator.config}"
+  	  token="[GADGET_UUID]"
+  	  value="${uuid}"
+  	/>
+  	<replace
+  	  file="${keggtranslator.config}"
+  	  token="[GADGET_NAME]"
+  	  value="${Name}"
+  	/>
+  	<replace
+  	  file="${keggtranslator.config}"
+  	  token="[JAR_NAME]"
+  	  value="${final.jar}"
   	/>
   	
   	<echo message="Generating ZIP archive for Garuda..."/>
@@ -301,7 +549,7 @@
       update="true"
    	>
       <mappedresources>
-        <fileset file="${gadget.config}"/>
+        <fileset file="${keggtranslator.config}"/>
           <globmapper from="*" to="${uuid}/*"/>
         </mappedresources>
       <mappedresources>
@@ -312,31 +560,12 @@
         <fileset file="${resources}/de/zbit/kegg/gui/img/${Name}Icon_64.png"/>
         <globmapper from="*" to="${uuid}/icons/*"/>
       </mappedresources>
-      <mappedresources>
-        <fileset file="${dist}/Screenshot_1.png"/>
-        <globmapper from="*" to="${uuid}/snapshot/*"/>
-      </mappedresources>
-      <mappedresources>
-        <fileset file="${dist}/Screenshot_2.png"/>
-        <globmapper from="*" to="${uuid}/snapshot/*"/>
-      </mappedresources>
-      <mappedresources>
-        <fileset file="${dist}/Screenshot_3.png"/>
-        <globmapper from="*" to="${uuid}/snapshot/*"/>
-      </mappedresources>
+  	  <zipfileset dir="${dist}/" prefix="${uuid}/snapshot/">
+  		<include name="Screenshot_*.png"/>
+  	  </zipfileset>
     </zip>
   	
-  	<echo message="Reverting changes in Garuda gadget configuration file..."/>
-  	<replace
-      file="${gadget.config}"
-      token="${uuid}"
-      value="[GADGET_UUID]"
-  	/>
-  	<replace
-      file="${gadget.config}"
-      token="${appJarObfSgn}"
-      value="[JAR_NAME]"
-  	/>
+  	<delete file="${keggtranslator.config}" verbose="${verbose}"/>
 
   </target>
 	
@@ -349,26 +578,26 @@
     description="Build a minimal version of SysBio for KEGGtranslator"
   >
     <!-- The relative path of the SysBio project -->
-  	<property name="lib" value="${base}/lib"/>
   	<property name="sysbio.lib" value="${SysBioPath}/lib"/>
     <path id="sysbio.classpath">
-      <fileset dir="${sysbio.lib}" includes="**.jar, **/*.jar, **.zip"/>
+      <fileset dir="${sysbio.lib}"
+      	includes="**.jar, **/*.jar, **.zip"
+      	excludes="Java5/**, jsbml-old/**"
+      />
     </path>
     <path id="sysbio.sourcepath">
       <fileset dir="${SysBioPath}/src"/>
-      <fileset dir="${SysBioPath}/test"/>
       <fileset dir="${SysBioPath}/resources"/>
-      <fileset dir="${SysBioPath}/examples"/>
     </path>
     
   	<echo message="Determining the revision number of SysBio"/>
-    <exec executable="svn" outputproperty="svninfo.xml">
-      <arg line="info --xml"/>
+    <exec executable="svn" outputproperty="${SysBioPath}/svninfo.xml">
+      <arg line="info --xml ${SysBioPath}"/>
     </exec>
     <xmlproperty collapseAttributes="true">
-      <propertyresource name="svninfo.xml"/>
+      <propertyresource name="${SysBioPath}/svninfo.xml"/>
     </xmlproperty>
-		<property name="sysbio.revision" value="${info.entry.revision}"/>
+	<property name="sysbio.revision" value="${info.entry.revision}"/>
 
     <echo message="Deleting all previous versions of SysBio JAR files"/>
     <delete verbose="true">
@@ -386,6 +615,7 @@
       debug="${debug}"
       deprecation="${deprecation}"
       destdir="${SysBioPath}/bin"
+      fork="true"
       listfiles="yes"
       memoryMaximumSize="512M"
       nowarn="no"
@@ -396,15 +626,14 @@
       target="1.6"
       verbose="${verbose}"
     />
-    <!-- <copy todir="${SysBioPath}/bin"/> -->
 
-    <echo message="Packing a minimal JAR file containing only parts required for KEGGtranslator"/>
+    <echo message="Packing a minimal JAR file containing only parts required for ${Name}"/>
     <jar
       compress="true"
       filesetmanifest="mergewithoutmain"
       index="true"
       indexMetaInf="true"
-    jarfile="${lib}/SysBio.jar"
+      jarfile="${lib}/SysBio.jar"
       level="9"
       manifestencoding="utf-8"
       strict="warn"
@@ -415,88 +644,26 @@
         <section name="SysBio">
           <attribute name="Specification-Title"    value="SysBio"/>
           <attribute name="Specification-Version"  value="Revision ${sysbio.revision}"/>
-          <attribute name="Specification-Vendor"   value="Center for Bioinformatics Tuebingen (ZBIT)"/>
+          <attribute name="Specification-Vendor"   value="${vendor}"/>
           <attribute name="Implementation-Title"   value="SysBio"/>
           <attribute name="Implementation-Version" value="Revision ${sysbio.revision} ${TODAY} (Build ${DSTAMP}-${TSTAMP})"/>
-          <attribute name="Implementation-Vendor"  value="University of Tuebingen"/>
+          <attribute name="Implementation-Vendor"  value="${impl.vendor}"/>
         </section>
       </manifest>
-      <fileset dir="${SysBioPath}">
+      <zipfileset dir="${SysBioPath}" prefix="META-INF">
         <include name="licenses/COPYING.txt"/>
-        <include name="licenses/lib-licenses/*.txt"/>
-        <include name="licenses/lib-licenses/*.html"/>
         <include name="licenses/AUTHORS.txt"/>
-      </fileset>
-      <fileset dir="${SysBioPath}/bin" excludes="**/.svn*, **/package-info.class">
-        <include name="de/zbit/**.class"/>
-        <include name="de/zbit/cache/**.class"/>
-        <include name="de/zbit/collection/**.class"/>
-      	<include name="de/zbit/dbfetch/**.class"/>
-      	<include name="de/zbit/exception/**.class"/>
-        <include name="de/zbit/garuda/**.class"/>
-      	<include name="de/zbit/graph/**.class"/>
-      	<include name="de/zbit/graph/gui/**.class"/>
-      	<include name="de/zbit/graph/gui/options/**.class"/>
-      	<include name="de/zbit/graph/io/**.class"/>
-      	<include name="de/zbit/graph/io/def/**.class"/>
-        <include name="de/zbit/gui/**.class"/>
-        <include name="de/zbit/gui/csv/**.class"/>
-        <include name="de/zbit/gui/actioncommand/**.class"/>
-        <include name="de/zbit/gui/layout/**.class"/>
-        <exclude name="de/zbit/gui/layout/SpringUtilities.class"/>
-        <exclude name="de/zbit/gui/layout/VerticalLayout.class"/>
-        <include name="de/zbit/gui/panels/**.class"/>
-        <include name="de/zbit/gui/prefs/**.class"/>
-        <include name="de/zbit/gui/table/**.class"/>
-        <include name="de/zbit/gui/table/renderer/**.class"/>
-        <include name="de/zbit/gui/wizard/**.class"/>
-        <include name="de/zbit/gui/**.class"/>
-        <include name="de/zbit/io/**.class"/>
-      	<include name="de/zbit/io/bzip2/**.class"/>
-      	<include name="de/zbit/io/csv/**.class"/>
-      	<include name="de/zbit/io/filefilter/**.class"/>
-      	<include name="de/zbit/io/fileformat/**.class"/>
-      	<include name="de/zbit/io/tar/**.class"/>
-      	<include name="de/zbit/kegg/**.class"/>
-      	<include name="de/zbit/kegg/api/**.class"/>
-      	<include name="de/zbit/kegg/api/cache/**.class"/>
-      	<include name="de/zbit/kegg/gui/**.class"/>
-      	<include name="de/zbit/kegg/io/**.class"/>
-      	<include name="de/zbit/kegg/parser/**.class"/>
-      	<include name="de/zbit/kegg/parser/pathway/**.class"/>
-      	<include name="de/zbit/kegg/parser/pathway/ext/**.class"/>
-      	<include name="de/zbit/locales/**.class"/>
-        <include name="de/zbit/math/**.class"/>
-      	<include name="de/zbit/parser/**.class"/>
-        <include name="de/zbit/resources/**.class"/>
-        <include name="de/zbit/sbml/**.class"/>
-        <include name="de/zbit/sbml/gui/*.class"/>
-        <include name="de/zbit/sbml/io/*.class"/>
-        <include name="de/zbit/sbml/layout/*.class"/>
-        <exclude name="de/zbit/sbml/layout/y"/>
-        <include name="de/zbit/sbml/util/*.class"/>
-        <include name="de/zbit/text/**.class"/>
-        <include name="de/zbit/util/*.class"/>
-      	<include name="de/zbit/util/argparser/**.class"/>
-      	<include name="de/zbit/util/liftOver/**.class"/>
-      	<include name="de/zbit/util/liftOver/io/**.class"/>
-      	<include name="de/zbit/util/liftOver/util/**.class"/>
-      	<include name="de/zbit/util/logging/**.class"/>
-        <include name="de/zbit/util/objectwrapper/**.class"/>
-        <include name="de/zbit/util/prefs/**.class"/>
-        <include name="de/zbit/util/progressbar/**.class"/>
-      	<include name="de/zbit/util/progressbar/gui/**.class"/>
-        <include name="de/zbit/util/**.class"/>
-      	<include name="keggapi/**.class"/>
-      </fileset>
-      <fileset dir="${SysBioPath}/resources" excludes="**/.svn*, package-info.*">
-        <include name="de/zbit/garuda/img/**.png"/>
-        <include name="de/zbit/garuda/locales/**.xml"/>
-        <include name="de/zbit/gui/img/**.png"/>
-        <include name="de/zbit/locales/**.xml"/>
-        <include name="de/zbit/sbml/locales/**.xml"/>
-      	<include name="de/zbit/resources/liftover/**"/>
-      </fileset>
+        <include name="licenses/lib-licenses/argparser.txt"/>
+      	<include name="licenses/lib-licenses/License_Icons.txt"/>
+      </zipfileset>
+      <fileset
+      	dir="${SysBioPath}/bin"
+    	excludes="**/overview.html, **/.svn*, **/package-info.class, **/*.java, de/zbit/gui/wizard, de/zbit/mapper/**, de/zbit/mapper/compounds/**, de/zbit/mapper/enrichment/**, de/zbit/mapper/probes/**, de/zbit/sbml/layout/y/**"
+      />
+      <fileset
+      	dir="${SysBioPath}/resources"
+      	excludes="**/.svn*, package-info.*, de/zbit/mapper/**, de/zbit/mapper/compounds/**"
+      />
       <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
     </jar>
 
@@ -508,47 +675,48 @@
   <target
     name="minimal_jsbml"
     depends="init"
-    description="Build a minimal version of JSBML for KEGGtranslator"
+    description="Build a minimal version of JSBML for ${Name}"
   >
   	<echo message="Defining basic properties of the JSBML project"/>
   	<property name="jsbml.dir" value="${base}/../JSBML"/>
   	<property name="jsbml.name" value="JSBML"/>
-  	<property name="jsbml.version" value="1.0-a1"/>
+  	<property name="jsbml.version" value="1.0-b1"/>
   	<property name="lib" value="${base}/lib"/>
   	
   	
     <echo message="Determining the revision number of JSBML"/>
-    <exec executable="svn" outputproperty="svninfo.xml">
-      <arg line="info --xml"/>
+    <exec executable="svn" outputproperty="${jsbml.dir}/svninfo.xml">
+      <arg line="info --xml ${jsbml.dir}"/>
     </exec>
     <xmlproperty collapseAttributes="true">
-      <propertyresource name="svninfo.xml"/>
+      <propertyresource name="${jsbml.dir}/svninfo.xml"/>
     </xmlproperty>
-		<property name="jsbml.revision" value="${info.entry.revision}"/>
+    <property name="jsbml.revision" value="${info.entry.revision}"/>
 
-    <echo message="Compiling the entire JSBML project"/>
+    <echo message="Compiling the entire JSBML project for revision ${jsbml.revision}"/>
     <delete dir="${jsbml.dir}/bin"/>
     <mkdir dir="${jsbml.dir}/bin"/>
   	
   	<path id="jsbml.classpath">
-    <fileset dir="${jsbml.dir}/core/lib" includes="**.jar, **/*.jar, **.zip"/>
+    <fileset dir="${jsbml.dir}/core/lib" includes="**.jar, **/**.jar, **.zip"/>
   	</path>
 
   	<!-- Compile JSBML including core and all extension packages -->
   	<javac
-    classpathref="jsbml.classpath"
-    compiler="${build.compiler}"
-    debug="${debug}"
-    deprecation="${deprecation}"
-    destdir="${jsbml.dir}/bin"
-    includeantruntime="false"
-    listfiles="yes"
-    memoryMaximumSize="512M"
-    nowarn="no"
-    optimize="${optimize}"
-    source="1.6"
-    target="1.6"
-    verbose="${verbose}"
+      classpathref="jsbml.classpath"
+      compiler="${build.compiler}"
+      debug="${debug}"
+      deprecation="${deprecation}"
+      destdir="${jsbml.dir}/bin"
+  	  fork="true"
+      includeantruntime="false"
+      listfiles="yes"
+      memoryMaximumSize="512M"
+      nowarn="no"
+      optimize="${optimize}"
+      source="1.6"
+      target="1.6"
+      verbose="${verbose}"
   	>
       <!-- Source -->
       <src path="${jsbml.dir}/core/src"/>
@@ -570,71 +738,80 @@
       <src path="${jsbml.dir}/extensions/multi/resources"/>
       <src path="${jsbml.dir}/extensions/qual/resources"/>
       <src path="${jsbml.dir}/extensions/render/resources"/>
-    <src path="${jsbml.dir}/extensions/req/resources"/>
+      <src path="${jsbml.dir}/extensions/req/resources"/>
       <src path="${jsbml.dir}/extensions/spatial/resources"/>
   	</javac>
   	  	
     <copy file="${jsbml.dir}/AUTHORS.txt" tofile="${jsbml.dir}/core/licenses/JSBML-AUTHORS.txt"/>
   	
-    <echo message="Packing a minimal JAR file containing only parts required for KEGGtranslator"/>
+    <echo message="Packing a minimal JAR file containing only parts required for ${Name}"/>
+  	<property name="vendor"         value="The JSBML Team"/>
+  	<property name="jsbml.includes" value="**.txt, **/**.txt, **.xml, **/**.xml, **.properties, **/**.properties, **.cfg, **/**.cfg, **.obo, **/**.obo"/>
+    
     <jar
       compress="true"
       filesetmanifest="mergewithoutmain"
       index="true"
       indexMetaInf="true"
-      jarfile="${lib}/jsbml-1.0-a1-with-dependencies.jar"
+      jarfile="${lib}/jsbml-${jsbml.version}-incl-libs.jar"
       level="9"
       manifestencoding="utf-8"
       strict="warn"
       update="true"
     >
       <manifest>
-      	<section name="${jsbml.name}">
-          <attribute name="Specification-Title" value="${jsbml.name}"/>
-          <attribute name="Specification-Version" value="${jsbml.version}"/>
-          <attribute name="Implementation-Title" value="${jsbml.name}"/>
-        <attribute name="Implementation-Version" value="Revision ${jsbml.revision} (Build ${DSTAMP}-${TSTAMP})"/>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Built-Date" value="${TODAY}"/>
+        <attribute name="Bundle-Name"            value="${jsbml.name}"/>
+        <attribute name="Bundle-Version"         value="${version}"/>
+        <attribute name="Bundle-Vendor"          value="${vendor}"/>
+        <attribute name="Bundle-RequiredExecutionEnvironment" value="JavaSE-1.6"/>
+        <attribute name="Created-By"             value="${vendor}"/>
+        <section name="${jsbml.name}">
+          <attribute name="Specification-Title"    value="${jsbml.name}"/>
+          <attribute name="Specification-Version"  value="${jsbml.version}"/>
+          <attribute name="Specification-Vendor"   value="${vendor}"/>
+          <attribute name="Implementation-Title"   value="${jsbml.name}"/>
+          <attribute name="Implementation-Version" value="Revision ${jsbml.revision} (Build ${DSTAMP}-${TSTAMP})"/>
+          <attribute name="Implementation-Vendor"  value="${vendor}"/>
+          <attribute name="Implementation-URL"     value="http://sbml.org/Software/JSBML/"/>
         </section>
       </manifest>
-      <fileset
-        dir="${jsbml.dir}/bin"
-      	includes="META-INF/**"
-      />
-    	
+
       <!-- Licenses -->
-      <fileset dir="${jsbml.dir}/core">
+      <zipfileset dir="${jsbml.dir}/core" prefix="META-INF/">
         <include name="licenses/COPYING.txt"/>
       	<include name="licenses/COPYING.html"/>
-        <include name="licenses/lib-licenses/*.txt"/>
-        <include name="licenses/lib-licenses/*.html"/>
         <include name="licenses/JSBML-AUTHORS.txt"/>
-      </fileset>
+        <include name="licenses/lib-licenses/**.txt"/>
+        <include name="licenses/lib-licenses/**.html"/>
+      </zipfileset>
       <!-- Binaries -->
       <fileset
       	dir="${jsbml.dir}/bin"
-    	includes="**.class **/*.class"
+    	includes="META-INF/**, **.class **/**.class"
     	excludes="**/.svn*, **/package-info.class"
       />
       <!-- Resources -->
-      <fileset dir="${jsbml.dir}/core/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
-      <fileset dir="${jsbml.dir}/extensions/comp/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
-      <fileset dir="${jsbml.dir}/extensions/fbc/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
-      <fileset dir="${jsbml.dir}/extensions/groups/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
-      <fileset dir="${jsbml.dir}/extensions/layout/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
-      <fileset dir="${jsbml.dir}/extensions/multi/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
-      <fileset dir="${jsbml.dir}/extensions/qual/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
-      <fileset dir="${jsbml.dir}/extensions/render/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
-      <fileset dir="${jsbml.dir}/extensions/spatial/resources" includes="**.txt, **/*.txt, **.xml, **/*.xml, **.properties, **/*.properties, **.cfg, **/*.cfg, **.obo, **/*.obo"/>
+      <fileset dir="${jsbml.dir}/core/resources"               includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/comp/resources"    includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/fbc/resources"     includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/groups/resources"  includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/layout/resources"  includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/multi/resources"   includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/qual/resources"    includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/render/resources"  includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/spatial/resources" includes="${jsbml.includes}"/>
       <!-- 3rd party libraries -->
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java readme.txt LICENSE" src="${jsbml.dir}/core/lib/biojava-1.7-ontology.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java" src="${jsbml.dir}/core/lib/jigsaw-dateParser.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java" src="${jsbml.dir}/core/lib/log4j-1.2.8.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java" src="${jsbml.dir}/core/lib/stax-api-1.0.1.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java" src="${jsbml.dir}/core/lib/stax2-api-3.0.3.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java" src="${jsbml.dir}/core/lib/staxmate-2.0.0.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java" src="${jsbml.dir}/core/lib/woodstox-core-lgpl-4.0.9.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java" src="${jsbml.dir}/core/lib/xstream-1.3.1.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/*.java" src="${jsbml.dir}/core/lib/spi-full-0.2.4.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java readme.txt LICENSE" src="${jsbml.dir}/core/lib/biojava-1.7-ontology.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/jigsaw-dateParser.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/log4j-1.2.8.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/stax-api-1.0.1.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/stax2-api-3.0.3.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/staxmate-2.0.0.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/woodstox-core-lgpl-4.0.9.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/xstream-1.3.1.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/spi-full-0.2.4.jar"/>
     </jar>
   	
   	<!-- Remove temporary file again: -->

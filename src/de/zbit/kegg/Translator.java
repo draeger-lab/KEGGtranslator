@@ -20,17 +20,16 @@
  */
 package de.zbit.kegg;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -39,7 +38,6 @@ import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import de.zbit.AppConf;
 import de.zbit.Launcher;
 import de.zbit.cache.InfoManagement;
-import de.zbit.garuda.BackendNotInitializedException;
 import de.zbit.garuda.GarudaOptions;
 import de.zbit.garuda.GarudaSoftwareBackend;
 import de.zbit.gui.GUIOptions;
@@ -379,7 +377,7 @@ public class Translator extends Launcher {
         props.get(KEGGtranslatorIOOptions.INPUT),
         props.get(KEGGtranslatorIOOptions.OUTPUT));
     } catch (IOException exc) {
-      logger.warning(exc.getLocalizedMessage());
+      logger.warning(getMessage(exc));
     }
   }
   
@@ -503,7 +501,7 @@ public class Translator extends Launcher {
     try {
       url = new URL("http://www.gnu.org/licenses/lgpl-3.0-standalone.html");
     } catch (MalformedURLException exc) {
-      logger.log(Level.FINE, exc.getLocalizedMessage(), exc);
+      logger.log(Level.FINE, getMessage(exc), exc);
     }
     return url;
   }
@@ -528,7 +526,7 @@ public class Translator extends Launcher {
    */
   @Override
   public String getVersionNumber() {
-    return "2.5.0";
+    return "2.4.0";
   }
   
   /* (non-Javadoc)
@@ -572,46 +570,13 @@ public class Translator extends Launcher {
         @Override
         public void run() {
           try {
-            String localPath = Translator.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-            String folder = new File(localPath).getParent() + "/resources/de/zbit/kegg/gui/img/";
-            String icon = folder + "KEGGtranslatorIcon_64.png";
-            
             GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(
-              "a4978d67-f0b0-4f91-abc6-0cc7b848cd53",
-              gui,
-              icon,
-              bundle.getString("PROGRAM_DESCRIPTION"),
-              Arrays.asList(bundle.getStringArray("KEYWORDS")),
-              Arrays.asList(new String[] {
-                  "snapshot/Screenshot_1.png",
-                  "snapshot/Screenshot_1.png",
-                  "snapshot/Screenshot_1.png"
-              })
-                );
-            garudaBackend.addInputFileFormat("xml", "KGML");
-            garudaBackend.addInputFileFormat("kgml", "KGML");
-            
-            Set<String> alreadyIn = new HashSet<String>();
-            for (Format f : Format.values()) {
-              String format = f.toString();
-              int pos = format.indexOf('_');
-              if (pos>0) {
-                format = format.substring(0, pos);
-              }
-              if (alreadyIn.add(format)) {
-                for (String extension : f.getOutputFileExtensions()) {
-                  garudaBackend.addOutputFileFormat(extension, format);
-                }
-              }
-            }
+              "a4978d67-f0b0-4f91-abc6-0cc7b848cd53", gui);
             garudaBackend.init();
-            garudaBackend.registedSoftwareToGaruda();
           } catch (NetworkException exc) {
             GUITools.showErrorMessage(gui, exc);
-          } catch (BackendNotInitializedException exc) {
-            GUITools.showErrorMessage(gui, exc);
           } catch (Throwable exc) {
-            logger.fine(exc.getLocalizedMessage());
+            logger.fine(getMessage(exc));
           }
         }
       }).start();

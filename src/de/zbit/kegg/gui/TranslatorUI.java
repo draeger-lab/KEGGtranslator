@@ -20,6 +20,8 @@
  */
 package de.zbit.kegg.gui;
 
+import static de.zbit.util.Utils.getMessage;
+
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -335,7 +337,7 @@ KeyListener, ItemListener {
   protected boolean checkSettingsAndIssueWarning(String format) {
     
     Format f = Format.valueOf(format);
-    if (f==null) {
+    if (f == null) {
       GUITools.showErrorMessage(this, "Unknown output format: " + format);
       return false;
     } else if (f == Format.SBML_L2V4) {
@@ -727,27 +729,23 @@ KeyListener, ItemListener {
    */
   @Override
   protected JMenuItem[] additionalFileMenuItems() {
-    return new JMenuItem[] {
-        /*GUITools.createJMenuItem(this,
-				Action.TO_LATEX, UIManager.getIcon("ICON_LATEX_16"), KeyStroke
-						.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK), 'E', false),*/
-        GUITools.createJMenuItem(this,
-          Action.DOWNLOAD_KGML, UIManager.getIcon("ICON_GEAR_16"), KeyStroke
-          .getKeyStroke('D', InputEvent.CTRL_DOWN_MASK), 'D', true)
-    };
-  }
-  
-  /* (non-Javadoc)
-   * @see de.zbit.gui.BaseFrame#additionalEditMenuItems()
-   */
-  @Override
-  protected JMenuItem[] additionalEditMenuItems() {
-    List<JMenuItem> items = new ArrayList<JMenuItem>(1);
+    List<JMenuItem> additionalItems = new ArrayList<JMenuItem>(2);
     if (!appConf.getCmdArgs().containsKey(GarudaOptions.CONNECT_TO_GARUDA)
         || appConf.getCmdArgs().getBoolean(GarudaOptions.CONNECT_TO_GARUDA)) {
-      items.add(GarudaGUIfactory.createGarudaMenu(EventHandler.create(ActionListener.class, this, "sendToGaruda")));
+      additionalItems.add(GarudaGUIfactory.createGarudaMenu(
+        EventHandler.create(ActionListener.class, this, "sendToGaruda")));
     }
-    return items.toArray(new JMenuItem[0]);
+    /*
+     * SBML2LaTeX
+    additionalItems.add(GUITools.createJMenuItem(this,
+				Action.TO_LATEX, UIManager.getIcon("ICON_LATEX_16"), KeyStroke
+						.getKeyStroke('E', InputEvent.CTRL_DOWN_MASK), 'E', false));
+     */
+    additionalItems.add(GUITools.createJMenuItem(this,
+      Action.DOWNLOAD_KGML, UIManager.getIcon("ICON_GEAR_16"), KeyStroke
+      .getKeyStroke('D', InputEvent.CTRL_DOWN_MASK), 'D', true));
+    
+    return additionalItems.toArray(new JMenuItem[0]);
   }
   
   /**
@@ -757,7 +755,7 @@ KeyListener, ItemListener {
     final TranslatorPanel<?> o = getCurrentlySelectedPanel();
     if (o != null) {
       List<FileFilter> formatList = o.getOutputFileFilter();
-      if (formatList == null || formatList.size()<1) {
+      if ((formatList == null) || (formatList.size() < 1)) {
         return;
       }
       FileFilter selectedFilter = formatList.get(0);
@@ -877,7 +875,7 @@ KeyListener, ItemListener {
       }
       
     } catch (BackingStoreException exc) {
-      Logger.getLogger(getClass().getName()).log(Level.WARNING, exc.getLocalizedMessage(), exc);
+      Logger.getLogger(getClass().getName()).log(Level.WARNING, getMessage(exc), exc);
       // Unimportant error... don't bother the user here.
       // GUITools.showErrorMessage(this, exc);
     }
