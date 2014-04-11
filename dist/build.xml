@@ -6,7 +6,7 @@
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
  * GraphML, and many more. Please visit the project homepage at
- * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
+ * http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/ to
  * obtain the latest version of KEGGtranslator.
  *
  * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
@@ -27,7 +27,7 @@
 -->
 <project
   name="KEGGtranslator with Obfuscation"
-  default="sign"
+  default="dist"
   basedir="."
 >
 
@@ -473,17 +473,36 @@
   	description="Removes all that has been built"
   >
   	<!-- <delete file="${yJarObf}"/> -->
-  	<delete file="${appJar}"/>
-    <delete file="${appJarObf}"/>
-    <delete file="${obfuscationLog}"/>
-    <delete includeemptydirs="true" dir="${classes}"/>
-    <delete file="${appJarObfSgn}"/>
-    <delete includeEmptyDirs="true" quiet="yes">
+  	<delete file="${appJar}" verbose="${verbose}"/>
+    <delete file="${appJarObf}" verbose="${verbose}"/>
+    <delete file="${obfuscationLog}" verbose="${verbose}"/>
+    <delete includeemptydirs="true" dir="${classes}" verbose="${verbose}"/>
+    <!--<delete file="${appJarObfSgn}"/>-->
+    <delete includeEmptyDirs="true" verbose="${verbose}">
       <fileset dir="${build.dir}" includes="**/*"/>
     </delete>
+  	<delete dir="${build.dir}" verbose="${verbose}"/>
   </target>
-	
-	
+
+  <!-- =================================================================== -->
+  <!-- Creates a distribution for release                                  -->
+  <!-- =================================================================== -->
+  <target
+  	name="dist"
+  	depends="minimal_sysbio, minimal_jsbml, sign, garuda, clean"
+  	description="Compiles the project, builds jars, obfuscates and signs them, creates Garuda zip file, updates the JNLP file for Java Web Start and bundles all together for a release"
+  >
+  	<property name="jnlp.file.name" value="kgtrans.jnlp"/>
+    <property name="jnlp.file" value="${dist.dir}/kgtrans.jnlp"/>
+  	<copy file="${dist}/${jnlp.file.name}" todir="${dist.dir}/" verbose="${verbose}"/>
+  	<replace
+  	  file="${jnlp.file}"
+  	  token="[JAR_NAME]"
+  	  value="${final.jar}"
+  	/>
+  	
+  </target>
+
   <!-- =================================================================== -->
   <!-- Creates a ZIP file for Garuda                                       -->
   <!-- =================================================================== -->

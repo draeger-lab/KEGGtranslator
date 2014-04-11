@@ -435,7 +435,7 @@ KeyListener, ItemListener {
     // Check input
     if (!KEGGtranslatorIOOptions.INPUT.getRange().isInRange(inFile)) {
       String message = "The given file is no valid input file.";
-      if (inFile!=null) {
+      if (inFile != null) {
         message = '\'' + inFile.getName() + "' is no valid input file.";
       }
       JOptionPane.showMessageDialog(this, message, System.getProperty("app.name"), JOptionPane.WARNING_MESSAGE);
@@ -499,7 +499,21 @@ KeyListener, ItemListener {
         case TRANSLATION_DONE:
           TranslatorPanel<?> source = (TranslatorPanel<?>) e.getSource();
           int index = tabbedPane.indexOfComponent(source);
-          if (index>=0) {// ELSE: User closed the tab before completion
+          logger.info("TRANSLATION DONE");
+          if (garudaBackend != null) {
+            logger.info("GARUDA ACTIVE");
+            if (tabbedPane.getTabCount() == 1) {
+              logger.info("GARUDA NOW ENABLED");
+              // TabCount check is needed to avoid that this is done again when more tabs are added.
+              GUITools.setEnabled(true, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
+            } else if (tabbedPane.getTabCount() == 0) {
+              logger.info("GARUDA NOW DISABLED");
+              GUITools.setEnabled(false, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
+            }
+          } else {
+            logger.info("GARUDA NOT AVAILABLE!");
+          }
+          if (index >= 0) { // ELSE: User closed the tab before completion
             if (e.getID() != JOptionPane.OK_OPTION) {
               // If translation failed, remove the tab. The error
               // message has already been issued by the translator.
@@ -648,15 +662,10 @@ KeyListener, ItemListener {
    */
   private void updateButtons() {
     GUITools.setEnabled(false, getJMenuBar(), BaseAction.FILE_SAVE_AS,
-      //Action.TO_LATEX,
-      BaseAction.FILE_CLOSE);
+      /*Action.TO_LATEX,*/ BaseAction.FILE_CLOSE);
     TranslatorPanel<?> o = getCurrentlySelectedPanel();
     if (o != null) {
       o.updateButtons(getJMenuBar());
-      if ((garudaBackend != null) && (tabbedPane.getTabCount() == 1)) {
-        // TabCount check is needed to avoid that this is done again when more tabs are added.
-        GUITools.setEnabled(true, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
-      }
     }
   }
   
@@ -777,7 +786,7 @@ KeyListener, ItemListener {
             o.saveToFile(file, outputFormat);
             
             logger.fine("Launching Garuda sender");
-            GarudaFileSender sender = new GarudaFileSender(parent, garudaBackend, file, outputFormat.toUpperCase());
+            GarudaFileSender sender = new GarudaFileSender(parent, garudaBackend, file, outputFormat.toLowerCase());
             sender.execute();
             return null;
           }

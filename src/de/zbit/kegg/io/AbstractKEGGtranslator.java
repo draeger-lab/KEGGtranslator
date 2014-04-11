@@ -423,6 +423,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     try {
       doc = translateWithoutPreprocessing(p);
     } catch (Throwable t) {
+      t.printStackTrace();
       log.log(Level.SEVERE, "Unhandled exception during translation!", t);
     }
     

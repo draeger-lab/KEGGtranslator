@@ -110,12 +110,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   /**
    * Default compartment size.
    */
-  private double defaultCompartmentSize=1d;
+  private double defaultCompartmentSize = 1d;
   
   /**
    * Default initial amount of a species.
    */
-  private double speciesDefaultInitialAmount=1d;
+  private double speciesDefaultInitialAmount = 1d;
   
   /**
    * The SBML level to be initialized. <code>NULL</code> results in
@@ -1515,11 +1515,17 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
   }
   
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.AbstractKEGGtranslator#considerRelations()
+   */
   @Override
   protected boolean considerRelations() {
     return false;
   }
   
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.AbstractKEGGtranslator#considerReactions()
+   */
   @Override
   protected boolean considerReactions() {
     return true;
