@@ -162,6 +162,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       } else if (entry.getType() == EntryType.map) {
         instantiate = org.biopax.paxtools.model.level3.Pathway.class;
       } else if (entry.getType() == EntryType.ortholog) {
+        // TODO: We are loosing information here because orthologs need to be split into several entities. At least we have to annotate the element!!
         instantiate = Protein.class;
       } else if (entry.getType() == EntryType.reaction) {
         //instantiate = Interaction.class;
@@ -233,8 +234,9 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
           BioPAXElement ceb = (BioPAXElement) ce.getCustom();
           if (ceb==null) {
             ceb = addEntry(ce, p);
+            // TODO: post-process the entry if it is an ortholog!
           }
-          if (ceb==null || !(ceb instanceof PhysicalEntity)) {
+          if ((ceb == null) || !(ceb instanceof PhysicalEntity)) {
             continue;
           }
           
@@ -253,7 +255,9 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     // error if no entityReferences are set.
     if ((element instanceof SimplePhysicalEntity) &&
         !(element instanceof Complex)) {
-      setupEntityReference(element);
+      setupEntityReference(element); // TODO this is probably the root of all evil...
+      // TODO: If the element has multiple Uniprot ids in its xref map then it is most likely a generic and needs to be split into individual entityReference objects!!!!
+      // This happens when the entry is an ortholog.
     }
     
     
@@ -430,6 +434,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     
     Class<? extends BioPAXElement> instantiate = BiochemicalReaction.class;
     if (hasEnzymes) {
+      // TODO: Here the assumption seems to be an AND logic, but meant is an OR logic! We need to create a separate catalysis for each controller!
       instantiate = Catalysis.class;
     }
     
@@ -445,7 +450,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
           if (ce!=null) {
             // Get current component
             BioPAXElement ceb = (BioPAXElement) ce.getCustom();
-            if (ceb==null || !(ceb instanceof Controller) || !addedEnzymes.add(ceb)) {
+            if ((ceb == null) || !(ceb instanceof Controller) || !addedEnzymes.add(ceb)) {
               continue;
             }
             
@@ -1078,7 +1083,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
         ((XReferrable) newElement).addXref(xr);
       }
     }
-    if (element instanceof BiochemicalReaction && newElement instanceof BiochemicalReaction) {
+    if ((element instanceof BiochemicalReaction) && (newElement instanceof BiochemicalReaction)) {
       for (String ec : ((BiochemicalReaction) element).getECNumber()) {
         ((BiochemicalReaction) newElement).addECNumber(ec);
       }

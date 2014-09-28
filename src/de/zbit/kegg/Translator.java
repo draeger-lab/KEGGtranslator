@@ -22,11 +22,11 @@ package de.zbit.kegg;
 
 import static de.zbit.util.Utils.getMessage;
 
-import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -34,14 +34,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
-import jp.sbi.garuda.platform.commons.exception.NetworkException;
 import de.zbit.AppConf;
 import de.zbit.Launcher;
 import de.zbit.cache.InfoManagement;
 import de.zbit.garuda.GarudaOptions;
-import de.zbit.garuda.GarudaSoftwareBackend;
 import de.zbit.gui.GUIOptions;
-import de.zbit.gui.GUITools;
 import de.zbit.io.FileTools;
 import de.zbit.kegg.api.KeggInfos;
 import de.zbit.kegg.api.cache.KeggFunctionManagement;
@@ -74,6 +71,11 @@ import de.zbit.util.prefs.SBProperties;
 public class Translator extends Launcher {
   
   /**
+   * Localization support
+   */
+  private static final transient ResourceBundle bundle = ResourceManager.getBundle(Translator.class.getName());
+  
+  /**
    * {@link File} name of the KEGG cache {@link File} (implemented just like the
    * browser cache). Must be loaded upon start and saved upon exit.
    */
@@ -86,26 +88,9 @@ public class Translator extends Launcher {
   public final static String cacheFunctionFileName = "keggfc.dat";
   
   /**
-   * Adjusts a few methods in KEGGtranslator to generate an ouput for
-   * the path2models project if true.
-   * <p><b>PLESE ALWAYS KEEP THE DEFAULT, INITIAL VALUE TO FALSE!</b>
-   */
-  public static boolean path2models = false;
-  
-  /**
-   * If or if not Garuda should be enabled.
-   */
-  public static boolean garuda = true;
-  
-  /**
    * The {@link Logger} for this class.
    */
   private static final transient Logger logger = Logger.getLogger(Translator.class.getName());
-  
-  /**
-   * Localization support
-   */
-  private static final transient ResourceBundle bundle = ResourceManager.getBundle(Translator.class.getName());
   
   /**
    * The cache to be used by all KEGG interacting classes.
@@ -120,266 +105,16 @@ public class Translator extends Launcher {
   private static KeggFunctionManagement managerFunction = null;
   
   /**
+   * Adjusts a few methods in KEGGtranslator to generate an ouput for
+   * the path2models project if true.
+   * <p><b>PLESE ALWAYS KEEP THE DEFAULT, INITIAL VALUE TO FALSE!</b>
+   */
+  public static boolean path2models = false;
+  
+  /**
    * Generated serial version identifier.
    */
   private static final long serialVersionUID = -428595670090648615L;
-  
-  /**
-   * 
-   * @return
-   */
-  public synchronized static KeggFunctionManagement getFunctionManager() {
-    
-    // Try to load from cache file
-    if (managerFunction == null
-        && new File(Translator.cacheFunctionFileName).exists()
-        && new File(Translator.cacheFunctionFileName).length() > 1) {
-      try {
-        managerFunction = (KeggFunctionManagement) InfoManagement
-            .loadFromFilesystem(Translator.cacheFunctionFileName);
-      } catch (Throwable e) { // IOException or class cast, if class is moved.
-        e.printStackTrace();
-        managerFunction = null;
-        
-        // Delete invalid cache file
-        try {
-          File f = new File(Translator.cacheFunctionFileName);
-          if (f.exists() && f.canRead()) {
-            logger.info(String.format("Deleting invalid cache file %s.", f
-              .getName()));
-            f.delete();
-          }
-        } catch (Throwable t) {
-        }
-      }
-    }
-    
-    // Create new, if loading failed
-    if (managerFunction == null) {
-      managerFunction = new KeggFunctionManagement(5000);
-    }
-    
-    return managerFunction;
-  }
-  
-  /**
-   * 
-   * @return
-   */
-  public synchronized static KeggInfoManagement getManager() {
-    boolean newManangerLoadedOrInitialized = (manager==null);
-    // Try to load from cache file
-    if ((manager == null) && new File(Translator.cacheFileName).exists() && new File(Translator.cacheFileName).length() > 1) {
-      try {
-        manager = (KeggInfoManagement) InfoManagement.loadFromFilesystem(Translator.cacheFileName);
-      } catch (Throwable e) { // IOException or class cast, if class is moved.
-        e.printStackTrace();
-        manager = null;
-        // Delete invalid cache file
-        try {
-          File f = new File(Translator.cacheFileName);
-          if (f.exists() && f.canRead()) {
-            logger.info(String.format("Deleting invalid cache file %s.", f
-              .getName()));
-            f.delete();
-          }
-        } catch (Throwable t) {}
-        
-      }
-    }
-    
-    // Create new, if loading failed
-    if (manager == null) {
-      manager = new KeggInfoManagement(10000);
-    }
-    
-    // Set cache size and eventually remove some items from the cache
-    if (newManangerLoadedOrInitialized) {
-      int initialSize=-1;
-      try {
-        SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
-        initialSize = KEGGtranslatorCommandLineOnlyOptions.CACHE_SIZE.getValue(prefs);
-        
-        if (KEGGtranslatorCommandLineOnlyOptions.CLEAR_FAIL_CACHE.getValue(prefs)) {
-          logger.info("Clearing cache of failed-to-retrieve objects.");
-          manager.clearFailCache();
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      if (initialSize<=0) {
-        initialSize = 10000;
-      }
-      manager.setCacheSize(initialSize);
-    }
-    
-    
-    
-    return manager;
-  }
-  
-  /**
-   * Wrapper methods for applications including KEGGtranslator as library:
-   * this method translates a given KGML document and returns the resulting
-   * data structure (currently SBMLDocument or Graph2D).
-   * @param format
-   * @param in
-   * @return
-   * @throws IOException
-   */
-  public static Object translate(Format format, File in) throws IOException {
-    // Check and build input
-    if ((in == null) || !in.canRead() || in.isDirectory()) {
-      logger.severe("Invalid or not-readable input file.");
-      return null;
-    }
-    
-    // Initiate the manager
-    KeggInfoManagement manager = getManager();
-    
-    // Check and build format
-    AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator
-        .getTranslator(format, manager);
-    if (translator == null) {
-      return false; // Error message already issued.
-    }
-    
-    // Translate.
-    return translator.translate(in);
-  }
-  
-  
-  /**
-   * 
-   * @param args
-   */
-  public static void main(String args[]) {
-    // --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
-    new Translator(args);
-  }
-  
-  /**
-   * Remember already queried KEGG objects (save cache)
-   */
-  public synchronized static void saveCache() {
-    if ((manager != null) && manager.hasChanged()) {
-      KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, manager);
-    }
-    if ((managerFunction != null) && managerFunction.isCacheChangedSinceLastLoading()) {
-      InfoManagement.saveToFilesystem(Translator.cacheFunctionFileName, managerFunction);
-    }
-  }
-  
-  /**
-   * 
-   * @param format One of all valid output {@link Format}s.
-   * @param input input file
-   * @param output output file
-   * @return
-   * @throws IOException
-   */
-  public static boolean translate(Format format, String input, String output)
-      throws IOException {
-    
-    // Check and build input
-    File in = input == null ? null : new File(input);
-    if ((in == null) || !in.canRead()) {
-      // in might also be a directory
-      logger.severe("Invalid or not-readable input file.");
-      return false;
-    }
-    
-    // Initiate the manager
-    KeggInfoManagement manager = getManager();
-    
-    // Check and build format
-    KEGGtranslator translator = BatchKEGGtranslator.getTranslator(format, manager);
-    if (translator == null) {
-      return false; // Error message already issued.
-    }
-    
-    // Check and build output
-    File out = output == null ? null : new File(output);
-    if (!in.isDirectory()) {
-      // else: batch-mode
-      if ((out == null) || (output.length() < 1) || out.isDirectory()) {
-        String fileExtension = BatchKEGGtranslator.getFileExtension(translator);
-        out = new File(FileTools.removeFileExtension(input) + fileExtension);
-        logger.info(String.format("Writing to %s.", out));
-      }
-      
-      // Further check out
-      if (out.exists()) {
-        logger.info(String.format("Overwriting exising file %s.", out));
-      }
-      out.createNewFile();
-      if (!out.canWrite()) {
-        logger.severe(String.format("Cannot write to file %s.", out));
-        return false;
-      }
-    }
-    
-    // Translate.
-    if (in.isDirectory()) {
-      BatchKEGGtranslator batch = new BatchKEGGtranslator();
-      batch.setOrgOutdir(in.getPath());
-      batch.setTranslator(translator);
-      batch.setOutFormat(format);
-      if (output != null && output.length() > 0) {
-        batch.setChangeOutdirTo(output);
-      }
-      batch.parseDirAndSubDir();
-      // parseDir... is saving the cache.
-    } else {
-      try {
-        translator.translate(in.getPath(), out.getPath());
-        saveCache();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    
-    return true;
-  }
-  
-  /**
-   * 
-   * @param args
-   */
-  public Translator(String[] args) {
-    super(args);
-  }
-  
-  /* (non-Javadoc)
-   * @see de.zbit.Launcher#commandLineMode(de.zbit.AppConf)
-   */
-  @Override
-  public void commandLineMode(AppConf appConf) {
-    SBProperties props = appConf.getCmdArgs();
-    
-    // Maybe adjust for path2models
-    SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
-    if (KEGGtranslatorCommandLineOnlyOptions.PATH2MODELS.getValue(props)) {
-      adjustForPath2Models();
-    }
-    
-    // Make command-line options persistent
-    prefs.restoreDefaults(); // This is just used as an empty prefs-template.
-    try {
-      prefs.saveContainedOptions(props);
-    } catch (BackingStoreException e) {
-      logger.log(Level.WARNING, "Could not process command-line-only options.", e);
-    }
-    
-    // Initiate translation
-    try {
-      translate(KEGGtranslatorIOOptions.FORMAT.getValue(props),
-        props.get(KEGGtranslatorIOOptions.INPUT),
-        props.get(KEGGtranslatorIOOptions.OUTPUT));
-    } catch (IOException exc) {
-      logger.warning(getMessage(exc));
-    }
-  }
   
   /**
    * Adjusts the current KEGGtranslator instances to create an outout
@@ -422,6 +157,270 @@ public class Translator extends Launcher {
     }
   }
   
+  /**
+   * 
+   * @return
+   */
+  public synchronized static KeggFunctionManagement getFunctionManager() {
+    
+    // Try to load from cache file
+    if (managerFunction == null
+        && new File(Translator.cacheFunctionFileName).exists()
+        && new File(Translator.cacheFunctionFileName).length() > 1) {
+      try {
+        managerFunction = (KeggFunctionManagement) InfoManagement
+            .loadFromFilesystem(Translator.cacheFunctionFileName);
+      } catch (Throwable e) { // IOException or class cast, if class is moved.
+        e.printStackTrace();
+        managerFunction = null;
+        
+        // Delete invalid cache file
+        try {
+          File f = new File(Translator.cacheFunctionFileName);
+          if (f.exists() && f.canRead()) {
+            logger.info(MessageFormat.format("Deleting invalid cache file {0}.", f.getName()));
+            f.delete();
+          }
+        } catch (Throwable t) {
+        }
+      }
+    }
+    
+    // Create new, if loading failed
+    if (managerFunction == null) {
+      managerFunction = new KeggFunctionManagement(5000);
+    }
+    
+    return managerFunction;
+  }
+  
+  /**
+   * 
+   * @return
+   */
+  public synchronized static KeggInfoManagement getManager() {
+    boolean newManangerLoadedOrInitialized = (manager==null);
+    // Try to load from cache file
+    if ((manager == null) && new File(Translator.cacheFileName).exists() && new File(Translator.cacheFileName).length() > 1) {
+      try {
+        manager = (KeggInfoManagement) InfoManagement.loadFromFilesystem(Translator.cacheFileName);
+      } catch (Throwable e) { // IOException or class cast, if class is moved.
+        e.printStackTrace();
+        manager = null;
+        // Delete invalid cache file
+        try {
+          File f = new File(Translator.cacheFileName);
+          if (f.exists() && f.canRead()) {
+            logger.info(MessageFormat.format("Deleting invalid cache file {0}.", f.getName()));
+            f.delete();
+          }
+        } catch (Throwable t) {
+          logger.log(Level.FINEST, t.getMessage(), t);
+        }
+      }
+    }
+    
+    // Create new, if loading failed
+    if (manager == null) {
+      manager = new KeggInfoManagement(10000);
+    }
+    
+    // Set cache size and eventually remove some items from the cache
+    if (newManangerLoadedOrInitialized) {
+      int initialSize=-1;
+      try {
+        SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
+        initialSize = KEGGtranslatorCommandLineOnlyOptions.CACHE_SIZE.getValue(prefs);
+        
+        if (KEGGtranslatorCommandLineOnlyOptions.CLEAR_FAIL_CACHE.getValue(prefs)) {
+          logger.info("Clearing cache of failed-to-retrieve objects.");
+          manager.clearFailCache();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      if (initialSize<=0) {
+        initialSize = 10000;
+      }
+      manager.setCacheSize(initialSize);
+    }
+    
+    
+    
+    return manager;
+  }
+  
+  
+  /**
+   * 
+   * @param args
+   */
+  public static void main(String args[]) {
+    // --input files/KGMLsamplefiles/hsa00010.xml --format GraphML --output test.txt
+    new Translator(args);
+  }
+  
+  /**
+   * Remember already queried KEGG objects (save cache)
+   */
+  public synchronized static void saveCache() {
+    if ((manager != null) && manager.hasChanged()) {
+      KeggInfoManagement.saveToFilesystem(Translator.cacheFileName, manager);
+    }
+    if ((managerFunction != null) && managerFunction.isCacheChangedSinceLastLoading()) {
+      InfoManagement.saveToFilesystem(Translator.cacheFunctionFileName, managerFunction);
+    }
+  }
+  
+  /**
+   * Wrapper methods for applications including KEGGtranslator as library:
+   * this method translates a given KGML document and returns the resulting
+   * data structure (currently SBMLDocument or Graph2D).
+   * @param format
+   * @param in
+   * @return
+   * @throws IOException
+   */
+  public static Object translate(Format format, File in) throws IOException {
+    // Check and build input
+    if ((in == null) || !in.canRead() || in.isDirectory()) {
+      logger.severe("Invalid or not-readable input file.");
+      return null;
+    }
+    
+    // Initiate the manager
+    KeggInfoManagement manager = getManager();
+    
+    // Check and build format
+    AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator
+        .getTranslator(format, manager);
+    if (translator == null) {
+      return false; // Error message already issued.
+    }
+    
+    // Translate.
+    return translator.translate(in);
+  }
+  
+  /**
+   * 
+   * @param format One of all valid output {@link Format}s.
+   * @param input input file
+   * @param output output file
+   * @return
+   * @throws IOException
+   */
+  public static boolean translate(Format format, String input, String output)
+      throws IOException {
+    
+    // Check and build input
+    File in = input == null ? null : new File(input);
+    if ((in == null) || !in.canRead()) {
+      // in might also be a directory
+      logger.severe("Invalid or not-readable input file.");
+      return false;
+    }
+    
+    // Initiate the manager
+    KeggInfoManagement manager = getManager();
+    
+    // Check and build format
+    KEGGtranslator<?> translator = BatchKEGGtranslator.getTranslator(format, manager);
+    if (translator == null) {
+      return false; // Error message already issued.
+    }
+    
+    // Check and build output
+    File out = output == null ? null : new File(output);
+    if (!in.isDirectory()) {
+      // else: batch-mode
+      if ((out == null) || (output.length() < 1) || out.isDirectory()) {
+        String fileExtension = BatchKEGGtranslator.getFileExtension(translator);
+        out = new File(FileTools.removeFileExtension(input) + fileExtension);
+        logger.info(MessageFormat.format("Writing to {0}.", out));
+      }
+      
+      // Further check out
+      if (out.exists()) {
+        logger.info(MessageFormat.format("Overwriting exising file {0}.", out));
+      }
+      out.createNewFile();
+      if (!out.canWrite()) {
+        logger.severe(MessageFormat.format("Cannot write to file {0}.", out));
+        return false;
+      }
+    }
+    
+    // Translate.
+    if (in.isDirectory()) {
+      BatchKEGGtranslator batch = new BatchKEGGtranslator();
+      batch.setOrgOutdir(in.getPath());
+      batch.setTranslator(translator);
+      batch.setOutFormat(format);
+      if (output != null && output.length() > 0) {
+        batch.setChangeOutdirTo(output);
+      }
+      batch.parseDirAndSubDir();
+      // parseDir... is saving the cache.
+    } else {
+      try {
+        translator.translate(in.getPath(), out.getPath());
+        saveCache();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+    return true;
+  }
+  
+  /**
+   * 
+   * @param args
+   */
+  public Translator(String[] args) {
+    super(args);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.Launcher#addCopyrightToSplashScreen()
+   */
+  @Override
+  protected boolean addCopyrightToSplashScreen() {
+    return false;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.Launcher#commandLineMode(de.zbit.AppConf)
+   */
+  @Override
+  public void commandLineMode(AppConf appConf) {
+    SBProperties props = appConf.getCmdArgs();
+    
+    // Maybe adjust for path2models
+    SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
+    if (KEGGtranslatorCommandLineOnlyOptions.PATH2MODELS.getValue(props)) {
+      adjustForPath2Models();
+    }
+    
+    // Make command-line options persistent
+    prefs.restoreDefaults(); // This is just used as an empty prefs-template.
+    try {
+      prefs.saveContainedOptions(props);
+    } catch (BackingStoreException e) {
+      logger.log(Level.WARNING, "Could not process command-line-only options.", e);
+    }
+    
+    // Initiate translation
+    try {
+      translate(KEGGtranslatorIOOptions.FORMAT.getValue(props),
+        props.get(KEGGtranslatorIOOptions.INPUT),
+        props.get(KEGGtranslatorIOOptions.OUTPUT));
+    } catch (IOException exc) {
+      logger.warning(getMessage(exc));
+    }
+  }
+  
   /* (non-Javadoc)
    * @see de.zbit.Launcher#getAppName()
    */
@@ -452,7 +451,7 @@ public class Translator extends Launcher {
     configList.add(KEGGtranslatorCommandLineOnlyOptions.class);
     configList.add(KEGGtranslatorOptions.class);
     configList.add(GUIOptions.class);
-    if (garuda) {
+    if (isGarudaEnabled()) {
       configList.add(GarudaOptions.class);
     }
     return configList;
@@ -476,19 +475,19 @@ public class Translator extends Launcher {
   }
   
   /* (non-Javadoc)
-   * @see de.zbit.Launcher#getLogPackages()
-   */
-  @Override
-  public String[] getLogPackages() {
-    return new String[] {"de.zbit", "org.sbml"};
-  }
-  
-  /* (non-Javadoc)
    * @see de.zbit.Launcher#getLogLevel()
    */
   @Override
   public Level getLogLevel() {
     return Level.INFO;
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.Launcher#getLogPackages()
+   */
+  @Override
+  public String[] getLogPackages() {
+    return new String[] {"de.zbit", "org.sbml"};
   }
   
   /*
@@ -546,42 +545,19 @@ public class Translator extends Launcher {
   }
   
   /* (non-Javadoc)
-   * @see de.zbit.Launcher#addCopyrightToSplashScreen()
-   */
-  @Override
-  protected boolean addCopyrightToSplashScreen() {
-    return false;
-  }
-  
-  /* (non-Javadoc)
    * @see de.zbit.Launcher#initGUI(de.zbit.AppConf)
    */
   @Override
-  public Window initGUI(AppConf appConf) {
-    final TranslatorUI gui = new TranslatorUI(appConf);
-    if (garuda &&
-        (getCmdLineOptions().contains(GarudaOptions.class) &&
-            (!appConf.getCmdArgs().containsKey(GarudaOptions.CONNECT_TO_GARUDA) ||
-                appConf.getCmdArgs().getBoolean(GarudaOptions.CONNECT_TO_GARUDA)))) {
-      new Thread(new Runnable() {
-        /* (non-Javadoc)
-         * @see java.lang.Runnable#run()
-         */
-        @Override
-        public void run() {
-          try {
-            GarudaSoftwareBackend garudaBackend = new GarudaSoftwareBackend(
-              "a4978d67-f0b0-4f91-abc6-0cc7b848cd53", gui);
-            garudaBackend.init();
-          } catch (NetworkException exc) {
-            GUITools.showErrorMessage(gui, exc);
-          } catch (Throwable exc) {
-            logger.fine(getMessage(exc));
-          }
-        }
-      }).start();
-    }
-    return gui;
+  public java.awt.Window initGUI(AppConf appConf) {
+    return new TranslatorUI(appConf);
+  }
+  
+  /* (non-Javadoc)
+   * @see de.zbit.Launcher#isGarudaEnabled()
+   */
+  @Override
+  public boolean isGarudaEnabled() {
+    return true;
   }
   
   /* (non-Javadoc)
@@ -594,7 +570,7 @@ public class Translator extends Launcher {
     if (!showGUI) {
       // Check if an input file is given. This is required for and will trigger the command-line mode.
       String inputFile = props.getProperty(KEGGtranslatorIOOptions.INPUT);
-      if (inputFile==null || inputFile.length()<1) {
+      if ((inputFile == null) || (inputFile.length() < 1)) {
         showGUI = true;
       }
     }
