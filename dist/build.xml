@@ -87,7 +87,7 @@
   	<property name="resources"      location="${base}/resources"/>
   	<property name="deprecation"    value="false"/>
   	<property name="optimize"       value="on"/>
-  	<property name="uuid"           value="a4978d67-f0b0-4f91-abc6-0cc7b848cd53"/>
+  	<property name="uuid"           value="5f007191-19df-3ea1-949a-78afd02ec5e0"/>
   	<property name="vendor"         value="Center for Bioinformatics Tuebingen (ZBIT)"/>
   	<property name="impl.vendor"    value="University of Tuebingen"/>
     <!-- add everything needed to the classpath -->
@@ -684,6 +684,7 @@
       	excludes="**/.svn*, package-info.*, de/zbit/mapper/**, de/zbit/mapper/compounds/**"
       />
       <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
+      <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/argparser.jar"/>
     </jar>
 
   </target>
@@ -822,7 +823,7 @@
       <fileset dir="${jsbml.dir}/extensions/render/resources"  includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/spatial/resources" includes="${jsbml.includes}"/>
       <!-- 3rd party libraries -->
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java readme.txt LICENSE" src="${jsbml.dir}/core/lib/biojava-1.7-ontology.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java readme.txt LICENSE" src="${jsbml.dir}/core/lib/biojava3-ontology-3.1.0.jar"/>
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/jigsaw-dateParser.jar"/>
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/log4j-1.2.8.jar"/>
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/stax-api-1.0.1.jar"/>
