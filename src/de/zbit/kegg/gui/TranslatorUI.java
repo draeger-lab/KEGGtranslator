@@ -357,9 +357,9 @@ KeyListener, ItemListener {
   }
   
   /**
-   * Searches for any JComponent with
-   * {@link KEGGtranslatorIOOptions#FORMAT}.getOptionName() on it and returns the selected
-   * format. Use it e.g. with {@link #translateToolBar}.
+   * Searches for any JComponent with {@link KEGGtranslatorIOOptions#FORMAT}
+   * .getOptionName() on it and returns the selected format. Use it, e.g., with
+   * the toolbar.
    * 
    * @param r
    * @return String - format.
@@ -382,7 +382,7 @@ KeyListener, ItemListener {
   /**
    * Searches for any JComponent with
    * "TranslatorOptions.INPUT.getOptionName()" on it and returns the selected
-   * file. Use it e.g. with {@link #translateToolBar}.
+   * file. Use it, e.g., with the translate toolbar.
    * 
    * @param r
    * @return File - input file.

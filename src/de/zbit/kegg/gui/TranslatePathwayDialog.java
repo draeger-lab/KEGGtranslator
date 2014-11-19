@@ -241,7 +241,7 @@ public class TranslatePathwayDialog extends JPanel {
    * Shows and evaluates this panel in a dialog.
    * @param addTabsHere this is where the created {@link TranslatorPanel} will be added
    * @param translationResult an optional action listener
-   * @param optionalPreSelectedFormat an optional pre-selection of desired output format
+   * @param d an optional pre-selection of desired output format
    */
   public static void showAndEvaluateDialog(final JTabbedPane addTabsHere, final ActionListener translationResult, final TranslatePathwayDialog d) {
     GUITools.showOkCancelDialogInNewThread(d, "Download pathway", d.createOkButtonAction(addTabsHere, translationResult), null, new PropertyChangeListener() {

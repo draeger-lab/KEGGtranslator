@@ -918,7 +918,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   /**
    * 
    * @param reactionModifiers
-   * @param r
+   * @param reaction
    * @return
    */
   private List<ModifierSpeciesReference> getAllModifier (

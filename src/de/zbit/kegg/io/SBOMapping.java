@@ -34,7 +34,7 @@ import de.zbit.util.objectwrapper.ValuePair;
 
 /**
  * This static class defines how to map from certain
- * {@link EntryType}s or {@link GeneType}s to SBO
+ * {@link EntryType}s or GeneTypes to SBO
  * terms.
  * 
  * @author Clemens Wrzodek

@@ -57,8 +57,8 @@ public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
   
   /**
    * Create a new translator-panel and initiates the translation.
+   * 
    * @param inputFile
-   * @param outputFormat
    * @param translationResult
    */
   public TranslatorSBMLPanel(File inputFile, ActionListener translationResult) {

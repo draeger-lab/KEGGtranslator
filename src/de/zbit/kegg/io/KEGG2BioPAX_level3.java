@@ -710,7 +710,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
       }
     }
     
-    if (name==null || name.length()<1) {
+    if ((name == null) || (name.length() < 1)) {
       name = qTwo.getRDFId();
     }
     
@@ -719,7 +719,6 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
   
   /**
    * @param r
-   * @param subtype
    * @param bpe
    * @param qOne
    * @param qTwo

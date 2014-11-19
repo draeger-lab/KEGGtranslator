@@ -468,8 +468,10 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
    * Create a Connection with a process {@link Glyph} between the source and
    * target {@link Glyph}s
    * 
-   * @param source
-   * @param target
+   * @param sources
+   * @param targets
+   * @param type
+   * @param reactionModifiers
    */
   private void createEdgeWithProcessGlyphAndPorts(ArrayList<Glyph> sources, ArrayList<Glyph> targets, GlyphType type, ArrayList<Glyph> reactionModifiers) {
     

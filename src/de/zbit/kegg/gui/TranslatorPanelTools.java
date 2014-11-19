@@ -22,7 +22,6 @@ package de.zbit.kegg.gui;
 
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.MalformedURLException;
 
 import de.zbit.graph.gui.TranslatorGraphLayerPanel;
 import de.zbit.graph.gui.TranslatorPanel;
@@ -108,8 +107,8 @@ public class TranslatorPanelTools {
   
   /**
    * Setup the background image as set in the preferences
-   * @param pane the pane to add the background image
-   * @throws MalformedURLException
+   * 
+   * @param panel the pane to add the background image
    */
   public static void setupBackgroundImage(TranslatorGraphLayerPanel<?> panel) {
     GraphBackgroundImageProvider provider = createBackgroundImageProvider();
@@ -143,8 +142,8 @@ public class TranslatorPanelTools {
   
   /**
    * Setup the background image as set in the preferences
+   * 
    * @param writer the writer to add the background image
-   * @throws MalformedURLException
    */
   public static void setupBackgroundImage(Graph2Dwriter writer) {
     GraphBackgroundImageProvider provider = createBackgroundImageProvider();

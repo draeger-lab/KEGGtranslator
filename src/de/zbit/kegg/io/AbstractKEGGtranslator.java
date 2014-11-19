@@ -251,8 +251,8 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   }
   
   /**
-   * See {@link #autocompleteReactions}
-   * @param
+   * @param autocompleteReactions
+   * @see #autocompleteReactions
    */
   public void setAutocompleteReactions(boolean autocompleteReactions) {
     this.autocompleteReactions = autocompleteReactions;
@@ -301,12 +301,11 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   /**
    * Set a progressBar that should be used to display the
    * status of the conversion.
-   * @param progressBarSwing
+   * @param progressBar
    */
   public void setProgressBar(AbstractProgressBar progressBar) {
     this.progress = progressBar;
   }
-  
   
   
   /*===========================

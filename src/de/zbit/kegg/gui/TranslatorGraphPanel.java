@@ -47,8 +47,8 @@ public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
   
   /**
    * Create a new translator-panel and initiates the translation.
+   * 
    * @param inputFile
-   * @param outputFormat
    * @param translationResult
    */
   public TranslatorGraphPanel(File inputFile, ActionListener translationResult) {
@@ -90,7 +90,7 @@ public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
   
   /**
    * Initiates a translation of the given pathway.
-   * @param pathway a given KEGG pathway
+   * @param pathwayImporter a given KEGG pathway
    * @param outputFormat any GraphML compatible formats (unchecked).
    * @param translationResult
    */

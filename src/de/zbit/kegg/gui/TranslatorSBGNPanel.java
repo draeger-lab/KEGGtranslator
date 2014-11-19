@@ -49,8 +49,8 @@ public class TranslatorSBGNPanel extends TranslatorGraphLayerPanel<Sbgn>{
   
   /**
    * Create a new translator-panel and initiates the translation.
+   * 
    * @param inputFile
-   * @param outputFormat
    * @param translationResult
    */
   public TranslatorSBGNPanel(File inputFile, ActionListener translationResult) {

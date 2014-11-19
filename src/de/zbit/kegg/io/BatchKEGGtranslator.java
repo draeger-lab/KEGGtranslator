@@ -23,6 +23,7 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.Graph2Dwriter.writeableFileExtensions;
@@ -40,7 +41,6 @@ import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.prefs.SBPreferences;
 
-
 /**
  * Translate multiple KGML files to the desired
  * {@link KEGGtranslatorIOOptions#FORMAT}.
@@ -50,6 +50,11 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  */
 public class BatchKEGGtranslator {
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(BatchKEGGtranslator.class.getName());
   
   /**
    * 
@@ -72,7 +77,7 @@ public class BatchKEGGtranslator {
   private KEGGtranslator translator;
   
   /**
-   * Load preferences only once when BatchKEGGtranslator is started.
+   * Load preferences only once when {@link BatchKEGGtranslator} is started.
    */
   SBPreferences prefs = SBPreferences.getPreferencesFor(KEGGtranslatorCommandLineOnlyOptions.class);
   
@@ -106,7 +111,7 @@ public class BatchKEGGtranslator {
       batch.parseDirAndSubDir();
       return;
     }
-    System.out.println("Demo Mode:");
+    logger.info("Demo Mode:");
     batch.setOrgOutdir(System.getProperty("user.home"));
     batch.setChangeOutdirTo(System.getProperty("user.home"));
     batch.parseDirAndSubDir();
@@ -167,10 +172,10 @@ public class BatchKEGGtranslator {
         dir +="/";
       }
     }
-    System.out.println("Parsing directory " + dir);
+    logger.info("Parsing directory " + dir);
     
     
-    if (translator==null) {
+    if (translator == null) {
       translator = getTranslator(outFormat, manager);
     }
     String fileExtension = getFileExtension(translator);
@@ -204,10 +209,10 @@ public class BatchKEGGtranslator {
           String myDir = getAndCreateOutDir(dir);
           String outFileTemp = myDir + FileTools.removeFileExtension(fn) + fileExtension;
           if (new File(outFileTemp).exists()) {
-            System.out.println("Skipping '"+inFile+"' file already exists.");
+            logger.info("Skipping '"+inFile+"' file already exists.");
             continue; // Skip already converted files.
           } else {
-            System.out.println("Converting '"+inFile+"' ...");
+            logger.info("Converting '"+inFile+"' ...");
           }
           
           // Parse and convert all Pathways in XML file.
@@ -220,12 +225,12 @@ public class BatchKEGGtranslator {
               pw = de.zbit.kegg.parser.KeggParser.parse(dir+fn);
             } catch (Throwable t) {t.printStackTrace();} // Show must go on...
           }
-          if (pw==null || pw.size()<1) {
+          if (pw == null || pw.size()<1) {
             continue;
           }
           
           boolean appendNumber=(pw.size()>1);
-          for (int i=0; i<pw.size(); i++) {
+          for (int i = 0; i<pw.size(); i++) {
             String outFile = myDir + fn.trim().substring(0, fn.trim().length()-4) + (appendNumber?"-"+(i+1):"") + fileExtension;
             if (new File(outFile).exists())
             {
@@ -249,7 +254,7 @@ public class BatchKEGGtranslator {
             }
             
             if (translator.isLastFileWasOverwritten()) { // Datei war oben noch nicht da, spaeter aber schon => ein anderer prozess macht das selbe bereits.
-              System.out.println("It looks like another instance is processing the same files. Going to next subfolder.");
+              logger.warning("It looks like another instance is processing the same files. Going to next subfolder.");
               return; // Function is recursive.
             }
           }

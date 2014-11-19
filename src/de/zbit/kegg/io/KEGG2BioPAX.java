@@ -341,11 +341,11 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   
   
   /**
-   * Creates a biosource, corrsponding to the organism/species of
+   * Creates a biosource, corresponding to the organism/species of
    * the input pathway <code>p</code>.
    * <p> Please call this method only once per model and save the
-   * result somewhere, in case you need it multiple times.</p>
-   * @param factory
+   * result somewhere, in case you need it multiple times.
+   * 
    * @param p
    * @return either a {@link bioSource} for level 2, or a {@link BioSource} for level 3.
    */
@@ -500,8 +500,9 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   /**
    * Queries the KEGG API and adds various identifiers as {@link Xref}s,
    * further adds EC-Numbers, description, equation, etc.
+   * 
    * @param r
-   * @param element
+   * @param reaction
    */
   public void addAnnotations(Reaction r, BioPAXElement reaction) {
     // Various Annotations
@@ -1242,8 +1243,8 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * Gets the common reference to the given element.
    * Onls for {@link SimplePhysicalEntity}s.
    * <p>Does NOT create one if there is none (returns {@code null}).
+   * 
    * @param element
-   * @return
    * @return
    */
   protected EntityReference getEntityReference(BioPAXElement element) {

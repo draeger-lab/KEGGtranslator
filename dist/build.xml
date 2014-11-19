@@ -107,6 +107,7 @@
 
     <!-- the path to JSBML -->
     <property name="JSBMLPath" location="${base}/../JSBML" />
+  	<property name="jsbml.version" value="1.0-rc1"/>
   	
     <!-- the path to SBML2LaTeX -->
      <property name="SBML2LaTeXPath" location="${base}/../SBML2LaTeX" />
@@ -318,7 +319,7 @@
     	<zipfileset excludes="${EXCL}" src="${lib}/wsdl4j.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/jaxrpc.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/SBML2LaTeX_v1.0_slim.jar"/>
-        <zipfileset excludes="META-INF/INDEX.LIST META-INF/MANIFEST.MF, COPYING.txt, package.html, package-info.class, licenses/**, overview.html, AUTHORS.txt" src="${lib}/jsbml-1.0-b1-incl-libs.jar"/>
+        <zipfileset excludes="META-INF/INDEX.LIST META-INF/MANIFEST.MF, COPYING.txt, package.html, package-info.class, licenses/**, overview.html, AUTHORS.txt" src="${lib}/jsbml-${jsbml.version}-incl-libs.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/SysBio.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/quaqua-filechooser-only.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/garuda/GarudaBackend.jar"/>
@@ -489,9 +490,10 @@
   <!-- =================================================================== -->
   <target
   	name="dist"
-  	depends="minimal_sysbio, minimal_jsbml, sign, garuda, clean"
+  	depends="sign, garuda, clean"
   	description="Compiles the project, builds jars, obfuscates and signs them, creates Garuda zip file, updates the JNLP file for Java Web Start and bundles all together for a release"
   >
+  	<!-- This target should not depend on the following other targets: minimal_sysbio, minimal_jsbml, -->
   	<property name="jnlp.file.name" value="kgtrans.jnlp"/>
     <property name="jnlp.file" value="${dist.dir}/kgtrans.jnlp"/>
   	<copy file="${dist}/${jnlp.file.name}" todir="${dist.dir}/" verbose="${verbose}"/>
@@ -603,6 +605,7 @@
       	includes="**.jar, **/*.jar, **.zip"
       	excludes="Java5/**, jsbml-old/**"
       />
+      <!--<fileset dir="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/" includes="**.jar"/>-->
     </path>
     <path id="sysbio.sourcepath">
       <fileset dir="${SysBioPath}/src"/>
@@ -700,7 +703,6 @@
   	<echo message="Defining basic properties of the JSBML project"/>
   	<property name="jsbml.dir" value="${base}/../JSBML"/>
   	<property name="jsbml.name" value="JSBML"/>
-  	<property name="jsbml.version" value="1.0-b1"/>
   	<property name="lib" value="${base}/lib"/>
   	
   	
@@ -740,7 +742,9 @@
   	>
       <!-- Source -->
       <src path="${jsbml.dir}/core/src"/>
+      <src path="${jsbml.dir}/extensions/arrays/src"/>
       <src path="${jsbml.dir}/extensions/comp/src"/>
+  	  <src path="${jsbml.dir}/extensions/dyn/src"/>
       <src path="${jsbml.dir}/extensions/fbc/src"/>
       <src path="${jsbml.dir}/extensions/groups/src"/>
       <src path="${jsbml.dir}/extensions/layout/src"/>
@@ -751,7 +755,9 @@
       <src path="${jsbml.dir}/extensions/spatial/src"/>
       <!-- Resources -->
       <src path="${jsbml.dir}/core/resources"/>
+      <src path="${jsbml.dir}/extensions/arrays/resources"/>
       <src path="${jsbml.dir}/extensions/comp/resources"/>
+  	  <src path="${jsbml.dir}/extensions/dyn/resources"/>
       <src path="${jsbml.dir}/extensions/fbc/resources"/>
       <src path="${jsbml.dir}/extensions/groups/resources"/>
       <src path="${jsbml.dir}/extensions/layout/resources"/>
@@ -825,7 +831,7 @@
       <!-- 3rd party libraries -->
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java readme.txt LICENSE" src="${jsbml.dir}/core/lib/biojava3-ontology-3.1.0.jar"/>
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/jigsaw-dateParser.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/log4j-1.2.8.jar"/>
+      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/log4j-1.2.17.jar"/>
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/stax-api-1.0.1.jar"/>
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/stax2-api-3.0.3.jar"/>
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/staxmate-2.0.0.jar"/>

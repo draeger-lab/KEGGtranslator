@@ -74,7 +74,7 @@ public class CellDesignerUtils {
    * tags and finalizes the annotaion.
    * 
    * @param p
-   * @param annot
+   * @param model
    * @param defaultC
    * @throws XMLStreamException
    */
@@ -402,8 +402,7 @@ public class CellDesignerUtils {
    * with these special attributes.
    * 
    * @param name - input string to reformat.
-   * @param forCellDesigner
-   * @return String with special CD attributes (e.g. " " => "_space_").
+   * @return String with special CD attributes (e.g., " " => "_space_").
    */
   private static String NameToCellDesignerName(String name) {
     name = name.trim().replace(" ", "_space_").replace("-", "_minus_")

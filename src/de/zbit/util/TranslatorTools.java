@@ -86,10 +86,8 @@ public class TranslatorTools extends GraphTools {
     super(graph);
   }
   
-  
   /**
    * Highlight all given GeneIDs in YELLOW color. And selects these nodes.
-   * @param graph translated pathway with annotated geneIDs
    * @param ncbiGeneIDs geneIDs to color in YELLOW.
    */
   public void highlightGenes(Iterable<Integer> ncbiGeneIDs) {
@@ -282,7 +280,7 @@ public class TranslatorTools extends GraphTools {
   /**
    * Return a map from Entrez GeneID to corresponding {@link Node} for the given
    * translated pathway.
-   * @param graph
+   * 
    * @return map from geneID to List of nodes.
    */
   public Map<Integer, List<Node>> getGeneID2NodeMap() {

@@ -252,9 +252,10 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   public boolean isCreateEdgeLabels() {
     return createEdgeLabels;
   }
+  
   /**
+   * @param createEdgeLabels the createEdgeLabel to set
    * @see #isCreateEdgeLabels()
-   * @param createEdgeLabel the createEdgeLabel to set
    */
   public void setCreateEdgeLabels(boolean createEdgeLabels) {
     this.createEdgeLabels = createEdgeLabels;
@@ -266,6 +267,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   public boolean isDrawArrowsForReactions() {
     return drawArrowsForReactions;
   }
+  
   /**
    * @param drawArrowsForReactions the drawArrowsForReactions to set
    */
@@ -1773,11 +1775,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   
   /**
-   * @param document
-   * @param path
+   * @param graph
+   * @param outFile
    * @param format output file extension, e.g., "gif", "graphml", "gml", "jpg",...
    * @throws Exception
-   * @return true if everything went fine.
+   * @return {@code true} if everything went fine.
    */
   public boolean writeToFile(Graph2D graph, String outFile, String format) throws Exception {
     return outputHandler.writeToFile(graph, outFile, format);

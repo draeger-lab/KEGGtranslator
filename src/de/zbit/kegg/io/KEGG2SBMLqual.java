@@ -41,7 +41,7 @@ import org.sbml.jsbml.ext.qual.InputTransitionEffect;
 import org.sbml.jsbml.ext.qual.Output;
 import org.sbml.jsbml.ext.qual.OutputTransitionEffect;
 import org.sbml.jsbml.ext.qual.QualConstants;
-import org.sbml.jsbml.ext.qual.QualitativeModel;
+import org.sbml.jsbml.ext.qual.QualModelPlugin;
 import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
@@ -114,8 +114,8 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       return false;
     }
     SBasePlugin qm = document.getModel().getExtension(KEGG2SBMLqual.QUAL_NS);
-    if (qm!=null && qm instanceof QualitativeModel) {
-      QualitativeModel q = (QualitativeModel) qm;
+    if ((qm != null) && (qm instanceof QualModelPlugin)) {
+      QualModelPlugin q = (QualModelPlugin) qm;
       if (!q.isSetListOfQualitativeSpecies()) {
         return false;
       }
@@ -178,7 +178,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     // Create qualitative model
     Model model = doc.getModel();
-    QualitativeModel qualModel = new QualitativeModel(model);
+    QualModelPlugin qualModel = new QualModelPlugin(model);
     
     // Determine if this is a combined model (core + qual) or a pure qual model.
     boolean isCombindedModel = considerReactions();
@@ -228,10 +228,11 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
   /**
    * Creates a qual species for every entry in the pathway
    * (as a side effect, also for every species in the model).
-   * @param model
+   * 
+   * @param p
    * @param qualModel
    */
-  private void createQualSpecies(Pathway p, QualitativeModel qualModel) {
+  private void createQualSpecies(Pathway p, QualModelPlugin qualModel) {
     for (Entry e: p.getEntries()) {
       Object s = e.getCustom();
       if (s!=null && s instanceof Species) {
@@ -256,7 +257,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * component or other conflicts occur.
    * @throws XMLStreamException
    */
-  public Transition addKGMLRelation(Relation r, Pathway p, QualitativeModel qualModel) throws XMLStreamException {
+  public Transition addKGMLRelation(Relation r, Pathway p, QualModelPlugin qualModel) throws XMLStreamException {
     // create transition and add it to the model
     
     Entry eOne = p.getEntryForId(r.getEntry1());
@@ -411,7 +412,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * @param qualModel
    * @return
    */
-  private QualitativeSpecies createQualitativeSpeciesFromSpecies(Species species, QualitativeModel qualModel) {
+  private QualitativeSpecies createQualitativeSpeciesFromSpecies(Species species, QualModelPlugin qualModel) {
     String id = QUAL_SPECIES_PREFIX + species.getId();
     QualitativeSpecies qs = qualModel.getQualitativeSpecies(id);
     if(qs == null){

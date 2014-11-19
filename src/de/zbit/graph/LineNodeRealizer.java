@@ -70,6 +70,9 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
     }
   }
   
+  /* (non-Javadoc)
+   * @see y.view.ShapeNodeRealizer#createCopy(y.view.NodeRealizer)
+   */
   @Override
   public NodeRealizer createCopy(NodeRealizer nr) {
     return new LineNodeRealizer(nr);
@@ -77,9 +80,7 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
   
   /**
    * 
-   * @param clonedXes already cloned other list.
-   * @param clonedYes already cloned other list.
-   * @param clonedBounds already cloned other list.
+   * @param other already cloned other list.
    */
   private void setCoordLists(Polygon other) {
     shape = new Polygon(); // clear
@@ -91,7 +92,9 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
   
   /**
    * Add a pair of x/y coordinates for the current spline.
-   * @param coords
+   * 
+   * @param x
+   * @param y
    */
   public void addSplineCoords(int x, int y) {
     ((Polygon)shape).addPoint(x, y);
