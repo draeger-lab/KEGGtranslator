@@ -889,7 +889,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @return
    */
   private static boolean isLetter(char c) {
-    // Unfortunately Character.isLetter also accepts ��, but SBML doesn't.
+    // Unfortunately Character.isLetter also accepts symbols that SBML doesn't.
     // a-z or A-Z
     return (c>=97 && c<=122) || (c>=65 && c<=90);
   }

@@ -1165,15 +1165,15 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     /*
      * XXX: Gruppenknoten erstellen evtl. in einer SBML version >2 moeglich?
      * Gibt es sowas in SBML?
-     * InCD -> ja, aber umsetzung ist ungen��gend (nur
-     * zur visualisierung, keine SBML Species f��r alle species).
+     * InCD -> ja, aber umsetzung ist ungenuegend (nur
+     * zur visualisierung, keine SBML Species fuer alle species).
      * 
-     * Gel��st: ��ber complexSpeciesAlias in CD. & MIRIAM in normal SBML
+     * Geloest: ueber complexSpeciesAlias in CD. & MIRIAM in normal SBML
      * In simplen SBML ignoriert, da funktion nicht vorhanden.
-     * Reaktionen werden stets so ��bersetzt, wie sie im Dokument stehen
+     * Reaktionen werden stets so uebersetzt, wie sie im Dokument stehen
      * (meist nur vom Gruppenknoten aus, nicht von den Komponenten).
      * Das macht Sinn, da Gruppenknoten selbst nicht nur eine "Gruppe" ist,
-     * sondern per se auch schon ein Protein o.��. definiert.
+     * sondern per se auch schon ein Protein o.Ae. definiert.
      *
      *  Beispiel (aus map04010hsa.xml):
      *      <entry id="141" name="group:" type="genes">

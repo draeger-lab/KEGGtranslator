@@ -640,7 +640,7 @@ KeyListener, ItemListener {
     
     // Ask output format
     String format = getOutputFileFormat(toolBar);
-    if ( askOutputFormat || (format == null) || (format.length() < 1)) {
+    if (askOutputFormat || (format == null) || (format.length() < 1)) {
       JLabeledComponent outputFormat = (JLabeledComponent) PreferencesPanel.createJComponentForOption(KEGGtranslatorIOOptions.FORMAT, prefsIO, null);
       outputFormat.setTitle("Please select the output format");
       JOptionPane.showMessageDialog(this, outputFormat, System

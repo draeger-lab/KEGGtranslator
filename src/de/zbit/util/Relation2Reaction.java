@@ -62,7 +62,7 @@
 //     * - Compunds identifizieren
 //     * - Infos holen, reactions parsen
 //     * - reactions suibstrates, products& enzymes, schauen was wir haben
-//     * - wenn wir mind. 1 haben, dann reaction hinzuf��gen.
+//     * - wenn wir mind. 1 haben, dann reaction hinzufuegen.
 //     */
 //    System.out.println(x);
 //  }

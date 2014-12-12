@@ -487,7 +487,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
     if(sources.size() != 0 && targets.size() != 0) {
       
       // for all sources
-      for(Glyph source : sources) {
+      for (Glyph source : sources) {
         
         // create an connection arc / edge
         Arc connection = objectFactory.createArc();
@@ -511,7 +511,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
       
       
       // for all targets
-      for(Glyph target : targets) {
+      for (Glyph target : targets) {
         
         // create an connection arc / edge
         Arc connection = objectFactory.createArc();
@@ -535,7 +535,7 @@ public class KEGG2SBGN extends AbstractKEGGtranslator<Sbgn> {
       
       
       // for all reactionModifiers
-      for(Glyph rm : reactionModifiers) {
+      for (Glyph rm : reactionModifiers) {
         
         // create an connection arc / edge
         Arc connection = objectFactory.createArc();

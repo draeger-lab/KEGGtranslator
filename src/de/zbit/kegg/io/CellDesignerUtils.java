@@ -424,7 +424,7 @@ public class CellDesignerUtils {
     Set<String> alreadyProcessed = new HashSet<String>();
     for (Entry entry : entries) {
       if (entry.getCustom()!=null && entry.getCustom() instanceof Species) {
-        if ( alreadyProcessed.add(((NamedSBase) entry.getCustom()).getId()) ) {
+        if (alreadyProcessed.add(((NamedSBase) entry.getCustom()).getId()) ) {
           addCellDesignerAnnotationToSpecies((Species) entry.getCustom(), entry);
         }
       }

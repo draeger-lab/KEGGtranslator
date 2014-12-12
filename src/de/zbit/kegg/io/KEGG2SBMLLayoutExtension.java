@@ -402,7 +402,7 @@ public class KEGG2SBMLLayoutExtension {
     for (Reaction r : document.getModel().getListOfReactions()) {
       if (r.isSetListOfModifiers()) {
         for (ModifierSpeciesReference msr : r.getListOfModifiers()) {
-          if ( msr.isSetSpecies() && msr.getSpecies().length()>0) {
+          if (msr.isSetSpecies() && msr.getSpecies().length()>0) {
             Utils.addToMapOfSets(enzymeSpeciesIDs, msr.getSpecies(), r);
           }
         }

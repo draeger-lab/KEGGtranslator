@@ -847,7 +847,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
             // Jochen:  "protein", "protein in complex", "complex", "RNA", "DNA", "small molecule", "RNA in complex", "DNA in complex", "small molecule in complex", "pathway", "biological process"
             // Mapping: gene/ortholog => protein. Group=>complex, compound=>complex, map=>pathway(/biolog. process)
             //          enzyme & other fehlen.
-            // Au��erdem: "bindsToChemicals" nicht gesetzt.
+            // Auusserdem: "bindsToChemicals" nicht gesetzt.
           }
         }
         

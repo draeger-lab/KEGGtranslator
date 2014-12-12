@@ -421,7 +421,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       ((PublicationXref) xr).setYear(2011);
       ((PublicationXref) xr).addUrl("http://www.ncbi.nlm.nih.gov/pubmed/21700675");
       ((PublicationXref) xr).addAuthor("Andreas Zell");
-      ((PublicationXref) xr).addAuthor("Andreas Dräger");
+      ((PublicationXref) xr).addAuthor("Andreas Dr\u00e4ger");
       ((PublicationXref) xr).addAuthor("Clemens Wrzodek");
       ((PublicationXref) xr).addSource("Bioinformatics 2011, 27(16), 2314-2315");
       
@@ -429,7 +429,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       ((publicationXref) xr).setTITLE("KEGGtranslator: visualizing and converting the KEGG PATHWAY database to various formats");
       ((publicationXref) xr).setYEAR(2011);
       ((publicationXref) xr).addURL("http://www.ncbi.nlm.nih.gov/pubmed/21700675");
-      ((publicationXref) xr).addAUTHORS("Wrzodek C., Dräger A., Zell A.");
+      ((publicationXref) xr).addAUTHORS("Wrzodek C., Dr\u00e4ger A., Zell A.");
       ((publicationXref) xr).addSOURCE("Bioinformatics 2011, 27(16), 2314-2315");
     }
     
