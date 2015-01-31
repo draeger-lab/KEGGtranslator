@@ -39,7 +39,7 @@ import de.zbit.util.NotifyingWorker;
  * @author Clemens Wrzodek
  * @version $Rev$
  */
-public class KEGGImporter extends NotifyingWorker<Object, Void> {
+public class KEGGImporter extends NotifyingWorker<Object> {
   /**
    * 
    */
@@ -96,51 +96,47 @@ public class KEGGImporter extends NotifyingWorker<Object, Void> {
    */
   @Override
   protected Object doInBackground() throws Exception {
-    if (inputFile==null && inputPathway==null) {
+    if ((inputFile == null) && (inputPathway == null)) {
       // PART0: Notify that we are goint to download something
-      ActionEvent event = new ActionEvent(this, 1, KEGGpathwayID);
-      fireActionEvent(event);
+      publish(new ActionEvent(this, 1, KEGGpathwayID));
       
       // PART1: Download
       String localFile = null;
       try {
         localFile = KGMLSelectAndDownload.downloadPathway(KEGGpathwayID, false);
-      } catch (Exception e) {
+      } catch (Exception exc) {
         // Mostly 1) pathway does not exists for organism or 2) no connection to server
-        GUITools.showErrorMessage(null, e);
+        GUITools.showErrorMessage(null, exc);
       }
       
       // PART2: Fire listener that we are done with downloading
-      event = new ActionEvent(this, 2, localFile);
-      fireActionEvent(event);
+      publish(new ActionEvent(this, 2, localFile));
       inputFile = new File(localFile);
     }
     
     // PART3: Translate
-    if (inputFile!=null || inputPathway!=null) {
+    if ((inputFile != null) || (inputPathway != null)) {
       // The order in which the following events happen is important
       AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator.getTranslator(outputFormat, Translator.getManager());
       
       // The following should also trigger a new progress bar!
-      ActionEvent event = new ActionEvent(translator, 3, null);
-      fireActionEvent(event);
+      publish(new ActionEvent(translator, 3, null));
       
       translator.setProgressBar(getProgressBar());
       Object result;
-      if (inputPathway!=null) {
+      if (inputPathway != null) {
         result = translator.translate(inputPathway);
       } else {
         result = translator.translate(inputFile);
       }
       
-      event = new ActionEvent(result, 4, null);
-      fireActionEvent(event);
+      publish(new ActionEvent(result, 4, null));
       
       return result;
     }
     
     // Remove this from list of listeners
-    fireActionEvent(new ActionEvent(this, 5, null));
+    publish(new ActionEvent(this, 5, null));
     
     return null;
   }

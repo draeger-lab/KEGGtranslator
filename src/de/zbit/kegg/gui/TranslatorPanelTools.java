@@ -68,12 +68,19 @@ public class TranslatorPanelTools {
         GUITools.showErrorMessage(null, "Unknown output Format: '" + outputFormat + "'.");
     }
     
-    if (panel!=null && (panel instanceof TranslatorGraphLayerPanel)) {
+    if ((panel != null) && (panel instanceof TranslatorGraphLayerPanel)) {
       setupBackgroundImage((TranslatorGraphLayerPanel<?>) panel);
     }
     return panel;
   }
   
+  /**
+   * 
+   * @param pathwayID
+   * @param outputFormat
+   * @param translationResult
+   * @return
+   */
   public static TranslatorPanel<?> createPanel(final String pathwayID, final Format outputFormat, ActionListener translationResult) {
     TranslatorPanel<?> panel = null;
     

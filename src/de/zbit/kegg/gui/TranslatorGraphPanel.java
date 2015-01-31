@@ -94,7 +94,7 @@ public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
    * @param outputFormat any GraphML compatible formats (unchecked).
    * @param translationResult
    */
-  public TranslatorGraphPanel(NotifyingWorker<?, ?> pathwayImporter, Format outputFormat,
+  public TranslatorGraphPanel(NotifyingWorker<?> pathwayImporter, Format outputFormat,
     ActionListener translationResult) {
     super(pathwayImporter, outputFormat.toString(), translationResult);
   }

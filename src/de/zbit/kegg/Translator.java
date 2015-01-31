@@ -73,6 +73,7 @@ public class Translator extends Launcher {
   /**
    * Localization support
    */
+  @SuppressWarnings("unused")
   private static final transient ResourceBundle bundle = ResourceManager.getBundle(Translator.class.getName());
   
   /**

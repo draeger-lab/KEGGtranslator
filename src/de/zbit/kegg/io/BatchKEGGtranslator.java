@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import de.zbit.graph.io.Graph2Dwriteable.WriteableFileExtensions;
 import de.zbit.graph.io.Graph2Dwriter;
-import de.zbit.graph.io.Graph2Dwriter.writeableFileExtensions;
 import de.zbit.graph.io.SBGN2GraphML;
 import de.zbit.graph.io.SBML2GraphML;
 import de.zbit.io.DirectoryParser;
@@ -74,7 +74,7 @@ public class BatchKEGGtranslator {
    * Will be initialized with {@link #outFormat} and
    * {@link KeggInfoManagement}.
    */
-  private KEGGtranslator translator;
+  private KEGGtranslator<?> translator;
   
   /**
    * Load preferences only once when {@link BatchKEGGtranslator} is started.
@@ -129,7 +129,7 @@ public class BatchKEGGtranslator {
    * 
    * @return
    */
-  public KEGGtranslator getConverter() {
+  public KEGGtranslator<?> getConverter() {
     return translator;
   }
   
@@ -282,7 +282,7 @@ public class BatchKEGGtranslator {
     }
     
     outFile = FileTools.removeFileExtension(outFile) + ".jpg";
-    Graph2Dwriter writer = new Graph2Dwriter(writeableFileExtensions.jpg);
+    Graph2Dwriter writer = new Graph2Dwriter(WriteableFileExtensions.jpg);
     TranslatorPanelTools.setupBackgroundImage(writer);
     Object myGraph = null; // actually a Graph2D object
     
@@ -408,7 +408,7 @@ public class BatchKEGGtranslator {
    * @param translator
    * @return
    */
-  public static String getFileExtension(KEGGtranslator translator) {
+  public static String getFileExtension(KEGGtranslator<?> translator) {
     String fileExtension = ".translated";
     if (translator instanceof KEGG2yGraph) {
       fileExtension = ((KEGG2yGraph)translator).getWriter().getOutputHandler().getFileNameExtension();
@@ -435,7 +435,7 @@ public class BatchKEGGtranslator {
    * output format of this class.
    * @param translator
    */
-  public void setTranslator(KEGGtranslator translator) {
+  public void setTranslator(KEGGtranslator<?> translator) {
     this.translator = translator;
   }
   
