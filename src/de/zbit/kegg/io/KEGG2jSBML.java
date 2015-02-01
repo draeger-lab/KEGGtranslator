@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  * 
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -826,7 +827,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         if (infos.getDefinition() != null) {
           notes.append(String.format("<b>Definition of %s%s%s:</b> %s<br/>\n",
             quotStart, ko_id.toUpperCase(), quotEnd, formatTextForHTMLnotes(infos.getDefinition()) ));
-          // System.out.println(sbReaction.getNotesString());
+          logger.fine(sbReaction.getNotesString());
           // notes="<body xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>&#8220;TEST&#8221;</b> A &lt;&#061;&gt;&#62;&#x3e;\u003E B<br/></p></body>";
         } else {
           notes.append(String.format("<b>%s</b><br/>\n", ko_id.toUpperCase()));
@@ -1495,7 +1496,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     
     // Just a few test cases here.
-    System.out.println("Demo mode.");
+    logger.info("Demo mode.");
     
     long start = System.currentTimeMillis();
     try {
@@ -1512,8 +1513,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     }
     
     
-    System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
+    logger.info("Conversion took " + Utils.getTimeString((System.currentTimeMillis() - start)));
   }
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static transient final Logger logger = Logger.getLogger(KEGG2jSBML.class.getName());
   
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.AbstractKEGGtranslator#considerRelations()

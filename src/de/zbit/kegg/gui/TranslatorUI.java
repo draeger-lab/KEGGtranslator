@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -237,6 +237,10 @@ KeyListener, ItemListener {
     this(null);
   }
   
+  /**
+   * 
+   * @param appConf
+   */
   public TranslatorUI(AppConf appConf) {
     super(appConf);
     
@@ -501,17 +505,17 @@ KeyListener, ItemListener {
           int index = tabbedPane.indexOfComponent(source);
           logger.info("TRANSLATION DONE");
           if (garudaBackend != null) {
-            logger.info("GARUDA ACTIVE");
+            logger.fine("GARUDA ACTIVE");
             if (tabbedPane.getTabCount() == 1) {
-              logger.info("GARUDA NOW ENABLED");
+              logger.fine("GARUDA NOW ENABLED");
               // TabCount check is needed to avoid that this is done again when more tabs are added.
               GUITools.setEnabled(true, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
             } else if (tabbedPane.getTabCount() == 0) {
-              logger.info("GARUDA NOW DISABLED");
+              logger.fine("GARUDA NOW DISABLED");
               GUITools.setEnabled(false, getJMenuBar(), getJToolBar(), GarudaActions.SENT_TO_GARUDA);
             }
           } else {
-            logger.info("GARUDA NOT AVAILABLE!");
+            logger.fine("GARUDA NOT AVAILABLE!");
           }
           if (index >= 0) { // ELSE: User closed the tab before completion
             if (e.getID() != JOptionPane.OK_OPTION) {
@@ -559,7 +563,7 @@ KeyListener, ItemListener {
           }
           break;
         default:
-          System.out.println(action);
+          logger.fine(action.toString());
           break;
       }
     } catch (Throwable exc) {
@@ -863,7 +867,7 @@ KeyListener, ItemListener {
       SBProperties props = new SBProperties();
       { // Save KEGGtranslatorIOOptions
         File f = getInputFile(toolBar);
-        if (f != null && KEGGtranslatorIOOptions.INPUT.getRange().isInRange(f, props)) {
+        if ((f != null) && KEGGtranslatorIOOptions.INPUT.getRange().isInRange(f, props)) {
           props.put(KEGGtranslatorIOOptions.INPUT, f);
         }
         props.put(KEGGtranslatorIOOptions.FORMAT, getOutputFileFormat(toolBar));
@@ -872,13 +876,13 @@ KeyListener, ItemListener {
       props.clear();
       
       { // Save GUIOptions
-        if (openDir != null && openDir.length() > 1) {
+        if ((openDir != null) && (openDir.length() > 1)) {
           props.put(GUIOptions.OPEN_DIR, openDir);
         }
-        if (saveDir != null && saveDir.length() > 1) {
+        if ((saveDir != null) && (saveDir.length() > 1)) {
           props.put(GUIOptions.SAVE_DIR, saveDir);
         }
-        if (props.size()>0) {
+        if (props.size() > 0) {
           SBPreferences.saveProperties(GUIOptions.class, props);
         }
       }

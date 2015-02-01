@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -466,7 +467,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * @throws XMLStreamException
    * @throws ClassNotFoundException
    */
-  @SuppressWarnings({ "unchecked", "static-access" })
+  @SuppressWarnings({ "unchecked" })
   public static void main(String[] args) throws Exception {
     // Speedup Kegg2SBML by loading alredy queried objects. Reduces network
     // load and heavily reduces computation time.
@@ -520,7 +521,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     
     // Just a few test cases here.
-    System.out.println("Demo mode.");
+    logger.info("Demo mode.");
     
     long start = System.currentTimeMillis();
     try {
@@ -539,10 +540,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       e.printStackTrace();
     }
     
-    
-    System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
+    logger.info("Conversion took " + Utils.getTimeString((System.currentTimeMillis() - start)));
   }
   
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static transient final Logger logger = Logger.getLogger(KEGG2SBMLqual.class.getName());
   
   /**
    * See {@link #considerReactions}. Please stick to the default

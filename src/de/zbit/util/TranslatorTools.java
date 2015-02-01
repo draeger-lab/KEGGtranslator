@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -21,6 +21,7 @@
 package de.zbit.util;
 
 import java.awt.Color;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.StackingNodeLayout;
 import de.zbit.graph.gui.TranslatorPanel;
-import de.zbit.graph.io.Graph2Dwriter;
+import de.zbit.graph.io.Graph2DExporter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
 import de.zbit.kegg.io.KEGG2yGraph;
@@ -223,7 +224,7 @@ public class TranslatorTools extends GraphTools {
     NodeMap typeMap = (NodeMap) getMap(GraphMLmaps.NODE_TYPE);
     NodeMap labelMap = (NodeMap) getMap(GraphMLmaps.NODE_LABEL);
     if (typeMap==null || labelMap==null) {
-      log.severe(String.format("Could not find %s %s mapping.", (typeMap==null?"type":""), (labelMap==null?"label":"")));
+      log.severe(MessageFormat.format("Could not find {0} {1} mapping.", (typeMap==null?"type":""), (labelMap==null?"label":"")));
       return mi2node; // return an empty map.
     }
     
@@ -262,7 +263,7 @@ public class TranslatorTools extends GraphTools {
     // Get Type map
     NodeMap typeMap = (NodeMap) getMap(GraphMLmaps.NODE_TYPE);
     if (typeMap==null) {
-      log.severe(String.format("Could not find %s mapping.", (typeMap==null?"type":"")));
+      log.severe(MessageFormat.format("Could not find {0} mapping.", (typeMap == null ? "type" : "")));
       return false;
     }
     
@@ -433,7 +434,7 @@ public class TranslatorTools extends GraphTools {
   
   
   public void layoutGroupNode(Node group) {
-    if (group==null) {
+    if (group == null) {
       return;
     }
     StackingNodeLayout.doRecursiveLayout(graph, group);
@@ -519,7 +520,7 @@ public class TranslatorTools extends GraphTools {
   public void resetWidthAndHeight(Node node) {
     // TODO: Also reset shape
     DataMap nodeMap = descriptor2Map.get(GraphMLmaps.NODE_SIZE);
-    if (nodeMap==null) {
+    if (nodeMap == null) {
       log.severe("Could not find original node sizes.");
       return;
     }
@@ -555,7 +556,7 @@ public class TranslatorTools extends GraphTools {
     }
     
     // Remove from description map
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2DExporter.mapDescription);
     mapDescriptionMap.removeMapByKey(map, graph);
     
     // Remove from graph
@@ -583,7 +584,7 @@ public class TranslatorTools extends GraphTools {
     DataMap item = descriptor2Map.remove(identifier);
     
     // Remove from description map
-    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2Dwriter.mapDescription);
+    GenericDataMap<DataMap, String> mapDescriptionMap = (GenericDataMap<DataMap, String>) graph.getDataProvider(Graph2DExporter.mapDescription);
     mapDescriptionMap.removeMap(identifier, graph);
     
     // Remove from graph
@@ -701,7 +702,7 @@ public class TranslatorTools extends GraphTools {
     NodeMap typeMap = (NodeMap) getMap(GraphMLmaps.NODE_TYPE);
     NodeMap labelMap = (NodeMap) getMap(GraphMLmaps.NODE_KEGG_ID);
     if (typeMap==null || labelMap==null) {
-      log.severe(String.format("Could not find %s %s mapping.", (typeMap==null?"type":""), (labelMap==null?"label":"")));
+      log.severe(MessageFormat.format("Could not find {0} {1} mapping.", (typeMap == null ? "type" : ""), (labelMap == null ? "label" : "")));
       return pw2node; // return an empty map.
     }
     

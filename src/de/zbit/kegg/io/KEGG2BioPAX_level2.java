@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2010-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2010-2015 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -213,7 +214,7 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
     
     
     // Just a few test cases here.
-    System.out.println("Demo mode.");
+    logger.info("Demo mode.");
     
     long start = System.currentTimeMillis();
     try {
@@ -230,8 +231,13 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
     }
     
     
-    System.out.println("Conversion took "+Utils.getTimeString((System.currentTimeMillis() - start)));
+    logger.info("Conversion took " + Utils.getTimeString((System.currentTimeMillis() - start)));
   }
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static transient final Logger logger = Logger.getLogger(KEGG2BioPAX.class.getName());
   
   /* (non-Javadoc)
    * @see de.zbit.kegg.io.KEGG2BioPAX#addEntry(de.zbit.kegg.parser.pathway.Entry, de.zbit.kegg.parser.pathway.Pathway)

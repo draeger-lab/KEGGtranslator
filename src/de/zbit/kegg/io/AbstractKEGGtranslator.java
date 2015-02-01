@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -436,13 +436,14 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     return doc;
   }
   
-  
   /**
-   * {@inheritDoc}
+   * A {@link Logger} for this class.
    */
+  private static final transient Logger logger = Logger.getLogger(AbstractKEGGtranslator.class.getName());
+  
   @Override
   public void translate(String infile, String outfile) throws Exception {
-    // System.out.println("Reading kegg pathway...");
+    logger.fine("Reading kegg pathway...");
     Pathway p = KeggParser.parse(infile).get(0);
     translate(p, outfile);
   }

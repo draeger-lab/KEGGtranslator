@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import y.base.DataMap;
 import y.base.Edge;
@@ -73,6 +74,7 @@ import y.view.hierarchy.HierarchyManager;
 import de.zbit.graph.GraphTools;
 import de.zbit.graph.LineNodeRealizer;
 import de.zbit.graph.StackingNodeLayout;
+import de.zbit.graph.io.Graph2DExporter;
 import de.zbit.graph.io.Graph2Dwriter;
 import de.zbit.graph.io.def.GenericDataMap;
 import de.zbit.graph.io.def.GraphMLmaps;
@@ -420,40 +422,40 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   private static NodeList removeOutlier(NodeList nl, Graph2D graph, int threshold) {
     // Calculate minimal distances
     double[] minDists = new double[nl.size()];
-    for (int j=0; j<nl.size(); j++) {
+    for (int j = 0; j < nl.size(); j++) {
       NodeRealizer n1 = graph.getRealizer((Node) nl.get(j));
       double minDist=Double.MAX_VALUE;
-      for (int k=0; k<nl.size(); k++) {
-        if (j==k) {
+      for (int k = 0; k<nl.size(); k++) {
+        if (j == k) {
           continue;
         }
         NodeRealizer n2 = graph.getRealizer((Node) nl.get(k));
         double dist = Math.max(Math.abs(n1.getCenterX()-n2.getCenterX()), Math.abs(n1.getCenterY()-n2.getCenterY()));
         minDist = Math.min(minDist, dist);
       }
-      //System.out.println(minDist + " \t" + n1.getLabelText() );
+      logger.fine(minDist + " \t" + n1.getLabelText() );
       minDists[j] = minDist;
     }
     
-    ArrayList<Integer> toRemove = new ArrayList<Integer>();
-    if (nl.size()<2)
+    List<Integer> toRemove = new ArrayList<Integer>();
+    if (nl.size() < 2)
     {
       return nl; // one node
     }
     
-    for (int j=0; j<minDists.length; j++) {
-      if (minDists[j]>threshold) {
+    for (int j = 0; j < minDists.length; j++) {
+      if (minDists[j] > threshold) {
         toRemove.add(j);
       }
     }
     
     // Nothing to do?
-    if (toRemove.size()<1) {
+    if (toRemove.size() < 1) {
       return nl;
     }
     
     NodeList nl2 = new NodeList();
-    for (int j=0; j<nl.size(); j++) {
+    for (int j = 0; j < nl.size(); j++) {
       if (toRemove.contains(j)) {
         continue;
       }
@@ -463,6 +465,11 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
     
     return nl;
   }
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(KEGG2yGraph.class.getName());
   
   /**
    * Standard Setup for group nodes.
@@ -1220,8 +1227,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
       double x=Double.MAX_VALUE,y=Double.MAX_VALUE,width=0,height=0;
       for (int n2: groupNodeChildren.get(i)) {
         Entry two = p.getEntryForId(n2);
-        if (two==null) {
-          System.out.println("WARNING: Missing node for id " + n2);
+        if (two == null) {
+          logger.warning("WARNING: Missing node for id " + n2);
           continue;
         }
         Node twoNode = (Node) two.getCustom();
@@ -1258,7 +1265,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
      * Create a data provider that stores the names of all
      * data providers (Maps).
      */
-    GenericDataMap<DataMap, String> mapDescriptionMap = Graph2Dwriter.addMapDescriptionMapToGraph(graph);
+    GenericDataMap<DataMap, String> mapDescriptionMap = Graph2DExporter.addMapDescriptionMapToGraph(graph);
     
     mapDescriptionMap.set(nodeLabel, GraphMLmaps.NODE_LABEL);
     mapDescriptionMap.set(entrezIds, GraphMLmaps.NODE_GENE_ID);
@@ -1725,7 +1732,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @return KEGGtranslator (KEGG2yGraph, yFiles implementation)
    */
   public static KEGG2yGraph createKEGG2SVG(KeggInfoManagement manager) {
-    IOHandler ioh = Graph2Dwriter.createSVGIOHandler();
+    IOHandler ioh = Graph2DExporter.createSVGIOHandler();
     if (ioh!=null) {
       return new KEGG2yGraph(ioh, manager);
     } else {

@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -53,6 +53,10 @@ import de.zbit.util.prefs.SBPreferences;
  * @version $Rev$
  */
 public class TranslatorSBMLPanel extends TranslatorPanel<SBMLDocument> {
+  
+  /**
+   * Generated serial version identifier.
+   */
   private static final long serialVersionUID = -1110886974773446666L;
   
   /**

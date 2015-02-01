@@ -94,23 +94,20 @@
     <!-- adjust the settings to your local environment -->
     <path id="classpath">
       <fileset dir="${lib}"         includes="*.jar, *.zip"/>
-      <fileset dir="${lib}/garuda"  includes="*.jar, *.zip"/>
     </path>
-	<path id="sourcepath">
-	  <fileset dir="${src}"/>
-	  <fileset dir="${test}"/>
-	  <fileset dir="${resources}"/>
-    </path>
+  	
+    <!-- Exclusion pattern for third-party JAR files -->
+  	<property name="EXCL" value="META-INF/**, COPYING.txt, licenses/**, package.html, package-info.class, overview.html, AUTHORS.txt"/>
   	
   	<!-- the path to SYSBIO -->
   	<property name="SysBioPath" location="${base}/../SysBio" />
 
     <!-- the path to JSBML -->
     <property name="JSBMLPath" location="${base}/../JSBML" />
-  	<property name="jsbml.version" value="1.0-rc1"/>
+  	<property name="jsbml.version" value="1.0"/>
   	
     <!-- the path to SBML2LaTeX -->
-     <property name="SBML2LaTeXPath" location="${base}/../SBML2LaTeX" />
+    <property name="SBML2LaTeXPath" location="${base}/../SBML2LaTeX" />
 
   	
     <!-- the path to the KEGGtranslator binaries -->
@@ -147,13 +144,7 @@
   	depends="init"
   	description="Determines the current SVN revions number of KEGGtranslator and stores it in a variable."
   >
-  	<exec executable="svn" outputproperty="${base}/svninfo.xml">
-  	  <arg line="info --xml ${base}/"/>
-  	</exec>
-  	<xmlproperty collapseAttributes="true">
-  	  <propertyresource name="${base}/svninfo.xml"/>
-  	</xmlproperty>
-  	<property name="repository.revision" value="${info.entry.revision}"/>
+  	<property name="repository.revision" value="399"/> <!--${info.entry.revision}"/>-->
   	<echo message="Current revision is ${repository.revision}"/>
   </target>
 
@@ -216,6 +207,11 @@
   	description="Compiles the entire project"
   >
   	<echo message="Compiling the entire ${Name} project"/>
+	<path id="sourcepath">
+	  <fileset dir="${src}"/>
+	  <fileset dir="${test}"/>
+	  <fileset dir="${resources}"/>
+    </path>
   	<javac
       classpathref="classpath"
       compiler="${build.compiler}"
@@ -275,8 +271,6 @@
   	depends="compile"
   	description="puts the application specific classes into application.jar."
   >
-  	<property name="EXCL" value="META-INF/**, COPYING.txt, licenses/**, package.html, package-info.class, overview.html, AUTHORS.txt"/>
-  	
     <jar
       compress="true"
       duplicate="preserve"
@@ -309,22 +303,20 @@
           <exclude name="MANIFEST.MF"/>
         </zipfileset>
     	
-        <zipfileset excludes="META-INF/*.SF" src="${lib}/y.jar"/>
-        <zipfileset excludes="overview.html,META-INF/**/*,org/apache/commons/logging/**/*,javax/xml/namespace/QName.class,org/apache/log4j/**/*" src="${lib}/paxtools-4.1.1_customJenaFix.jar"/>
-        <zipfileset excludes="META-INF/*.SF" src="${lib}/org.sbgn.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/axis.jar"/>
-    	<zipfileset excludes="${EXCL}" src="${lib}/commons-discovery.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/commons-cli-1.1.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/commons-discovery.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/commons-logging.jar"/>
-    	<zipfileset excludes="${EXCL}" src="${lib}/wsdl4j.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/jaxrpc.jar"/>
-    	<zipfileset excludes="${EXCL}" src="${lib}/SBML2LaTeX_v1.0_slim.jar"/>
-        <zipfileset excludes="META-INF/INDEX.LIST META-INF/MANIFEST.MF, COPYING.txt, package.html, package-info.class, licenses/**, overview.html, AUTHORS.txt" src="${lib}/jsbml-${jsbml.version}-incl-libs.jar"/>
-    	<zipfileset excludes="${EXCL}" src="${lib}/SysBio.jar"/>
+        <zipfileset excludes="META-INF/licenses/**, META-INF/INDEX.LIST, META-INF/MANIFEST.MF, COPYING.txt, licenses/**, package.html, package-info.class, overview.html, 
+        	 AUTHORS.txt" src="${lib}/jsbml-${jsbml.version}-incl-libs.jar"/>
+        <zipfileset excludes="META-INF/*.SF" src="${lib}/org.sbgn.jar"/>
+        <zipfileset excludes="${EXCL}, org/apache/commons/logging/**/*, javax/xml/namespace/QName.class,org/apache/log4j/**/*" src="${lib}/paxtools-4.1.1_customJenaFix.jar"/>
     	<zipfileset excludes="${EXCL}" src="${lib}/quaqua-filechooser-only.jar"/>
-    	<zipfileset excludes="${EXCL}" src="${lib}/garuda/GarudaBackend.jar"/>
-    	<zipfileset excludes="${EXCL}" src="${lib}/garuda/garuda-csr.jar"/>
-    	<zipfileset excludes="${EXCL}" src="${lib}/garuda/jsonic-1.2.10.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/SBML2LaTeX_v1.0_slim.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/SysBio.jar"/>
+    	<zipfileset excludes="${EXCL}" src="${lib}/wsdl4j.jar"/>
+        <zipfileset excludes="META-INF/*.SF" src="${lib}/y.jar"/>
     </jar>
   </target>
 
@@ -348,12 +340,14 @@
                  of the public part of the "application" -->
       <attribute name="LineNumberTable,LocalVariableTable,SourceFile">
         <patternset>
-          <include name="de.zbit.**"/>
-          <include name="org.**.*"/>
-          <include name="com.**.*"/>
-          <include name="javax.**.*"/>
           <include name="ch.**.*"/>
+          <include name="com.**.*"/>
           <include name="cz.**.*"/>
+          <include name="de.zbit.**"/>
+          <include name="javax.**.*"/>
+          <include name="jp.sbi.**.*"/>
+          <include name="net.**.*"/>
+          <include name="org.**.*"/>
         </patternset>
       </attribute>
 
@@ -361,12 +355,14 @@
       	<keep>
       	  <class classes="protected" methods="protected" fields="protected">
       		<patternset>
-      		  <include name="de.zbit.**"/>
-      		  <include name="org.**.*"/>
-      		  <include name="com.**.*"/>
-      	      <include name="javax.**.*"/>
       		  <include name="ch.**.*"/>
+      		  <include name="com.**.*"/>
       		  <include name="cz.**.*"/>
+      		  <include name="de.zbit.**"/>
+      	      <include name="javax.**.*"/>
+      		  <include name="jp.sbi.**.*"/>
+      		  <include name="net.**.*"/>
+      		  <include name="org.**.*"/>
       		</patternset>
       	  </class>
       	</keep>
@@ -382,12 +378,14 @@
         
         	<package>
         		<patternset>
-          	      <include name="de.**.*"/>
-        		  <include name="org.**.*"/>
-        		  <include name="com.**.*"/>
-        		  <include name="javax.**.*"/>
         		  <include name="ch.**.*"/>
+        		  <include name="com.**.*"/>
         		  <include name="cz.**.*"/>
+          	      <include name="de.**.*"/>
+          		  <include name="javax.**.*"/>
+        		  <include name="jp.sbi.**.*"/>
+        		  <include name="net.**.*"/>
+        		  <include name="org.**.*"/>
         		</patternset>
         	</package>
 
@@ -442,7 +440,15 @@
   	description="signs the obfuscated application"
   >
     <!-- Having an "keystore" file is required. Generate it with the "keytool" in the current directory. -->  	
-	  <signjar alias="${Name}" jar="${appJarObf}" keypass="d=dpfKEGGtranslator!" keystore="keystore" signedjar="${appJarObfSgn}" storepass="d=dpfKEGGtranslator!"/>
+	  <signjar
+	  	alias="${Name}"
+	  	jar="${appJarObf}"
+  	    keypass="d=dpfKEGGtranslator!"
+	  	keystore="keystore"
+  	    signedjar="${appJarObfSgn}"
+	  	storepass="d=dpfKEGGtranslator!"
+	  	digestalg="SHA1"
+	  />
   </target>
 
   <target name="run" depends="obfuscate" description="executes the obfuscated application">
@@ -454,6 +460,9 @@
     </java>
   </target>
 
+  <!-- =================================================================== -->
+  <!-- Displays the yGard mapping in a browser                             -->
+  <!-- =================================================================== -->
   <target
   	name="show"
   	depends="obfuscate"
@@ -605,21 +614,23 @@
       	includes="**.jar, **/*.jar, **.zip"
       	excludes="Java5/**, jsbml-old/**"
       />
-      <!--<fileset dir="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/" includes="**.jar"/>-->
+      <fileset dir="/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Classes/" includes="**.jar"/><!-- -->
     </path>
     <path id="sysbio.sourcepath">
       <fileset dir="${SysBioPath}/src"/>
+      <fileset dir="${SysBioPath}/test"/>
       <fileset dir="${SysBioPath}/resources"/>
+      <fileset dir="${SysBioPath}/examples"/>
     </path>
     
   	<echo message="Determining the revision number of SysBio"/>
-    <exec executable="svn" outputproperty="${SysBioPath}/svninfo.xml">
-      <arg line="info --xml ${SysBioPath}"/>
-    </exec>
-    <xmlproperty collapseAttributes="true">
-      <propertyresource name="${SysBioPath}/svninfo.xml"/>
-    </xmlproperty>
-	<property name="sysbio.revision" value="${info.entry.revision}"/>
+  	<!--<exec executable="svn" outputproperty="${SysBioPath}/svninfo.xml">
+  	      <arg line="info MINUSMINUSxml ${SysBioPath}"/>
+  	    </exec>
+  	    <xmlproperty collapseAttributes="true">
+  	      <propertyresource name="${SysBioPath}/svninfo.xml"/>
+  	</xmlproperty>-->
+    <property name="sysbio.revision" value="1365"/> <!--${info.entry.revision}"/>-->
 
     <echo message="Deleting all previous versions of SysBio JAR files"/>
     <delete verbose="true">
@@ -680,14 +691,54 @@
       </zipfileset>
       <fileset
       	dir="${SysBioPath}/bin"
-    	excludes="**/overview.html, **/.svn*, **/package-info.class, **/*.java, de/zbit/gui/wizard, de/zbit/mapper/**, de/zbit/mapper/compounds/**, de/zbit/mapper/enrichment/**, de/zbit/mapper/probes/**, de/zbit/sbml/layout/y/**"
-      />
+    	excludes="**/overview.html, **/.svn*, **/package-info.class, **/*.java"
+      >
+        <include name="de/zbit/**.class"/>
+      	<include name="de/zbit/cache/**"/>
+        <include name="de/zbit/collection/**"/>
+      	<include name="de/zbit/dbfetch/**"/>
+      	<include name="de/zbit/exception/**"/>
+        <include name="de/zbit/garuda/**"/>
+      	<include name="de/zbit/graph/**"/>
+      	<include name="de/zbit/gui/**"/>
+        <exclude name="de/zbit/gui/layout/SpringUtilities.class"/>
+        <exclude name="de/zbit/gui/wizard/**"/>
+        <include name="de/zbit/io/**"/>
+      	<include name="de/zbit/kegg/**"/>
+      	<include name="de/zbit/locales/**"/>
+      	<exclude name="de/zbit/mapper/**"/>
+        <include name="de/zbit/math/**"/>
+      	<include name="de/zbit/resources/**"/>
+      	<include name="de/zbit/parser/**"/>
+        <include name="de/zbit/sbml/**"/>
+        <exclude name="de/zbit/sbml/layout/**"/>
+        <include name="de/zbit/sequence/**"/>
+        <include name="de/zbit/text/**"/>
+        <include name="de/zbit/util/**"/>
+        <include name="keggapi/**.class"/>
+      </fileset>
       <fileset
       	dir="${SysBioPath}/resources"
-      	excludes="**/.svn*, package-info.*, de/zbit/mapper/**, de/zbit/mapper/compounds/**"
-      />
-      <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
-      <zipfileset excludes="META-INF/*" src="${SysBioPath}/lib/argparser.jar"/>
+      	excludes="**/.svn*, package-info.*"
+      >
+        <include name="de/zbit/garuda/img/**.png"/>
+        <include name="de/zbit/garuda/locales/**.xml"/>
+      	<include name="de/zbit/graph/locales/**.xml"/>
+        <include name="de/zbit/gui/img/**.png"/>
+      	<include name="de/zbit/io/**.txt"/>
+        <include name="de/zbit/locales/**.xml"/>
+      	<exclude name="de/zbit/mapper/**"/>
+      	<exclude name="de/zbit/mapper/compounds/**"/>
+      	<include name="de/zbit/resources/**.txt"/>
+      	<exclude name="de/zbit/resources/liftover/**"/>
+        <include name="de/zbit/sbml/locales/**.xml"/>
+      </fileset>
+      <zipfileset excludes="${EXCL}" src="${SysBioPath}/lib/sysbio-osx-support.jar"/>
+      <zipfileset excludes="${EXCL}" src="${SysBioPath}/lib/argparser.jar"/>
+      <!--<zipfileset excludes="${EXCL}" src="${SysBioPath}/lib/garuda/commons-io-2.4.jar"/>-->
+      <zipfileset excludes="${EXCL}" src="${SysBioPath}/lib/garuda/garuda-csr.jar"/>
+      <zipfileset excludes="${EXCL}" src="${SysBioPath}/lib/garuda/GarudaBackend.jar"/>
+      <zipfileset excludes="${EXCL}" src="${SysBioPath}/lib/garuda/jsonic-1.2.10.jar"/>
     </jar>
 
   </target>
@@ -707,13 +758,13 @@
   	
   	
     <echo message="Determining the revision number of JSBML"/>
-    <exec executable="svn" outputproperty="${jsbml.dir}/svninfo.xml">
-      <arg line="info --xml ${jsbml.dir}"/>
+    <!--<exec executable="svn" outputproperty="${jsbml.dir}/svninfo.xml">
+      <arg line="info MINUSMINUSxml ${jsbml.dir}"/>
     </exec>
     <xmlproperty collapseAttributes="true">
       <propertyresource name="${jsbml.dir}/svninfo.xml"/>
-    </xmlproperty>
-    <property name="jsbml.revision" value="${info.entry.revision}"/>
+    </xmlproperty>-->
+    <property name="jsbml.revision" value="2116"/> <!-- ${info.entry.revision}"/>-->
 
     <echo message="Compiling the entire JSBML project for revision ${jsbml.revision}"/>
     <delete dir="${jsbml.dir}/bin"/>
@@ -820,24 +871,27 @@
       />
       <!-- Resources -->
       <fileset dir="${jsbml.dir}/core/resources"               includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/arrays/resources"  includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/comp/resources"    includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/dyn/resources"     includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/fbc/resources"     includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/groups/resources"  includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/layout/resources"  includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/multi/resources"   includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/qual/resources"    includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/render/resources"  includes="${jsbml.includes}"/>
+      <fileset dir="${jsbml.dir}/extensions/req/resources"     includes="${jsbml.includes}"/>
       <fileset dir="${jsbml.dir}/extensions/spatial/resources" includes="${jsbml.includes}"/>
       <!-- 3rd party libraries -->
       <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java readme.txt LICENSE" src="${jsbml.dir}/core/lib/biojava3-ontology-3.1.0.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/jigsaw-dateParser.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/log4j-1.2.17.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/stax-api-1.0.1.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/stax2-api-3.0.3.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/staxmate-2.0.0.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/woodstox-core-lgpl-4.0.9.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/xstream-1.3.1.jar"/>
-      <zipfileset excludes="META-INF/**, **/package-info.class, **/package.html, **/**.java" src="${jsbml.dir}/core/lib/spi-full-0.2.4.jar"/>
+      <zipfileset excludes="${EXCL}" src="${jsbml.dir}/core/lib/jigsaw-dateParser.jar"/>
+      <zipfileset excludes="${EXCL}" src="${jsbml.dir}/core/lib/log4j-1.2.17.jar"/>
+      <zipfileset excludes="${EXCL}" src="${jsbml.dir}/core/lib/stax-api-1.0.1.jar"/>
+      <zipfileset excludes="${EXCL}" src="${jsbml.dir}/core/lib/stax2-api-3.0.3.jar"/>
+      <zipfileset excludes="${EXCL}" src="${jsbml.dir}/core/lib/staxmate-2.0.0.jar"/>
+      <zipfileset excludes="${EXCL}" src="${jsbml.dir}/core/lib/woodstox-core-lgpl-4.0.9.jar"/>
+      <zipfileset excludes="${EXCL}" src="${jsbml.dir}/core/lib/xstream-1.3.1.jar"/>
+      <zipfileset excludes="${EXCL}" src="${jsbml.dir}/core/lib/spi-full-0.2.4.jar"/>
     </jar>
   	
   	<!-- Remove temporary file again: -->

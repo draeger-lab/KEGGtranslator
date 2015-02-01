@@ -8,7 +8,7 @@
  * <http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator> to
  * obtain the latest version of KEGGtranslator.
  *
- * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ * Copyright (C) 2011-2015 by the University of Tuebingen, Germany.
  *
  * KEGGtranslator is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -25,6 +25,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.logging.Logger;
 
 import de.zbit.io.DirectoryParser;
 
@@ -107,7 +108,7 @@ public class FixFiles {
         if (changed) {
           (new File(curFile)).delete();
           (new File(tempFile)).renameTo(new File(curFile));
-          System.out.println(curFile + " - Success.");
+          logger.info(curFile + " - Success.");
         } else {
           (new File(tempFile)).delete();
         }
@@ -116,6 +117,11 @@ public class FixFiles {
     }
     
   }
+  
+  /**
+   * A {@link Logger} for this class.
+   */
+  private static final transient Logger logger = Logger.getLogger(FixFiles.class.getName());
   
   /**
    * 
