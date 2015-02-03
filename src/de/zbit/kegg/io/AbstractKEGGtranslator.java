@@ -303,7 +303,15 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * status of the conversion.
    * @param progressBar
    */
-  public void setProgressBar(AbstractProgressBar progressBar) {
+  public synchronized void setProgressBar(AbstractProgressBar progressBar) {
+    if (progress!=null && progressBar!=null) {
+      // It's very dirty and non-thread sage to exchange the progress-bar
+      // in an ongoing translation! This is just a quick-hack trying to 
+      // hand-over the state of the old bar to the new one. Remember, that
+      // the state may change just in the moment the next line is executed!
+      progressBar.setCallNr(progress.getCallNumber());
+      progressBar.setNumberOfTotalCalls(progress.getNumberOfTotalCalls());
+    }
     this.progress = progressBar;
   }
   

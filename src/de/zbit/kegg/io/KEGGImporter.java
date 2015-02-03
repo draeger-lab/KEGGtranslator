@@ -31,6 +31,7 @@ import de.zbit.kegg.gui.KGMLSelectAndDownload;
 import de.zbit.kegg.io.KEGGtranslatorIOOptions.Format;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.util.NotifyingWorker;
+import de.zbit.util.progressbar.AbstractProgressBar;
 
 /**
  * A {@link SwingWorker} that handles downloads of KGML-xmls
@@ -56,6 +57,8 @@ public class KEGGImporter extends NotifyingWorker<Object> {
    * 
    */
   private Format outputFormat;
+  
+  AbstractKEGGtranslator<?> translator;
   
   /**
    * This will download and translate the given pathway.
@@ -117,7 +120,7 @@ public class KEGGImporter extends NotifyingWorker<Object> {
     // PART3: Translate
     if ((inputFile != null) || (inputPathway != null)) {
       // The order in which the following events happen is important
-      AbstractKEGGtranslator<?> translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator.getTranslator(outputFormat, Translator.getManager());
+      translator = (AbstractKEGGtranslator<?>) BatchKEGGtranslator.getTranslator(outputFormat, Translator.getManager());
       
       // The following should also trigger a new progress bar!
       publish(new ActionEvent(translator, 3, null));
@@ -141,4 +144,12 @@ public class KEGGImporter extends NotifyingWorker<Object> {
     return null;
   }
   
+  @Override
+  public void setProgressBar(AbstractProgressBar progress) {
+    super.setProgressBar(progress);
+    
+    if (translator!=null) { // Uh-oh, there is already a translation running!
+      translator.setProgressBar(progress);
+    }
+  }
 }

@@ -722,11 +722,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     if (level!=null) {
       if (level<3) {
         if (addLayoutExtension) {
-          log.warning("SBML supports extensions since Level 3. You've chosen to translate a document to Level 2 including the layout extension, what is not possible.\nDeavtivating the layout extension for this translation.");
+          log.warning("SBML supports extensions since Level 3. You've chosen to translate a document to Level 2 including the layout extension, what is not possible.\nDeactivating the layout extension for this translation.");
           setAddLayoutExtension(false);
         }
         if (useGroupsExtension) {
-          log.warning("SBML supports extensions since Level 3. You've chosen to translate a document to Level 2 including the groups extension, what is not possible.\nDeavtivating the groups extension for this translation.");
+          log.warning("SBML supports extensions since Level 3. You've chosen to translate a document to Level 2 including the groups extension, what is not possible.\nDeactivating the groups extension for this translation.");
           setUseGroupsExtension(false);
         }
       }
