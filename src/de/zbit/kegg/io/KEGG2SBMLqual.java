@@ -332,43 +332,41 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
           }
         }
         de.zbit.util.objectwrapper.ValuePair<String, Integer> subMI = SBOMapping.getMITerm(subType);
-        if (subMI!=null && subMI.getB()!=null && subMI.getB()>0) {
+        if ((subMI != null) && (subMI.getB() != null) && (subMI.getB() > 0)) {
           String mi = DatabaseIdentifiers.getMiriamURN(IdentifierDatabases.GeneOntology, Integer.toString(subMI.getB()));
-          if (mi!=null) {
+          if (mi != null) {
             cv.addResource(mi);
           }
         }
       }
       
-      
-      
       in.setSign(sign);
     }
     
     // Set SBO term and miriam URNs on transition.
-    if (SBOs.size()>0 ) {
+    if (SBOs.size() > 0 ) {
       // Remove unspecific ones, try to get the specific ones
-      if (SBOs.size()>1) {
+      if (SBOs.size() > 1) {
         SBOs.remove(SBOMapping.getSBOTerm(SubType.MISSING_INTERACTION));
       }
-      if (SBOs.size()>1) {
+      if (SBOs.size() > 1) {
         // Remark: If activation and inhibition is set, 168 is always added as third sbo.
         SBOs.remove(SBOMapping.getSBOTerm(SubType.ACTIVATION));
         SBOs.remove(SBOMapping.getSBOTerm(SubType.INHIBITION));
       }
-      if (SBOs.size()>1) {
+      if (SBOs.size() > 1) {
         SBOs.remove(SBOMapping.getSBOTerm(SubType.STATE_CHANGE));
       }
-      if (SBOs.size()>1) {
+      if (SBOs.size() > 1) {
         SBOs.remove(SBOMapping.getSBOTerm(SubType.BINDING_ASSOCIATION));
       }
-      if (SBOs.size()>1) {
+      if (SBOs.size() > 1) {
         SBOs.remove(SBOMapping.getSBOTerm(SubType.INDIRECT_EFFECT));
       }
       t.setSBOTerm(SBOs.iterator().next());
     }
     
-    if (cv.getResourceCount()>0) {
+    if (cv.getResourceCount() > 0) {
       // Use always "IS", because "methylation" and "activation"
       // can both share the attribute IS and don't need
       // to be annotated as different versions ("HAS_VERSION").
@@ -558,13 +556,20 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     considerReactions = b;
   }
   
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.KEGG2jSBML#considerRelations()
+   */
   @Override
   protected boolean considerRelations() {
     return true;
   }
   
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.KEGG2jSBML#considerReactions()
+   */
   @Override
   protected boolean considerReactions() {
     return considerReactions; // FALSE in doubt
   }
+  
 }

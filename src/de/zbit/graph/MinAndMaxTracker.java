@@ -24,33 +24,73 @@ package de.zbit.graph;
  * This is a helper class that tracks always the minimum and
  * maximum x/y coordinates, including the width and height
  * of nodes.
+ * 
  * @author Clemens Wrzodek
  * @version $Rev$
  */
 public class MinAndMaxTracker {
   
+  /**
+   * 
+   */
   double minX = Double.MAX_VALUE;
+  /**
+   * 
+   */
   double minY = Double.MAX_VALUE;
   
+  /**
+   * 
+   */
   double maxX = Double.MIN_VALUE;
+  /**
+   * 
+   */
   double maxY = Double.MIN_VALUE;
   
+  /**
+   * 
+   */
   public MinAndMaxTracker() {
     super();
   }
   
+  /**
+   * 
+   * @param x
+   * @param y
+   */
   public void track(int x, int y) {
     track((double)x,(double)y);
   }
   
+  /**
+   * 
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   */
   public void track(int x, int y, int width, int height) {
     track((double)x,(double)y, (double)width, (double)height);
   }
   
+  /**
+   * 
+   * @param x
+   * @param y
+   */
   public void track(double x, double y) {
     track(x, y, 0d, 0d);
   }
   
+  /**
+   * 
+   * @param x
+   * @param y
+   * @param width
+   * @param height
+   */
   public void track(double x, double y, double width, double height) {
     minX = Math.min(minX, x);
     minY = Math.min(minY, y);

@@ -60,6 +60,10 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
     setLineType(defaultStroke);
   }
   
+  /**
+   * 
+   * @param nr
+   */
   public LineNodeRealizer(NodeRealizer nr) {
     super(nr);
     // If the given node realizer is of this type, then apply copy semantics.
@@ -84,7 +88,7 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
    */
   private void setCoordLists(Polygon other) {
     shape = new Polygon(); // clear
-    for (int i=0; i<other.npoints; i++) {
+    for (int i = 0; i < other.npoints; i++) {
       ((Polygon)shape).addPoint(other.xpoints[i], other.ypoints[i]);
     }
     
@@ -181,7 +185,7 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
       //      gfx.fillPolygon(((Polygon)shape));
     }
     Polygon p = (Polygon)shape;
-    for (int i=1; i<p.npoints; i++) {
+    for (int i = 1; i < p.npoints; i++) {
       try {
         if (doNotConnectIndex==null || !doNotConnectIndex.contains(i)) {
           gfx.drawLine(p.xpoints[i-1], p.ypoints[i-1], p.xpoints[i], p.ypoints[i]);
@@ -218,8 +222,8 @@ public class LineNodeRealizer extends ShapeNodeRealizer {
    */
   public void startNewLine() {
     Integer np = ((Polygon)shape).npoints;
-    if (np!=null && np>0) {
-      if (doNotConnectIndex==null) {
+    if ((np != null) && (np > 0)) {
+      if (doNotConnectIndex == null) {
         doNotConnectIndex = new HashSet<Integer>();
       }
       doNotConnectIndex.add(np);

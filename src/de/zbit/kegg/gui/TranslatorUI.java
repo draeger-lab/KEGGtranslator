@@ -553,7 +553,7 @@ KeyListener, ItemListener {
           //        }
           break;
         case NEW_PROGRESSBAR:
-          getStatusBar().showProgress((AbstractProgressBar)e.getSource());
+          getStatusBar().showProgress((AbstractProgressBar) e.getSource());
           break;
         case OPEN_PATHWAY:
           try {

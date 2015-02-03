@@ -144,7 +144,7 @@
   	depends="init"
   	description="Determines the current SVN revions number of KEGGtranslator and stores it in a variable."
   >
-  	<property name="repository.revision" value="399"/> <!--${info.entry.revision}"/>-->
+  	<property name="repository.revision" value="402"/> <!--${info.entry.revision}"/>-->
   	<echo message="Current revision is ${repository.revision}"/>
   </target>
 
@@ -404,16 +404,26 @@
 
                 <exclude name="de.zbit.kegg.ext.GenericDataMap"/>
               	
-              	<exclude name="de.zbit.util.TranslatorTools"/>
-              	
                 <exclude name="de.zbit.kegg.io.KEGG2yGraph"/>
                 <exclude name="de.zbit.kegg.io.YFilesWriter"/>
               	
+              	<exclude name="de.zbit.graph.GraphTools"/>
+              	<exclude name="de.zbit.graph.PartialElementsMarkers"/>
               	<exclude name="de.zbit.graph.CollapseGroupNodesViewMode"/>
                 <exclude name="de.zbit.graph.RestrictedEditMode"/>
                 <exclude name="de.zbit.graph.RestrictedEditModeV2"/>
               	<exclude name="de.zbit.graph.SearchSupport"/>
               	<exclude name="de.zbit.graph.StackingNodeLayout"/>
+              	
+              	<exclude name="de.zbit.graph.gui.options.GraphBackgroundImageProvider"/>
+              	
+              	<exclude name="de.zbit.graph.io.*"/>
+              	<exclude name="de.zbit.graph.io.def.GenericDataMap"/>
+              	<exclude name="de.zbit.graph.io.def.SBGNVisualizationProperties"/>
+              	
+              	<exclude name="de.zbit.graph.sbgn.*"/>
+              	
+              	<exclude name="de.zbit.util.TranslatorTools"/>
               	
                 <!-- Obfuscate the included y.jar -->
                 <exclude name="y.**.*"/>
@@ -630,7 +640,7 @@
   	    <xmlproperty collapseAttributes="true">
   	      <propertyresource name="${SysBioPath}/svninfo.xml"/>
   	</xmlproperty>-->
-    <property name="sysbio.revision" value="1365"/> <!--${info.entry.revision}"/>-->
+    <property name="sysbio.revision" value="1367"/> <!--${info.entry.revision}"/>-->
 
     <echo message="Deleting all previous versions of SysBio JAR files"/>
     <delete verbose="true">
@@ -700,6 +710,7 @@
       	<include name="de/zbit/exception/**"/>
         <include name="de/zbit/garuda/**"/>
       	<include name="de/zbit/graph/**"/>
+      	<exclude name="de/zbit/graph/gui/LayoutGraphPanel"/>
       	<include name="de/zbit/gui/**"/>
         <exclude name="de/zbit/gui/layout/SpringUtilities.class"/>
         <exclude name="de/zbit/gui/wizard/**"/>

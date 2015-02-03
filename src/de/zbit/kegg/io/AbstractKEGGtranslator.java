@@ -22,6 +22,7 @@ package de.zbit.kegg.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,6 +61,10 @@ import de.zbit.util.progressbar.ProgressBar;
  * @version $Rev$
  */
 public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtranslator <OutputFormat> {
+  
+  /**
+   * A {@link Logger} for this class.
+   */
   public static final transient Logger log = Logger.getLogger(AbstractKEGGtranslator.class.getName());
   
   /**
@@ -153,7 +158,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   /**
    * ProgressBar for KEGG translation
    */
-  protected AbstractProgressBar progress=null;
+  protected AbstractProgressBar progress = null;
   
   
   /*===========================
@@ -164,9 +169,9 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @param manage
    */
   public AbstractKEGGtranslator(KeggInfoManagement manage) {
-    if (manager==null && manage==null) {
+    if ((manager == null) && (manage == null)) {
       Translator.getManager();
-    } else if (manage!=null) {
+    } else if (manage != null) {
       setKeggInfoManager(manage);
     }
     
@@ -392,8 +397,8 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     }
   }
   
-  /**
-   * {@inheritDoc}
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.KEGGtranslator#translate(de.zbit.kegg.parser.pathway.Pathway, java.lang.String)
    */
   @Override
   public boolean translate(Pathway p, String outFile) {
@@ -449,6 +454,9 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    */
   private static final transient Logger logger = Logger.getLogger(AbstractKEGGtranslator.class.getName());
   
+  /* (non-Javadoc)
+   * @see de.zbit.kegg.io.KEGGtranslator#translate(java.lang.String, java.lang.String)
+   */
   @Override
   public void translate(String infile, String outfile) throws Exception {
     logger.fine("Reading kegg pathway...");
@@ -471,7 +479,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       try {
         l = KeggParser.parse(f.getAbsolutePath());
       } catch (Exception e) {
-        throw new IOException(String.format("Cannot translate input file %s.", f.getAbsolutePath()), e);
+        throw new IOException(MessageFormat.format("Cannot translate input file {0}.", f.getAbsolutePath()), e);
       }
       
       if (l.size() > 0) {
@@ -479,10 +487,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
         OutputFormat doc = translate(p);
         return doc;
       } else {
-        throw new IOException(String.format("Empty or invalid input file %s.", f.getAbsolutePath()));
+        throw new IOException(MessageFormat.format("Empty or invalid input file {0}.", f.getAbsolutePath()));
       }
     }
-    throw new IOException(String.format("Invalid input file %s.", f.getAbsolutePath()));
+    throw new IOException(MessageFormat.format("Invalid input file {0}.", f.getAbsolutePath()));
   }
   
   /**
@@ -499,15 +507,15 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     // Initialize a progress bar.
     int totalCalls = p.getEntries().size(); // +p.getRelations().size(); // Relations are very fast.
     if (addRelations) {
-      totalCalls+=p.getRelations().size();
+      totalCalls += p.getRelations().size();
     }
     if (addReactions) {
-      totalCalls+=p.getReactions().size();
+      totalCalls += p.getReactions().size();
     }
     // if (!retrieveKeggAnnots) aufrufeGesamt+=p.getRelations().size();
-    if (progress==null) {
+    if (progress == null) {
       progress = new ProgressBar(totalCalls + 1);
-      ((ProgressBar)progress).setPrintInOneLine(true);
+      ((ProgressBar) progress).setPrintInOneLine(true);
     } else {
       progress.reset();
       progress.setNumberOfTotalCalls(totalCalls + 1);
@@ -582,8 +590,8 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   protected String getNameForEntry(Entry entry, KeggInfos... infos) {
     
     // Query API
-    if (infos==null || infos.length==0 ||
-        (infos.length==1 && infos[0]==null)) {
+    if ((infos == null) || (infos.length == 0) ||
+        ((infos.length == 1) && (infos[0] == null))) {
       List<KeggInfos> list = new LinkedList<KeggInfos>();
       for (String ko_id:entry.getName().split(" ")) {
         // Do not consider group nodes
@@ -658,7 +666,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       //--------
       return firstName(name);
       
-    } else if (names!=null && names.length()>0) {
+    } else if ((names != null) && (names.length() > 0)) {
       
       // Pathway references are to be treated separately
       // SPECIAL CASES FOR MAPS AND BRITE
@@ -737,14 +745,14 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     }
     
     // In doubt, return first nicest...
-    if (names!=null&&names.length()>0) {
+    if ((names != null) && (names.length() > 0)) {
       // From API
       return names;
     } else {
       // From KGML
       String name = entry.getName();
-      if (entry.hasGraphics() && entry.getGraphics().getName()!=null &&
-          entry.getGraphics().getName().length()>0) {
+      if (entry.hasGraphics() && (entry.getGraphics().getName() != null) &&
+          (entry.getGraphics().getName().length() > 0)) {
         name = entry.getGraphics().getName();
       }
       if (name.toLowerCase().startsWith("undefined")) {
@@ -764,7 +772,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     //name is e.g. "Glycine, serine and threonine metabolism - Enterococcus faecalis"
     // => remove species and don't split at comma.
     int pos = name.lastIndexOf(" - ");
-    if (pos>0) {
+    if (pos > 0) {
       name = name.substring(0, pos).trim();
     }
     return name;
@@ -777,7 +785,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
    * @return
    */
   public static String formatTextForHTMLnotes(String text) {
-    if (text==null) {
+    if (text == null) {
       return "";
     }
     return EscapeChars.forHTML(text.replace('\n', ' '));
@@ -799,10 +807,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
     }*/
     String[] names = name.split(", ");
     for (String name2: names) {
-      name2 = name2==null?null:name2.trim();
+      name2 = name2 == null ? null : name2.trim();
       // E.g. 308800 has name "Tyr, C" and "C" is not that helpful
       // => At least 2 digits in name and shortest one.
-      if (name2!=null && name2.length()>1 && name2.length()<name.length()) {
+      if (name2!=null && (name2.length() > 1) && name2.length()<name.length()) {
         name = name2;
       }
     }
@@ -863,7 +871,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
       char c = name.charAt(0);
       
       // Must start with letter or '_'.
-      if (!(isLetter(c) || c == '_')) {
+      if (!(isLetter(c) || (c == '_'))) {
         ret2.append("SId_");
       } else {
         ret2.append(c);
@@ -876,7 +884,7 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
           c='_'; // Replace spaces with "_"
         }
         
-        if (isLetter(c) || Character.isDigit(c) || c == '_') {
+        if (isLetter(c) || Character.isDigit(c) || (c == '_')) {
           ret2.append(c);
         } // else: skip invalid characters
       }

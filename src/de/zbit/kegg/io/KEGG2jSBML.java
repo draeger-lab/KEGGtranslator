@@ -352,7 +352,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     }
     
     // Initialize a progress bar.
-    initProgressBar(p,false,false);
+    initProgressBar(p, false, false);
     
     // new Model with Kegg id as id.
     Model model = doc.createModel(NameToSId(p.getName().replace(":", "_")));
@@ -569,7 +569,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         }
       }
       
-      if (spec==null) {
+      if (spec == null) {
         // Usual case if this entry is no duplicate.
         spec = addKGMLEntry(entry, p, model, compartment);
       }
@@ -730,9 +730,9 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           setUseGroupsExtension(false);
         }
       }
-      if (version==null) {
+      if (version == null) {
         // Actually, they should only be set in combination...
-        if (level==2) {
+        if (level == 2) {
           version = 4;
         } else {
           version = 1;
@@ -802,7 +802,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Maybe add additional Miriam identifier (from other sources than kegg)
     if (r.isSetDatabaseIdentifiers()) {
       List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(r.getDatabaseIdentifiers(), null);
-      if (cvTerms!=null && cvTerms.size()>0) {
+      if ((cvTerms != null) && (cvTerms.size() > 0)) {
         for (CVTerm cvTerm : cvTerms) {
           sbReaction.addCVTerm(cvTerm);
         }
@@ -849,7 +849,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         }
         notes.append("</p>");
         
-        if (rePWs != null && infos.getPathways() != null) {
+        if ((rePWs != null) && (infos.getPathways() != null)) {
           for (String pwId : infos.getPathways().split(",")) {
             String urn = KeggInfos.miriam_urn_kgPathway + KeggInfos.suffix(pwId);
             if (!rePWs.getResources().contains(urn)){
@@ -871,7 +871,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // else, they are clearly wrong).
     if (autocompleteReactions && checkAtomBalance) {
       AtomCheckResult defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
-      if (defects!=null && defects.hasDefects()) {
+      if ((defects != null) && defects.hasDefects()) {
         notes.append("<p>");
         notes.append("<b><font color=\"#FF0000\">There are missing atoms in this reaction.</font></b><br/>" +
             "<small><i>Values lower than zero indicate missing atoms on the " +
@@ -927,7 +927,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     List<ModifierSpeciesReference> modifier = new ArrayList<ModifierSpeciesReference>();
     String lName = reaction.toLowerCase().trim();
     int modifierPos = reactionModifiers.indexOf(lName);
-    if (modifierPos<0) {
+    if (modifierPos < 0) {
       return modifier;
     }
     
@@ -1045,7 +1045,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       pointOfView = "protein"; // complex are multple proteins.
     }
     List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(ids, pointOfView);
-    if (cvTerms!=null && cvTerms.size()>0) {
+    if ((cvTerms != null) && (cvTerms.size() > 0)) {
       for (CVTerm cvTerm : cvTerms) {
         spec.addCVTerm(cvTerm);
       }
@@ -1071,38 +1071,38 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Add all reaction names from the list of reactions
     if (reactions!=null) {
       for (Reaction r: reactions) {
-        if (r==null || r.getName()==null) {
+        if ((r == null) || (r.getName() == null)) {
           continue;
         }
         String toAdd = KeggInfos.suffix(r.getName());
-        if (toAdd.length()>0) {
+        if (toAdd.length() > 0) {
           ret.add(toAdd.toUpperCase());
         }
       }
     }
     
     // Add all string ids
-    if (reactionIDs!=null) {
+    if (reactionIDs != null) {
       for (String r: reactionIDs) {
-        if (r==null) {
+        if (r == null) {
           continue;
         }
         String toAdd = KeggInfos.suffix(r);
-        if (toAdd.length()>0) {
+        if (toAdd.length() > 0) {
           ret.add(toAdd.toUpperCase());
         }
       }
     }
     
     // Create return value
-    if (ret.size()<1) {
+    if (ret.size() < 1) {
       return null;
-    } else if (ret.size()==1) {
+    } else if (ret.size() == 1) {
       return ret.iterator().next();
     } else {
       StringBuilder b = new StringBuilder();
       for (String item: ret) {
-        if (b.length()>0) {
+        if (b.length() > 0) {
           b.append(' ');
         }
         b.append(item);
