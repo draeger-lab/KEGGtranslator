@@ -22,9 +22,6 @@ package de.zbit.kegg.io;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.swing.SwingWorker;
 
@@ -44,11 +41,6 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * @version $Rev$
  */
 public class KEGGImporter extends NotifyingWorker<Object> {
-  /**
-   * This directory will be used as target for downloaded pathways.
-   * This string must end with a "/" and will be prepended to the file.
-   */
-  private final static String localPathwayCacheDir = "res/kgml/";
   /**
    * 
    */
@@ -114,29 +106,16 @@ public class KEGGImporter extends NotifyingWorker<Object> {
       // PART1: Download
       String localFile = null;
       try {
-        if (KGMLSelectAndDownload.class.getResource("kgml/" + KEGGpathwayID + ".xml") != null) {
-          System.out.println("Pathway in resources...");
-          InputStream is = KGMLSelectAndDownload.class.getResourceAsStream("kgml/" + KEGGpathwayID + ".xml");
-          System.out.println("Copying file...");
-          localFile = localPathwayCacheDir + KEGGpathwayID + ".xml";
-          new File("res/kgml/").mkdirs();
-          OutputStream os = new FileOutputStream(localFile);
-          int read = 0;
-          byte[] bytes = new byte[1024];
-       
-          while ((read = is.read(bytes)) != -1) {
-            os.write(bytes, 0, read);
-          }
-          is.close();
-          os.close();
-          System.out.println("Done...");
-        } else {
-          System.out.println("Pathway NOT in resources...");
-          localFile = KGMLSelectAndDownload.downloadPathway(KEGGpathwayID, false);
-        }
+        localFile = KGMLSelectAndDownload.downloadPathway(KEGGpathwayID, false);
       } catch (Exception exc) {
-        // Mostly 1) pathway does not exists for organism or 2) no connection to server
-        GUITools.showErrorMessage(null, exc);
+        // Overview pathways are no longer available through KEGG API as of Sept. 2014, must be fetched from FTP server by user
+        if (KEGGpathwayID.startsWith("011", 3) || KEGGpathwayID.startsWith("012", 3)) {
+          // Show message for overview pathways
+          GUITools.showErrorMessage(null, "The overview pathway maps are no longer available for free download! To visualize overview pathways, please acquire the kgml-files from the KEGG FTP server (see http://www.kegg.jp/kegg/download/) and place them in the res/kgml/ folder.");
+        } else {
+          // Mostly 1) pathway does not exists for organism or 2) no connection to server
+          GUITools.showErrorMessage(null, exc);
+        }
       }
       
       // PART2: Fire listener that we are done with downloading
