@@ -23,6 +23,7 @@ package de.zbit.kegg.io;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.sbml.jsbml.AbstractSBase;
@@ -87,7 +88,11 @@ public class KEGG2SBMLGroupExtension {
     // Create group and add all members
     Group g = groupModel.createGroup();
     for (String id: componentSpeciesIDs) {
-      g.createMember(id);
+      try{
+        g.createMember(id);
+      } catch (Throwable e) {
+        log.log(Level.WARNING, "Duplicated component species ID: " + id, e);
+      }
     }
     
     // The KIND attribute is required. Possible values are listed in GroupKind
