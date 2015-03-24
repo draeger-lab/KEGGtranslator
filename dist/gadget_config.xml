@@ -23,10 +23,10 @@
 <Gadget>
   <UUID>[GADGET_UUID]</UUID>
   <Name>[GADGET_NAME]</Name>
-  <LaunchCommand>cmd /c start javaw.exe -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommand>
-  <LaunchCommandWin>cmd /c start javaw.exe -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandWin>
-  <LaunchCommandMac>open "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandMac>
-  <LaunchCommandLinux>java -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandLinux>
+  <LaunchCommand>cmd /c start javaw.exe -Xms6G -Xmx6G -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommand>
+  <LaunchCommandWin>cmd /c start javaw.exe -Xms6G -Xmx6G -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandWin>
+  <LaunchCommandMac>java -Xms6G -Xmx6G -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandMac>
+  <LaunchCommandLinux>java -Xms6G -Xmx6G -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandLinux>
   <IconPaths>
     <Icon32Path>icons/KEGGtranslatorIcon_64.png</Icon32Path>
   </IconPaths>

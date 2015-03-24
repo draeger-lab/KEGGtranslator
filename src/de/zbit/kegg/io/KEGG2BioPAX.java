@@ -1200,20 +1200,21 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * @return a string that is no longer than 24 characters.
    */
   public static String createDisplayName(String displayName) {
-    if (displayName.length()>24) {
-      // Try to cut the string at a good position
-      int max = displayName.lastIndexOf(' ', 21);
-      max = Math.max(max, displayName.lastIndexOf('\t', 21));
-      max = Math.max(max, displayName.lastIndexOf('\n', 21));
-      max = Math.max(max, displayName.lastIndexOf(',', 21));
-      max = Math.max(max, displayName.lastIndexOf(';', 21));
-      
-      if (max>=10) {
-        displayName = displayName.substring(0, max)+"...";
-      } else {
-        displayName = displayName.substring(0, 20)+"...";
-      }
-    }
+    // The BioPAX community doesn't want this behavior anymore.
+    //    if (displayName.length()>24) {
+    //      // Try to cut the string at a good position
+    //      int max = displayName.lastIndexOf(' ', 21);
+    //      max = Math.max(max, displayName.lastIndexOf('\t', 21));
+    //      max = Math.max(max, displayName.lastIndexOf('\n', 21));
+    //      max = Math.max(max, displayName.lastIndexOf(',', 21));
+    //      max = Math.max(max, displayName.lastIndexOf(';', 21));
+    //
+    //      if (max>=10) {
+    //        displayName = displayName.substring(0, max)+"...";
+    //      } else {
+    //        displayName = displayName.substring(0, 20)+"...";
+    //      }
+    //    }
     
     return displayName;
   }

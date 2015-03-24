@@ -29,7 +29,7 @@
     <title>KEGGtranslator</title>
     <vendor>University of Tuebingen</vendor>
     <description kind="short">KEGGtranslator</description>
-    <description>KEGGtranslator - visualizing and translating the KEGG PATHWAY database</description>
+    <description>Precise generation of systems biology models from KEGG pathways</description>
     <homepage href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/"/>
     <icon href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/images/KEGGtranslatorIcon_48.png"/> 
     <icon kind="shortcut" href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/images/KEGGtranslatorIcon_48.png" width="16" height="16"/>
