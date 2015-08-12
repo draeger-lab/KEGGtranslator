@@ -81,57 +81,57 @@ public class CellDesignerUtils {
   public void addCellDesignerAnnotationToModel(Pathway p, Model model, Compartment defaultC) throws XMLStreamException {
     Annotation annot = model.getAnnotation();
     
-    annot.appendNoRDFAnnotation("<celldesigner:extension>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:modelVersion>4.0</celldesigner:modelVersion>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:extension>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:modelVersion>4.0</celldesigner:modelVersion>\n");
     int[] maxCoords = KeggTools.getMaxCoords(p);
-    annot.appendNoRDFAnnotation("<celldesigner:modelDisplay sizeX=\""
+    annot.appendNonRDFAnnotation("<celldesigner:modelDisplay sizeX=\""
         + (maxCoords[0] + 22) + "\" sizeY=\"" + (maxCoords[1] + 22) + "\"/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfCompartmentAliases>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:listOfCompartmentAliases>\n");
     
-    annot.appendNoRDFAnnotation(String.format("<celldesigner:compartmentAlias id=\"cd_ca%s\" compartment=\"%s\">\n",
+    annot.appendNonRDFAnnotation(String.format("<celldesigner:compartmentAlias id=\"cd_ca%s\" compartment=\"%s\">\n",
       defaultC.getId(), defaultC.getId()));
-    annot.appendNoRDFAnnotation("<celldesigner:class>SQUARE</celldesigner:class>\n");
-    annot.appendNoRDFAnnotation(String.format("<celldesigner:bounds x=\"10.0\" y=\"10.0\" w=\"%d\" h=\"%d\" />\n",
+    annot.appendNonRDFAnnotation("<celldesigner:class>SQUARE</celldesigner:class>\n");
+    annot.appendNonRDFAnnotation(String.format("<celldesigner:bounds x=\"10.0\" y=\"10.0\" w=\"%d\" h=\"%d\" />\n",
       (maxCoords[0] + 2), (maxCoords[1] + 2)));
     // <celldesigner:namePoint x="WIDTH HALBE - TEXT_WIDHT HALB"
     // y="COMPARTMENT_HEIGHT-25"/>
-    annot.appendNoRDFAnnotation(String.format("<celldesigner:namePoint x=\"%d\" y=\"%d\"/>\n",
+    annot.appendNonRDFAnnotation(String.format("<celldesigner:namePoint x=\"%d\" y=\"%d\"/>\n",
       ((maxCoords[0] + 22) / 2 - (3 * defaultC.getName().length())),maxCoords[1] - 22));
-    annot.appendNoRDFAnnotation("<celldesigner:doubleLine thickness=\"10.0\" outerWidth=\"2.0\" innerWidth=\"1.0\"/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:paint color=\"ffcccc00\" scheme=\"Color\" />\n");
-    annot.appendNoRDFAnnotation("<celldesigner:info state=\"empty\" angle=\"0.0\"/>\n");
-    annot.appendNoRDFAnnotation("</celldesigner:compartmentAlias>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:doubleLine thickness=\"10.0\" outerWidth=\"2.0\" innerWidth=\"1.0\"/>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:paint color=\"ffcccc00\" scheme=\"Color\" />\n");
+    annot.appendNonRDFAnnotation("<celldesigner:info state=\"empty\" angle=\"0.0\"/>\n");
+    annot.appendNonRDFAnnotation("</celldesigner:compartmentAlias>\n");
     
-    annot.appendNoRDFAnnotation("</celldesigner:listOfCompartmentAliases>\n");
+    annot.appendNonRDFAnnotation("</celldesigner:listOfCompartmentAliases>\n");
     
     if (CDloComplexSpeciesAliases.length() > 0) {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfComplexSpeciesAliases>\n");
-      annot.appendNoRDFAnnotation(CDloComplexSpeciesAliases.toString());
-      annot.appendNoRDFAnnotation("</celldesigner:listOfComplexSpeciesAliases>\n");
+      annot.appendNonRDFAnnotation("<celldesigner:listOfComplexSpeciesAliases>\n");
+      annot.appendNonRDFAnnotation(CDloComplexSpeciesAliases.toString());
+      annot.appendNonRDFAnnotation("</celldesigner:listOfComplexSpeciesAliases>\n");
     } else {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfComplexSpeciesAliases/>\n");
+      annot.appendNonRDFAnnotation("<celldesigner:listOfComplexSpeciesAliases/>\n");
     }
     if (CDloSpeciesAliases.length() > 0) {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfSpeciesAliases>\n");
-      annot.appendNoRDFAnnotation(CDloSpeciesAliases.toString());
-      annot.appendNoRDFAnnotation("</celldesigner:listOfSpeciesAliases>\n");
+      annot.appendNonRDFAnnotation("<celldesigner:listOfSpeciesAliases>\n");
+      annot.appendNonRDFAnnotation(CDloSpeciesAliases.toString());
+      annot.appendNonRDFAnnotation("</celldesigner:listOfSpeciesAliases>\n");
     } else {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfSpeciesAliases/>\n");
+      annot.appendNonRDFAnnotation("<celldesigner:listOfSpeciesAliases/>\n");
     }
     if (CDloProteins.length() > 0) {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfProteins>\n");
-      annot.appendNoRDFAnnotation(CDloProteins.toString());
-      annot.appendNoRDFAnnotation("</celldesigner:listOfProteins>\n");
+      annot.appendNonRDFAnnotation("<celldesigner:listOfProteins>\n");
+      annot.appendNonRDFAnnotation(CDloProteins.toString());
+      annot.appendNonRDFAnnotation("</celldesigner:listOfProteins>\n");
     } else {
-      annot.appendNoRDFAnnotation("<celldesigner:listOfProteins/>\n");
+      annot.appendNonRDFAnnotation("<celldesigner:listOfProteins/>\n");
     }
-    annot.appendNoRDFAnnotation("<celldesigner:listOfGroups/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfGenes/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfRNAs/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfAntisenseRNAs/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfLayers/>\n");
-    annot.appendNoRDFAnnotation("<celldesigner:listOfBlockDiagrams/>\n");
-    annot.appendNoRDFAnnotation("</celldesigner:extension>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:listOfGroups/>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:listOfGenes/>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:listOfRNAs/>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:listOfAntisenseRNAs/>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:listOfLayers/>\n");
+    annot.appendNonRDFAnnotation("<celldesigner:listOfBlockDiagrams/>\n");
+    annot.appendNonRDFAnnotation("</celldesigner:extension>\n");
     
     closeOpenSpeciesTags(model);
   }
@@ -146,7 +146,7 @@ public class CellDesignerUtils {
     for (Species s : model.getListOfSpecies()) {
       String a = s.getAnnotation().getNonRDFannotation().toXMLString();
       if (a != null && a.length() > 0 && a.contains("celldesigner")) {
-        s.getAnnotation().appendNoRDFAnnotation("</celldesigner:extension>\n");
+        s.getAnnotation().appendNonRDFAnnotation("</celldesigner:extension>\n");
       }
     }
   }
@@ -166,17 +166,17 @@ public class CellDesignerUtils {
     }
     
     // Add Reaction Annotation
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:extension>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:name>%s</celldesigner:name>\n",
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:extension>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation(String.format("<celldesigner:name>%s</celldesigner:name>\n",
       sbReaction.getName()));
     // TODO: STATE_TRANSITION or UNKNOWN_TRANSITION ? Ersteres in anderen
     // releases.
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:reactionType>STATE_TRANSITION</celldesigner:reactionType>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:reactionType>STATE_TRANSITION</celldesigner:reactionType>\n");
     
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:baseReactants>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:baseReactants>\n");
     for (SpeciesReference s : sbReaction.getListOfReactants()) {
       if (s!=null && s.isSetSpeciesInstance()) {
-        sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:baseReactant species=\"%s\" alias=\"%s\"/>\n",
+        sbReaction.getAnnotation().appendNonRDFAnnotation(String.format("<celldesigner:baseReactant species=\"%s\" alias=\"%s\"/>\n",
           s.getSpeciesInstance().getId(),"cd_sa"+ s.getSpeciesInstance().getId()));
         
         // Write annotation for SpeciesReference
@@ -189,16 +189,16 @@ public class CellDesignerUtils {
             s.setNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
           }
         }
-        s.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
+        s.getAnnotation().appendNonRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
           "cd_sa"+ s.getSpeciesInstance().getId()));
       }
     }
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:baseReactants>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:baseReactants>\n");
     
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:baseProducts>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:baseProducts>\n");
     for (SpeciesReference s : sbReaction.getListOfProducts()) {
       if (s!=null && s.isSetSpeciesInstance()) {
-        sbReaction.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:baseProduct species=\"%s\" alias=\"%s\"/>\n",
+        sbReaction.getAnnotation().appendNonRDFAnnotation(String.format("<celldesigner:baseProduct species=\"%s\" alias=\"%s\"/>\n",
           s.getSpeciesInstance().getId(),"cd_sa"+ s.getSpeciesInstance().getId()));
         // Write annotation for SpeciesReference
         if (!s.isSetAnnotation()) {
@@ -210,31 +210,31 @@ public class CellDesignerUtils {
             s.setNamespace("xmlns:celldesigner=http://www.sbml.org/2001/ns/celldesigner");
           }
         }
-        s.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
+        s.getAnnotation().appendNonRDFAnnotation(String.format("<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
           "cd_sa"+ s.getSpeciesInstance().getId()));
       }
     }
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:baseProducts>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:baseProducts>\n");
     
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:connectScheme connectPolicy=\"direct\" rectangleIndex=\"0\">\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:listOfLineDirection>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:lineDirection index=\"0\" value=\"unknown\"/>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:listOfLineDirection>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:connectScheme>\n");
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:line width=\"1.0\" color=\"ff000000\"/>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:connectScheme connectPolicy=\"direct\" rectangleIndex=\"0\">\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:listOfLineDirection>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:lineDirection index=\"0\" value=\"unknown\"/>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:listOfLineDirection>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:connectScheme>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:line width=\"1.0\" color=\"ff000000\"/>\n");
     
-    sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:listOfModification>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:listOfModification>\n");
     for (ModifierSpeciesReference s : sbReaction.getListOfModifiers()) {
-      sbReaction.getAnnotation().appendNoRDFAnnotation(
+      sbReaction.getAnnotation().appendNonRDFAnnotation(
         String.format("<celldesigner:modification type=\"CATALYSIS\" modifiers=\"%s\" aliases=\"%s\" targetLineIndex=\"-1,0\">\n", // original: -1,2
           s.getSpeciesInstance().getId(),"cd_sa"+ s.getSpeciesInstance().getId()));
-      sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:connectScheme connectPolicy=\"direct\">\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:listOfLineDirection>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:lineDirection index=\"0\" value=\"unknown\"/>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:listOfLineDirection>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:connectScheme>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("<celldesigner:line width=\"1.0\" color=\"ff000000\"/>\n");
-      sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:modification>\n");
+      sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:connectScheme connectPolicy=\"direct\">\n");
+      sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:listOfLineDirection>\n");
+      sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:lineDirection index=\"0\" value=\"unknown\"/>\n");
+      sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:listOfLineDirection>\n");
+      sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:connectScheme>\n");
+      sbReaction.getAnnotation().appendNonRDFAnnotation("<celldesigner:line width=\"1.0\" color=\"ff000000\"/>\n");
+      sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:modification>\n");
       
       // Write annotation for ModifierSpeciesReference
       
@@ -242,7 +242,7 @@ public class CellDesignerUtils {
       String currentAnnotation = s.getAnnotation().getNonRDFannotation().toXMLString();
       if (currentAnnotation!=null &&
           !s.getAnnotation().getNonRDFannotation().toXMLString().contains("<celldesigner:alias>")) {
-        s.getAnnotation().appendNoRDFAnnotation(String.format(
+        s.getAnnotation().appendNonRDFAnnotation(String.format(
           "<celldesigner:extension>\n<celldesigner:alias>%s</celldesigner:alias>\n</celldesigner:extension>\n",
           "cd_sa" + s.getSpeciesInstance().getId()));
       }
@@ -261,14 +261,14 @@ public class CellDesignerUtils {
         }
       }
       if (pos < 0) {
-        s.getSpeciesInstance().getAnnotation().appendNoRDFAnnotation(
+        s.getSpeciesInstance().getAnnotation().appendNonRDFAnnotation(
           loKey+"\n" + newKey + "</celldesigner:listOfCatalyzedReactions>\n");
       }
       
     }
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:listOfModification>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:listOfModification>\n");
     
-    sbReaction.getAnnotation().appendNoRDFAnnotation("</celldesigner:extension>\n");
+    sbReaction.getAnnotation().appendNonRDFAnnotation("</celldesigner:extension>\n");
   }
   
   /**
@@ -380,17 +380,17 @@ public class CellDesignerUtils {
     }
     
     // Add Species Annotation
-    spec.getAnnotation().appendNoRDFAnnotation("<celldesigner:extension>\n");
-    spec.getAnnotation().appendNoRDFAnnotation("<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>\n");
-    spec.getAnnotation().appendNoRDFAnnotation("<celldesigner:speciesIdentity>\n");
-    spec.getAnnotation().appendNoRDFAnnotation(String.format("<celldesigner:class>%s</celldesigner:class>\n",type));
-    spec.getAnnotation().appendNoRDFAnnotation(reference + "\n");
-    spec.getAnnotation().appendNoRDFAnnotation("</celldesigner:speciesIdentity>\n");
+    spec.getAnnotation().appendNonRDFAnnotation("<celldesigner:extension>\n");
+    spec.getAnnotation().appendNonRDFAnnotation("<celldesigner:positionToCompartment>inside</celldesigner:positionToCompartment>\n");
+    spec.getAnnotation().appendNonRDFAnnotation("<celldesigner:speciesIdentity>\n");
+    spec.getAnnotation().appendNonRDFAnnotation(String.format("<celldesigner:class>%s</celldesigner:class>\n",type));
+    spec.getAnnotation().appendNonRDFAnnotation(reference + "\n");
+    spec.getAnnotation().appendNonRDFAnnotation("</celldesigner:speciesIdentity>\n");
     
     /*
      * DON'T WRITE END TAG HERE. Catalysts write additional data in
      * "addCellDesignerAnnotationToReaction".
-     * spec.getAnnotation().appendNoRDFAnnotation
+     * spec.getAnnotation().appendNonRDFAnnotation
      * ("</celldesigner:extension>\n");
      */
   }

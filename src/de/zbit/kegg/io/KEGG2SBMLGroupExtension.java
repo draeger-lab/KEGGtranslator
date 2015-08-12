@@ -91,7 +91,7 @@ public class KEGG2SBMLGroupExtension {
       try{
         g.createMember(id);
       } catch (Throwable e) {
-        log.log(Level.WARNING, "Duplicated component species ID: " + id, e);
+        log.log(Level.WARNING, "Duplicated component species ID: " + id);
       }
     }
     
