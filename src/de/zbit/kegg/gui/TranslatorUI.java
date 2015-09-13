@@ -335,7 +335,7 @@ KeyListener, ItemListener {
    * with the currently selected format and eventually
    * issues a warning.
    * @param format
-   * @return <code>FALSE</code> if the translation should be
+   * @return {@code false} if the translation should be
    * stopped.
    */
   protected boolean checkSettingsAndIssueWarning(String format) {
@@ -412,7 +412,7 @@ KeyListener, ItemListener {
   
   /**
    * A method to set the value of a currently displayed {@link FileSelector}
-   * corresponding to the <code>KEGGtranslatorIOOptions.INPUT</code> option.
+   * corresponding to the {@code KEGGtranslatorIOOptions.INPUT} option.
    * @param r the JComponent on which the component for the mentioned
    * optioned is placed.
    * @param file the file to set

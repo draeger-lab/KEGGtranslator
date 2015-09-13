@@ -31,7 +31,6 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.ext.groups.Group;
-import org.sbml.jsbml.ext.groups.GroupKind;
 import org.sbml.jsbml.ext.groups.GroupsConstants;
 import org.sbml.jsbml.ext.groups.GroupsModelPlugin;
 import org.sbml.jsbml.ext.groups.Member;
@@ -68,17 +67,18 @@ public class KEGG2SBMLGroupExtension {
    * @param p
    * @param model
    * @param entry
+   * @param groupId
    * @return
    */
-  public static Group createGroup(Pathway p, Model model, Entry entry) {
+  public static Group createGroup(Pathway p, Model model, Entry entry, String groupId) {
     GroupsModelPlugin groupModel = getGroupsModelPlugin(model);
     
     // Get all group-members
     List<String> componentSpeciesIDs = new ArrayList<String>();
     if (entry.hasComponents()) {
-      for (int c:entry.getComponents()) {
+      for (int c : entry.getComponents()) {
         Entry ce = p.getEntryForId(c);
-        if (ce!=null && ce.getCustom()!=null && ce.getCustom() instanceof NamedSBase) {
+        if ((ce != null) && (ce.getCustom() != null) && (ce.getCustom() instanceof NamedSBase)) {
           String speciesID = ((NamedSBase)ce.getCustom()).getId();
           componentSpeciesIDs.add(speciesID);
         }
@@ -86,24 +86,25 @@ public class KEGG2SBMLGroupExtension {
     }
     
     // Create group and add all members
-    Group g = groupModel.createGroup();
+    Group g = groupModel.createGroup(groupId);
     for (String id: componentSpeciesIDs) {
-      try{
-        g.createMember(id);
+      try {
+        Member member = g.createMember(g.getId() + "_member_" + id);
+        member.setIdRef(id);
       } catch (Throwable e) {
         log.log(Level.WARNING, "Duplicated component species ID: " + id);
       }
     }
     
     // The KIND attribute is required. Possible values are listed in GroupKind
-    g.setKind(GroupKind.collection);
+    g.setKind(Group.Kind.collection);
     
     return g;
   }
   
   
   /**
-   * Clones the given group <code>g</code>
+   * Clones the given group {@code g}
    * @param id the id of the new group
    * @param g
    * @param prefixForMembers this will be prepended to all member symbols
@@ -138,7 +139,7 @@ public class KEGG2SBMLGroupExtension {
   }
   
   /**
-   * Duplicates all members of the given group <code>g</code> and
+   * Duplicates all members of the given group {@code g} and
    * adds a prefix to all duplicated members.
    * @param g
    * @param prefixForMembers
@@ -159,7 +160,8 @@ public class KEGG2SBMLGroupExtension {
       if (prefixForMembers!=null) {
         if (!symbol.startsWith(prefixForMembers)) {
           symbol = prefixForMembers + symbol;
-          g.createMember(symbol);
+          Member member = g.createMember(g.getId() + "_member_" + symbol);
+          member.setIdRef(symbol);
         }
       }
     }

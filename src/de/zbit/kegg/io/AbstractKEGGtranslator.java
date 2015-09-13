@@ -466,10 +466,10 @@ public abstract class AbstractKEGGtranslator<OutputFormat> implements KEGGtransl
   
   /**
    * This method converts a given KGML file into the
-   * specified <code>OutputFormat</code>.
+   * specified {@code OutputFormat}.
    * 
    * @param f the input file.
-   * @return the generated document in <code>OutputFormat</code>.
+   * @return the generated document in {@code OutputFormat}.
    * @throws IOException if the input file is not readable.
    */
   @Override

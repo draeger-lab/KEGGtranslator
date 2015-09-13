@@ -135,7 +135,12 @@ public class KEGG2SBMLLayoutExtension {
     // => track min and max values.
     MinAndMaxTracker tracker = new MinAndMaxTracker();
     
-    Map<String, Integer> idCounts = new HashMap<String, Integer>();
+    String keyWord = "KEGGtranslator_idCounts";
+    Map<String, Integer> idCounts = (Map<String, Integer>) doc.getUserObject(keyWord);
+    if (idCounts == null) {
+      idCounts = new HashMap<String, Integer>();
+      doc.putUserObject(keyWord, idCounts);
+    }
     Map<String, ReactionGlyph> keggReactionName2glyph = new HashMap<String, ReactionGlyph>();
     
     // First, create a glyph for each reaction
@@ -171,7 +176,7 @@ public class KEGG2SBMLLayoutExtension {
     // Create a glyph for each entry (In KGML, only entries have graph objects)
     for (Entry e : p.getEntries()) {
       Object s = e.getCustom();
-      if (s!=null && e.hasGraphics()) {
+      if ((s != null) && e.hasGraphics()) {
         Graphics g = e.getGraphics();
         boolean isLineGraphic = g.getType().equals(GraphicsType.line);
         if (isLineGraphic) {

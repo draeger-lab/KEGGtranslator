@@ -342,7 +342,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   
   /**
    * Creates a biosource, corresponding to the organism/species of
-   * the input pathway <code>p</code>.
+   * the input pathway {@code p}.
    * <p> Please call this method only once per model and save the
    * result somewhere, in case you need it multiple times.
    * 
@@ -881,7 +881,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * set.
    * <br/>But these entries might be reused in relations (i.e., relations involving
    * reactions) and thus, this method will set the custom attribute of an {@link Entry}
-   * to the BioPAX reaction given as <code>reaction</code> .
+   * to the BioPAX reaction given as {@code reaction} .
    * @param p
    * @param r KEGG reaction
    * @param reaction BioPAX reaction
@@ -1078,7 +1078,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * This method tries to denote the vocabulary with an identifiers.org URI.
    * This has been suggested by Igor R.
    * @param st the corresponding subtype
-   * @param proteinModification {@code TRUE} ONLY for modification
+   * @param proteinModification {@code true} ONLY for modification
    * vocabularies, such as {@link SequenceModificationVocabulary}.
    * @return an RDF-ID of the vocabulary element.
    */
@@ -1155,7 +1155,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   
   /**
    * Please implement this method to add the given {@link Entry}
-   * <code>e</code> as appropriate BioPAX entity to the {@link #model}.
+   * {@code e} as appropriate BioPAX entity to the {@link #model}.
    * @param e
    * @param p
    * @return created {@link BioPAXElement}
@@ -1164,7 +1164,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   
   /**
    * Please implement this method to add the given {@link Reaction}
-   * <code>r</code> as appropriate BioPAX entity to the {@link #model}.
+   * {@code r} as appropriate BioPAX entity to the {@link #model}.
    * @param r
    * @param p
    * @return created {@link BioPAXElement}
@@ -1173,7 +1173,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   
   /**
    * Please implement this method to add the given {@link Relation}
-   * <code>r</code> as appropriate BioPAX entity to the {@link #model}.
+   * {@code r} as appropriate BioPAX entity to the {@link #model}.
    * @param r
    * @param p
    * @return created {@link BioPAXElement}

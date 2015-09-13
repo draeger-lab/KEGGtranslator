@@ -350,6 +350,9 @@ public class BatchKEGGtranslator {
       case SBML_L2V4:
         translator = new KEGG2jSBML(manager, 2, 4);
         break;
+      case SBML_L2V5:
+        translator = new KEGG2jSBML(manager, 2, 5);
+        break;
       case SBML_L3V1:
         translator = new KEGG2jSBML(manager, 3, 1);
         break;

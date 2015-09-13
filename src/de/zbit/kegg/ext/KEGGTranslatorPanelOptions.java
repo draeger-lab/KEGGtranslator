@@ -55,7 +55,7 @@ public abstract interface KEGGTranslatorPanelOptions extends de.zbit.graph.gui.o
       "Select percentage for brightening the KEGG background image.", new Range<Integer>(Integer.class, "{[0,100]}"), 65, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, TRUE_RANGE);
   
   /**
-   * <code>TRUE</code> if the image should be converted to a greyscale image.
+   * {@code true} if the image should be converted to a greyscale image.
    */
   public static final Option<Boolean> GREYSCALE_KEGG_BACKGROUND_IMAGE = new Option<Boolean>("GREYSCALE_KEGG_BACKGROUND_IMAGE", Boolean.class,
       "If true, converts the KEGG background image to a greyscale picture.", true, SHOW_KEGG_PICTURE_IN_GRAPH_BACKGROUND, TRUE_RANGE);

@@ -1297,7 +1297,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   }
   
   /**
-   * Returns {@code TRUE} if a direct relation between the given
+   * Returns {@code true} if a direct relation between the given
    * entry {@code one} and {@code two} exists.
    * @param one
    * @param two
@@ -1334,8 +1334,8 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   }
   
   /**
-   * Links all information in all <code>nodeMaps</code> that are
-   * assigned to <code>oldNode</code> also to the <code>newNode</code>.
+   * Links all information in all {@code nodeMaps} that are
+   * assigned to {@code oldNode} also to the {@code newNode}.
    * @param nodeMaps
    * @param oldNode
    * @param newNode
@@ -1403,12 +1403,12 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   }
   
   /**
-   * Layoutes the node <code>parent</code> if all children are contained
-   * in <code>toLayout</code>. (Uses {@link StackingNodeLayout}).
+   * Layoutes the node {@code parent} if all children are contained
+   * in {@code toLayout}. (Uses {@link StackingNodeLayout}).
    * @param graph
    * @param parent
    * @param toLayout nodes without layout information
-   * @return <code>TRUE</code> if a layout has been applied,
+   * @return {@code true} if a layout has been applied,
    */
   @SuppressWarnings("unchecked")
   private boolean layoutIfallChildsAreInSet(Graph2D graph, Node parent, Set<Node> toLayout) {
@@ -1553,7 +1553,7 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
    * @param graph
    * @param reactionModifiers
    * @return the intermediate reaction node (should be layouted!) or
-   * <code>NULL</code> if the reaction wasn't drawn.
+   * {@code NULL} if the reaction wasn't drawn.
    */
   private Node addKGMLReaction(Reaction r, Pathway p, Graph2D graph, Map<String, Collection<Node>> reactionModifiers) {
     if (!reactionHasAtLeastOneSubstrateAndProduct(r, p)) {
@@ -1665,17 +1665,17 @@ public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   
   
   /**
-   * Bundles all <code>childs</code> that belong to
+   * Bundles all {@code childs} that belong to
    * the same group node (i.e., parent), by removing the
    * childs from the list and adding the parent group node.
    * Only if all childs of (any) group nodes in the graph
-   * are inside the <code>childs</code> list, this bundling
+   * are inside the {@code childs} list, this bundling
    * is performed.
    * If only a subset of a group node is given as childs or
    * no given node belongs to a group node, the list is
    * returned unmodifified.
    * @param childs
-   * @return common group node parent or <code>NULL</code>.
+   * @return common group node parent or {@code NULL}.
    */
   private List<Node> bundle(Graph2D graph, List<Node> childs) {
     if (childs==null || !childs.iterator().hasNext()) {

@@ -59,6 +59,10 @@ public interface KEGGtranslatorIOOptions extends KeyProvider {
      */
     SBML_L2V4,
     /**
+     * SBML Level 2 Version 5
+     */
+    SBML_L2V5,
+    /**
      * 
      */
     SBML_L3V1,

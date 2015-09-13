@@ -117,7 +117,7 @@ public class StackingNodeLayout {
   
   /**
    * Perform a simply stacking layout with {@link #cols} columns.
-   * @param graph graph in which <code>groupNode</code> is contained
+   * @param graph graph in which {@code groupNode} is contained
    * @param groupNode the group node whose childs should be stacked
    */
   public static void doLayout(Graph2D graph, Node groupNode) {
@@ -128,7 +128,7 @@ public class StackingNodeLayout {
    * Perform a simply stacking layout with {@link #cols} columns.
    * Perform also a stacking layout for all group nodes in this
    * group node.
-   * @param graph graph in which <code>groupNode</code> is contained
+   * @param graph graph in which {@code groupNode} is contained
    * @param groupNode the group node whose childs should be stacked
    */
   public static void doRecursiveLayout(Graph2D graph, Node groupNode) {
@@ -202,7 +202,7 @@ public class StackingNodeLayout {
   
   /**
    * @param group
-   * @return all children of the given <code>group</code> node.
+   * @return all children of the given {@code group} node.
    */
   @SuppressWarnings("unchecked")
   public List<Node> getChildren(Node group) {
@@ -220,7 +220,7 @@ public class StackingNodeLayout {
    * The order of the returned list is fixed: First grouped nodes
    * than ungrouped nodes!
    * @param group
-   * @return all children of the given <code>group</code>
+   * @return all children of the given {@code group}
    * node and all group nodes in this group node.
    */
   public List<Node> getChildrenDeep(Node group) {

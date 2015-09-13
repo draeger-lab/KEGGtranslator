@@ -126,9 +126,9 @@ public class SearchSupport {
   }
   
   /**
-   * Returns the <code>Graph2DView</code> that is associated to the search
+   * Returns the {@code Graph2DView} that is associated to the search
    * suuport.
-   * @return the <code>Graph2DView</code> that is associated to the search
+   * @return the {@code Graph2DView} that is associated to the search
    * suuport.
    */
   public Graph2DView getView() {
@@ -464,9 +464,9 @@ public class SearchSupport {
   
   /**
    * Creates a preconfigured action map for the support's
-   * <em>find next match</em> and <em>clear result</code> actions.
+   * <em>find next match</em> and <em>clear result} actions.
    * @return a preconfigured action map for the support's
-   * <em>find next match</em> and <em>clear result</code> actions.
+   * <em>find next match</em> and <em>clear result} actions.
    * @see #getClearAction()
    * @see #getNextAction()
    */
@@ -479,12 +479,12 @@ public class SearchSupport {
   
   /**
    * Creates a preconfigured input map for the support's
-   * <em>find next match</em> and <em>clear result</code> actions.
+   * <em>find next match</em> and <em>clear result} actions.
    * The default implementation maps the <em>find next match</em> action
-   * to the <code>F3</code> function key and the <em>clear search result</em>
-   * action to the <code>ESCAPE</code> key.
+   * to the {@code F3} function key and the <em>clear search result</em>
+   * action to the {@code ESCAPE} key.
    * @return a preconfigured input map for the support's
-   * <em>find next match</em> and <em>clear result</code> actions.
+   * <em>find next match</em> and <em>clear result} actions.
    * @see #getClearAction()
    * @see #getNextAction()
    */
@@ -500,7 +500,7 @@ public class SearchSupport {
   private static final Color HIGHLIGHT_COLOR = new Color(202,227,255);
   
   /**
-   * <code>Drawable</code> that highlights search results by drawing a thick,
+   * {@code Drawable} that highlights search results by drawing a thick,
    * colored border around search result nodes.
    */
   private final class Marker implements Drawable {
@@ -576,7 +576,7 @@ public class SearchSupport {
     
     /**
      * Add the specified node to the search result set.
-     * @param node   the <code>Node</code> to add.
+     * @param node   the {@code Node} to add.
      */
     void add( final Node node ) {
       nodes.add(node);
@@ -648,7 +648,7 @@ public class SearchSupport {
     /**
      * Sorts the nodes in the search result set according to the order
      * induced by the specified comparator.
-     * @param c   the <code>Comparator</code> to sort the nodes in the search
+     * @param c   the {@code Comparator} to sort the nodes in the search
      * result set.
      */
     void sort( final Comparator c ) {
@@ -656,8 +656,8 @@ public class SearchSupport {
     }
     
     /**
-     * Returns a <code>Collection</code> handle for the search result.
-     * @return a <code>Collection</code> handle for the search result.
+     * Returns a {@code Collection} handle for the search result.
+     * @return a {@code Collection} handle for the search result.
      */
     Collection asCollection() {
       return nodes;
@@ -671,9 +671,9 @@ public class SearchSupport {
     /**
      * Returns {@code true} if the specified node should be included
      * in the search result and {@code false} otherwise.
-     * @param graph   the <code>Graph2D</code> to which the specified node
+     * @param graph   the {@code Graph2D} to which the specified node
      * belongs.
-     * @param node   the <code>Node</code> to test for inclusion in the
+     * @param node   the {@code Node} to test for inclusion in the
      * search result.
      * @return {@code true} if the specified node should be included
      * in the search result and {@code false} otherwise.

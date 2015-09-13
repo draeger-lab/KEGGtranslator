@@ -73,7 +73,7 @@ public class TranslatorTools extends GraphTools {
   public static final transient Logger log = Logger.getLogger(TranslatorTools.class.getName());
   
   /**
-   * Static String for the <code>type</code> {@link NodeMap} of the {@link #graph}
+   * Static String for the {@code type} {@link NodeMap} of the {@link #graph}
    * to be used for, e.g. microRNAs.
    */
   public final static String RNA_TYPE = "RNA";
@@ -182,7 +182,7 @@ public class TranslatorTools extends GraphTools {
   }
   
   /**
-   * Get a reverse map for the <code>descriptor</code>. This means,
+   * Get a reverse map for the {@code descriptor}. This means,
    * descriptor object to List of nodes with this descriptor.
    * <p>Key is an Object, Value is a <pre>List<Node></pre>
    * @param descriptor

@@ -180,7 +180,7 @@ public class SBOMapping {
   
   /**
    * Get the most appropriate SBO term for this
-   * <code>entry</code>.
+   * {@code entry}.
    * @param entry
    * @return
    */
@@ -280,10 +280,10 @@ public class SBOMapping {
   }
   
   /**
-   * Convert <code>subtype</code> to a MI-term that is a child of 'MI:0190' (Molecular Interaction (PSI-MI)).
+   * Convert {@code subtype} to a MI-term that is a child of 'MI:0190' (Molecular Interaction (PSI-MI)).
    * The terms are for relations/interactions.
    * @param subtype
-   * @return {@link ValuePair} with the term name and integer id. Or <code>NULL</code> if
+   * @return {@link ValuePair} with the term name and integer id. Or {@code NULL} if
    * no MI term is available that matches the given input {@link SubType}.
    */
   public static ValuePair<String, Integer> getMITerm(String subtype) {
@@ -338,11 +338,11 @@ public class SBOMapping {
   }
   
   /**
-   * Convert <code>subtype</code> to a MOD-term (Protein Modification Ontology (PSI-MOD))
+   * Convert {@code subtype} to a MOD-term (Protein Modification Ontology (PSI-MOD))
    * that is either a child of 'MOD:01157' or 'MOD:01156'.
    * <p>The terms are for entries that are modified as result of an relation/interaction.
    * @param subtype
-   * @return {@link ValuePair} with the term name and integer id. Or <code>NULL</code> if
+   * @return {@link ValuePair} with the term name and integer id. Or {@code NULL} if
    * no MI term is available that matches the given input {@link SubType}.
    */
   public static ValuePair<String, Integer> getMODTerm(String subtype) {

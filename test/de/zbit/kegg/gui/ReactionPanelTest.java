@@ -35,7 +35,7 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBMLException;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
-import org.sbml.jsbml.xml.stax.SBMLWriter;
+import org.sbml.jsbml.TidySBMLWriter;
 
 import de.zbit.sbml.gui.ReactionPanel;
 
@@ -54,10 +54,7 @@ public class ReactionPanelTest {
   public static void main(String[] args) throws XMLStreamException,
   SBMLException {
     SBMLDocument doc = createSimpleSBMLDocument(1, 2, 2, false);
-    SBMLWriter writer = new SBMLWriter();
-    writer.setIndentationCount(2);
-    writer.setIndentationChar(' ');
-    System.out.println(writer.writeSBMLToString(doc));
+    TidySBMLWriter.write(doc, System.out, null, null);
     JFrame f = new JFrame("Reaction test");
     JPanel panel = new ReactionPanel(doc.getModel().getReaction(0), false);
     panel.setBackground(Color.WHITE);

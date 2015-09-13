@@ -21,6 +21,7 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.Species;
+import org.sbml.jsbml.TidySBMLWriter;
 import org.sbml.jsbml.ext.SBasePlugin;
 import org.sbml.jsbml.ext.groups.Group;
 import org.sbml.jsbml.ext.qual.Input;
@@ -47,7 +49,6 @@ import org.sbml.jsbml.ext.qual.QualitativeSpecies;
 import org.sbml.jsbml.ext.qual.Sign;
 import org.sbml.jsbml.ext.qual.Transition;
 import org.sbml.jsbml.util.ValuePair;
-import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.cache.InfoManagement;
 import de.zbit.kegg.KEGGtranslatorOptions;
@@ -186,14 +187,14 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     
     // Add extension and namespace to model
     doc.addNamespace(KEGG2SBMLqual.QUAL_NS_NAME, "xmlns", KEGG2SBMLqual.QUAL_NS);
-    doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", (isCombindedModel?"false":"true"));
+    doc.getSBMLDocumentAttributes().put(QUAL_NS_NAME + ":required", (isCombindedModel? "false" : "true"));
     model.addExtension(KEGG2SBMLqual.QUAL_NS, qualModel);
     
-    /* Until (INCLUDING) Verison 2.2, if there were no relations, no qual species
+    /* Until (INCLUDING) Version 2.2, if there were no relations, no qual species
      * have been created. The comment was as follows:
      * 
      * // Qualitative species are just created if transitions are available
-     * // Reason: all species are in the file as normal sbml species. Following the
+     * // Reason: all species are in the file as normal SBML species. Following the
      * // qualitative species are not necessary
      */
     
@@ -234,12 +235,12 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
    * @param qualModel
    */
   private void createQualSpecies(Pathway p, QualModelPlugin qualModel) {
-    for (Entry e: p.getEntries()) {
+    for (Entry e : p.getEntries()) {
       Object s = e.getCustom();
-      if (s!=null && s instanceof Species) {
+      if ((s != null) && (s instanceof Species)) {
         QualitativeSpecies qs = createQualitativeSpeciesFromSpecies((Species) s, qualModel);
         e.setCustom(qs);
-      } else if (s!=null && s instanceof Group) {
+      } else if ((s != null) && (s instanceof Group)) {
         Group updatedReferences = createQualitativeGroupFromGroup((Group) s);
         e.setCustom(updatedReferences);
         // Sinmply KEEP non-species objects (e.g., groups when using the group extension)
@@ -390,7 +391,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       StringBuffer notes = new StringBuffer(KEGG2jSBML.notesStartString);
       notes.append(String.format("This transition is defined by '%s'.\n", r.getSource()));
       notes.append(KEGG2jSBML.notesEndString);
-      t.setNotes(notes.toString());
+      try {
+        t.setNotes(notes.toString());
+      } catch (Throwable exc) {
+        logger.warning(MessageFormat.format(
+          "Cannot write notes for species ''{0}'' because of {1}: {2}.",
+          t.getId(), exc.getClass().getName(), Utils.getMessage(exc)));
+      }
     }
     
     // Don't add same relations twice
@@ -527,7 +534,7 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       //      k2s.translate("files/KGMLsamplefiles/hsa00010.xml", "files/KGMLsamplefiles/hsa00010.sbml.xml");
       
       SBMLDocument doc = k2s.translate(new File("files/KGMLsamplefiles/hsa04210.xml"));
-      new SBMLWriter().write(doc, "files/KGMLsamplefiles/hsa04210.sbml.xml");
+      TidySBMLWriter.write(doc, "files/KGMLsamplefiles/hsa04210.sbml.xml", ' ', (short) 2);
       
       // Remember already queried objects
       if (AbstractKEGGtranslator.getKeggInfoManager().hasChanged()) {

@@ -21,6 +21,7 @@
 package de.zbit.kegg.io;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,9 +50,11 @@ import org.sbml.jsbml.SBMLDocument;
 import org.sbml.jsbml.SBase;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.SpeciesReference;
+import org.sbml.jsbml.TidySBMLWriter;
 import org.sbml.jsbml.UnitDefinition;
+import org.sbml.jsbml.ext.fbc.FBCConstants;
+import org.sbml.jsbml.ext.fbc.FBCSpeciesPlugin;
 import org.sbml.jsbml.util.ValuePair;
-import org.sbml.jsbml.xml.stax.SBMLWriter;
 
 import de.zbit.cache.InfoManagement;
 import de.zbit.kegg.AtomBalanceCheck;
@@ -119,14 +122,14 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   private double speciesDefaultInitialAmount = 1d;
   
   /**
-   * The SBML level to be initialized. <code>NULL</code> results in
+   * The SBML level to be initialized. {@code NULL} results in
    * initializing it automatically (adjusts the level as needed (e.g.
    *  extensions require L3)).
    */
   protected Integer level = null;
   
   /**
-   * The SBML version to be initialized. <code>NULL</code> results in
+   * The SBML version to be initialized. {@code NULL} results in
    * initializing it automatically (adjusts it as needed).
    */
   protected Integer version = null;
@@ -270,7 +273,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   private void configureReactionComponent(Pathway p, ReactionComponent rc, SpeciesReference sr, int SBO) {
     if (!rc.isSetID() && !rc.isSetName()) {
       rc = rc.getAlt();
-      if (rc==null || ((!rc.isSetID() && !rc.isSetName()))) {
+      if ((rc == null) || ((!rc.isSetID() && !rc.isSetName()))) {
         return;
       }
     }
@@ -292,7 +295,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Set the stoichiometry
     Integer stoich = rc.getStoichiometry();
-    sr.setStoichiometry(stoich==null?1d:stoich);
+    sr.setStoichiometry(stoich == null ? 1d : stoich);
     
     // Get Species for ReactionComponent and assign to SpeciesReference.
     Entry rcEntry = p.getEntryForReactionComponent(rc);
@@ -320,8 +323,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       lastFileWasOverwritten=true;
     }
     try {
-      SBMLWriter writer = new SBMLWriter();
-      writer.write(doc, outFile, System.getProperty("app.name"), System
+      TidySBMLWriter.write(doc, outFile, System.getProperty("app.name"), System
         .getProperty("app.version"));
     } catch (Exception e) {
       log.log(Level.SEVERE, "Could not write SBML document.", e);
@@ -616,7 +618,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Finalize notes and annotations.
     notes.append(notesEndString);
-    model.setNotes(notes.toString());
+    try {
+      model.setNotes(notes.toString());
+    } catch (Throwable t) {
+      logger.warning(MessageFormat.format(
+        "Cannot write notes for model ''{0}'' because of {1}: {2}.",
+        model.getId(), t.getClass().getName(), Utils.getMessage(t)));
+    }
     if (addCellDesignerAnnots) {
       cdu.addCellDesignerAnnotationToModel(p, model, compartment);
     }
@@ -651,7 +659,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   }
   
   /**
-   * Create a compartment with the given <code>name</code>.
+   * Create a compartment with the given {@code name}.
    * @param model
    * @param name
    * @return
@@ -783,12 +791,12 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Add substrates/ products
     sbReaction.setReversible(r.getType().equals(ReactionType.reversible));
     for (ReactionComponent rc : r.getSubstrates()) {
-      int sbo = (r.getType().equals(ReactionType.irreversible))?15:10;
+      int sbo = (r.getType().equals(ReactionType.irreversible))? 15 : 10;
       SpeciesReference sr = sbReaction.createReactant();
       configureReactionComponent(p, rc, sr, sbo); // 15=Substrate, 10=Reactant
     }
     for (ReactionComponent rc : r.getProducts()) {
-      int sbo = (r.getType().equals(ReactionType.irreversible))?11:10;
+      int sbo = (r.getType().equals(ReactionType.irreversible))? 11 : 10;
       SpeciesReference sr = sbReaction.createProduct();
       configureReactionComponent(p, rc, sr, sbo); // 11=Product
     }
@@ -866,7 +874,6 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       sbReaction.addCVTerm(rePWs);
     }
     
-    
     // Check the atom balance (only makes sense if reactions are corrected,
     // else, they are clearly wrong).
     if (autocompleteReactions && checkAtomBalance) {
@@ -895,7 +902,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     sbReaction.setName(r.getName());
     sbReaction.setId(NameToSId(r.getName()));
     notes.append(notesEndString);
-    sbReaction.setNotes(notes.toString());
+    try {
+      sbReaction.setNotes(notes.toString());
+    } catch (Throwable t) {
+      logger.warning(MessageFormat.format(
+        "Cannot write notes for reaction ''{0}'' because of {1}: {2}.",
+        sbReaction.getId(), t.getClass().getName(), Utils.getMessage(t)));
+    }
     sbReaction.setMetaId("meta_" + sbReaction.getId());
     sbReaction.setSBOTerm(176); // biochemical reaction. Most generic SBO Term possible, for a reaction.
     //rAnnot.setAbout("#" + sbReaction.getMetaId());
@@ -1112,10 +1125,10 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   }
   
   /**
-   * Assigns a {@link Qualifier} to <code>CVterm</code>, dependent
+   * Assigns a {@link Qualifier} to {@code CVterm}, dependent
    * on the number of contained resources. If this CVTerm contains
-   * one resource, <code>BQB_IS</code> is assigned, else
-   * <code>BQB_HAS_VERSION</code>
+   * one resource, {@code BQB_IS} is assigned, else
+   * {@code BQB_HAS_VERSION}
    * is assignes.
    * @param CVterm any CVTerm
    */
@@ -1204,11 +1217,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // ---
     
     // Initialize species object
-    SBase spec;
+    NamedSBase spec;
+    String id = NameToSId(name.replace(' ', '_')); // defined in org.sbml.jsbml.NamedSBase
     if (useGroupsExtension && (entry.hasComponents() || entry.getType().equals(EntryType.group))) {
-      spec = KEGG2SBMLGroupExtension.createGroup(p, model, entry);
+      spec = KEGG2SBMLGroupExtension.createGroup(p, model, entry, "group_" + id);
     } else {
-      spec = model.createSpecies();
       
       // Eventually assign a different compartment
       Compartment c = compartment;
@@ -1226,8 +1239,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           }
         }
       }
-      ((Species) spec).setCompartment(c);
-      
+      spec = model.createSpecies(id, c);
     }
     
     if (spec instanceof Species) {
@@ -1239,6 +1251,25 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         ((Species) spec).setHasOnlySubstanceUnits(false);
         ((Species) spec).setBoundaryCondition(false);
         ((Species) spec).setConstant(false); // defined in org.sbml.jsbml.Variable
+        
+        
+        KeggInfos infos = KeggInfos.get(entry.getName(), manager);
+        
+        if ((infos != null) && infos.queryWasSuccessfull()) {
+          
+          // Component.getName() might be a glycan and the chemical formula is only given for compounds
+          // => Look if we have synonym identifers for KEGG compound and refetch
+          String formula = infos.getFormulaDirectOrFromSynonym(manager);
+          if (formula != null) {
+            FBCSpeciesPlugin specPlug = (FBCSpeciesPlugin) spec.getPlugin(FBCConstants.getNamespaceURI(spec.getLevel(), spec.getVersion(), 2));
+            try {
+              specPlug.setChemicalFormula(formula);
+            } catch (IllegalArgumentException exc) {
+              logger.warning(exc.getClass().getSimpleName() + ": " + Utils.getMessage(exc));
+            }
+          }
+        }
+        
       }
       ((Species) spec).setInitialAmount(speciesDefaultInitialAmount);
       //((Species) spec).setUnits(model.getUnitDefinition("substance"));
@@ -1247,8 +1278,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // ID has to be at this place, because other refer to it by id and if id is not set. refenreces go to null.
     // spec.setId(NameToSId(entry.getName().replace(' ', '_')));
     if (spec instanceof NamedSBase) {
-      ((NamedSBase)spec).setId(NameToSId(name.replace(' ', '_'))); // defined in org.sbml.jsbml.NamedSBase
-      spec.setMetaId("meta_" + ((NamedSBase) spec).getId()); // defined in org.sbml.jsbml.SBase
+      spec.setMetaId("meta_" + spec.getId()); // defined in org.sbml.jsbml.SBase
     }
     
     //Annotation specAnnot = new Annotation("");
@@ -1256,7 +1286,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     //spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
     StringBuffer notes = new StringBuffer(notesStartString);
     if (entry.isSetLink()) {
-      notes.append(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink()));
+      notes.append(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink().replace("&", "&amp;")));
     }
     
     
@@ -1271,11 +1301,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       CVTerm cvt = new CVTerm(Type.BIOLOGICAL_QUALIFIER,Qualifier.BQB_IS_ENCODED_BY);
       for (int c:entry.getComponents()) {
         Entry ce = p.getEntryForId(c);
-        if (ce==null) {
+        if (ce == null) {
           notesAppend.append("<li>Unknown</li>");
         } else {
           String ce_name = getNameForEntry(ce);
-          notesAppend.append(String.format("<li>%s</li>",ce_name));
+          notesAppend.append(String.format("<li>%s</li>", ce_name));
           
           // Append all kegg ids as "has_part" NLN: Should be "IS_ENCONDED_BY"
           for (String kg_id: ce.getName().split(" ")) {
@@ -1297,7 +1327,13 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Set notes here, so other methods (miriam) can append the notes.
     notes.append(notesEndString);
-    spec.setNotes(notes.toString());
+    try {
+      spec.setNotes(notes.toString());
+    } catch (Throwable t) {
+      logger.warning(MessageFormat.format(
+        "Cannot write notes for species ''{0}'' because of {1}: {2}.",
+        spec.getId(), t.getClass().getName(), Utils.getMessage(t)));
+    }
     
     // Set SBO Term
     spec.setSBOTerm(SBOMapping.getSBOTerm(entry));
@@ -1306,7 +1342,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     addMiriamURNs(entry, spec);
     
     // Finally, add the fully configured species.
-    ((NamedSBase) spec).setName(name);
+    spec.setName(name);
     //specAnnot.setAbout("#" + spec.getMetaId());
     entry.setCustom(spec); // Remember node in KEGG Structure for further references.
     // NOT here, because it may depend on other entries, that are not yet processed.
@@ -1318,7 +1354,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   
   /**
    * Creates a {@link ModifierSpeciesReference} for entry and spec and adds this reference
-   * to the <code>reactionModifiers</code> list.
+   * to the {@code reactionModifiers} list.
    * 
    * @param entry
    * @param spec

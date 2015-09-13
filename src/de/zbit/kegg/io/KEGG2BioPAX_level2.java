@@ -354,7 +354,7 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
   
   /**
    * Searches for the {@link physicalEntityParticipant} represented by the given
-   * {@link BioPAXElement} <code>ceb</code>.
+   * {@link BioPAXElement} {@code ceb}.
    * @param ceb
    * @return instance of {@link physicalEntityParticipant}
    */

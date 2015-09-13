@@ -48,7 +48,12 @@ public class TranslatorPanelTools {
     TranslatorPanel<?> panel = null;
     
     switch (outputFormat) {
-      case SBML: case SBML_QUAL: case SBML_CORE_AND_QUAL: case SBML_L2V4: case SBML_L3V1: /*case LaTeX: */
+      case SBML:
+      case SBML_QUAL:
+      case SBML_CORE_AND_QUAL:
+      case SBML_L2V4:
+      case SBML_L2V5:
+      case SBML_L3V1: /*case LaTeX: */
         panel = new TranslatorSBMLPanel(inputFile, outputFormat, translationResult);
         break;
         
