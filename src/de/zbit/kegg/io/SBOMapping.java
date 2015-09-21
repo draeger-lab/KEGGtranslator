@@ -23,13 +23,15 @@ package de.zbit.kegg.io;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sbml.jsbml.SBO;
+import org.sbml.jsbml.util.StringTools;
+
 import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.EntryType;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
 import de.zbit.kegg.parser.pathway.ext.EntryExtended;
 import de.zbit.kegg.parser.pathway.ext.EntryTypeExtended;
-import de.zbit.util.StringUtil;
 import de.zbit.util.objectwrapper.ValuePair;
 
 /**
@@ -392,11 +394,7 @@ public class SBOMapping {
    * @return
    */
   private static String formatSBO(int sbo, String prefix) {
-    StringBuilder b = new StringBuilder(prefix);
-    String iString = Integer.toString(sbo);
-    b.append(StringUtil.replicateCharacter('0', 7-iString.length()));
-    b.append(iString);
-    return b.toString();
+    return StringTools.concat(prefix, SBO.sboNumberString(sbo)).toString();
   }
   
 }

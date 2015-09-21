@@ -116,8 +116,8 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
     // Parse Kegg Pathway information
     boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM());
     if (isKEGGPathway) {
-      xref xr = (xref)createXRef(IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM(), 1);
-      if (xr!=null) {
+      xref xr = (xref) createXRef(IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM(), 1);
+      if (xr != null) {
         pathway.addXREF(xr);
       }
     }
@@ -133,8 +133,8 @@ public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
       // GO IDs
       if (pwInfos.getGo_id() != null) {
         for (String goID : pwInfos.getGo_id().split("\\s")) {
-          xref xr = (xref)createXRef(IdentifierDatabases.GeneOntology, goID, 2);
-          if (xr!=null) {
+          xref xr = (xref) createXRef(IdentifierDatabases.GeneOntology, goID, 2);
+          if (xr != null) {
             pathway.addXREF(xr);
           }
         }

@@ -35,6 +35,7 @@ import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.Model;
 import org.sbml.jsbml.NamedSBase;
 import org.sbml.jsbml.SBMLDocument;
+import org.sbml.jsbml.SBO;
 import org.sbml.jsbml.Species;
 import org.sbml.jsbml.TidySBMLWriter;
 import org.sbml.jsbml.ext.SBasePlugin;
@@ -61,6 +62,7 @@ import de.zbit.kegg.parser.pathway.Entry;
 import de.zbit.kegg.parser.pathway.Pathway;
 import de.zbit.kegg.parser.pathway.Relation;
 import de.zbit.kegg.parser.pathway.SubType;
+import de.zbit.sbml.util.AnnotationUtils;
 import de.zbit.util.DatabaseIdentifierTools;
 import de.zbit.util.DatabaseIdentifiers;
 import de.zbit.util.DatabaseIdentifiers.IdentifierDatabases;
@@ -293,13 +295,13 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
     List<SubType> subTypes = r.getSubtypes();
     
     CVTerm cv = new CVTerm(CVTerm.Qualifier.BQB_IS);
-    if (subTypes != null && subTypes.size() > 0) {
+    if ((subTypes != null) && (subTypes.size() > 0)) {
       Collection<String> subTypeNames = r.getSubtypesNames();
       
       // Parse activations/ inhibitions separately for the sign
       if (subTypeNames.contains(SubType.INHIBITION) || subTypeNames.contains(SubType.REPRESSION)) {
         if (subTypeNames.contains(SubType.ACTIVATION) || subTypeNames.contains(SubType.EXPRESSION)) {
-          sign=Sign.dual;
+          sign = Sign.dual;
           in.setSBOTerm(168); // control is parent of inhibition and activation
           SBOs.add(168);
           
@@ -321,20 +323,22 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       // Add all subtypes as MIRIAM annotation
       for (String subType: subTypeNames) {
         Integer subSBO = SBOMapping.getSBOTerm(subType);
-        if (subSBO!=null && subSBO>0) {
-          cv.addResource(KeggInfos.miriam_urn_sbo + SBOMapping.formatSBOforMIRIAM(subSBO));
+        if ((subSBO != null) && (subSBO > 0)) {
+          cv.addResource(String.format("http://identifiers.org/%s/%s",
+            KeggInfos.miriam_urn_sbo.substring(11, KeggInfos.miriam_urn_sbo.length() - 1),
+            SBO.intToString(subSBO)));
           SBOs.add(subSBO);
         }
         Integer subGO = SBOMapping.getGOTerm(subType);
-        if (subGO!=null && subGO>0) {
-          String go = DatabaseIdentifiers.getMiriamURN(IdentifierDatabases.GeneOntology, Integer.toString(subGO));
-          if (go!=null) {
+        if ((subGO != null) && (subGO > 0)) {
+          String go = DatabaseIdentifiers.getMiriamURI(IdentifierDatabases.GeneOntology, Integer.toString(subGO));
+          if (go != null) {
             cv.addResource(go);
           }
         }
         de.zbit.util.objectwrapper.ValuePair<String, Integer> subMI = SBOMapping.getMITerm(subType);
         if ((subMI != null) && (subMI.getB() != null) && (subMI.getB() > 0)) {
-          String mi = DatabaseIdentifiers.getMiriamURN(IdentifierDatabases.GeneOntology, Integer.toString(subMI.getB()));
+          String mi = DatabaseIdentifiers.getMiriamURI(IdentifierDatabases.GeneOntology, Integer.toString(subMI.getB()));
           if (mi != null) {
             cv.addResource(mi);
           }
@@ -374,12 +378,12 @@ public class KEGG2SBMLqual extends KEGG2jSBML {
       //setBiologicalQualifierISorHAS_VERSION(cv);
       t.addCVTerm(cv);
     }
-    t.addCVTerm(new CVTerm(CVTerm.Qualifier.BQB_IS_DESCRIBED_BY, KeggInfos.miriam_urn_eco + "ECO%3A0000313"));
+    t.addCVTerm(new CVTerm(CVTerm.Qualifier.BQB_IS_DESCRIBED_BY, AnnotationUtils.convertURN2URI(KeggInfos.miriam_urn_eco + "ECO%3A0000313")));
     
     // Add additional miriam identifiers
     if (r.isSetDatabaseIdentifiers()) {
       List<CVTerm> cvTerms = DatabaseIdentifierTools.getCVTerms(r.getDatabaseIdentifiers(), null);
-      if (cvTerms!=null && cvTerms.size()>0) {
+      if ((cvTerms != null) && (cvTerms.size() > 0)) {
         for (CVTerm cvTerm : cvTerms) {
           t.addCVTerm(cvTerm);
         }

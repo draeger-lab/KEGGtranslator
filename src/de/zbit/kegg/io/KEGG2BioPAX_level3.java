@@ -388,7 +388,7 @@ public class KEGG2BioPAX_level3 extends KEGG2BioPAX {
     boolean isKEGGPathway = DatabaseIdentifiers.checkID(DatabaseIdentifiers.IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM());
     if (isKEGGPathway) {
       Xref xr = (Xref)createXRef(IdentifierDatabases.KEGG_Pathway, p.getNameForMIRIAM(), 1);
-      if (xr!=null) {
+      if (xr != null) {
         pathway.addXref(xr);
       }
     }

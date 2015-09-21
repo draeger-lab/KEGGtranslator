@@ -23,6 +23,7 @@ package de.zbit.kegg.io;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,6 +75,7 @@ import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.SmallMoleculeReference;
 import org.biopax.paxtools.model.level3.UnificationXref;
 import org.biopax.paxtools.model.level3.Xref;
+import org.sbml.jsbml.CVTerm;
 import org.sbml.jsbml.CVTerm.Qualifier;
 
 import de.zbit.kegg.AtomBalanceCheck;
@@ -134,7 +136,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * {@link Entry}s with {@link EntryType#reaction} are in the
    * last translated pathway.
    */
-  private boolean entriesWithTypeReactionAvailable=false;
+  private boolean entriesWithTypeReactionAvailable =false;
   
   /**
    * @param manager
@@ -208,7 +210,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   @Override
   public boolean writeToFile(Model model, String outFile) {
     if (new File(outFile).exists()) {
-      lastFileWasOverwritten=true;
+      lastFileWasOverwritten =true;
     }
     try {
       //      JenaIOHandler io = new JenaIOHandler(model.getLevel());
@@ -226,7 +228,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   
   public boolean writeToSIFFile(Model model, String outFile) {
     if (new File(outFile).exists()) {
-      lastFileWasOverwritten=true;
+      lastFileWasOverwritten =true;
     }
     try {
       SimpleInteractionConverter sic =
@@ -265,20 +267,19 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * {@link Xref} for level 3 factories.
    */
   public BioPAXElement createXRef(IdentifierDatabases db, String id, int type) {
-    if (id==null) {
+    if (id == null) {
       return null;
     }
-    if (type<1 || type>3) {
+    if ((type < 1) || (type > 3)) {
       type = 2; // Default to relationship.
     }
     String formattedID = DatabaseIdentifiers.getFormattedID(db, id);
     if (!DatabaseIdentifiers.checkID(db, formattedID)) {
-      log.warning("Skipping invalid database entry " + id);
+      log.warning(MessageFormat.format("Skipping invalid database entry {0}", id));
       return null;
     }
     
-    if (formattedID==null || formattedID.length()<1)
-    {
+    if ((formattedID == null) || (formattedID.length() < 1)) {
       formattedID = id;
       // Igor R. told me not to use the identifiers.org URL as URI
       // String uri = DatabaseIdentifiers.getMiriamURI(db, formattedID);
@@ -290,19 +291,19 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     uri += "_" + type; // We need to create a different XRef for unifications or relationships!
     
     // Avoid creating duplicates.
-    if (model.getByID(uri)!=null) {
+    if (model.getByID(uri) != null) {
       return model.getByID(uri);
     }
     
     BioPAXElement xr = null;
-    if (model.getLevel()==BioPAXLevel.L2) {
+    if (model.getLevel() == BioPAXLevel.L2) {
       
       Class<? extends BioPAXElement> instantiate = xref.class;
-      if (type==1) {
+      if (type == 1) {
         instantiate = unificationXref.class;
-      } else if (type==2) {
+      } else if (type == 2) {
         instantiate = relationshipXref.class;
-      } else if (type==3) {
+      } else if (type == 3) {
         instantiate = publicationXref.class;
       } else {
         // we can NOT instantiate xref.class
@@ -311,17 +312,17 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       
       xr = model.addNew(instantiate, uri);
       pathwayComponentCreated(xr);
-      ((xref)xr).setDB(db.getOfficialName());
-      ((xref)xr).setID(formattedID);
+      ((xref) xr).setDB(db.getOfficialName());
+      ((xref) xr).setID(formattedID);
       
-    } else if (model.getLevel()==BioPAXLevel.L3) {
+    } else if (model.getLevel() == BioPAXLevel.L3) {
       
       Class<? extends BioPAXElement> instantiate = Xref.class;
-      if (type==1) {
+      if (type == 1) {
         instantiate = UnificationXref.class;
-      } else if (type==2) {
+      } else if (type == 2) {
         instantiate = RelationshipXref.class;
-      } else if (type==3) {
+      } else if (type == 3) {
         instantiate = PublicationXref.class;
       } else {
         // we can NOT instantiate Xref.class
@@ -330,10 +331,10 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       
       xr = model.addNew(instantiate, uri);
       pathwayComponentCreated(xr);
-      ((Xref)xr).setDb(db.getOfficialName());
-      ((Xref)xr).setId(formattedID);
+      ((Xref) xr).setDb(db.getOfficialName());
+      ((Xref) xr).setId(formattedID);
     } else {
-      log.severe(String.format("Level %s not supported.", factory.getLevel()));
+      log.severe(MessageFormat.format("Level {0} not supported.", factory.getLevel()));
     }
     
     return xr;
@@ -351,7 +352,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    */
   public BioPAXElement createBioSource(Pathway p) {
     String speciesString = "Unknown";
-    String taxonID="";
+    String taxonID = "";
     
     // Get from KEGG API
     KeggInfos orgInfos = KeggInfos.get("gn:" + p.getOrg(), manager); // Retrieve all organism information via KeggAdaptor
@@ -362,7 +363,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       // Get Organism from internal list
       if (p.isSetOrg()) {
         speciesString = p.getOrg();
-        Species species=null;
+        Species species = null;
         try {
           species = Species.get(p.getOrg(), Species.KEGG_ABBR);
         } catch (IOException e) {
@@ -380,7 +381,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     }
     
     BioPAXElement biosource = null;
-    if (model.getLevel()==BioPAXLevel.L2) {
+    if (model.getLevel() ==BioPAXLevel.L2) {
       bioSource bioSource = model.addNew(bioSource.class, '#'+NameToSId(speciesString));
       bioSource.setNAME(speciesString);
       if (taxonID!=null && taxonID.length()>0) {
@@ -391,7 +392,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       }
       biosource = bioSource;
       
-    } else if (model.getLevel()==BioPAXLevel.L3) {
+    } else if (model.getLevel() ==BioPAXLevel.L3) {
       BioSource bioSource = model.addNew(BioSource.class, NameToSId(speciesString));
       //bioSource.setName(Collections.singleton(speciesString));
       bioSource.setDisplayName(createDisplayName(speciesString));
@@ -447,7 +448,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   public Collection<BioPAXElement> createDataSources(Pathway p) {
     Collection<BioPAXElement> ret = new LinkedList<BioPAXElement>();
     
-    if (model.getLevel()==BioPAXLevel.L2) {
+    if (model.getLevel() ==BioPAXLevel.L2) {
       dataSource ds = model.addNew(dataSource.class, NameToSId(System.getProperty("app.name"))+"_DataSource");
       pathwayComponentCreated(ds);
       ds.setNAME(Collections.singleton(System.getProperty("app.name")));
@@ -468,7 +469,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
         ds.setNAME(Collections.singleton(p.getOriginFormatName()+" Data"));
         ret.add(ds);
       }
-    } else if (model.getLevel()==BioPAXLevel.L3) {
+    } else if (model.getLevel() ==BioPAXLevel.L3) {
       Provenance ds = model.addNew(Provenance.class, NameToSId(System.getProperty("app.name"))+"_DataSource");
       pathwayComponentCreated(ds);
       //      ds.setName(Collections.singleton(System.getProperty("app.name")));
@@ -606,7 +607,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       
       // Add reactions as miriam annotation
       String reactionID = KEGG2jSBML.concatReactionIDs(entry.getParentPathway().getReactionsForEntry(entry), ArrayUtils.merge(entry.getReactions(), infos.getReaction_id()));
-      if (reactionID != null && reactionID.length()>0) {
+      if ((reactionID != null) && (reactionID.length() > 0)) {
         Utils.addToMapOfSets(ids, IdentifierDatabases.KEGG_Reaction, reactionID.split("\\s"));
       }
       // Add all available identifiers (entrez gene, ensembl, etc)
@@ -647,10 +648,10 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
         } else if (element instanceof SmallMolecule) {
           if (infos.getFormulaDirectOrFromSynonym(manager) != null || infos.getMass() != null) {
             BioPAXElement refNative = getEntityReference(element);
-            if (refNative==null || refNative instanceof SmallMoleculeReference) {
+            if (refNative ==null || refNative instanceof SmallMoleculeReference) {
               // should always be true
               SmallMoleculeReference ref = (SmallMoleculeReference) refNative;
-              if (ref==null) {
+              if (ref ==null) {
                 ref = model.addNew(SmallMoleculeReference.class,
                   ensureUniqueRDFId(element.getRDFId() + KEGG2BioPAX_level3.EntityReferenceSuffix));
                 pathwayComponentCreated(ref);
@@ -687,13 +688,13 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     boolean hadAlreadyOneUnification = false;
     for (IdentifierDatabases db: ids.keySet()) {
       Collection<?> id = ids.get(db);
-      if (id==null) {
+      if (id ==null) {
         continue;
       }
       for (Object i: id) {
         // We should only add EXACTLY ONE unification XRef
         int type = infereType(db, pointOfView, i.toString());
-        if (type==1 && hadAlreadyOneUnification) {
+        if (type ==1 && hadAlreadyOneUnification) {
           type = 2; // Switch to relationship
         }
         // Unfortunately, biopax does not allow grouping multiple ids in one xref bag for one db...
@@ -722,7 +723,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * @param ids
    */
   private void addSmallMoleculeXRefs(BioPAXElement element, Map<DatabaseIdentifiers.IdentifierDatabases, Collection<String>> ids) {
-    if (ids==null) {
+    if (ids == null) {
       return;
     }
     
@@ -760,13 +761,13 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    */
   private double getNumber(String stringStartWithNum) {
     stringStartWithNum = stringStartWithNum.trim();
-    boolean pointEncountered=false;
-    int i=0;
+    boolean pointEncountered =false;
+    int i =0;
     for (; i<stringStartWithNum.length(); i++) {
       char c = stringStartWithNum.charAt(i);
       if (Character.isDigit(c)) {
         continue;
-      } else if (c=='.') {
+      } else if (c =='.') {
         if (pointEncountered) {
           break;
         }
@@ -776,16 +777,16 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       }
     }
     
-    if (i==0) {
+    if (i ==0) {
       return 0d;
     }
     if (i>=stringStartWithNum.length()) {
       return Double.parseDouble(stringStartWithNum);
     } else {
-      if (stringStartWithNum.charAt(i)-1=='.') {
+      if (stringStartWithNum.charAt(i)-1 =='.') {
         i--;
       }
-      if (i==0) {
+      if (i ==0) {
         return 0d;
       } else {
         return Double.parseDouble(stringStartWithNum.substring(0, i));
@@ -813,7 +814,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
     
     // Let the qualifier handle these things
     Qualifier bqb = DatabaseIdentifierTools.getBQBQualifier(db, pointOfView, id);
-    if (bqb==Qualifier.BQB_IS || bqb == Qualifier.BQB_HAS_VERSION) {
+    if ((bqb == CVTerm.Qualifier.BQB_IS) || (bqb == CVTerm.Qualifier.BQB_HAS_VERSION)) {
       return 1;
     } else {
       return 2;
@@ -842,15 +843,15 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
         // Check the atom balance (only makes sense if reactions are corrected,
         // else, they are clearly wrong).
         if (autocompleteReactions && checkAtomBalance) {
-          AtomCheckResult defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
+          AtomCheckResult<Reaction> defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
           StringBuilder notes = new StringBuilder();
-          if (defects!=null && defects.hasDefects()) {
+          if ((defects != null) && (defects.hasDefects())) {
             notes.append("There are missing atoms in this reaction. " +
                 "Values lower than zero indicate missing atoms on the " +
                 "substrate side, whereas positive values indicate missing atoms " +
                 "on the product side: ");
             notes.append(defects.getDefects().toString());
-          } else if (defects==null) {
+          } else if (defects == null) {
             notes.append("Could not check the atom balance of this reaction.");
           } else {
             notes.append("There are no missing atoms in this reaction.");
@@ -1092,26 +1093,26 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
       }
     } else {
       ValuePair<String, Integer> miTerm = SBOMapping.getMITerm(st.getName());
-      if (miTerm!=null && miTerm.getB()!=null && miTerm.getB()>0) {
+      if ((miTerm != null) && (miTerm.getB() != null) && (miTerm.getB() > 0)) {
         return DatabaseIdentifiers.getMiriamURI(IdentifierDatabases.MI, Integer.toString(miTerm.getB()));
       }
     }
     
     String uri = null;
     int sbo = SBOMapping.getSBOTerm(st.getName());
-    if (sbo>0) {
+    if (sbo > 0) {
       uri = DatabaseIdentifiers.getMiriamURI(IdentifierDatabases.SBO, Integer.toString(sbo));
     }
     
-    if (uri==null) {
+    if (uri == null) {
       int go = SBOMapping.getGOTerm(st.getName());
-      if (go>0) {
+      if (go > 0) {
         uri = DatabaseIdentifiers.getMiriamURI(IdentifierDatabases.GeneOntology, Integer.toString(go));
       }
     }
     
     // Should actually never occur...
-    if (uri==null) {
+    if (uri == null) {
       String formattedName = st.getName().trim().replace(' ', '_').replace("/", "_or_");
       uri = "#voc_subtype_" + formattedName;
     }
@@ -1133,7 +1134,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    */
   protected void addOntologyXRef(BioPAXElement xReferrableBPelement,
     BioPAXElement xRef, String formattedName) {
-    if (xRef!=null) {
+    if (xRef != null) {
       if (level == BioPAXLevel.L3) {
         ((Xref) xRef).addComment(formattedName);
         ((org.biopax.paxtools.model.level3.XReferrable) xReferrableBPelement).addXref((Xref) xRef);
@@ -1185,7 +1186,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
    * @param element
    */
   protected void pathwayComponentCreated(BioPAXElement element) {
-    if (element!=null) {
+    if (element != null) {
       if (element instanceof pathwayComponent) {
         ((org.biopax.paxtools.model.level2.pathway) pathway).addPATHWAY_COMPONENTS((pathwayComponent) element);
       } else if (element instanceof org.biopax.paxtools.model.level3.Process) {
@@ -1229,7 +1230,7 @@ public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   protected String ensureUniqueRDFId(String id) {
     String originalID = id;
     if (model.containsID(id)) {
-      int i=2;
+      int i = 2;
       id = originalID.concat(Integer.toString(i));
       while (model.containsID(id)) {
         i++;

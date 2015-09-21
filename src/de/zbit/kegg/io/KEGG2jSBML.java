@@ -53,6 +53,7 @@ import org.sbml.jsbml.SpeciesReference;
 import org.sbml.jsbml.TidySBMLWriter;
 import org.sbml.jsbml.UnitDefinition;
 import org.sbml.jsbml.ext.fbc.FBCConstants;
+import org.sbml.jsbml.ext.fbc.FBCModelPlugin;
 import org.sbml.jsbml.ext.fbc.FBCSpeciesPlugin;
 import org.sbml.jsbml.util.ValuePair;
 
@@ -71,6 +72,7 @@ import de.zbit.kegg.parser.pathway.Reaction;
 import de.zbit.kegg.parser.pathway.ReactionComponent;
 import de.zbit.kegg.parser.pathway.ReactionType;
 import de.zbit.kegg.parser.pathway.ext.EntryExtended;
+import de.zbit.sbml.util.AnnotationUtils;
 import de.zbit.util.ArrayUtils;
 import de.zbit.util.DatabaseIdentifierTools;
 import de.zbit.util.DatabaseIdentifiers;
@@ -202,7 +204,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
    * @param addCellDesignerAnnots - see {@link #addCellDesignerAnnots}.
    */
   public void setAddCellDesignerAnnots(boolean addCellDesignerAnnots) {
-    this.addCellDesignerAnnots = addCellDesignerAnnots;
+    addCellDesignerAnnots = addCellDesignerAnnots;
   }
   
   /**
@@ -411,7 +413,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       // Next line is same as "urn:miriam:kegg.pathway" + p.getName().substring(p.getName().indexOf(":"))
       String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(p.getName());
       if (kgMiriamEntry != null) {
-        mtPwID.addResource(kgMiriamEntry);
+        mtPwID.addResource(AnnotationUtils.convertURN2URI(kgMiriamEntry));
       }
       model.addCVTerm(mtPwID);
       
@@ -634,6 +636,11 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
       KEGG2SBMLLayoutExtension.addLayoutExtension(p, doc, model, true);
     }
     
+    // Important: we don's satisfy all requirements for COBRA models, so we want to make sure the file is valid.
+    if ((model.getSpeciesCount() > 0) && (model.getLevel() > 2)) {
+      ((FBCModelPlugin) model.getPlugin(FBCConstants.getNamespaceURI(model.getLevel(), model.getVersion(), 2))).setStrict(false);
+    }
+    
     return doc;
   }
   
@@ -819,13 +826,17 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     
     // Add KEGG miriam identifier
-    CVTerm reID = new CVTerm(); reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER); reID.setBiologicalQualifierType(Qualifier.BQB_IS);
-    CVTerm rePWs = new CVTerm(); rePWs.setQualifierType(Type.BIOLOGICAL_QUALIFIER); rePWs.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
+    CVTerm reID = new CVTerm();
+    CVTerm rePWs = new CVTerm();
+    reID.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
+    reID.setBiologicalQualifierType(Qualifier.BQB_IS);
+    rePWs.setQualifierType(Type.BIOLOGICAL_QUALIFIER);
+    rePWs.setBiologicalQualifierType(Qualifier.BQB_OCCURS_IN);
     
     for (String ko_id : r.getName().split(" ")) {
       String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(ko_id);
       if (kgMiriamEntry != null) {
-        reID.addResource(kgMiriamEntry);
+        reID.addResource(AnnotationUtils.convertURN2URI(kgMiriamEntry));
       }
       
       // Retrieve further information via Kegg API
@@ -859,8 +870,8 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
         
         if ((rePWs != null) && (infos.getPathways() != null)) {
           for (String pwId : infos.getPathways().split(",")) {
-            String urn = KeggInfos.miriam_urn_kgPathway + KeggInfos.suffix(pwId);
-            if (!rePWs.getResources().contains(urn)){
+            String urn = AnnotationUtils.convertURN2URI(KeggInfos.miriam_urn_kgPathway + KeggInfos.suffix(pwId));
+            if ((urn != null) && !rePWs.getResources().contains(urn)){
               rePWs.addResource(urn);
             }
           }
@@ -877,7 +888,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     // Check the atom balance (only makes sense if reactions are corrected,
     // else, they are clearly wrong).
     if (autocompleteReactions && checkAtomBalance) {
-      AtomCheckResult defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
+      AtomCheckResult<Reaction> defects = AtomBalanceCheck.checkAtomBalance(manager, r, 1);
       if ((defects != null) && defects.hasDefects()) {
         notes.append("<p>");
         notes.append("<b><font color=\"#FF0000\">There are missing atoms in this reaction.</font></b><br/>" +
@@ -913,7 +924,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     sbReaction.setSBOTerm(176); // biochemical reaction. Most generic SBO Term possible, for a reaction.
     //rAnnot.setAbout("#" + sbReaction.getMetaId());
     
-    sbReaction.addCVTerm(new CVTerm(Qualifier.BQB_IS_DESCRIBED_BY, KeggInfos.miriam_urn_eco + "ECO%3A0000313"));
+    sbReaction.addCVTerm(new CVTerm(Qualifier.BQB_IS_DESCRIBED_BY, AnnotationUtils.convertURN2URI(KeggInfos.miriam_urn_eco + "ECO%3A0000313")));
     
     return sbReaction;
   }
@@ -1066,7 +1077,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     
     // Set a static ECO Code
     // ECO_CODE "ECO:0000313"="imported information used in automatic assertion"
-    spec.addCVTerm(new CVTerm(Qualifier.BQB_IS_DESCRIBED_BY, KeggInfos.miriam_urn_eco + "ECO%3A0000313"));
+    spec.addCVTerm(new CVTerm(Qualifier.BQB_IS_DESCRIBED_BY, AnnotationUtils.convertURN2URI(KeggInfos.miriam_urn_eco + "ECO%3A0000313")));
   }
   
   
@@ -1082,7 +1093,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     Set<String> ret = new HashSet<String>();
     
     // Add all reaction names from the list of reactions
-    if (reactions!=null) {
+    if (reactions != null) {
       for (Reaction r: reactions) {
         if ((r == null) || (r.getName() == null)) {
           continue;
@@ -1286,7 +1297,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
     //spec.setAnnotation(specAnnot); // manchmal ist jSBML schon bescheurt...
     StringBuffer notes = new StringBuffer(notesStartString);
     if (entry.isSetLink()) {
-      notes.append(String.format("<a href=\"%s\">Original Kegg Entry</a><br/>\n", entry.getLink().replace("&", "&amp;")));
+      notes.append(String.format("<a href=\"%s\">Original KEGG Entry</a><br/>\n", entry.getLink().replace("&", "&amp;")));
     }
     
     
@@ -1309,7 +1320,7 @@ public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
           
           // Append all kegg ids as "has_part" NLN: Should be "IS_ENCONDED_BY"
           for (String kg_id: ce.getName().split(" ")) {
-            String kgMiriamEntry = KeggInfos.getMiriamURNforKeggID(kg_id, ce.getType());
+            String kgMiriamEntry = AnnotationUtils.convertURN2URI(KeggInfos.getMiriamURNforKeggID(kg_id, ce.getType()));
             if (kgMiriamEntry != null) {
               cvt.addResource(kgMiriamEntry);
             }
