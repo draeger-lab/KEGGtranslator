@@ -1,0 +1,58 @@
+<body>
+  <p>
+    Welcome to the API for <a href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/index.htm">KEGGtranslator</a>, an application to translate KGML-formatted XML files to various output formats. Please, feel free to use and include KEGGtranslator in your own application.
+    If you do so, please don't forget to <a href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/index.htm#cite">cite us</a>.
+  </p>
+  
+  <h2>Examples of how to use the KEGGtranslator JAR in your application</h2>
+    <h3>1. Translating a KGML-formatted XML file to an SBML file:</h3>
+    <pre>
+    // Simple translation of KEGG file to SBML file
+    AbstractKEGGtranslator&lt;SBMLDocument&gt; k2s = new KEGG2jSBML();
+    k2s.translate("test.xml", "test.sbml.xml");
+    </pre>
+  
+    <h3>2. Reading, manipulating and translating KEGG pathways:</h3>
+    <pre>
+    // Read a KGML file to the internal KGML data structure
+    // and generate a new SBML file.
+    AbstractKEGGtranslator&lt;SBMLDocument&gt; k2s = new KEGG2jSBML();
+    Pathway p = KeggParser.parse("test.xml").get(0);
+    p.setTitle("I renamed the pathway to my own title!");
+    k2s.translate(p, "test.sbml.xml");
+    </pre>
+    
+    <h3>3. Generating a JSBML data structure from a KGML document:</h3>
+    <pre>
+    // Read a KGML file and simply create a JSBML data structure
+    // from it. This data structure can then be reused for further
+    // operations.
+    AbstractKEGGtranslator&lt;SBMLDocument&gt; k2s = new KEGG2jSBML();
+    Pathway p = KeggParser.parse("test.xml").get(0);
+    org.sbml.jsbml.SBMLDocument doc = k2s.translate(p);
+    </pre>
+    
+    <h3>4. Batch translation of directories:</h3>
+    <pre>
+    AbstractKEGGtranslator&lt;SBMLDocument&gt; k2s = new KEGG2jSBML();
+    BatchKEGGtranslator batch = new BatchKEGGtranslator();
+    batch.setOrgOutdir("input_directory");
+    //Optional: batch.setChangeOutdirTo("output_directory");
+    batch.setTranslator(k2s);
+    batch.setOutFormat(Format.SBML);
+    batch.parseDirAndSubDir();
+    </pre>
+    
+    <h3>5. Quick translation of KGML to GraphML:</h3>
+    <pre>
+    // Fast translation of a KGML to a GraphML file
+    Translator.translate(
+      KEGGtranslatorIOOptions.Format.GraphML,
+      "test.xml", "test.graphML");
+    </pre>
+  
+  <p>
+    Main authors of this project:
+    <ul><li>Clemens Wrzodek</li><li>Andreas Dr&auml;ger</li></ul>
+  </p>
+</body>

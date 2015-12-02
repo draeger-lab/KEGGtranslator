@@ -1,0 +1,1251 @@
+<?xml version="1.0"?>
+<!DOCTYPE pathway SYSTEM "http://www.genome.jp/kegg/xml/KGML_v0.7.1_.dtd">
+<!-- Creation date: May 10, 2010 17:59:50 +0900 (GMT+09:00) -->
+<pathway name="path:ec00010" org="ec" number="00010"
+         title="Glycolysis / Gluconeogenesis"
+         image="http://www.genome.jp/kegg/pathway/ec/ec00010.png"
+         link="http://www.genome.jp/kegg-bin/show_pathway?ec00010">
+    <entry id="1" name="ec:4.1.2.13" type="enzyme" reaction="rn:R01070"
+        link="http://www.kegg.jp/dbget-bin/www_bget?4.1.2.13">
+        <graphics name="4.1.2.13" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="483" y="404" width="46" height="17"/>
+    </entry>
+    <entry id="2" name="ec:1.2.1.3" type="enzyme" reaction="rn:R00710"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.1.3">
+        <graphics name="1.2.1.3" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="289" y="943" width="46" height="17"/>
+    </entry>
+    <entry id="3" name="ec:6.2.1.13" type="enzyme" reaction="rn:R00229"
+        link="http://www.kegg.jp/dbget-bin/www_bget?6.2.1.13">
+        <graphics name="6.2.1.13" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="146" y="911" width="46" height="17"/>
+    </entry>
+    <entry id="4" name="ec:1.2.1.5" type="enzyme" reaction="rn:R00711"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.1.5">
+        <graphics name="1.2.1.5" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="289" y="964" width="46" height="17"/>
+    </entry>
+    <entry id="5" name="cpd:C00033" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00033">
+        <graphics name="C00033" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="146" y="953" width="8" height="8"/>
+    </entry>
+    <entry id="6" name="path:ec00030" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ec00030">
+        <graphics name="Pentose phosphate pathway" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="656" y="339" width="62" height="237"/>
+    </entry>
+    <entry id="7" name="path:ec00500" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ec00500">
+        <graphics name="Starch and sucrose metabolism" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="485" y="76" width="110" height="34"/>
+    </entry>
+    <entry id="8" name="ec:4.1.1.1" type="enzyme" reaction="rn:R00755"
+        link="http://www.kegg.jp/dbget-bin/www_bget?4.1.1.1">
+        <graphics name="4.1.1.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="378" y="912" width="46" height="17"/>
+    </entry>
+    <entry id="9" name="ec:1.1.1.2" type="enzyme" reaction="rn:R00746"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.1.1.2">
+        <graphics name="1.1.1.2" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="487" y="943" width="46" height="17"/>
+    </entry>
+    <entry id="10" name="ec:1.1.1.1" type="enzyme" reaction="rn:R00754"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.1.1.1">
+        <graphics name="1.1.1.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="439" y="943" width="46" height="17"/>
+    </entry>
+    <entry id="11" name="ec:4.1.1.1" type="enzyme" reaction="rn:R00014"
+        link="http://www.kegg.jp/dbget-bin/www_bget?4.1.1.1">
+        <graphics name="4.1.1.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="431" y="874" width="46" height="17"/>
+    </entry>
+    <entry id="12" name="ec:1.2.4.1" type="enzyme" reaction="rn:R00014"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.4.1">
+        <graphics name="1.2.4.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="431" y="853" width="46" height="17"/>
+    </entry>
+    <entry id="13" name="ec:1.2.4.1" type="enzyme" reaction="rn:R03270"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.4.1">
+        <graphics name="1.2.4.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="319" y="865" width="46" height="17"/>
+    </entry>
+    <entry id="14" name="ec:2.3.1.12" type="enzyme" reaction="rn:R02569"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.3.1.12">
+        <graphics name="2.3.1.12" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="210" y="865" width="46" height="17"/>
+    </entry>
+    <entry id="15" name="ec:1.1.1.27" type="enzyme" reaction="rn:R00703"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.1.1.27">
+        <graphics name="1.1.1.27" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="558" y="864" width="46" height="17"/>
+    </entry>
+    <entry id="16" name="path:ec00620" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ec00620">
+        <graphics name="Pyruvate metabolism" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="384" y="763" width="78" height="34"/>
+    </entry>
+    <entry id="17" name="ec:2.7.1.40" type="enzyme" reaction="rn:R00200"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.40">
+        <graphics name="2.7.1.40" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="483" y="770" width="46" height="17"/>
+    </entry>
+    <entry id="18" name="path:ec00020" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ec00020">
+        <graphics name="Citrate cycle (TCA cycle)" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="64" y="800" width="47" height="154"/>
+    </entry>
+    <entry id="19" name="ec:4.2.1.11" type="enzyme" reaction="rn:R00658"
+        link="http://www.kegg.jp/dbget-bin/www_bget?4.2.1.11">
+        <graphics name="4.2.1.11" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="483" y="701" width="46" height="17"/>
+    </entry>
+    <entry id="20" name="ec:5.4.2.1" type="enzyme" reaction="rn:R01518"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.4.2.1">
+        <graphics name="5.4.2.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="483" y="629" width="46" height="17"/>
+    </entry>
+    <entry id="21" name="ec:1.2.1.12" type="enzyme" reaction="rn:R01061 rn:R01063"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.1.12">
+        <graphics name="1.2.1.12" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="458" y="484" width="46" height="17"/>
+    </entry>
+    <entry id="22" name="path:ec00710" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ec00710">
+        <graphics name="Carbon fixation in photosynthetic organisms" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="306" y="599" width="153" height="34"/>
+    </entry>
+    <entry id="23" name="ec:5.3.1.1" type="enzyme" reaction="rn:R01015"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.3.1.1">
+        <graphics name="5.3.1.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="403" y="450" width="46" height="17"/>
+    </entry>
+    <entry id="24" name="ec:2.7.1.11" type="enzyme" reaction="rn:R04779"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.11">
+        <graphics name="2.7.1.11" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="483" y="338" width="46" height="17"/>
+    </entry>
+    <entry id="25" name="ec:3.1.3.11" type="enzyme" reaction="rn:R04780"
+        link="http://www.kegg.jp/dbget-bin/www_bget?3.1.3.11">
+        <graphics name="3.1.3.11" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="430" y="338" width="46" height="17"/>
+    </entry>
+    <entry id="26" name="ec:2.7.1.69" type="enzyme" reaction="rn:R02738"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.69">
+        <graphics name="2.7.1.69" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="552" y="195" width="46" height="17"/>
+    </entry>
+    <entry id="27" name="ec:5.3.1.9" type="enzyme" reaction="rn:R02740"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.3.1.9">
+        <graphics name="5.3.1.9" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="483" y="268" width="46" height="17"/>
+    </entry>
+    <entry id="28" name="ec:5.4.2.2" type="enzyme" reaction="rn:R00959"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.4.2.2">
+        <graphics name="5.4.2.2" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="483" y="173" width="46" height="17"/>
+    </entry>
+    <entry id="29" name="ec:5.3.1.9" type="enzyme" reaction="rn:R03321"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.3.1.9">
+        <graphics name="5.3.1.9" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="403" y="302" width="46" height="17"/>
+    </entry>
+    <entry id="30" name="ec:2.7.1.1" type="enzyme" reaction="rn:R01600"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.1">
+        <graphics name="2.7.1.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="248" y="283" width="46" height="17"/>
+    </entry>
+    <entry id="31" name="ec:2.7.1.2" type="enzyme" reaction="rn:R01600"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.2">
+        <graphics name="2.7.1.2" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="248" y="302" width="46" height="17"/>
+    </entry>
+    <entry id="32" name="ec:5.3.1.9" type="enzyme" reaction="rn:R02739"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.3.1.9">
+        <graphics name="5.3.1.9" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="357" y="269" width="46" height="17"/>
+    </entry>
+    <entry id="33" name="ec:5.1.3.15" type="enzyme" reaction="rn:R02739"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.1.3.15">
+        <graphics name="5.1.3.15" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="307" y="269" width="46" height="17"/>
+    </entry>
+    <entry id="34" name="ec:5.1.3.3" type="enzyme" reaction="rn:R01602"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.1.3.3">
+        <graphics name="5.1.3.3" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="181" y="264" width="46" height="17"/>
+    </entry>
+    <entry id="35" name="ec:2.7.1.2" type="enzyme" reaction="rn:R01786"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.2">
+        <graphics name="2.7.1.2" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="248" y="227" width="46" height="17"/>
+    </entry>
+    <entry id="36" name="ec:2.7.1.1" type="enzyme" reaction="rn:R01786"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.1">
+        <graphics name="2.7.1.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="248" y="208" width="46" height="17"/>
+    </entry>
+    <entry id="37" name="ec:3.1.3.9" type="enzyme" reaction="rn:R01788"
+        link="http://www.kegg.jp/dbget-bin/www_bget?3.1.3.9">
+        <graphics name="3.1.3.9" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="316" y="186" width="46" height="17"/>
+    </entry>
+    <entry id="38" name="ec:3.1.3.10" type="enzyme" reaction="rn:R00947"
+        link="http://www.kegg.jp/dbget-bin/www_bget?3.1.3.10">
+        <graphics name="3.1.3.10" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="343" y="154" width="46" height="17"/>
+    </entry>
+    <entry id="39" name="ec:2.7.1.41" type="enzyme" reaction="rn:R00960"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.41">
+        <graphics name="2.7.1.41" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="343" y="133" width="46" height="17"/>
+    </entry>
+    <entry id="40" name="path:ec00010" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ec00010">
+        <graphics name="TITLE:Glycolysis / Gluconeogenesis" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="166" y="58" width="251" height="25"/>
+    </entry>
+    <entry id="41" name="ec:1.8.1.4" type="enzyme" reaction="rn:R07618"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.8.1.4">
+        <graphics name="1.8.1.4" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="262" y="908" width="46" height="17"/>
+    </entry>
+    <entry id="42" name="ec:2.7.2.3" type="enzyme" reaction="rn:R01512"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.2.3">
+        <graphics name="2.7.2.3" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="483" y="556" width="46" height="17"/>
+    </entry>
+    <entry id="43" name="ec:2.7.1.63" type="enzyme" reaction="rn:R02189"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.63">
+        <graphics name="2.7.1.63" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="248" y="246" width="46" height="17"/>
+    </entry>
+    <entry id="44" name="ec:2.7.1.63" type="enzyme" reaction="rn:R02187"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.63">
+        <graphics name="2.7.1.63" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="248" y="321" width="46" height="17"/>
+    </entry>
+    <entry id="45" name="ec:2.7.1.69" type="enzyme" reaction="rn:R05132"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.69">
+        <graphics name="2.7.1.69" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="181" y="360" width="46" height="17"/>
+    </entry>
+    <entry id="46" name="ec:2.7.1.69" type="enzyme" reaction="rn:R04394"
+        link="http://www.kegg.jp/dbget-bin/www_bget?2.7.1.69">
+        <graphics name="2.7.1.69" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="181" y="386" width="46" height="17"/>
+    </entry>
+    <entry id="47" name="ec:3.2.1.86" type="enzyme" reaction="rn:R05133"
+        link="http://www.kegg.jp/dbget-bin/www_bget?3.2.1.86">
+        <graphics name="3.2.1.86" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="291" y="359" width="46" height="17"/>
+    </entry>
+    <entry id="48" name="ec:3.2.1.86" type="enzyme" reaction="rn:R05134"
+        link="http://www.kegg.jp/dbget-bin/www_bget?3.2.1.86">
+        <graphics name="3.2.1.86" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="291" y="385" width="46" height="17"/>
+    </entry>
+    <entry id="49" name="cpd:C00031" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00031">
+        <graphics name="C00031" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="601" y="195" width="8" height="8"/>
+    </entry>
+    <entry id="50" name="cpd:C00103" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00103">
+        <graphics name="C00103" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="143" width="8" height="8"/>
+    </entry>
+    <entry id="51" name="cpd:C00631" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00631">
+        <graphics name="C00631" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="664" width="8" height="8"/>
+    </entry>
+    <entry id="52" name="cpd:C00267" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00267">
+        <graphics name="C00267" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="181" y="228" width="8" height="8"/>
+    </entry>
+    <entry id="53" name="cpd:C00221" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00221">
+        <graphics name="C00221" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="181" y="301" width="8" height="8"/>
+    </entry>
+    <entry id="54" name="cpd:C00111" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00111">
+        <graphics name="C00111" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="332" y="448" width="8" height="8"/>
+    </entry>
+    <entry id="55" name="cpd:C01172" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C01172">
+        <graphics name="C01172" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="332" y="301" width="8" height="8"/>
+    </entry>
+    <entry id="56" name="cpd:C00668" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00668">
+        <graphics name="C00668" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="230" width="8" height="8"/>
+    </entry>
+    <entry id="57" name="cpd:C05345" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C05345">
+        <graphics name="C05345" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="303" width="8" height="8"/>
+    </entry>
+    <entry id="58" name="cpd:C00074" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00074">
+        <graphics name="C00074" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="736" width="8" height="8"/>
+    </entry>
+    <entry id="59" name="cpd:C00197" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00197">
+        <graphics name="C00197" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="592" width="8" height="8"/>
+    </entry>
+    <entry id="60" name="cpd:C00236" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00236">
+        <graphics name="C00236" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="520" width="8" height="8"/>
+    </entry>
+    <entry id="61" name="cpd:C00186" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00186">
+        <graphics name="C00186" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="627" y="863" width="8" height="8"/>
+    </entry>
+    <entry id="62" name="cpd:C15972" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C15972">
+        <graphics name="C15972" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="314" y="906" width="8" height="8"/>
+    </entry>
+    <entry id="63" name="cpd:C00469" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00469">
+        <graphics name="C00469" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="550" y="953" width="8" height="8"/>
+    </entry>
+    <entry id="64" name="cpd:C00022" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00022">
+        <graphics name="C00022" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="863" width="8" height="8"/>
+    </entry>
+    <entry id="65" name="cpd:C05125" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C05125">
+        <graphics name="C05125" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="378" y="863" width="8" height="8"/>
+    </entry>
+    <entry id="66" name="cpd:C00024" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00024">
+        <graphics name="C00024" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="146" y="863" width="8" height="8"/>
+    </entry>
+    <entry id="67" name="cpd:C00084" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00084">
+        <graphics name="C00084" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="378" y="953" width="8" height="8"/>
+    </entry>
+    <entry id="68" name="cpd:C16255" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C16255">
+        <graphics name="C16255" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="265" y="863" width="8" height="8"/>
+    </entry>
+    <entry id="69" name="cpd:C15973" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C15973">
+        <graphics name="C15973" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="212" y="906" width="8" height="8"/>
+    </entry>
+    <entry id="70" name="cpd:C05378" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C05378">
+        <graphics name="C05378" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="373" width="8" height="8"/>
+    </entry>
+    <entry id="71" name="cpd:C06186" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C06186">
+        <graphics name="C06186" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="132" y="359" width="8" height="8"/>
+    </entry>
+    <entry id="72" name="cpd:C06187" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C06187">
+        <graphics name="C06187" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="239" y="359" width="8" height="8"/>
+    </entry>
+    <entry id="73" name="cpd:C06188" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C06188">
+        <graphics name="C06188" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="239" y="385" width="8" height="8"/>
+    </entry>
+    <entry id="74" name="cpd:C01451" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C01451">
+        <graphics name="C01451" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="132" y="385" width="8" height="8"/>
+    </entry>
+    <entry id="75" name="cpd:C00068" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00068">
+        <graphics name="C00068" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="378" y="820" width="8" height="8"/>
+    </entry>
+    <entry id="76" name="ec:4.1.1.32" type="enzyme" reaction="rn:R00431 rn:R00726"
+        link="http://www.kegg.jp/dbget-bin/www_bget?4.1.1.32">
+        <graphics name="4.1.1.32" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="204" y="726" width="46" height="17"/>
+    </entry>
+    <entry id="77" name="cpd:C00036" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00036">
+        <graphics name="C00036" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="146" y="736" width="8" height="8"/>
+    </entry>
+    <entry id="78" name="ec:1.1.99.8" type="enzyme" reaction="rn:R05198"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.1.99.8">
+        <graphics name="1.1.99.8" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="439" y="964" width="46" height="17"/>
+    </entry>
+    <entry id="79" name="ec:4.1.1.49" type="enzyme" reaction="rn:R00341"
+        link="http://www.kegg.jp/dbget-bin/www_bget?4.1.1.49">
+        <graphics name="4.1.1.49" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="204" y="747" width="46" height="17"/>
+    </entry>
+    <entry id="81" name="path:ec00640" type="map"
+        link="http://www.kegg.jp/dbget-bin/www_bget?ec00640">
+        <graphics name="Propanoate metabolism" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="roundrectangle" x="629" y="920" width="127" height="25"/>
+    </entry>
+    <entry id="82" name="ec:1.2.1.59" type="enzyme" reaction="rn:R01061 rn:R01063"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.1.59">
+        <graphics name="1.2.1.59" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="508" y="484" width="46" height="17"/>
+    </entry>
+    <entry id="83" name="ec:1.2.7.6" type="enzyme" reaction="rn:R07159"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.7.6">
+        <graphics name="1.2.7.6" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="582" y="525" width="46" height="17"/>
+    </entry>
+    <entry id="84" name="ec:1.2.1.9" type="enzyme" reaction="rn:R01058"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.1.9">
+        <graphics name="1.2.1.9" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="555" y="544" width="46" height="17"/>
+    </entry>
+    <entry id="85" name="ec:1.2.7.1" type="enzyme" reaction="rn:R01196"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.7.1">
+        <graphics name="1.2.7.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="289" y="795" width="46" height="17"/>
+    </entry>
+    <entry id="86" name="ec:1.2.7.5" type="enzyme" reaction="rn:R07159"
+        link="http://www.kegg.jp/dbget-bin/www_bget?1.2.7.5">
+        <graphics name="1.2.7.5" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="532" y="525" width="46" height="17"/>
+    </entry>
+    <entry id="87" name="cpd:C01159" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C01159">
+        <graphics name="C01159" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="398" y="556" width="8" height="8"/>
+    </entry>
+    <entry id="88" name="ec:3.1.3.13" type="enzyme" reaction="rn:R01516"
+        link="http://www.kegg.jp/dbget-bin/www_bget?3.1.3.13">
+        <graphics name="3.1.3.13" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="437" y="586" width="46" height="17"/>
+    </entry>
+    <entry id="89" name="ec:5.4.2.4" type="enzyme" reaction="rn:R01662"
+        link="http://www.kegg.jp/dbget-bin/www_bget?5.4.2.4">
+        <graphics name="5.4.2.4" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="438" y="522" width="46" height="17"/>
+    </entry>
+    <entry id="90" name="cpd:C00118" type="compound"
+        link="http://www.kegg.jp/dbget-bin/www_bget?C00118">
+        <graphics name="C00118" fgcolor="#000000" bgcolor="#FFFFFF"
+             type="circle" x="483" y="448" width="8" height="8"/>
+    </entry>
+    <entry id="91" name="ec:6.2.1.1" type="enzyme" reaction="rn:R00235"
+        link="http://www.kegg.jp/dbget-bin/www_bget?6.2.1.1">
+        <graphics name="6.2.1.1" fgcolor="#000000" bgcolor="#BFBFFF"
+             type="rectangle" x="96" y="911" width="46" height="17"/>
+    </entry>
+    <relation entry1="36" entry2="39" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="36" entry2="38" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="34" entry2="36" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="35" entry2="39" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="35" entry2="38" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="34" entry2="35" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="39" entry2="43" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="38" entry2="43" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="34" entry2="43" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="37" entry2="39" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="34" entry2="39" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="37" entry2="38" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="34" entry2="38" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="34" entry2="37" type="ECrel">
+        <subtype name="compound" value="52"/>
+    </relation>
+    <relation entry1="31" entry2="34" type="ECrel">
+        <subtype name="compound" value="53"/>
+    </relation>
+    <relation entry1="30" entry2="34" type="ECrel">
+        <subtype name="compound" value="53"/>
+    </relation>
+    <relation entry1="34" entry2="44" type="ECrel">
+        <subtype name="compound" value="53"/>
+    </relation>
+    <relation entry1="31" entry2="47" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="31" entry2="48" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="29" entry2="31" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="31" entry2="33" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="30" entry2="47" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="30" entry2="48" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="29" entry2="30" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="30" entry2="33" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="44" entry2="47" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="44" entry2="48" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="29" entry2="44" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="33" entry2="44" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="29" entry2="47" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="33" entry2="47" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="29" entry2="48" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="33" entry2="48" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="29" entry2="33" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="27" entry2="37" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="33" entry2="37" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="32" entry2="37" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="26" entry2="37" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="28" entry2="37" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="27" entry2="36" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="27" entry2="35" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="27" entry2="43" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="27" entry2="33" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="26" entry2="27" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="27" entry2="28" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="33" entry2="36" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="32" entry2="36" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="26" entry2="36" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="28" entry2="36" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="33" entry2="35" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="32" entry2="35" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="26" entry2="35" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="28" entry2="35" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="33" entry2="43" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="32" entry2="43" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="26" entry2="43" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="28" entry2="43" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="26" entry2="33" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="28" entry2="33" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="26" entry2="32" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="28" entry2="32" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="26" entry2="28" type="ECrel">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="25" entry2="27" type="ECrel">
+        <subtype name="compound" value="57"/>
+    </relation>
+    <relation entry1="24" entry2="27" type="ECrel">
+        <subtype name="compound" value="57"/>
+    </relation>
+    <relation entry1="1" entry2="25" type="ECrel">
+        <subtype name="compound" value="70"/>
+    </relation>
+    <relation entry1="1" entry2="24" type="ECrel">
+        <subtype name="compound" value="70"/>
+    </relation>
+    <relation entry1="23" entry2="1" type="ECrel">
+        <subtype name="compound" value="54"/>
+    </relation>
+    <relation entry1="21" entry2="42" type="ECrel">
+        <subtype name="compound" value="60"/>
+    </relation>
+    <relation entry1="20" entry2="42" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="19" entry2="20" type="ECrel">
+        <subtype name="compound" value="51"/>
+    </relation>
+    <relation entry1="13" entry2="14" type="ECrel">
+        <subtype name="compound" value="68"/>
+    </relation>
+    <relation entry1="11" entry2="13" type="ECrel">
+        <subtype name="compound" value="65"/>
+    </relation>
+    <relation entry1="13" entry2="41" type="ECrel">
+        <subtype name="compound" value="62"/>
+    </relation>
+    <relation entry1="14" entry2="41" type="ECrel">
+        <subtype name="compound" value="69"/>
+    </relation>
+    <relation entry1="8" entry2="10" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="8" entry2="9" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="2" entry2="8" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="4" entry2="8" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="2" entry2="10" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="4" entry2="10" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="2" entry2="9" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="4" entry2="9" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="17" entry2="19" type="ECrel">
+        <subtype name="compound" value="58"/>
+    </relation>
+    <relation entry1="45" entry2="47" type="ECrel">
+        <subtype name="compound" value="72"/>
+    </relation>
+    <relation entry1="2" entry2="3" type="ECrel">
+        <subtype name="compound" value="5"/>
+    </relation>
+    <relation entry1="3" entry2="4" type="ECrel">
+        <subtype name="compound" value="5"/>
+    </relation>
+    <relation entry1="28" entry2="39" type="ECrel">
+        <subtype name="compound" value="50"/>
+    </relation>
+    <relation entry1="28" entry2="38" type="ECrel">
+        <subtype name="compound" value="50"/>
+    </relation>
+    <relation entry1="25" entry2="29" type="ECrel">
+        <subtype name="compound" value="57"/>
+    </relation>
+    <relation entry1="24" entry2="29" type="ECrel">
+        <subtype name="compound" value="57"/>
+    </relation>
+    <relation entry1="15" entry2="17" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="12" entry2="17" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="11" entry2="17" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="12" entry2="15" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="11" entry2="15" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="3" entry2="14" type="ECrel">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <relation entry1="31" entry2="32" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="30" entry2="32" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="32" entry2="44" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="32" entry2="47" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="32" entry2="48" type="ECrel">
+        <subtype name="compound" value="55"/>
+    </relation>
+    <relation entry1="46" entry2="48" type="ECrel">
+        <subtype name="compound" value="73"/>
+    </relation>
+    <relation entry1="38" entry2="7" type="maplink">
+        <subtype name="compound" value="50"/>
+    </relation>
+    <relation entry1="39" entry2="7" type="maplink">
+        <subtype name="compound" value="50"/>
+    </relation>
+    <relation entry1="28" entry2="7" type="maplink">
+        <subtype name="compound" value="50"/>
+    </relation>
+    <relation entry1="26" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="28" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="27" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="37" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="36" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="35" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="43" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="32" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="33" entry2="6" type="maplink">
+        <subtype name="compound" value="56"/>
+    </relation>
+    <relation entry1="14" entry2="18" type="maplink">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <relation entry1="3" entry2="18" type="maplink">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <relation entry1="42" entry2="82" type="ECrel">
+        <subtype name="compound" value="60"/>
+    </relation>
+    <relation entry1="42" entry2="89" type="ECrel">
+        <subtype name="compound" value="60"/>
+    </relation>
+    <relation entry1="82" entry2="89" type="ECrel">
+        <subtype name="compound" value="60"/>
+    </relation>
+    <relation entry1="21" entry2="89" type="ECrel">
+        <subtype name="compound" value="60"/>
+    </relation>
+    <relation entry1="88" entry2="42" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="88" entry2="20" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="88" entry2="84" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="88" entry2="86" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="88" entry2="83" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="42" entry2="84" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="42" entry2="86" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="42" entry2="83" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="20" entry2="84" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="20" entry2="86" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="20" entry2="83" type="ECrel">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="76" entry2="19" type="ECrel">
+        <subtype name="compound" value="58"/>
+    </relation>
+    <relation entry1="76" entry2="17" type="ECrel">
+        <subtype name="compound" value="58"/>
+    </relation>
+    <relation entry1="19" entry2="79" type="ECrel">
+        <subtype name="compound" value="58"/>
+    </relation>
+    <relation entry1="79" entry2="17" type="ECrel">
+        <subtype name="compound" value="58"/>
+    </relation>
+    <relation entry1="12" entry2="85" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="11" entry2="85" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="15" entry2="85" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="17" entry2="85" type="ECrel">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="15" entry2="81" type="maplink">
+        <subtype name="compound" value="61"/>
+    </relation>
+    <relation entry1="2" entry2="78" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="4" entry2="78" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="8" entry2="78" type="ECrel">
+        <subtype name="compound" value="67"/>
+    </relation>
+    <relation entry1="13" entry2="8" type="ECrel">
+        <subtype name="compound" value="65"/>
+    </relation>
+    <relation entry1="12" entry2="8" type="ECrel">
+        <subtype name="compound" value="65"/>
+    </relation>
+    <relation entry1="3" entry2="85" type="ECrel">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <relation entry1="14" entry2="85" type="ECrel">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <relation entry1="18" entry2="85" type="maplink">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <relation entry1="88" entry2="22" type="maplink">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="42" entry2="22" type="maplink">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="20" entry2="22" type="maplink">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="84" entry2="22" type="maplink">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="86" entry2="22" type="maplink">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="83" entry2="22" type="maplink">
+        <subtype name="compound" value="59"/>
+    </relation>
+    <relation entry1="18" entry2="76" type="maplink">
+        <subtype name="compound" value="77"/>
+    </relation>
+    <relation entry1="18" entry2="79" type="maplink">
+        <subtype name="compound" value="77"/>
+    </relation>
+    <relation entry1="20" entry2="6" type="maplink">
+        <subtype name="compound" value="51"/>
+    </relation>
+    <relation entry1="19" entry2="6" type="maplink">
+        <subtype name="compound" value="51"/>
+    </relation>
+    <relation entry1="12" entry2="6" type="maplink">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="11" entry2="6" type="maplink">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="15" entry2="6" type="maplink">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="17" entry2="6" type="maplink">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="85" entry2="6" type="maplink">
+        <subtype name="compound" value="64"/>
+    </relation>
+    <relation entry1="23" entry2="21" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="23" entry2="82" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="23" entry2="86" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="23" entry2="83" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="23" entry2="84" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="21" entry2="86" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="21" entry2="83" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="21" entry2="84" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="82" entry2="86" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="82" entry2="83" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="1" entry2="23" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="1" entry2="21" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="1" entry2="82" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="1" entry2="86" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="1" entry2="83" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="1" entry2="84" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="1" entry2="6" type="maplink">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="6" entry2="83" type="maplink">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="6" entry2="86" type="maplink">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="6" entry2="82" type="maplink">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="6" entry2="21" type="maplink">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="6" entry2="23" type="maplink">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="82" entry2="84" type="ECrel">
+        <subtype name="compound" value="90"/>
+    </relation>
+    <relation entry1="89" entry2="88" type="ECrel">
+        <subtype name="compound" value="87"/>
+    </relation>
+    <relation entry1="13" entry2="11" type="ECrel">
+        <subtype name="compound" value="75"/>
+    </relation>
+    <relation entry1="91" entry2="2" type="ECrel">
+        <subtype name="compound" value="5"/>
+    </relation>
+    <relation entry1="91" entry2="4" type="ECrel">
+        <subtype name="compound" value="5"/>
+    </relation>
+    <relation entry1="91" entry2="14" type="ECrel">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <relation entry1="91" entry2="85" type="ECrel">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <relation entry1="91" entry2="18" type="maplink">
+        <subtype name="compound" value="66"/>
+    </relation>
+    <reaction id="2" name="rn:R00710" type="reversible">
+        <substrate id="67" name="cpd:C00084"/>
+        <product id="5" name="cpd:C00033"/>
+    </reaction>
+    <reaction id="3" name="rn:R00229" type="irreversible">
+        <substrate id="66" name="cpd:C00024"/>
+        <product id="5" name="cpd:C00033"/>
+    </reaction>
+    <reaction id="4" name="rn:R00711" type="reversible">
+        <substrate id="67" name="cpd:C00084"/>
+        <product id="5" name="cpd:C00033"/>
+    </reaction>
+    <reaction id="8" name="rn:R00755" type="irreversible">
+        <substrate id="65" name="cpd:C05125"/>
+        <product id="67" name="cpd:C00084"/>
+    </reaction>
+    <reaction id="9" name="rn:R00746" type="reversible">
+        <substrate id="63" name="cpd:C00469"/>
+        <product id="67" name="cpd:C00084"/>
+    </reaction>
+    <reaction id="10" name="rn:R00754" type="reversible">
+        <substrate id="63" name="cpd:C00469"/>
+        <product id="67" name="cpd:C00084"/>
+    </reaction>
+    <reaction id="11" name="rn:R00014" type="irreversible">
+        <substrate id="75" name="cpd:C00068"/>
+        <substrate id="64" name="cpd:C00022"/>
+        <product id="65" name="cpd:C05125"/>
+    </reaction>
+    <reaction id="12" name="rn:R00014" type="irreversible">
+        <substrate id="75" name="cpd:C00068"/>
+        <substrate id="64" name="cpd:C00022"/>
+        <product id="65" name="cpd:C05125"/>
+    </reaction>
+    <reaction id="13" name="rn:R03270" type="irreversible">
+        <substrate id="62" name="cpd:C15972"/>
+        <substrate id="65" name="cpd:C05125"/>
+        <product id="75" name="cpd:C00068"/>
+        <product id="68" name="cpd:C16255"/>
+    </reaction>
+    <reaction id="14" name="rn:R02569" type="reversible">
+        <substrate id="66" name="cpd:C00024"/>
+        <substrate id="69" name="cpd:C15973"/>
+        <product id="68" name="cpd:C16255"/>
+    </reaction>
+    <reaction id="15" name="rn:R00703" type="reversible">
+        <substrate id="61" name="cpd:C00186"/>
+        <product id="64" name="cpd:C00022"/>
+    </reaction>
+    <reaction id="17" name="rn:R00200" type="irreversible">
+        <substrate id="58" name="cpd:C00074"/>
+        <product id="64" name="cpd:C00022"/>
+    </reaction>
+    <reaction id="19" name="rn:R00658" type="reversible">
+        <substrate id="51" name="cpd:C00631"/>
+        <product id="58" name="cpd:C00074"/>
+    </reaction>
+    <reaction id="20" name="rn:R01518" type="reversible">
+        <substrate id="51" name="cpd:C00631"/>
+        <product id="59" name="cpd:C00197"/>
+    </reaction>
+    <reaction id="21" name="rn:R01061 rn:R01063" type="reversible">
+        <substrate id="90" name="cpd:C00118"/>
+        <product id="60" name="cpd:C00236"/>
+    </reaction>
+    <reaction id="23" name="rn:R01015" type="reversible">
+        <substrate id="90" name="cpd:C00118"/>
+        <product id="54" name="cpd:C00111"/>
+    </reaction>
+    <reaction id="1" name="rn:R01070" type="reversible">
+        <substrate id="70" name="cpd:C05378"/>
+        <product id="54" name="cpd:C00111"/>
+        <product id="90" name="cpd:C00118"/>
+    </reaction>
+    <reaction id="24" name="rn:R04779" type="irreversible">
+        <substrate id="57" name="cpd:C05345"/>
+        <product id="70" name="cpd:C05378"/>
+    </reaction>
+    <reaction id="25" name="rn:R04780" type="irreversible">
+        <substrate id="70" name="cpd:C05378"/>
+        <product id="57" name="cpd:C05345"/>
+    </reaction>
+    <reaction id="26" name="rn:R02738" type="irreversible">
+        <substrate id="49" name="cpd:C00031"/>
+        <product id="56" name="cpd:C00668"/>
+    </reaction>
+    <reaction id="27" name="rn:R02740" type="reversible">
+        <substrate id="56" name="cpd:C00668"/>
+        <product id="57" name="cpd:C05345"/>
+    </reaction>
+    <reaction id="28" name="rn:R00959" type="reversible">
+        <substrate id="50" name="cpd:C00103"/>
+        <product id="56" name="cpd:C00668"/>
+    </reaction>
+    <reaction id="29" name="rn:R03321" type="reversible">
+        <substrate id="55" name="cpd:C01172"/>
+        <product id="57" name="cpd:C05345"/>
+    </reaction>
+    <reaction id="30" name="rn:R01600" type="irreversible">
+        <substrate id="53" name="cpd:C00221"/>
+        <product id="55" name="cpd:C01172"/>
+    </reaction>
+    <reaction id="31" name="rn:R01600" type="irreversible">
+        <substrate id="53" name="cpd:C00221"/>
+        <product id="55" name="cpd:C01172"/>
+    </reaction>
+    <reaction id="32" name="rn:R02739" type="reversible">
+        <substrate id="56" name="cpd:C00668"/>
+        <product id="55" name="cpd:C01172"/>
+    </reaction>
+    <reaction id="33" name="rn:R02739" type="reversible">
+        <substrate id="56" name="cpd:C00668"/>
+        <product id="55" name="cpd:C01172"/>
+    </reaction>
+    <reaction id="34" name="rn:R01602" type="reversible">
+        <substrate id="52" name="cpd:C00267"/>
+        <product id="53" name="cpd:C00221"/>
+    </reaction>
+    <reaction id="35" name="rn:R01786" type="irreversible">
+        <substrate id="52" name="cpd:C00267"/>
+        <product id="56" name="cpd:C00668"/>
+    </reaction>
+    <reaction id="36" name="rn:R01786" type="irreversible">
+        <substrate id="52" name="cpd:C00267"/>
+        <product id="56" name="cpd:C00668"/>
+    </reaction>
+    <reaction id="37" name="rn:R01788" type="irreversible">
+        <substrate id="56" name="cpd:C00668"/>
+        <product id="52" name="cpd:C00267"/>
+    </reaction>
+    <reaction id="38" name="rn:R00947" type="irreversible">
+        <substrate id="50" name="cpd:C00103"/>
+        <product id="52" name="cpd:C00267"/>
+    </reaction>
+    <reaction id="39" name="rn:R00960" type="irreversible">
+        <substrate id="50" name="cpd:C00103"/>
+        <product id="52" name="cpd:C00267"/>
+    </reaction>
+    <reaction id="41" name="rn:R07618" type="reversible">
+        <substrate id="69" name="cpd:C15973"/>
+        <product id="62" name="cpd:C15972"/>
+    </reaction>
+    <reaction id="42" name="rn:R01512" type="reversible">
+        <substrate id="59" name="cpd:C00197"/>
+        <product id="60" name="cpd:C00236"/>
+    </reaction>
+    <reaction id="43" name="rn:R02189" type="irreversible">
+        <substrate id="52" name="cpd:C00267"/>
+        <product id="56" name="cpd:C00668"/>
+    </reaction>
+    <reaction id="44" name="rn:R02187" type="irreversible">
+        <substrate id="53" name="cpd:C00221"/>
+        <product id="55" name="cpd:C01172"/>
+    </reaction>
+    <reaction id="45" name="rn:R05132" type="irreversible">
+        <substrate id="71" name="cpd:C06186"/>
+        <product id="72" name="cpd:C06187"/>
+    </reaction>
+    <reaction id="46" name="rn:R04394" type="irreversible">
+        <substrate id="74" name="cpd:C01451"/>
+        <product id="73" name="cpd:C06188"/>
+    </reaction>
+    <reaction id="47" name="rn:R05133" type="irreversible">
+        <substrate id="72" name="cpd:C06187"/>
+        <product id="55" name="cpd:C01172"/>
+    </reaction>
+    <reaction id="48" name="rn:R05134" type="irreversible">
+        <substrate id="73" name="cpd:C06188"/>
+        <product id="55" name="cpd:C01172"/>
+    </reaction>
+    <reaction id="76" name="rn:R00431 rn:R00726" type="irreversible">
+        <substrate id="77" name="cpd:C00036"/>
+        <product id="58" name="cpd:C00074"/>
+    </reaction>
+    <reaction id="78" name="rn:R05198" type="reversible">
+        <substrate id="63" name="cpd:C00469"/>
+        <product id="67" name="cpd:C00084"/>
+    </reaction>
+    <reaction id="79" name="rn:R00341" type="irreversible">
+        <substrate id="77" name="cpd:C00036"/>
+        <product id="58" name="cpd:C00074"/>
+    </reaction>
+    <reaction id="82" name="rn:R01061 rn:R01063" type="reversible">
+        <substrate id="90" name="cpd:C00118"/>
+        <product id="60" name="cpd:C00236"/>
+    </reaction>
+    <reaction id="83" name="rn:R07159" type="irreversible">
+        <substrate id="90" name="cpd:C00118"/>
+        <product id="59" name="cpd:C00197"/>
+    </reaction>
+    <reaction id="84" name="rn:R01058" type="irreversible">
+        <substrate id="90" name="cpd:C00118"/>
+        <product id="59" name="cpd:C00197"/>
+    </reaction>
+    <reaction id="85" name="rn:R01196" type="reversible">
+        <substrate id="66" name="cpd:C00024"/>
+        <product id="64" name="cpd:C00022"/>
+    </reaction>
+    <reaction id="86" name="rn:R07159" type="irreversible">
+        <substrate id="90" name="cpd:C00118"/>
+        <product id="59" name="cpd:C00197"/>
+    </reaction>
+    <reaction id="88" name="rn:R01516" type="reversible">
+        <substrate id="87" name="cpd:C01159"/>
+        <product id="59" name="cpd:C00197"/>
+    </reaction>
+    <reaction id="89" name="rn:R01662" type="reversible">
+        <substrate id="60" name="cpd:C00236"/>
+        <product id="87" name="cpd:C01159"/>
+    </reaction>
+    <reaction id="91" name="rn:R00235" type="irreversible">
+        <substrate id="5" name="cpd:C00033"/>
+        <product id="66" name="cpd:C00024"/>
+    </reaction>
+</pathway>
