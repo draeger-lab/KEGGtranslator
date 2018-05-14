@@ -1,5 +1,14 @@
 # KEGGtranslator
-A Java-based software for visualizing and translating the KEGG PATHWAY database. Conversion of KGML files into BioPAX, SBML, GraphML, GML, and various other formats.
+
+<img align="right" src="https://github.com/draeger-lab/KEGGtranslator/blob/master/resources/de/zbit/kegg/gui/img/KEGGtranslatorIcon_64.png"/>
+
+**A Java-based software for visualizing and translating the KEGG PATHWAY database. Conversion of KGML files into BioPAX, SBML, GraphML, GML, and various other formats.**
+
+[![License (LGPL version 3)](https://img.shields.io/badge/license-LGPLv3.0-blue.svg?style=plastic)](http://opensource.org/licenses/LGPL-3.0)
+[![Stable version](https://img.shields.io/badge/Stable_version-2.5-brightgreen.svg?style=plastic)](https://github.com/draeger-lab/KEGGtranslator/releases/)
+[![DOI](http://img.shields.io/badge/DOI-10.1093%20%2F%20bioinformatics%20%2F%20btr377-blue.svg?style=plastic)](http://dx.doi.org/10.1093/bioinformatics/btr377)
+
+*Authors:* [Clemens Wrzodek](https://github.com/Clemens82/), [Finja Wrzodek](http://cogsys.cs.uni-tuebingen.de/mitarb/buechel/), [Andreas Zell](https://github.com/ZellTuebingen), Manuel Ruff, [Andreas Dräger](https://github.com/draeger/)
 
 ## Please cite
 
