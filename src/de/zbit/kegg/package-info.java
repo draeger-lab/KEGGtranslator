@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: package-info.java 400 2015-02-01 07:32:30Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/package-info.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -24,6 +24,6 @@
  * Options for its configuration and also the main class that starts the
  * application, either in command-line or graphical mode.
  * 
- * @version $Rev$
+ * @version $Rev: 400 $
  */
 package de.zbit.kegg;

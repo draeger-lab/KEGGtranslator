@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: KEGG2jSBML.java 412 2015-09-21 20:39:51Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/io/KEGG2jSBML.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -88,7 +88,7 @@ import de.zbit.util.objectwrapper.Info;
  * @author Clemens Wrzodek
  * @author Andreas Dr&auml;ger
  * @since 1.0
- * @version $Rev$
+ * @version $Rev: 412 $
  */
 public class KEGG2jSBML extends AbstractKEGGtranslator<SBMLDocument>  {
   

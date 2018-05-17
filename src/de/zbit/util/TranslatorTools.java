@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: TranslatorTools.java 410 2015-09-13 04:49:20Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/util/TranslatorTools.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -67,7 +67,7 @@ import de.zbit.kegg.parser.pathway.EntryType;
  * an unobfuscated release of KEGGtranslator.</i></p>
  * 
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 410 $
  */
 public class TranslatorTools extends GraphTools {
   public static final transient Logger log = Logger.getLogger(TranslatorTools.class.getName());

@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: KEGGtranslatorIOOptions.java 410 2015-09-13 04:49:20Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/io/KEGGtranslatorIOOptions.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -38,7 +38,7 @@ import de.zbit.util.prefs.Range;
  * @author Clemens Wrzodek
  * @date 2011-01-07
  * @since 1.0
- * @version $Rev$
+ * @version $Rev: 410 $
  */
 public interface KEGGtranslatorIOOptions extends KeyProvider {
   

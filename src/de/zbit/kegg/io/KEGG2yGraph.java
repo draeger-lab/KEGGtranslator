@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: KEGG2yGraph.java 410 2015-09-13 04:49:20Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/io/KEGG2yGraph.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -116,7 +116,7 @@ import de.zbit.util.Utils;
  * 
  * @author Clemens Wrzodek
  * @since 1.0
- * @version $Rev$
+ * @version $Rev: 410 $
  */
 public class KEGG2yGraph extends AbstractKEGGtranslator<Graph2D> {
   

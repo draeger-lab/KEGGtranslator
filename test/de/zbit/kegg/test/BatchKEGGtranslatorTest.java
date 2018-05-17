@@ -25,7 +25,7 @@ package de.zbit.kegg.test;
 /**
  * @author Andreas Dr&auml;ger
  * @since 1.0
- * @version $Rev$
+ * @version $Rev: 400 $
  */
 public class BatchKEGGtranslatorTest {
   

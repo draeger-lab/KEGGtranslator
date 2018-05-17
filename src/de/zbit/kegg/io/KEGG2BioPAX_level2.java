@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: KEGG2BioPAX_level2.java 412 2015-09-21 20:39:51Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/io/KEGG2BioPAX_level2.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -80,7 +80,7 @@ import de.zbit.util.Utils;
  * KEGG2BioPAX level 2 converter (also called KGML2BioPAX).
  * 
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 412 $
  */
 public class KEGG2BioPAX_level2 extends KEGG2BioPAX {
   

@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: TranslatorPanelTools.java 410 2015-09-13 04:49:20Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/gui/TranslatorPanelTools.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -34,7 +34,7 @@ import de.zbit.util.prefs.SBPreferences;
 
 /**
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 410 $
  */
 public class TranslatorPanelTools {
   

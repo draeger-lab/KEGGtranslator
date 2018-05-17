@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: TranslatePathwayDialog.java 400 2015-02-01 07:32:30Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/gui/TranslatePathwayDialog.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -50,7 +50,7 @@ import de.zbit.util.prefs.SBProperties;
  * format to create a new {@link TranslatorPanel}.
  * 
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 400 $
  */
 public class TranslatePathwayDialog extends JPanel {
   private static final long serialVersionUID = 6884078022042984336L;

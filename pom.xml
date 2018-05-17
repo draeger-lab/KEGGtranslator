@@ -1,0 +1,290 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.zbit</groupId>
+  <artifactId>KEGGtranslator</artifactId>
+  
+  <!-- Output to jar format -->
+  <packaging>jar</packaging>
+
+
+  <!-- =================================================================== -->
+  <!-- General project information                                         -->
+  <!-- =================================================================== -->
+
+  <name>${project.artifactId}</name>
+  <version>2.6</version>
+  <url>https://github.com/cogsys-tuebingen/KEGGtranslator/</url>
+  <description>KEGGtranslator is an easy-to-use stand-alone application that can visualize and convert files in the KEGG PATHWAY database format (KGML formatted XML-files) into multiple output formats. Unlike other translators, KEGGtranslator supports a plethora of output formats, is able to augment the information in translated documents (e.g., MIRIAM annotations) beyond the scope of the KGML document, and amends missing components to fragmentary reactions within the pathway to allow simulations on those. KEGGtranslator converts KEGG files (KGML formatted XML-files) to SBML, BioPAX, SIF, SBGN, SBML-qual, GML, GraphML, JPG, GIF, LaTeX, etc. KEGG pathways can be obtained from within the application.</description>
+  <inceptionYear>2010</inceptionYear>
+
+  <properties>
+    <jdk.version>1.6</jdk.version>
+    <maven.build.timestamp.format>yyyy</maven.build.timestamp.format>
+    <year>${maven.build.timestamp}</year><!-- This property is used for filtering the variable ${year} in some resource files -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</project.license.url>
+    <junit.version>4.11</junit.version>
+    <paxtools.version>4.3.1</paxtools.version>
+    <y.version>2.8</y.version>
+  </properties>
+
+  <organization>
+    <name>Center for Bioinformatics Tuebingen (ZBIT)</name>
+    <url>http://www.zbit.uni-tuebingen.de</url>
+  </organization>
+  
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/cogsys-tuebingen/KEGGtranslator/issues</url>
+  </issueManagement>
+    
+  <licenses>
+    <license>
+      <name>LGPL Version 3</name>
+      <url>${project.license.url}</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
+  <developers>
+    <developer>
+      <name>Andreas Dräger</name>
+      <email>andreas.draeger@uni-tuebingen.de</email>
+      <url>https://github.com/draeger</url>
+      <id>draeger</id>
+      <organization>University of Tuebingen</organization>
+      <organizationUrl>http://www.cogsys.cs.uni-tuebingen.de</organizationUrl>
+      <timezone>Europe/Berlin</timezone>
+      <roles>
+        <role>developer</role>
+        <role>tester</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Clemens Wrzodek</name>
+      <email>clemens@germancafe.de</email>
+      <!--<id>wrzodek</id>-->
+      <organization>University of Tuebingen</organization>
+      <organizationUrl>http://www.cogsys.cs.uni-tuebingen.de</organizationUrl>
+      <timezone>Europe/Berlin</timezone>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Andreas Zell</name>
+      <email>andreas.zell@uni-tuebingen.de</email>
+      <!--<id>zell</id>-->
+      <organization>University of Tuebingen</organization>
+      <organizationUrl>http://www.cogsys.cs.uni-tuebingen.de</organizationUrl>
+      <timezone>Europe/Berlin</timezone>
+      <roles>
+        <role>coordinator</role>
+      </roles>
+    </developer>
+  </developers>
+  
+
+  <!-- =================================================================== -->
+  <!-- Dependencies                                                        -->
+  <!-- =================================================================== -->
+  
+  <dependencies>
+    <!-- 
+      MAVEN commands to update or install Non-MAVEN JAR files are given where
+      needed. Just modify and run the command. Make sure JAVA_HOME is correctly
+      configured before executing. Otherwise, MAVEN will throw an error. E.g.
+      export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_66.jdk/Contents/Home/
+    -->
+    <dependency>
+      <groupId>axis</groupId>
+      <artifactId>axis</artifactId>
+      <version>1.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-discovery</groupId>
+      <artifactId>commons-discovery</artifactId>
+      <version>0.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.rpc</groupId>
+      <artifactId>javax.xml.rpc-api</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <!-- mvn install:install-file -Dfile=/path/to/jsbml.jar -DgroupId=org.sbml -DartifactId=JSBML -Dversion=REVISION_NUMBER -Dpackaging=jar -->
+      <groupId>org.sbml</groupId>
+      <artifactId>JSBML</artifactId>
+      <version>2422</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- mvn install:install-file -Dfile=/path/to/sbgn.jar -DgroupId=org.sbgn -DartifactId=libSBGN -Dversion=VERSION_NUMBER -Dpackaging=jar -->
+      <groupId>org.sbgn</groupId>
+      <artifactId>libSBGN</artifactId>
+      <version>0.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+	  <groupId>org.biopax.paxtools</groupId>
+	  <artifactId>paxtools-trove</artifactId>
+	  <version>${paxtools.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.biopax.paxtools</groupId>
+      <artifactId>sif-converter</artifactId>
+      <version>${paxtools.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <!-- mvn install:install-file -Dfile=/path/to/quaqua-filechooser-only.jar -DgroupId=ch.randelshofer -DartifactId=quaqua-filechooser-only -Dversion=VERSION_NUMBER -Dpackaging=jar -->
+      <groupId>ch.randelshofer</groupId>
+      <artifactId>quaqua-filechooser-only</artifactId>
+      <version>8.0</version>
+      <optional>true</optional>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- mvn install:install-file -Dfile=/path/to/SBML2LaTeX_v1.0_slim.jar -DgroupId=org.sbml -DartifactId=SBML2LaTeX -Dversion=VERSION_NUMBER -Dpackaging=jar -->
+      <groupId>org.sbml</groupId>
+      <artifactId>SBML2LaTeX</artifactId>
+      <version>1.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <!-- mvn install:install-file -Dfile=/path/to/sysbio.jar -DgroupId=de.zbit -DartifactId=SysBio -Dversion=REVISION_NUMBER -Dpackaging=jar -->
+      <groupId>de.zbit</groupId>
+      <artifactId>SysBio</artifactId>
+      <version>1382</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>wsdl4j</groupId>
+      <artifactId>wsdl4j</artifactId>
+      <version>1.6.3</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <!-- mvn install:install-file -Dfile=/path/to/y.jar -DgroupId=y -DartifactId=y -Dversion=VERSION_NUMBER -Dpackaging=jar -->
+      <groupId>y</groupId>
+      <artifactId>y</artifactId>
+      <version>${y.version}</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+
+  <!-- =================================================================== -->
+  <!-- Building                                                            -->
+  <!-- =================================================================== -->
+  
+  <!-- To build the project run: -->
+  <!-- mvn clean compile package assembly:single -->
+  
+  <build>
+  
+    <finalName>${project.artifactId}-${project.version}</finalName>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
+    
+    <resources>
+      <resource>
+        <directory>resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    
+    <pluginManagement>
+    
+      <plugins>
+      
+        <!-- Download source code in Eclipse, best practice [OPTIONAL!] -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.9</version>
+          <configuration>
+            <downloadSources>true</downloadSources>
+            <downloadJavadocs>false</downloadJavadocs>
+          </configuration>
+        </plugin>
+        
+        <!-- Set a JDK compiler level -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.3</version>
+          <configuration>
+            <source>${jdk.version}</source>
+            <target>${jdk.version}</target>
+          </configuration>
+        </plugin>
+        
+        <!-- Assemble executable JAR -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.5.5</version>
+          <configuration>
+            <archive>
+              <manifest>
+                <addClasspath>true</addClasspath>
+                <mainClass>de.zbit.kegg.Translator</mainClass>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              </manifest>
+              <manifestEntries>
+                <SplashScreen-Image>de/zbit/kegg/gui/img/Logo.gif</SplashScreen-Image>
+              </manifestEntries>
+            </archive>
+            <descriptorRefs>
+              <descriptorRef>jar-with-dependencies</descriptorRef>
+            </descriptorRefs>
+            <finalName>${project.artifactId}-${project.version}</finalName>
+            <appendAssemblyId>false</appendAssemblyId>
+            <descriptor>assembly.xml</descriptor> <!-- Details of the assembly are described in this file -->
+          </configuration>
+          <executions>
+            <execution>
+              <id>make-assembly</id> <!-- this is used for inheritance merges -->
+              <phase>package</phase> <!-- bind to the packaging phase -->
+              <goals>
+                <!-- This will create a JAR with all dependencies -->
+                <!-- mvn clean compile assembly:single -->
+                <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      
+      </plugins>
+      
+    </pluginManagement>
+  
+  </build>
+  
+</project>

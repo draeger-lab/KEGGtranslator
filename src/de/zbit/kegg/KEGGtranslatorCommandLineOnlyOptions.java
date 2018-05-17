@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: KEGGtranslatorCommandLineOnlyOptions.java 400 2015-02-01 07:32:30Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/KEGGtranslatorCommandLineOnlyOptions.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -30,7 +30,7 @@ import de.zbit.util.prefs.Range;
  * Options for KEGGtranslator that are supposed only for
  * the command-line.
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 400 $
  */
 public interface KEGGtranslatorCommandLineOnlyOptions extends KeyProvider {
   

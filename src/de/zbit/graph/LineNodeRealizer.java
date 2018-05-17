@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: LineNodeRealizer.java 402 2015-02-03 20:22:57Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/graph/LineNodeRealizer.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -39,7 +39,7 @@ import y.view.ShapeNodeRealizer;
  * {@link #addSplineCoords(int, int)} as absolute
  * coordinates!
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 402 $
  */
 public class LineNodeRealizer extends ShapeNodeRealizer {
   

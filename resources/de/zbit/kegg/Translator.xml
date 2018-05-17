@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <!-- 
- * $Id$
- * $URL$
+ * $Id: Translator.xml 400 2015-02-01 07:32:30Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/resources/de/zbit/kegg/Translator.xml $
  *********************************************************************** 
  * This file is part of KEGGtranslator;a program to convert KGML files
  * from the KEGG database into various other formats;e.g.;SBML;GML,
@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
  ***********************************************************************
  *
- * Version: $Rev$
+ * Version: $Rev: 400 $
 -->
 <properties>
   <comment>

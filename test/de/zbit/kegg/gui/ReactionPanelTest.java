@@ -42,7 +42,7 @@ import de.zbit.sbml.gui.ReactionPanel;
 /**
  * @author Andreas Dr&auml;ger
  * @since 1.0
- * @version $Rev$
+ * @version $Rev: 410 $
  */
 public class ReactionPanelTest {
   

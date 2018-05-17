@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: KEGG2BioPAX.java 412 2015-09-21 20:39:51Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/io/KEGG2BioPAX.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -106,7 +106,7 @@ import de.zbit.util.objectwrapper.ValuePair;
  * BioPAX level 3 code.
  * 
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 412 $
  */
 public abstract class KEGG2BioPAX extends AbstractKEGGtranslator<Model> {
   public static final transient Logger log = Logger.getLogger(KEGG2BioPAX.class.getName());

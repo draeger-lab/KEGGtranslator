@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: TranslatorBioPAXPanel.java 400 2015-02-01 07:32:30Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/gui/TranslatorBioPAXPanel.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -46,7 +46,7 @@ import de.zbit.kegg.parser.pathway.Pathway;
  * This panel uses the BioPAX2SBML Converter to visualize BioPAX content.
  * 
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 400 $
  */
 public class TranslatorBioPAXPanel extends TranslatorGraphLayerPanel<Model> {
   

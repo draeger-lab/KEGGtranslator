@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: MinAndMaxTracker.java 402 2015-02-03 20:22:57Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/graph/MinAndMaxTracker.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -26,7 +26,7 @@ package de.zbit.graph;
  * of nodes.
  * 
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 402 $
  */
 public class MinAndMaxTracker {
   

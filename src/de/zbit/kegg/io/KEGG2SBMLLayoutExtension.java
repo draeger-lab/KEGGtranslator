@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: KEGG2SBMLLayoutExtension.java 410 2015-09-13 04:49:20Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/io/KEGG2SBMLLayoutExtension.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -55,7 +55,7 @@ import de.zbit.util.Utils;
 /**
  * Add support for the layout extension to SBML translations.
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 410 $
  */
 public class KEGG2SBMLLayoutExtension {
   private static final transient Logger log = Logger.getLogger(KEGG2SBMLLayoutExtension.class.getName());

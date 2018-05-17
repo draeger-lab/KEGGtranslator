@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: TranslatorGraphPanel.java 400 2015-02-01 07:32:30Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/gui/TranslatorGraphPanel.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -40,7 +40,7 @@ import de.zbit.util.NotifyingWorker;
  * graphs.
  * 
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 400 $
  */
 public class TranslatorGraphPanel extends TranslatorGraphLayerPanel<Graph2D> {
   private static final long serialVersionUID = -1083637150034491451L;

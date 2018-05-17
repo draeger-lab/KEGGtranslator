@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: KEGGImporter.java 405 2015-02-12 10:32:23Z roemer $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/kegg/io/KEGGImporter.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -38,7 +38,7 @@ import de.zbit.util.progressbar.AbstractProgressBar;
  * and translations to destination formats.
  * 
  * @author Clemens Wrzodek
- * @version $Rev$
+ * @version $Rev: 405 $
  */
 public class KEGGImporter extends NotifyingWorker<Object> {
   /**

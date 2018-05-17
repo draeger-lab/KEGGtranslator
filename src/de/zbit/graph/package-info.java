@@ -1,6 +1,6 @@
 /*
- * $Id$
- * $URL$
+ * $Id: package-info.java 400 2015-02-01 07:32:30Z draeger $
+ * $URL: https://rarepos.cs.uni-tuebingen.de/svn/KEGGconverter/trunk/src/de/zbit/graph/package-info.java $
  * ---------------------------------------------------------------------
  * This file is part of KEGGtranslator, a program to convert KGML files
  * from the KEGG database into various other formats, e.g., SBML, GML,
@@ -23,7 +23,7 @@
  * The graph package of KEGGtranslator, which contains yFiles related classes
  * that contain the view, look and feel or also functions and tools for graphs.
  * 
- * @version $Rev$
+ * @version $Rev: 400 $
  */
 package de.zbit.graph;
 
