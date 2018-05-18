@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ * $Id$
+ * $URL$
+ *
+ * This file is part of KEGGtranslator, a program to convert KGML files
+ * from the KEGG database into various other formats, e.g., SBML, GML,
+ * GraphML, and many more. Please visit the project homepage at
+ * http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator to
+ * obtain the latest version of KEGGtranslator.
+ *
+ * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ *
+ * KEGGtranslator is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
+ *
+ * Version: $Rev$
+-->
+<Gadget>
+  <UUID>[GADGET_UUID]</UUID>
+  <Name>[GADGET_NAME]</Name>
+  <LaunchCommand>cmd /c start javaw.exe -Xms6G -Xmx6G -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommand>
+  <LaunchCommandWin>cmd /c start javaw.exe -Xms6G -Xmx6G -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandWin>
+  <LaunchCommandMac>java -Xms6G -Xmx6G -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandMac>
+  <LaunchCommandLinux>java -Xms6G -Xmx6G -jar "gadgets/[GADGET_UUID]/[JAR_NAME]"</LaunchCommandLinux>
+  <IconPaths>
+    <Icon32Path>icons/KEGGtranslatorIcon_64.png</Icon32Path>
+  </IconPaths>
+  <Snapshots>
+    <SnapshotPath>snapshot/Screenshot_1.png</SnapshotPath>
+    <SnapshotPath>snapshot/Screenshot_2.png</SnapshotPath>
+    <SnapshotPath>snapshot/Screenshot_3.png</SnapshotPath>
+    <SnapshotPath>snapshot/Screenshot_4.png</SnapshotPath>
+  </Snapshots>
+  <Categories>
+    <Category>KEGG</Category>
+    <Category>Pathways</Category>
+    <Category>Pathway modeling</Category>
+    <Category>Qualitative modeling</Category>
+    <Category>Converter</Category>
+    <Category>Database</Category>
+    <Category>Visualization</Category>
+    <Category>Annotation</Category>
+  </Categories>
+  <Provider>University of Tuebingen</Provider>
+  <Description>KEGGtranslator is an easy-to-use stand-alone application that can visualize and convert pathway-based information from the KEGG PATHWAY database into multiple output formats. KEGGtranslator supports a plethora of output formats, is able to augment the information in translated documents (e.g., MIRIAM annotations) beyond the scope of the KGML document, and amends missing components to fragmentary reactions within the pathway to allow simulations on those. KEGGtranslator converts KEGG files (KGML-formatted XML-files) to SBML, BioPAX, SIF, SBGN, SBML-qual, GML, GraphML, JPG, GIF etc. KEGG pathways can be obtained from within the application.</Description>
+  <LoadableKeys>
+    <InputFileFormat>
+      <FileExtension>xml</FileExtension>
+      <FileFormat>KGML</FileFormat>
+    </InputFileFormat>
+    <InputFileFormat>
+      <FileExtension>xml</FileExtension>
+      <FileFormat>kgml</FileFormat>
+    </InputFileFormat>
+    <InputFileFormat>
+      <FileExtension>kgml</FileExtension>
+      <FileFormat>KGML</FileFormat>
+    </InputFileFormat>
+    <InputFileFormat>
+      <FileExtension>kgml</FileExtension>
+      <FileFormat>kgml</FileFormat>
+    </InputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>sbml</FileExtension>
+      <FileFormat>SBML</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>sbml</FileExtension>
+      <FileFormat>sbml</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>xml</FileExtension>
+      <FileFormat>SBML</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>xml</FileExtension>
+      <FileFormat>sbml</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>sbgn</FileExtension>
+      <FileFormat>SBGN</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>sbgn</FileExtension>
+      <FileFormat>sbgn</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>xml</FileExtension>
+      <FileFormat>SBGN</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>xml</FileExtension>
+      <FileFormat>sbgn</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>bp2</FileExtension>
+      <FileFormat>BioPAX</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>bp2</FileExtension>
+      <FileFormat>biopax</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>bp3</FileExtension>
+      <FileFormat>BioPAX</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>bp3</FileExtension>
+      <FileFormat>biopax</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>owl</FileExtension>
+      <FileFormat>BioPAX</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>owl</FileExtension>
+      <FileFormat>biopax</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>xml</FileExtension>
+      <FileFormat>BioPAX</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>xml</FileExtension>
+      <FileFormat>biopax</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>sif</FileExtension>
+      <FileFormat>SIF</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>sif</FileExtension>
+      <FileFormat>sif</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>graphml</FileExtension>
+      <FileFormat>GraphML</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>graphml</FileExtension>
+      <FileFormat>graphml</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>gml</FileExtension>
+      <FileFormat>GML</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>gml</FileExtension>
+      <FileFormat>gml</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>jpg</FileExtension>
+      <FileFormat>JPG</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>jpg</FileExtension>
+      <FileFormat>jpg</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>jpeg</FileExtension>
+      <FileFormat>JPEG</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>jpeg</FileExtension>
+      <FileFormat>jpeg</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>gif</FileExtension>
+      <FileFormat>GIF</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>gif</FileExtension>
+      <FileFormat>gif</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>tgf</FileExtension>
+      <FileFormat>TGF</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>tgf</FileExtension>
+      <FileFormat>tgf</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>ygf</FileExtension>
+      <FileFormat>YGF</FileFormat>
+    </OutputFileFormat>
+    <OutputFileFormat>
+      <FileExtension>ygf</FileExtension>
+      <FileFormat>ygf</FileFormat>
+    </OutputFileFormat>
+  </LoadableKeys>
+  <LaunchEnv>
+    <Id>f22aa6a2-beff-4487-b838-03b8275a4361</Id>
+  </LaunchEnv>
+</Gadget>

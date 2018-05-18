@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ * $Id$
+ * $URL$
+ * =================================================================== 
+ * This file is part of KEGGtranslator, a program to convert KGML files
+ * from the KEGG database into various other formats, e.g., SBML, GML,
+ * GraphML, and many more. Please visit the project homepage at
+ * http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/ to
+ * obtain the latest version of KEGGtranslator.
+ *
+ * Copyright (C) 2011-2014 by the University of Tuebingen, Germany.
+ *
+ * KEGGtranslator is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation. A copy of the license
+ * agreement is provided in the file named "LICENSE.txt" included with
+ * this software distribution and also available online as
+ * http://www.gnu.org/licenses/lgpl-3.0-standalone.html.
+ * ===================================================================
+ *
+ * JNLP File for KEGGtranslator: Java(TM) Web Start launcher.
+ *
+ * Authors: Clemens Wrzodek and Andreas Dröger
+ * Version: $Rev$
+-->
+<jnlp spec="6.0+" codebase="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/" href="kgtrans.jnlp">
+   <information>
+    <title>KEGGtranslator</title>
+    <vendor>University of Tuebingen</vendor>
+    <description kind="short">KEGGtranslator</description>
+    <description>Precise generation of systems biology models from KEGG pathways</description>
+    <homepage href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/downloads/"/>
+    <icon href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/images/KEGGtranslatorIcon_48.png"/> 
+    <icon kind="shortcut" href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/images/KEGGtranslatorIcon_48.png" width="16" height="16"/>
+    <icon kind="splash" href="http://www.cogsys.cs.uni-tuebingen.de/software/KEGGtranslator/images/splash.gif"/> 
+    <offline-allowed/>
+  </information>
+ <resources>
+    <j2se version="1.6+" initial-heap-size="64m" max-heap-size ="256m" java-vm-args="-splash:bin/de/zbit/kegg/gui/img/Logo.gif" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="[JAR_NAME]" main="true"/>
+ </resources>
+  <security>
+    <all-permissions/>
+  </security>
+ <application-desc main-class="de.zbit.kegg.Translator"/>
+</jnlp>

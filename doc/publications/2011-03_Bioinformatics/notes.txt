@@ -1,0 +1,22 @@
+Publizieren in Oxford Bioinformatics
+
+- KEGG translator
+- SBML & GraphML
+- jSBML Vorteile hervorheben
+- Abrenzung zu anderen Convertern (Reactions vervollständigung, mehr als nur SBML,...)
+- auch gml export (und weitere yFiles formate prüfen)
+- API, webservice, stand-alone anbieten
+- yFiles obfuscating rules beachten!
+- Alle unterstützen MIRIAM identifier aufzählen
+- Notes erwähnen (sehr umfangreich mit bild, etc.)
+
+- Für Webservice: KGML downloaden und bereithalten.
+- Wir dürfen (und sollten) Jochens pathway visualizer mit-verwenden (und mit-publizieren?)
+
+- Geplante Erweiterung: libSBGN Anbindung (SBML => Funktional || SBGN => Grafische erweiterung, deshalb für relations geeignet).
+
+
+Lizenz:
+- Standard: GPL wegen HotEQ & to-LaTeX_dependencies
+- Abgespeckte Version ohne toLatex und HotEQ: L-GPL v3
+- Webservice: L-GPL v3
