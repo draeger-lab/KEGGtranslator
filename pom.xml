@@ -25,7 +25,7 @@
     <year>${maven.build.timestamp}</year><!-- This property is used for filtering the variable ${year} in some resource files -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</project.license.url>
-    <junit.version>4.11</junit.version>
+    <junit.version>4.13.1</junit.version>
     <paxtools.version>4.3.1</paxtools.version>
     <y.version>2.8</y.version>
     <sbgn.version>0.2</sbgn.version>
