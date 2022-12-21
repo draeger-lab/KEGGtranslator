@@ -56,13 +56,13 @@
   <files>
     <file>
       <outputDirectory>/</outputDirectory>  
-      <source>../README.md</source>
+      <source>README.md</source>
       <fileMode>0644</fileMode>
       <filtered>true</filtered>
     </file>
     <file>
       <outputDirectory>/</outputDirectory>
-      <source>../LICENSE</source>
+      <source>LICENSE</source>
       <fileMode>0644</fileMode>
       <filtered>true</filtered>
     </file>

@@ -28,6 +28,8 @@
     <junit.version>4.11</junit.version>
     <paxtools.version>4.3.1</paxtools.version>
     <y.version>2.8</y.version>
+    <sbgn.version>0.2</sbgn.version>
+    <quaqua.version>9</quaqua.version>
   </properties>
 
   <organization>
@@ -37,7 +39,7 @@
   
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/cogsys-tuebingen/KEGGtranslator/issues</url>
+    <url>https://github.com/draeger-lab/KEGGtranslator/issues</url>
   </issueManagement>
     
   <licenses>
@@ -87,6 +89,19 @@
     </developer>
   </developers>
   
+  <!-- =================================================================== -->
+  <!-- Repositories -->
+  <!-- =================================================================== -->
+
+  <repositories>
+    <!-- Local libraries are an in-project repository -->
+    <!-- Add the dependencies and put them in -->
+    <!-- ${project.basedir}/lib/groupId/artifactId/version/ -->
+    <repository>
+      <id>libs</id>
+      <url>file://${project.basedir}/lib</url>
+    </repository>
+  </repositories>
 
   <!-- =================================================================== -->
   <!-- Dependencies                                                        -->
@@ -129,11 +144,9 @@
       <version>1.1</version>
     </dependency>
     <dependency>
-      <!-- mvn install:install-file -Dfile=/path/to/jsbml.jar -DgroupId=org.sbml -DartifactId=JSBML -Dversion=REVISION_NUMBER -Dpackaging=jar -->
-      <groupId>org.sbml</groupId>
-      <artifactId>JSBML</artifactId>
-      <version>2422</version>
-      <scope>compile</scope>
+      <groupId>org.sbml.jsbml</groupId>
+      <artifactId>jsbml</artifactId>
+      <version>1.3.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -143,9 +156,9 @@
     </dependency>
     <dependency>
       <!-- mvn install:install-file -Dfile=/path/to/sbgn.jar -DgroupId=org.sbgn -DartifactId=libSBGN -Dversion=VERSION_NUMBER -Dpackaging=jar -->
-      <groupId>org.sbgn</groupId>
-      <artifactId>libSBGN</artifactId>
-      <version>0.2</version>
+      <groupId>org</groupId>
+      <artifactId>sbgn</artifactId>
+      <version>${sbgn.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -161,10 +174,9 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <!-- mvn install:install-file -Dfile=/path/to/quaqua-filechooser-only.jar -DgroupId=ch.randelshofer -DartifactId=quaqua-filechooser-only -Dversion=VERSION_NUMBER -Dpackaging=jar -->
       <groupId>ch.randelshofer</groupId>
-      <artifactId>quaqua-filechooser-only</artifactId>
-      <version>8.0</version>
+      <artifactId>quaqua</artifactId>
+      <version>${quaqua.version}</version>
       <optional>true</optional>
       <scope>runtime</scope>
     </dependency>
@@ -173,14 +185,16 @@
       <groupId>org.sbml</groupId>
       <artifactId>SBML2LaTeX</artifactId>
       <version>1.0</version>
-      <scope>compile</scope>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/SBML2LaTeX-1.0.jar</systemPath>
     </dependency>
     <dependency>
       <!-- mvn install:install-file -Dfile=/path/to/sysbio.jar -DgroupId=de.zbit -DartifactId=SysBio -Dversion=REVISION_NUMBER -Dpackaging=jar -->
       <groupId>de.zbit</groupId>
       <artifactId>SysBio</artifactId>
       <version>1382</version>
-      <scope>compile</scope>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/SysBio-1382.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>wsdl4j</groupId>
@@ -193,7 +207,8 @@
       <groupId>y</groupId>
       <artifactId>y</artifactId>
       <version>${y.version}</version>
-      <scope>compile</scope>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/lib/y.jar</systemPath>
     </dependency>
   </dependencies>
 
@@ -277,6 +292,92 @@
                 <!-- mvn clean compile assembly:single -->
                 <goal>single</goal>
               </goals>
+            </execution>
+          </executions>
+        </plugin>
+        
+        <plugin>
+          <!-- https://gist.github.com/mikroskeem/8a6ecaa21742ee18686fc07563b6459a -->
+	      <artifactId>maven-antrun-plugin</artifactId>
+	      <version>1.8</version>
+	      <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <tasks>
+                  <property refid="maven.compile.classpath" name="mvn.classpath"></property>
+                  <taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="lib/yguard.jar"/>
+                    <yguard>
+                      <inoutpair
+                        in="${project.build.directory}/${project.build.finalName}.jar"
+                        out="${project.build.directory}/${project.build.finalName}.jar"/>
+                        <rename logfile="${project.build.directory}/yguard.log.xml" replaceClassNameStrings="true">
+                          <property name="obfuscation-prefix" value="new.target.package"/>
+                            <keep>
+                              <package>
+                                <patternset>
+                                  <include name="ch.**.*"/>
+                                  <include name="com.**.*"/>
+                                  <include name="cz.**.*"/>
+                                  <include name="de.**.*"/>
+                                  <include name="javax.**.*"/>
+                                  <include name="jp.sbi.**.*"/>
+                                  <include name="net.**.*"/>
+                                  <include name="org.**.*"/>
+                                  </patternset>
+                                </package>
+                              <class classes="private" methods="private" fields="private">
+                                <patternset>
+                                  <!-- Do not obfuscate anything, by default -->
+                                  <include name="**.*"/>
+
+                                  <!-- Obfuscate all classes that make use of y.jar -->
+                                  <exclude name="de.zbit.kegg.gui.TranslatorPanel"/>
+
+                                  <exclude name="de.zbit.kegg.ext.GenericDataMap"/>
+    
+                                  <exclude name="de.zbit.kegg.io.KEGG2yGraph"/>
+                                  <exclude name="de.zbit.kegg.io.YFilesWriter"/>
+    
+                                  <exclude name="de.zbit.graph.GraphTools"/>
+                                  <exclude name="de.zbit.graph.PartialElementsMarkers"/>
+                                  <exclude name="de.zbit.graph.CollapseGroupNodesViewMode"/>
+                                  <exclude name="de.zbit.graph.RestrictedEditMode"/>
+                                  <exclude name="de.zbit.graph.RestrictedEditModeV2"/>
+                                  <exclude name="de.zbit.graph.SearchSupport"/>
+                                  <exclude name="de.zbit.graph.StackingNodeLayout"/>
+    
+                                  <exclude name="de.zbit.graph.gui.LayoutGraphPanel"/>
+                                  <exclude name="de.zbit.graph.gui.TranslatorGraphLayerPanel"/>
+                                  <exclude name="de.zbit.graph.gui.TranslatorSBMLgraphPanel"/>
+    
+                                  <exclude name="de.zbit.graph.gui.options.*"/>
+    
+                                  <exclude name="de.zbit.graph.io.*"/>
+                                  <exclude name="de.zbit.graph.io.def.GenericDataMap"/>
+                                  <exclude name="de.zbit.graph.io.def.SBGNVisualizationProperties"/>
+    
+                                  <exclude name="de.zbit.graph.sbgn.*"/>
+    
+                                  <exclude name="de.zbit.sbml.layout.y.*"/>
+    
+                                  <exclude name="de.zbit.util.TranslatorTools"/>
+    
+                                  <!-- Obfuscate the included y.jar -->
+                                  <exclude name="y.**.*"/>
+                                </patternset>
+                              </class>
+                            </keep>
+                          </rename>
+                        <externalclasses>
+                      <pathelement path="${mvn.classpath}"/>
+                    </externalclasses>
+                  </yguard>
+                </tasks>
+              </configuration>
             </execution>
           </executions>
         </plugin>
