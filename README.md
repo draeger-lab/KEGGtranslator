@@ -10,6 +10,10 @@
 
 *Authors:* [Clemens Wrzodek](https://github.com/Clemens82/), [Finja Wrzodek](http://cogsys.cs.uni-tuebingen.de/mitarb/buechel/), [Andreas Zell](https://github.com/ZellTuebingen), Manuel Ruff, [Andreas Dräger](https://github.com/draeger/)
 
+## Download
+
+Latest versions of KEGGtranslator are available under [Releases](https://github.com/draeger-lab/KEGGtranslator/releases).
+
 ## Please cite
 
 1. Clemens Wrzodek. Inference and integration of biochemical networks with multilayered omics data. PhD thesis, University of Tuebingen, Tübingen, Germany, June 2013. [ [link](http://www.dr.hut-verlag.de/978-3-8439-1116-0.html) ]
